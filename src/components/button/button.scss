@@ -1,0 +1,110 @@
+.action-button {
+  .p-button {
+    color: white;
+    border-color: var(--bko-color-primary);
+    background-color: var(--bko-color-primary);
+  }
+}
+
+.reset-button {
+  .p-button {
+    color: white;
+    border-color: var(--bko-color-secondary);
+    background-color: var(--bko-color-secondary);
+  }
+}
+
+.trasparent-button {
+  .p-button {
+    color: white;
+    border-color: transparent;
+    background-color: transparent;
+  }
+}
+
+.trasparent-danger-button {
+  .p-button {
+    color: red;
+    border-color: transparent;
+    background-color: transparent;
+  }
+}
+
+.div-button {
+  display: flex;
+  border-radius: 20px;
+
+  &.invisible {
+    display: none;
+  }
+
+  button {
+    width: 12rem;
+    &.compact {
+      width: fit-content;
+    }
+  }
+}
+
+.div-icon-label-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+
+  &.row {
+    flex-direction: row;
+  }
+
+  &.column {
+    flex-direction: column;
+  }
+
+  &.compact {
+    width: fit-content;
+  }
+
+  // stato base (non compatto)
+  &:not(.compact) {
+    width: 100%;
+  }
+}
+
+.icon-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.span-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.table-add-button {
+  .p-button {
+    width: 100%;
+    color: white;
+    border: 1px dashed white;
+    background-color: transparent;
+    .div-icon-label-button {
+      justify-content: flex-start !important; /* sposta il contenuto a sinistra */
+      text-align: left !important;
+    }
+  }
+}
+
+.table-button {
+  .p-button {
+    color: white;
+    background-color: var(--bko-color-background);
+    border-color: var(--bko-color-border-button-table);
+  }
+}
+
+.p-button:focus {
+  box-shadow: 0 0 0 1px var(--bko-color-primary) !important;
+}

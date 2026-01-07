@@ -1,0 +1,20 @@
+.p-menu .menu-item-danger div a span {
+  color: red !important;
+}
+
+.p-overlaypanel:before,
+.p-overlaypanel:after {
+  display: none !important;
+  content: none !important;
+  border: 0 !important;
+}
+
+.p-overlaypanel {
+  border: none;
+  width: 8.375rem;
+}
+
+.p-menu.p-component.p-ripple-disabled {
+  background-color: var(--bko-color-overlay-menu);
+  border: none;
+}

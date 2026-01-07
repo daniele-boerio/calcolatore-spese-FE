@@ -1,0 +1,46 @@
+// src/styles/_variables.scss
+
+// Colori
+// src/styles/_variables.scss
+
+// 1. Definiamo i colori che NON cambiano (es. il blu primario)
+$primary: #007bff;
+$mobile: 480px;
+$radius: 0.75rem;
+
+// 2. Creiamo una struttura per i colori che cambiano
+:root {
+  // Tema Chiaro (Default)
+  --bg-app: #f4f7f6;
+  --bg-card: #ffffff;
+  --text-main: #333333;
+  --text-muted: #666666;
+  --border-color: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    // Tema Scuro
+    --bg-app: #121212;      // Sfondo molto scuro
+    --bg-card: #1e1e1e;     // Grigio antracite per i contenitori
+    --text-main: #f0f0f0;   // Bianco sporco
+    --text-muted: #b0b0b0;  // Grigio chiaro per sottotitoli
+    --border-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Mappiamo le variabili SCSS a quelle CSS per usarle comodamente
+$bg-app: var(--bg-app);
+$bg-card: var(--bg-card);
+$text-dark: var(--text-main);
+$text-light: var(--text-muted);
+
+// Bordi e Ombre
+$radius: 0.75rem;
+$shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
+
+// Breakpoints per il responsive
+$mobile: 480px;
+$tablet: 768px;

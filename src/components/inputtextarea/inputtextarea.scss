@@ -1,0 +1,30 @@
+/* Contenitore principale */
+.div-inputtextarea {
+  border-bottom: 1px solid var(--bko-color-tertiary);
+}
+
+/* Wrapper interno input + icone */
+.div-div-inputtextarea {
+  display: flex;
+  align-items: center;
+}
+
+/* Icone */
+.icon-inputtextarea {
+  margin-right: 0.5rem;
+  margin-left: 0.5rem;
+}
+
+/* Input primereact */
+.p-inputtextarea {
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  font-size: 1rem;
+}
+
+/* Label normale sopra input */
+.label-inputtextarea {
+  margin: 0 0 0.25rem 0;
+}
