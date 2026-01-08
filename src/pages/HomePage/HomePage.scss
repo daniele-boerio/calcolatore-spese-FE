@@ -1,0 +1,83 @@
+@import "../../styles/variables";
+
+.auth-page-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1rem; 
+}
+
+.auth-container {
+  background: var(--bg-card);
+  padding: 2.5rem; 
+  width: 100%;
+  max-width: 28.125rem; 
+  border-radius: $radius;
+  // Ombra convertita in rem per scalare con il box
+  box-shadow: 0 0.625rem 1.5625rem var(--shadow-color); 
+  display: flex;
+  flex-direction: column;
+
+  h2 {
+    margin-bottom: 2rem;
+    font-size: 1.75rem; 
+    color: $text-dark;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .input-email, .input-username, .input-password {
+    margin-bottom: 1.5rem;
+    width: 100%;
+  }
+
+  .btn-submit {
+    margin-top: 1rem;
+    width: 100%;
+    height: 2.8125rem; 
+    font-weight: 600;
+    transition: transform 0.2s;
+
+    .p-button {
+      width: 100%;
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  .auth-toggle-text {
+    margin-top: 1.5rem;
+    text-align: center;
+    font-size: 0.9375rem; 
+    color: $text-light;
+
+    span {
+      color: $primary;
+      font-weight: 600;
+      cursor: pointer; 
+      
+      &:hover {
+        text-decoration: underline;
+        filter: brightness(1.2);
+      }
+    }
+  }
+}
+
+/* OTTIMIZZAZIONE MOBILE */
+@media (max-width: $mobile) {
+  .auth-container {
+    padding: 1.5rem; 
+    box-shadow: none;
+    // Qui manteniamo il pixel fisso per la massima nitidezza
+    border: 1px solid var(--border-color); 
+    
+    h2 {
+      font-size: 1.5rem; 
+      margin-bottom: 1.5rem;
+    }
+  }
+}

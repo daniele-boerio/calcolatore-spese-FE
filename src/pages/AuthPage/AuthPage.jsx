@@ -37,7 +37,7 @@ const AuthPage = () => {
         formData.append("password", password);
 
         const response = await axios.post(`${API_BASE_URL}/login`, formData);
-        dispatch(setLogin(response.data.access_token));
+        dispatch(setLogin(response.data.access_token, formData.data.username));
       } else {
         // Registrazione: inviamo anche lo username
         await axios.post(`${API_BASE_URL}/register`, {

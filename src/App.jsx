@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import AuthPage from './pages/AuthPage/AuthPage';
-import ListaTransactions from './pages/ListaTransactions/ListaTransactions'; // Sposta qui il tuo vecchio codice di App.jsx
+import HomePage from './pages/HomePage/HomePage';
 import './App.scss';
 
 function App() {
@@ -11,7 +11,7 @@ function App() {
       {!isAuthenticated ? (
         <AuthPage />
       ) : (
-        <ListaTransactions />
+        <HomePage />
       )}
     </div>
   );
