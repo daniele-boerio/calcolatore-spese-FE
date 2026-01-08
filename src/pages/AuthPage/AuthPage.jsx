@@ -21,7 +21,7 @@ const AuthPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password || (!isLogin && !username)) {
+    if (!username || !password || (!isLogin && !email)) {
       setDialogHeader("Campi Mancanti");
       setDialogContent(
         "Assicurati di aver compilato tutti i campi richiesti prima di procedere."
@@ -33,23 +33,20 @@ const AuthPage = () => {
       if (isLogin) {
         // Endpoint FastAPI per il login (usa form-data come richiesto da OAuth2)
         const formData = new FormData();
-        formData.append("username", email);
+        formData.append("username", username);
         formData.append("password", password);
 
         const response = await axios.post(`${API_BASE_URL}/login`, formData);
-        dispatch(setLogin(response.data.access_token, formData.data.username));
+
+        dispatch(setLogin({token: response.data.access_token, username: response.data.username}));
       } else {
         // Registrazione: inviamo anche lo username
-        await axios.post(`${API_BASE_URL}/register`, {
+        const response = await axios.post(`${API_BASE_URL}/register`, {
           email,
           username,
           password,
         });
-        alert("Registrazione completata!");
-        setDialogHeader("Registrazione completata");
-        setDialogContent("");
-        setDialogVisible(true);
-        setIsLogin(true);
+        dispatch(setLogin({token: response.data.access_token, username: response.data.username}));
       }
     } catch (error) {
       setDialogHeader("Errore");
@@ -72,23 +69,23 @@ const AuthPage = () => {
       <div className="auth-container" onKeyDown={handleKeyDown}>
         <h2>{isLogin ? "Accedi" : "Registrati"}</h2>
 
-        <InputText
+        {!isLogin && (
+          <InputText
           className="input-email"
           label="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="Inserisci la tua email"
         />
+        )}
 
-        {!isLogin && (
-          <InputText
+        <InputText
             className="input-username"
             label="Username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Inserisci il tuo username"
           />
-        )}
 
         <InputText
           className="input-password"
