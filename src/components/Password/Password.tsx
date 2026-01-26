@@ -1,6 +1,6 @@
 import { Password as PasswordPrime } from "primereact/password";
 import React from "react";
-import "./Passoword.scss";
+import "./Password.scss";
 
 export type InputTextProps = {
   id?: string;

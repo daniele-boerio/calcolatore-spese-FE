@@ -1,11 +1,18 @@
-// store/errorSlice.js
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ErrorPayload, ErrorState } from "./interfaces";
+
+const initialState: ErrorState = {
+  isOpen: false,
+  message: "",
+  title: "",
+};
 
 const errorSlice = createSlice({
   name: "error",
-  initialState: { isOpen: false, message: "", title: "" },
+  initialState,
   reducers: {
-    showError: (state, action) => {
+    // Utilizziamo PayloadAction per tipizzare l'azione in ingresso
+    showError: (state, action: PayloadAction<ErrorPayload>) => {
       state.isOpen = true;
       state.message =
         action.payload.message || "Si è verificato un errore imprevisto.";
@@ -14,6 +21,7 @@ const errorSlice = createSlice({
     hideError: (state) => {
       state.isOpen = false;
       state.message = "";
+      state.title = ""; // Reset del titolo per pulizia
     },
   },
 });

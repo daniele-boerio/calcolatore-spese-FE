@@ -1,12 +1,31 @@
+import React from "react";
 import { PieChart } from "@mui/x-charts/PieChart";
 import "./CustomPieChart.scss";
 
-const CustomPieChart = ({ data, height = 300 }) => {
+// 1. Definiamo l'interfaccia per il singolo elemento del grafico
+interface PieDataItem {
+  id: string | number;
+  value: number;
+  label?: string;
+  color?: string;
+}
+
+// 2. Definiamo le Props del componente
+interface CustomPieChartProps {
+  data: PieDataItem[];
+  height?: number;
+}
+
+const CustomPieChart: React.FC<CustomPieChartProps> = ({
+  data,
+  height = 300,
+}) => {
   // Calcoliamo il totale reale
   const total = data.reduce((acc, curr) => acc + curr.value, 0);
 
   // Se non ci sono dati o il totale è 0, creiamo un set di dati "placeholder"
-  const chartData =
+  // Tipizziamo esplicitamente chartData come array di PieDataItem
+  const chartData: PieDataItem[] =
     data.length > 0 && total > 0
       ? data
       : [{ id: "empty", value: 1, color: "#e0e0e0", label: "Nessuna spesa" }];
@@ -16,10 +35,10 @@ const CustomPieChart = ({ data, height = 300 }) => {
       <PieChart
         series={[
           {
-            data: chartData, // Usiamo i dati reali o il placeholder
+            data: chartData,
             innerRadius: 75,
             outerRadius: 100,
-            paddingAngle: data.length > 0 ? 5 : 0, // Togliamo gli spazi se è vuoto
+            paddingAngle: data.length > 0 && total > 0 ? 5 : 0,
             cornerRadius: 4,
             cx: "50%",
             cy: "50%",
@@ -27,13 +46,11 @@ const CustomPieChart = ({ data, height = 300 }) => {
         ]}
         slotProps={{
           legend: {
-            // Nascondiamo la legenda se il grafico è vuoto
-            hidden: total === 0,
-            direction: "row",
-            position: { vertical: "bottom", horizontal: "middle" },
-            padding: 0,
+            direction: "row" as any,
+            position: { vertical: "bottom", horizontal: "center" },
           },
         }}
+        hideLegend={total === 0}
         height={height}
       />
 

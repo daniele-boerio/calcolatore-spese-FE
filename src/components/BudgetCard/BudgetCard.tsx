@@ -4,32 +4,37 @@ import "./BudgetCard.scss";
 import BudgetSettingsDialog from "../Dialog/BudgetSettingsDialog/BudgetSettingsDialog";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { updateBudget } from "../../features/conti/apiCalls";
+import { BudgetUpdateData } from "../../features/conti/interfaces";
 
-const BudgetCard = () => {
+const BudgetCard: React.FC = () => {
   const dispatch = useAppDispatch();
 
-  // Selettori tipizzati grazie al setup di store.ts
+  // Selettori ora tipizzati correttamente dallo store globale
   const monthlyBudget = useAppSelector((state) => state.conto.monthlyBudget);
-  const loading = useAppSelector((state) => state.conto.loading); // Preso da conto come nello slice precedente
+  const loading = useAppSelector((state) => state.conto.loading);
 
   const { totalBudget, expenses, percentage } = monthlyBudget;
 
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
 
+  // Helper per la leggibilità del template
   const hasTotalBudget = totalBudget !== null && totalBudget !== undefined;
+  // Gestiamo il caso in cui percentage sia 0 (valore falsy in JS)
   const hasPercentage = percentage !== null && percentage !== undefined;
 
-  // Tipizziamo i dati in entrata dal Dialog
-  const handleSaveBudget = async (updatedData) => {
+  const handleSaveBudget = async (
+    updatedData: BudgetUpdateData,
+  ): Promise<void> => {
     try {
       await dispatch(updateBudget(updatedData)).unwrap();
       setIsDialogVisible(false);
     } catch (error) {
-      console.error("Errore aggiornamento budget:", error);
+      // L'errore viene già gestito dal middleware globale, qui logghiamo solo per debug
+      console.error("Errore salvataggio budget:", error);
     }
   };
 
-  const formatEuro = (value) => {
+  const formatEuro = (value: number | null | undefined): string => {
     if (value === null || value === undefined) return "€0";
     return new Intl.NumberFormat("it-IT", {
       style: "currency",
@@ -38,14 +43,14 @@ const BudgetCard = () => {
     }).format(value);
   };
 
-  // Logica per le classi CSS
-  let statusClass = "is-neutral";
-  if (hasTotalBudget && expenses !== null) {
-    statusClass = totalBudget < expenses ? "is-danger" : "is-success";
-  }
+  // Logica dinamica per le classi di stato
+  const getStatusClass = (): string => {
+    if (!hasTotalBudget || expenses === null) return "is-neutral";
+    return totalBudget < expenses ? "is-danger" : "is-success";
+  };
 
   return (
-    <div className={`budget-card ${statusClass}`}>
+    <div className={`budget-card ${getStatusClass()}`}>
       <div className="budget-card__header-row">
         <span className="budget-card__label">
           {hasTotalBudget ? "Budget Mensile" : "Spese Mensili"}
@@ -84,7 +89,9 @@ const BudgetCard = () => {
                 aria-valuemax={100}
               ></div>
             </div>
-            <span className="budget-card__percentage">{percentage}%</span>
+            <span className="budget-card__percentage">
+              {Math.round(percentage)}%
+            </span>
           </div>
         </div>
       )}
@@ -93,7 +100,7 @@ const BudgetCard = () => {
         key={isDialogVisible ? "open" : "closed"}
         visible={isDialogVisible}
         onHide={() => setIsDialogVisible(false)}
-        initialData={{ total_budget: totalBudget }} // Passiamo i dati nel formato atteso dallo schema
+        initialData={{ totalBudget: totalBudget ?? null }}
         onSave={handleSaveBudget}
       />
     </div>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   getCategorie,
@@ -6,34 +6,37 @@ import {
 } from "../../features/categorie/apiCalls";
 import "./CategoryTagsPage.scss";
 import Button from "../../components/Button/Button";
+import { Categoria } from "../../features/categorie/interfaces";
 
-function CategoryTagsPage() {
+const CategoryTagsPage: React.FC = () => {
   const dispatch = useAppDispatch();
+
+  // Utilizziamo lo stato tipizzato. Nota: assicurati che il nome sia 'categorie' nel rootReducer
   const categorie = useAppSelector((state) => state.categoria.categorie);
   const loading = useAppSelector((state) => state.categoria.loading);
-  const [expandedRow, setExpandedRow] = useState(null);
+
+  // expandedRow gestisce l'ID della categoria espansa (string o null)
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   useEffect(() => {
     dispatch(getCategorie());
   }, [dispatch]);
 
-  const handleCreateCat = () => {
-    // Logica per creare una nuova categoria
+  const handleCreateCat = (): void => {
     console.log("Crea nuova categoria");
   };
 
-  const handleUpdateCat = (id) => {
-    // Logica per aggiornare la categoria
+  const handleUpdateCat = (id: string): void => {
     console.log("Aggiorna categoria con ID:", id);
   };
 
-  const handleDeleteCat = (id) => {
+  const handleDeleteCat = (id: string): void => {
     if (
       window.confirm(
         "Sei sicuro di voler eliminare questa categoria? Tutte le sottocategorie verranno influenzate.",
       )
     ) {
-      dispatch(deleteCategoria(id));
+      dispatch(deleteCategoria({ id }));
     }
   };
 
@@ -61,7 +64,6 @@ function CategoryTagsPage() {
           <span>Azioni</span>
         </div>
 
-        {/* LOGICA LOADING VS MAP */}
         {loading ? (
           <div className="loading-container">
             <i
@@ -71,7 +73,7 @@ function CategoryTagsPage() {
             <p>Caricamento categorie...</p>
           </div>
         ) : (
-          categorie.map((cat) => (
+          categorie.map((cat: Categoria) => (
             <div key={cat.id} className="category-item-container">
               {/* RIGA CATEGORIA PADRE */}
               <div
@@ -141,6 +143,6 @@ function CategoryTagsPage() {
       </div>
     </div>
   );
-}
+};
 
 export default CategoryTagsPage;

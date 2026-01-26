@@ -1,31 +1,41 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { getTransactionsPaginated } from "../../features/transactions/apiCalls";
 import { getConti } from "../../features/conti/apiCalls";
-import TableVisualization from "../../components/TableVisualization/TableVisualization";
+import TableVisualization, {
+  VisualizationColumnProps,
+} from "../../components/TableVisualization/TableVisualization";
 import "./TransactionPage.scss";
+import { Transaction } from "../../features/transactions/interfaces";
+
+// Definiamo l'interfaccia per la struttura delle colonne
+interface TableColumn {
+  field: string;
+  header: string;
+  body?: (row: Transaction) => React.ReactNode;
+}
 
 function TransactionPage() {
   const dispatch = useAppDispatch();
-  const transactions = useAppSelector(
-    (state) => state.transaction.transactions,
-  );
-  const loading = useAppSelector((state) => state.transaction.loading);
-  const pagination = useAppSelector((state) => state.transaction.pagination);
-  const conti = useAppSelector((state) => state.conto.conti); // Assumo che lo store dei conti sia così
 
-  const [currentPage, setCurrentPage] = useState(0); // PrimeReact parte da 0
-  const [pageSize, setPageSize] = useState(10);
+  // Utilizziamo lo stato tipizzato 'transactions'
+  const { transactions, loading, pagination } = useAppSelector(
+    (state) => state.transaction,
+  );
+  const conti = useAppSelector((state) => state.conto.conti);
+
+  const [currentPage, setCurrentPage] = useState<number>(0); // PrimeReact parte da 0
+  const [pageSize, setPageSize] = useState<number>(10);
 
   useEffect(() => {
-    // Il backend si aspetta la pagina. Se il backend usa base 1, invia currentPage + 1
+    // Il backend si aspetta la pagina (base 1)
     dispatch(
       getTransactionsPaginated({ page: currentPage + 1, size: pageSize }),
     );
     dispatch(getConti());
   }, [dispatch, currentPage, pageSize]);
 
-  const columns = [
+  const columns: VisualizationColumnProps[] = [
     {
       field: "data",
       header: "Data",
@@ -42,7 +52,9 @@ function TransactionPage() {
       field: "tipo",
       header: "Tipo",
       body: (row) => (
-        <span className={`badge-${row.tipo.toLowerCase()}`}>{row.tipo}</span>
+        <span className={`badge-${row.tipo.toLowerCase()}`}>
+          {row.tipo.toUpperCase()}
+        </span>
       ),
     },
     {
@@ -52,10 +64,14 @@ function TransactionPage() {
         <span
           style={{
             fontWeight: "bold",
-            color: row.tipo === "USCITA" ? "red" : "green",
+            color:
+              row.tipo.toUpperCase() === "USCITA"
+                ? "var(--red-500)"
+                : "var(--green-500)",
           }}
         >
-          {row.tipo === "USCITA" ? "-" : "+"} €{row.importo.toFixed(2)}
+          {row.tipo.toUpperCase() === "USCITA" ? "-" : "+"} €
+          {row.importo.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
         </span>
       ),
     },
@@ -65,11 +81,6 @@ function TransactionPage() {
       header: "Conto",
       body: (row) =>
         conti.find((c) => c.id === row.conto_id)?.nome || `ID: ${row.conto_id}`,
-    },
-    {
-      field: "tag",
-      header: "Tag",
-      body: (row) => row.tag?.nome || "-", // Usiamo l'oggetto tag completo se presente
     },
   ];
 
@@ -81,7 +92,7 @@ function TransactionPage() {
       </header>
 
       <TableVisualization
-        value={transactions} // value, non data (come da props definite)
+        value={transactions}
         columns={columns}
         className="mt-4"
         paginator={{
@@ -90,7 +101,7 @@ function TransactionPage() {
           first: currentPage * pageSize,
           loading: loading,
           lazy: true,
-          onPage: (e) => {
+          onPage: (e: { page: number; rows: number }) => {
             setCurrentPage(e.page);
             setPageSize(e.rows);
           },

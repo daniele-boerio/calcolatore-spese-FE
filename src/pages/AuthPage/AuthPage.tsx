@@ -1,50 +1,50 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { login, register } from "../../features/profile/apiCalls";
 import InputText from "../../components/InputText/InputText";
 import Button from "../../components/Button/Button";
 import { Dialog } from "primereact/dialog";
 import "./AuthPage.scss";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import Password from "../../components/Passoword/Passoword";
+import Password from "../../components/Password/Password";
 
-const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [dialogVisible, setDialogVisible] = useState(false);
-  const [dialogHeader, setDialogHeader] = useState("");
-  const [dialogContent, setDialogContent] = useState("");
+const AuthPage: React.FC = () => {
+  const [isLogin, setIsLogin] = useState<boolean>(true);
+  const [email, setEmail] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  // Stati per la Dialog di errore locale
+  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+  const [dialogHeader, setDialogHeader] = useState<string>("");
+  const [dialogContent, setDialogContent] = useState<string>("");
+
   const loading = useAppSelector((state) => state.profile.loading);
   const dispatch = useAppDispatch();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.BaseSyntheticEvent) => {
+    if (e) e.preventDefault();
+
     if (!username || !password || (!isLogin && !email)) {
       setDialogHeader("Campi Mancanti");
-      setDialogContent(
-        "Assicurati di aver compilato tutti i campi richiesti prima di procedere."
-      );
+      setDialogContent("Assicurati di aver compilato tutti i campi richiesti.");
       setDialogVisible(true);
       return;
     }
+
     try {
       if (isLogin) {
-        dispatch(login({ username, password }));
+        await dispatch(login({ username, password })).unwrap();
       } else {
-        dispatch(register({ email, username, password }));
+        await dispatch(register({ email, username, password })).unwrap();
       }
-    } catch (error) {
+    } catch (error: any) {
       setDialogHeader("Errore");
-      setDialogContent(
-        error.response?.data?.detail ||
-          "Si è verificato un errore durante l'operazione. Riprova più tardi."
-      );
+      setDialogContent(error?.detail || "Si è verificato un errore.");
       setDialogVisible(true);
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter") {
       handleSubmit(e);
     }
@@ -60,7 +60,9 @@ const AuthPage = () => {
             className="input-email"
             label="Email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
             placeholder="Inserisci la tua email"
           />
         )}
@@ -69,16 +71,19 @@ const AuthPage = () => {
           className="input-username"
           label="Username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setUsername(e.target.value)
+          }
           placeholder="Inserisci il tuo username"
         />
 
         <Password
           className="input-password"
           label="Password"
-          type="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
           placeholder="Inserisci la tua password"
           feedback={!isLogin}
           toggleMask={true}
@@ -98,13 +103,12 @@ const AuthPage = () => {
           </span>
         </p>
       </div>
+
       <Dialog
         header={dialogHeader}
         visible={dialogVisible}
-        onHide={() => {
-          if (!dialogVisible) return;
-          setDialogVisible(false);
-        }}
+        onHide={() => setDialogVisible(false)}
+        style={{ width: "90vw", maxWidth: "400px" }}
       >
         <p>{dialogContent}</p>
       </Dialog>
