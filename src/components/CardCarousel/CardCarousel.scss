@@ -1,0 +1,46 @@
+@use "../../styles/variables" as v;
+
+.carousel-title {
+  font-size: 1.5rem;
+}
+
+.card-carousel {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scroll-snap-type: x mandatory;
+
+  // --- STILE SCROLLBAR PER DESKTOP ---
+  &::-webkit-scrollbar {
+    height: 6px; // Altezza della barra orizzontale
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent; // Sfondo del binario
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: v.$bar-gray; // Usiamo la tua variabile grigia
+    border-radius: 10px;
+
+    &:hover {
+      background-color: v.$text-muted; // Si scurisce al passaggio del mouse
+    }
+  }
+
+  // --- LOGICA PER MOBILE ---
+  @media (max-width: v.$mobile) {
+    // Nascondiamo completamente la barra su smartphone/tablet
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    // Per Firefox mobile
+    scrollbar-width: none;
+  }
+}
+
+.credit-card {
+  scroll-snap-align: start;
+}

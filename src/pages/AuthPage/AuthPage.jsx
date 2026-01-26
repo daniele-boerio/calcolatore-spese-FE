@@ -1,13 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
-import { useDispatch } from "react-redux";
-import { setLogin } from "../../features/auth/authSlice";
-import InputText from "../../components/inputtext/inputtext";
-import Button from "../../components/button/button";
+import { login, register } from "../../features/profile/apiCalls";
+import InputText from "../../components/InputText/InputText";
+import Button from "../../components/Button/Button";
 import { Dialog } from "primereact/dialog";
 import "./AuthPage.scss";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import Password from "../../components/Passoword/Passoword";
 
 const AuthPage = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,7 +15,8 @@ const AuthPage = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
   const [dialogHeader, setDialogHeader] = useState("");
   const [dialogContent, setDialogContent] = useState("");
-  const dispatch = useDispatch();
+  const loading = useAppSelector((state) => state.profile.loading);
+  const dispatch = useAppDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,22 +30,9 @@ const AuthPage = () => {
     }
     try {
       if (isLogin) {
-        // Endpoint FastAPI per il login (usa form-data come richiesto da OAuth2)
-        const formData = new FormData();
-        formData.append("username", username);
-        formData.append("password", password);
-
-        const response = await axios.post(`${API_BASE_URL}/login`, formData);
-
-        dispatch(setLogin({token: response.data.access_token, username: response.data.username}));
+        dispatch(login({ username, password }));
       } else {
-        // Registrazione: inviamo anche lo username
-        const response = await axios.post(`${API_BASE_URL}/register`, {
-          email,
-          username,
-          password,
-        });
-        dispatch(setLogin({token: response.data.access_token, username: response.data.username}));
+        dispatch(register({ email, username, password }));
       }
     } catch (error) {
       setDialogHeader("Errore");
@@ -71,35 +57,38 @@ const AuthPage = () => {
 
         {!isLogin && (
           <InputText
-          className="input-email"
-          label="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Inserisci la tua email"
-        />
+            className="input-email"
+            label="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Inserisci la tua email"
+          />
         )}
 
         <InputText
-            className="input-username"
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Inserisci il tuo username"
-          />
+          className="input-username"
+          label="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Inserisci il tuo username"
+        />
 
-        <InputText
+        <Password
           className="input-password"
           label="Password"
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Inserisci la tua password"
+          feedback={!isLogin}
+          toggleMask={true}
         />
 
         <Button
           className="btn-submit"
           onClick={handleSubmit}
           label={isLogin ? "Login" : "Crea Account"}
+          loading={loading}
         />
 
         <p className="auth-toggle-text">

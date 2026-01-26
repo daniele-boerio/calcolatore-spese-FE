@@ -1,8 +1,8 @@
-import clsx from 'clsx';
-import { Badge } from 'primereact/badge';
-import { Button as ButtonPrime } from 'primereact/button';
-import React from 'react';
-import './button.scss';
+import clsx from "clsx";
+import { Badge } from "primereact/badge";
+import { Button as ButtonPrime } from "primereact/button";
+import React from "react";
+import "./Button.scss";
 
 export type ButtonProps = {
   label?: string;
@@ -11,10 +11,10 @@ export type ButtonProps = {
   disabled?: boolean;
   icon?: string;
   showIconBadge?: boolean;
-  iconPos?: 'top' | 'bottom' | 'left' | 'right';
+  iconPos?: "top" | "bottom" | "left" | "right";
   rounded?: boolean;
   className?: string;
-  size?: 'small' | 'large';
+  size?: "small" | "large";
   buttonStyle?: React.CSSProperties;
   onMouseDown?: (event: React.MouseEvent<unknown>) => void;
   compact?: boolean;
@@ -23,15 +23,24 @@ export type ButtonProps = {
 };
 
 export default function Button(props: ButtonProps) {
-
   const primeReactIcon = (
-    <i className={clsx('icon-button', props.icon, props.showIconBadge && 'p-overlay-badge')}>
+    <i
+      className={clsx(
+        "icon-button",
+        props.icon,
+        props.showIconBadge && "p-overlay-badge"
+      )}
+    >
       {props.showIconBadge && <Badge />}
     </i>
   );
 
   return (
-    <div className={`div-button ${props.className ?? ''} ${props.invisible ? 'invisible' : ''}`}>
+    <div
+      className={`div-button ${props.className ?? ""} ${
+        props.invisible ? "invisible" : ""
+      }`}
+    >
       <ButtonPrime
         aria-label={(props.label && props.label) || props.labelNoTraduction}
         onClick={props.onClick}
@@ -42,15 +51,19 @@ export default function Button(props: ButtonProps) {
         onMouseDown={props.onMouseDown}
         loading={props.loading}
         style={props.buttonStyle}
-        className={clsx(props.compact && 'compact')}
+        className={clsx(props.compact && "compact")}
       >
         <div
-          className={`div-icon-label-button ${props.iconPos === 'top' || props.iconPos === 'bottom' ? 'column' : 'row'} ${props.compact ? 'compact' : ''}`}
+          className={`div-icon-label-button ${
+            props.iconPos === "top" || props.iconPos === "bottom"
+              ? "column"
+              : "row"
+          } ${props.compact ? "compact" : ""}`}
         >
           {props.iconPos && props.icon ? (
             <>
-              {(props.iconPos === 'left' || props.iconPos === 'top') &&
-                (props.icon && props.icon.endsWith('.png') ? (
+              {(props.iconPos === "left" || props.iconPos === "top") &&
+                (props.icon && props.icon.endsWith(".png") ? (
                   <img src={props.icon} className="icon-button-img" />
                 ) : (
                   primeReactIcon
@@ -61,9 +74,9 @@ export default function Button(props: ButtonProps) {
                 {props.labelNoTraduction}
               </span>
 
-              {(props.iconPos === 'right' || props.iconPos === 'bottom') && (
+              {(props.iconPos === "right" || props.iconPos === "bottom") && (
                 <>
-                  {props.icon && props.icon.endsWith('.png') ? (
+                  {props.icon && props.icon.endsWith(".png") ? (
                     <img src={props.icon} className="icon-button-img" />
                   ) : (
                     primeReactIcon
@@ -74,7 +87,7 @@ export default function Button(props: ButtonProps) {
           ) : (
             props.icon &&
             !props.iconPos &&
-            (props.icon && props.icon.endsWith('.png') ? (
+            (props.icon && props.icon.endsWith(".png") ? (
               <img src={props.icon} className="icon-button-img" />
             ) : (
               primeReactIcon

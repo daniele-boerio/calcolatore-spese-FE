@@ -1,22 +1,23 @@
+@use "../../styles/variables.scss" as v;
 .action-button {
   .p-button {
-    color: white;
-    border-color: var(--bko-color-primary);
-    background-color: var(--bko-color-primary);
+    color: v.$text-main;
+    border-color: v.$bc-button-primary;
+    background-color: v.$bg-button-primary;
   }
 }
 
 .reset-button {
   .p-button {
-    color: white;
-    border-color: var(--bko-color-secondary);
-    background-color: var(--bko-color-secondary);
+    color: v.$text-main;
+    border-color: v.$bc-button-secondary;
+    background-color: v.$bg-button-secondary;
   }
 }
 
 .trasparent-button {
   .p-button {
-    color: white;
+    color: v.$text-main;
     border-color: transparent;
     background-color: transparent;
   }
@@ -24,7 +25,7 @@
 
 .trasparent-danger-button {
   .p-button {
-    color: red;
+    color: v.$text-red;
     border-color: transparent;
     background-color: transparent;
   }
@@ -87,8 +88,8 @@
 .table-add-button {
   .p-button {
     width: 100%;
-    color: white;
-    border: 1px dashed white;
+    color: v.$text-main;
+    border: 1px dashed v.$text-main;
     background-color: transparent;
     .div-icon-label-button {
       justify-content: flex-start !important; /* sposta il contenuto a sinistra */
@@ -97,14 +98,43 @@
   }
 }
 
-.table-button {
+.add-transaction-button {
   .p-button {
-    color: white;
-    background-color: var(--bko-color-background);
-    border-color: var(--bko-color-border-button-table);
+    justify-content: center !important;
+    width: 4rem !important;
+    height: 4rem !important;
+    color: v.$text-dark;
+    border: none;
+    background-color: v.$btn-light;
+    .icon-button {
+      font-size: 1.5rem;
+    }
   }
 }
 
-.p-button:focus {
-  box-shadow: 0 0 0 1px var(--bko-color-primary) !important;
+.add-category-button {
+  .p-button {
+    justify-content: center !important;
+    width: 4rem !important;
+    height: 4rem !important;
+    color: v.$text-dark;
+    border: none;
+    background-color: v.$btn-light;
+    .icon-button {
+      font-size: 1.5rem;
+    }
+  }
+}
+
+.add-subcategory-button {
+  .p-button {
+    width: 100%;
+    color: v.$text-main;
+    border: none;
+    background-color: transparent;
+    .div-icon-label-button {
+      justify-content: flex-start !important; /* sposta il contenuto a sinistra */
+      text-align: left !important;
+    }
+  }
 }

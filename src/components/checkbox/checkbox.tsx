@@ -1,5 +1,8 @@
-import { Checkbox as CheckboxPrime, type CheckboxChangeEvent } from 'primereact/checkbox';
-import './checkbox.scss';
+import {
+  Checkbox as CheckboxPrime,
+  type CheckboxChangeEvent,
+} from "primereact/checkbox";
+import "./Checkbox.scss";
 
 export type CheckboxProps = {
   onChange: (e: CheckboxChangeEvent) => void;
@@ -15,9 +18,12 @@ export type CheckboxProps = {
 };
 
 export default function Checkbox(props: CheckboxProps) {
-
   return (
-    <div className={`div-checkbox ${props.className ?? ''} ${props.invisible ? 'invisible' : ''}`}>
+    <div
+      className={`div-checkbox ${props.className ?? ""} ${
+        props.invisible ? "invisible" : ""
+      }`}
+    >
       <CheckboxPrime
         id={props.id}
         value={props.value}
@@ -27,7 +33,11 @@ export default function Checkbox(props: CheckboxProps) {
         disabled={props.disabled}
       />
       {props.label && <p className={`label-checkbox`}>{props.label}</p>}
-      {props.labelNoTranslate && <p className={`label-no-translate-checkbox`}>{props.labelNoTranslate}</p>}
+      {props.labelNoTranslate && (
+        <p className={`label-no-translate-checkbox`}>
+          {props.labelNoTranslate}
+        </p>
+      )}
     </div>
   );
 }

@@ -1,46 +1,77 @@
 // src/styles/_variables.scss
 
-// Colori
-// src/styles/_variables.scss
-
-// 1. Definiamo i colori che NON cambiano (es. il blu primario)
-$primary: #007bff;
-$mobile: 480px;
-$radius: 0.75rem;
-
-// 2. Creiamo una struttura per i colori che cambiano
 :root {
   // Tema Chiaro (Default)
   --bg-app: #f4f7f6;
   --bg-card: #ffffff;
+  --bg-card-gray: #e0e0e0;
+  --bg-gradient-table: #f9f9f9;
   --text-main: #333333;
-  --text-muted: #666666;
+  --text-dark: #f0f0f0;
+  --text-muted: #95a5a6;
   --border-color: #e0e0e0;
-  --shadow-color: rgba(0, 0, 0, 0.05);
+  --bar-neutral: #333333;
+  --bar-gray: #e0e0e0;
+  --bar-green: #2ecc71;
+  --bar-red: #e74c3c;
+  --btn-light: #95a5a6;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    // Tema Scuro
-    --bg-app: #121212;      // Sfondo molto scuro
-    --bg-card: #1e1e1e;     // Grigio antracite per i contenitori
-    --text-main: #f0f0f0;   // Bianco sporco
-    --text-muted: #b0b0b0;  // Grigio chiaro per sottotitoli
+    --bg-app: #121212;
+    --bg-card: #1e1e1e;
+    --bg-card-gray: #2c2c2c;
+    --bg-gradient-table: #252525;
+    --text-main: #f0f0f0;
+    --text-dark: #333333;
+    --text-muted: #b0b0b0;
     --border-color: #333333;
-    --shadow-color: rgba(0, 0, 0, 0.3);
+    --bar-neutral: #f0f0f0;
+    --bar-gray: #333333;
+    --bar-green: #2ecc71;
+    --bar-red: #e74c3c;
+    --btn-light: #b0b0b0;
   }
 }
 
-// Mappiamo le variabili SCSS a quelle CSS per usarle comodamente
+$light-blue: #3498db;
+$light-gray: #7f8c8d;
+$red: #e74c3c;
+$green: #2ecc71;
+
+// Mappatura variabili SCSS
 $bg-app: var(--bg-app);
 $bg-card: var(--bg-card);
-$text-dark: var(--text-main);
-$text-light: var(--text-muted);
+$bg-card-gray: var(--bg-card-gray);
+$bg-chips: $light-gray;
+$bg-button-primary: $light-gray;
+$bc-button-primary: $light-gray;
+$bg-button-secondary: $light-gray;
+$bc-button-secondary: $light-gray;
+$bg-gradient-table: var(--bg-gradient-table);
+$text-main: var(--text-main);
+$text-dark: var(--text-dark);
+$text-muted: var(--text-muted);
+$text-red: $red;
+$text-green: $green;
+$border-color: var(--border-color);
+$shadow-color: var(--shadow-color);
+$bar-neutral: var(--bar-neutral);
+$shadow-color: 0 4px 6px rgba(0, 0, 0, 0.05);
+$bar-gray: var(--bar-gray);
+$bar-green: $green;
+$bar-red: $red;
+$btn-light: var(--btn-light);
 
-// Bordi e Ombre
-$radius: 0.75rem;
-$shadow-soft: 0 10px 25px rgba(0, 0, 0, 0.05);
-
-// Breakpoints per il responsive
+// --- Breakpoints per il responsive ---
 $mobile: 480px;
 $tablet: 768px;
+$desktop: 1024px;
+
+// Typography
+$font-main:
+  "Inter",
+  -apple-system,
+  BlinkMacSystemFont,
+  sans-serif;

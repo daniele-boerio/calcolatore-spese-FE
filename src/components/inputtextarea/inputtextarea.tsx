@@ -1,6 +1,6 @@
-import { InputTextarea as InputTextareaPrime } from 'primereact/inputtextarea';
-import React from 'react';
-import './inputtextarea.scss';
+import { InputTextarea as InputTextareaPrime } from "primereact/inputtextarea";
+import React from "react";
+import "./InputTextArea.scss";
 
 export type InputTextareaProps = {
   id?: string;
@@ -15,14 +15,13 @@ export type InputTextareaProps = {
   onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   disabled?: boolean;
   icon?: string;
-  iconPos?: 'left' | 'right';
+  iconPos?: "left" | "right";
   rows?: number;
 };
 
 export default function InputTextarea(props: InputTextareaProps) {
-
   return (
-    <div className={`div-inputtextarea ${props.className ?? ''}`}>
+    <div className={`div-inputtextarea ${props.className ?? ""}`}>
       {props.label && (
         <p className={`label-inputtextarea`}>
           <label htmlFor={props.id}>{props.label}</label>
@@ -30,13 +29,15 @@ export default function InputTextarea(props: InputTextareaProps) {
       )}
 
       <div className={`div-div-inputtextarea`}>
-        {props.icon && props.iconPos === 'left' && <i className={`icon-inputtextarea ${props.icon ?? ''}`} />}
+        {props.icon && props.iconPos === "left" && (
+          <i className={`icon-inputtextarea ${props.icon ?? ""}`} />
+        )}
 
         <InputTextareaPrime
           id={props.id}
           value={props.value}
           onChange={props.onChange}
-          placeholder={props.placeholder || ''}
+          placeholder={props.placeholder || ""}
           autoFocus={props.autoFocus}
           onClick={props.onClick}
           onBlur={props.onBlur}
@@ -45,7 +46,9 @@ export default function InputTextarea(props: InputTextareaProps) {
           rows={props.rows}
         />
 
-        {props.icon && props.iconPos === 'right' && <i className={`icon-inputtextarea ${props.icon ?? ''}`} />}
+        {props.icon && props.iconPos === "right" && (
+          <i className={`icon-inputtextarea ${props.icon ?? ""}`} />
+        )}
       </div>
     </div>
   );

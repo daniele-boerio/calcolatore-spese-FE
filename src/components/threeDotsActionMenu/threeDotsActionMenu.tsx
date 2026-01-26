@@ -1,8 +1,8 @@
-import { Menu } from 'primereact/menu';
-import type { MenuItem } from 'primereact/menuitem';
-import { OverlayPanel } from 'primereact/overlaypanel';
-import { useEffect, useRef, useState } from 'react';
-import './three-dots-action-menu.scss';
+import { Menu } from "primereact/menu";
+import type { MenuItem } from "primereact/menuitem";
+import { OverlayPanel } from "primereact/overlaypanel";
+import { useEffect, useRef, useState } from "react";
+import "./ThreeDotsActionMenu.scss";
 
 export type ThreeDotsActionsMenuProps = {
   className?: string;
@@ -23,24 +23,26 @@ export default function ThreeDotsActionsMenu(props: ThreeDotsActionsMenuProps) {
       }
     };
 
-    window.addEventListener('scroll', handleScroll, true); // usa 'true' per catturare lo scroll in profondità
+    window.addEventListener("scroll", handleScroll, true); // usa 'true' per catturare lo scroll in profondità
 
     return () => {
-      window.removeEventListener('scroll', handleScroll, true);
+      window.removeEventListener("scroll", handleScroll, true);
     };
   }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      const isInsideMenu = ref.current?.getElement()?.contains(event.target as Node);
+      const isInsideMenu = ref.current
+        ?.getElement()
+        ?.contains(event.target as Node);
       const isInsideButton = buttonRef.current?.contains(event.target as Node);
       if (!isInsideMenu && !isInsideButton) {
         ref.current?.hide();
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
@@ -59,7 +61,7 @@ export default function ThreeDotsActionsMenu(props: ThreeDotsActionsMenuProps) {
               }
             },
           };
-        }),
+        })
       );
     }
   }, [props.items]);
@@ -80,14 +82,17 @@ export default function ThreeDotsActionsMenu(props: ThreeDotsActionsMenuProps) {
           }
         }}
       >
-        <i className="pi pi-ellipsis-v" style={{ transform: `rotate(${props.verticalDots ? '0' : '90'}deg)` }} />
+        <i
+          className="pi pi-ellipsis-v"
+          style={{ transform: `rotate(${props.verticalDots ? "0" : "90"}deg)` }}
+        />
       </button>
       <OverlayPanel
         ref={ref}
         pt={{
           content: () => ({
             style: {
-              padding: '0px',
+              padding: "0px",
             },
           }),
         }}
@@ -97,13 +102,13 @@ export default function ThreeDotsActionsMenu(props: ThreeDotsActionsMenuProps) {
           pt={{
             root: () => ({
               style: {
-                padding: '0px',
-                width: 'auto',
+                padding: "0px",
+                width: "auto",
               },
             }),
             menuitem: () => ({
               style: {
-                padding: '0.5rem 0',
+                padding: "0.5rem 0",
               },
             }),
           }}

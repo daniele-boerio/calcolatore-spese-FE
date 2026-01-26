@@ -1,20 +1,20 @@
 // src/index.scss o src/App.scss
-@import "./styles/variables";
+@use "./styles/variables" as v;
 
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
   // Applichiamo lo sfondo variabile
-  background-color: $bg-app; 
-  
+  background-color: v.$bg-app;
+
   // Applichiamo anche il colore del testo di base per evitare scritte invisibili
-  color: $text-dark;
-  
+  color: v.$text-main;
+
   // Aggiungiamo una transizione fluida per quando si cambia tema
-  transition: background-color 0.3s ease, color 0.3s ease;
-  
-  // Assicuriamoci che occupi tutta l'altezza
-  min-height: 100vh;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }

@@ -1,24 +1,30 @@
+@use "../../styles/variables" as v;
+
 .p-stepper-panels {
-  background-color: var(--bko-color-background-on-background);
-  border-top: 0.3px solid var(--bko-color-tertiary);
+  background-color: v.$bg-app; // Sfondo "on-background"
+  border-top: 0.3px solid v.$border-color;
+  padding: 1.5rem;
 }
 
 .p-stepper-separator {
   align-self: start;
-  background-color: var(--bko-color-stepper-separator);
+  background-color: v.$bar-gray; // Sfondo neutro per separatore
   opacity: 1 !important;
   margin-top: 1rem;
   margin-left: 0;
-}
 
-.p-stepper-separator.completed {
-  background-color: var(--bko-color-primary);
+  &.completed {
+    background-color: v.$bg-button-primary; // Colore primario al completamento
+  }
 }
 
 .p-stepper-title {
   font-size: 14px;
+  color: v.$text-main;
+  font-family: v.$font-main;
 }
 
+/* Header Disabilitato (Step futuri) */
 .p-stepper-header.p-disabled,
 .p-stepper-header-bottom.p-disabled {
   padding: 0;
@@ -30,56 +36,69 @@
     opacity: 0.4 !important;
 
     .p-stepper-number {
-      background-color: var(--bko-color-background);
+      background-color: v.$bg-app;
+      color: v.$text-muted;
       height: 1.5rem;
       min-width: 1.5rem;
+      border: 1px solid v.$border-color;
     }
   }
 }
 
+/* Header Attivo (Highlight) */
 .p-stepper-header.p-highlight.p-stepper-header-bottom {
   padding: 0;
   margin-bottom: 1.5rem;
+
   .p-stepper-action,
   .p-component {
     .p-stepper-number {
-      border: 1px solid var(--bko-color-primary);
-      background: linear-gradient(to right, var(--bko-color-primary), var(--bko-color-background));
+      border: 1px solid v.$bg-button-primary;
+      // Gradiente dinamico tra primario e sfondo card
+      background: linear-gradient(to right, v.$bg-button-primary, v.$bg-card);
       height: 1.5rem;
       min-width: 1.5rem;
+      color: #ffffff; // Testo bianco sul gradiente
     }
   }
 }
 
+/* Titolo Personalizzato con Sottotitolo (attr data) */
 .custom-stepper-title {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  color: var(--bko-color-text);
+  color: v.$text-main;
   font-size: 0.7rem;
   margin-top: 1rem;
+  font-family: v.$font-main;
 
   &::after {
     content: attr(data-sub-label);
     display: block;
     font-size: 0.9rem;
-    color: var(--bko-color-text);
+    font-weight: 600;
+    color: v.$text-main;
     margin-top: 0.5rem;
   }
 }
 
+/* Step Completato (Icona Check) */
 .p-stepper-number.completed {
-  color: transparent; /* nasconde il testo numerico */
-  font-size: 0; /* alternativa per sicurezza */
-}
-.p-stepper-number.completed.pi.pi-check::before {
-  font-size: 14px;
-  color: white;
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  border: 1px solid var(--bko-color-background-on-background);
-  border-radius: 50%;
+  color: transparent !important; // Nasconde il numero
+  background-color: v.$text-green !important; // Cerchio verde per completato
+  border-color: v.$text-green !important;
+  position: relative;
+
+  &.pi.pi-check::before {
+    font-size: 12px;
+    color: #ffffff; // Icona bianca
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    // Rimosso il bordo aggiuntivo per un look più pulito,
+    // ma puoi rimetterlo con v.$bg-app se vuoi l'outline
+  }
 }

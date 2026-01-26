@@ -1,0 +1,106 @@
+@use "../../styles/variables.scss" as v;
+
+.budget-card {
+  font-family: v.$font-main;
+  background-color: v.$bg-card;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: v.$shadow-color;
+  display: flex;
+  flex-direction: column;
+
+  &__header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+
+  &__label {
+    color: v.$text-muted;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  &__amount-container {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  &__amount {
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin: 0;
+    line-height: 1;
+    color: v.$text-main;
+    transition: color 0.3s ease;
+  }
+
+  &__summary {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: v.$text-muted;
+    .text-muted {
+      font-weight: 400;
+      margin-right: 2px;
+    }
+  }
+
+  &__footer-row {
+    margin-top: auto;
+  }
+
+  &__progress-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__track {
+    flex: 1;
+    background-color: v.$bar-gray;
+    height: 6px;
+    border-radius: 10px;
+    overflow: hidden; // Importante per tagliare la barra al 100%
+  }
+
+  &__fill {
+    height: 100%;
+    transition:
+      width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+      background-color 0.3s ease;
+  }
+
+  &__percentage {
+    color: v.$text-muted;
+    font-weight: 700;
+    font-size: 0.85rem;
+    min-width: 35px;
+  }
+
+  // --- STATI ---
+  &.is-neutral {
+    .budget-card__fill {
+      background-color: v.$bar-neutral;
+    }
+  }
+  &.is-success {
+    .budget-card__amount {
+      color: v.$text-green;
+    }
+    .budget-card__fill {
+      background-color: v.$bar-green;
+    }
+  }
+  &.is-danger {
+    .budget-card__amount {
+      color: v.$text-red;
+    }
+    .budget-card__fill {
+      background-color: v.$bar-red;
+    }
+  }
+}

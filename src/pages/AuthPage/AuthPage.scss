@@ -1,46 +1,67 @@
-@import "../../styles/variables";
+@use "../../styles/variables" as v;
 
 .auth-page-wrapper {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  padding: 1rem; 
+  padding: 1rem;
+  background-color: v.$bg-app; // Aggiunto per coprire l'intera pagina
 }
 
 .auth-container {
-  background: var(--bg-card);
-  padding: 2.5rem; 
+  background: v.$bg-card; // Convertito var
+  padding: 2.5rem;
   width: 100%;
-  max-width: 28.125rem; 
-  border-radius: $radius;
-  // Ombra convertita in rem per scalare con il box
-  box-shadow: 0 0.625rem 1.5625rem var(--shadow-color); 
+  max-width: 28.125rem;
+  border-radius: 12px;
+
+  // Ombra dinamica coerente con il sistema
+  box-shadow: v.$shadow-color;
+
   display: flex;
   flex-direction: column;
 
   h2 {
     margin-bottom: 2rem;
-    font-size: 1.75rem; 
-    color: $text-dark;
+    font-size: 1.75rem;
+    color: v.$text-main;
     text-align: center;
     font-weight: 700;
+    font-family: v.$font-main;
   }
 
-  .input-email, .input-username, .input-password {
+  .input-email,
+  .input-username,
+  .input-password {
     margin-bottom: 1.5rem;
     width: 100%;
+
+    // Integrazione specifica per PrimeReact Password
+    .p-password {
+      width: 100%;
+
+      input {
+        width: 100%; // Forza l'input interno a larghezza piena
+      }
+
+      > div {
+        width: 100%;
+      }
+    }
   }
 
   .btn-submit {
     margin-top: 1rem;
     width: 100%;
-    height: 2.8125rem; 
+    height: 2.8125rem;
     font-weight: 600;
     transition: transform 0.2s;
 
     .p-button {
       width: 100%;
+      background-color: v.$bg-button-primary;
+      border-color: v.$bc-button-primary;
+      height: 100%;
     }
 
     &:active {
@@ -51,14 +72,15 @@
   .auth-toggle-text {
     margin-top: 1.5rem;
     text-align: center;
-    font-size: 0.9375rem; 
-    color: $text-light;
+    font-size: 0.9375rem;
+    color: v.$text-muted; // Usato muted per il testo "non-cliccabile"
 
     span {
-      color: $primary;
+      color: v.$bg-button-primary; // Usato il colore primario per l'azione
       font-weight: 600;
-      cursor: pointer; 
-      
+      cursor: pointer;
+      margin-left: 0.5rem;
+
       &:hover {
         text-decoration: underline;
         filter: brightness(1.2);
@@ -68,15 +90,15 @@
 }
 
 /* OTTIMIZZAZIONE MOBILE */
-@media (max-width: $mobile) {
+@media (max-width: v.$mobile) {
   .auth-container {
-    padding: 1.5rem; 
-    box-shadow: none;
-    // Qui manteniamo il pixel fisso per la massima nitidezza
-    border: 1px solid var(--border-color); 
-    
+    padding: 1.5rem;
+    box-shadow: none; // Look più flat su mobile
+    border: 1px solid v.$border-color;
+    background-color: v.$bg-card;
+
     h2 {
-      font-size: 1.5rem; 
+      font-size: 1.5rem;
       margin-bottom: 1.5rem;
     }
   }

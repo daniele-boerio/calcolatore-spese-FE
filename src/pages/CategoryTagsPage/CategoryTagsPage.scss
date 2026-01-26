@@ -1,0 +1,100 @@
+@use "../../styles/variables.scss" as v;
+.categorie-page {
+  margin: 2rem;
+
+  .add-category-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000; // Assicura che il pulsante sia sopra altri elementi
+  }
+
+  .category-list {
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px;
+      font-weight: bold;
+      border-bottom: 2px solid v.$bar-neutral;
+    }
+
+    .category-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 0 15px 15px;
+      border-top: 1px solid v.$bar-neutral;
+      width: 100%;
+
+      &:first-of-type {
+        border-top: none;
+      }
+
+      .info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex: 1;
+        min-width: 0;
+
+        .arrow-icon {
+          flex-shrink: 0; // Impedisce all'icona di rimpicciolirsi se il testo è lungo
+        }
+
+        .cat-name {
+          font-weight: bold;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          flex: 1;
+        }
+      }
+
+      .actions {
+        display: flex;
+        gap: 5px;
+        flex-shrink: 0; // Impedisce ai bottoni di sparire se il testo a sinistra è troppo lungo
+      }
+    }
+
+    .subcategory-list {
+      padding: 0 0 10px 40px;
+
+      .subcategory-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 0.9rem;
+
+        &:last-of-type {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 8px;
+
+    button {
+      padding: 5px 10px;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8em;
+    }
+  }
+
+  .btn-add-sub {
+    margin-top: 10px;
+    background: transparent;
+    border: 1px dashed #ccc;
+    width: 100%;
+    padding: 5px;
+    color: #666;
+    &:hover {
+      border-color: #1976d2;
+      color: #1976d2;
+    }
+  }
+}

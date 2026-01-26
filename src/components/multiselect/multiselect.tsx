@@ -1,7 +1,10 @@
-import { MultiSelect as MultiSelectPrime, type MultiSelectChangeEvent } from 'primereact/multiselect';
-import type { VirtualScrollerProps } from 'primereact/virtualscroller';
-import React from 'react';
-import './multiselect.scss';
+import {
+  MultiSelect as MultiSelectPrime,
+  type MultiSelectChangeEvent,
+} from "primereact/multiselect";
+import type { VirtualScrollerProps } from "primereact/virtualscroller";
+import React from "react";
+import "./MultiSelect.scss";
 
 export type MultiselectProps = {
   id?: string;
@@ -12,7 +15,7 @@ export type MultiselectProps = {
   placeholder?: string;
   disabled?: boolean;
   hidden?: boolean;
-  display?: 'chip';
+  display?: "chip";
   label?: string;
   filter?: boolean;
   optionLabel?: string;
@@ -30,7 +33,7 @@ export default function Multiselect(props: MultiselectProps) {
   const isGrouped = !!(props.optionGroupLabel && props.optionGroupChildren);
 
   return (
-    <div className={`div-multiselect ${props.className ?? ''}`}>
+    <div className={`div-multiselect ${props.className ?? ""}`}>
       {props.label && (
         <p className={`label-multiselect`}>
           <label htmlFor={props.id}>{props.label}</label>
@@ -44,7 +47,7 @@ export default function Multiselect(props: MultiselectProps) {
         onChange={props.onChange}
         options={props.options}
         filter={props.filter}
-        placeholder={props.placeholder || ''}
+        placeholder={props.placeholder || ""}
         disabled={props.disabled}
         display={props.display || undefined}
         optionLabel={!isGrouped ? props.optionLabel : undefined}
@@ -55,14 +58,14 @@ export default function Multiselect(props: MultiselectProps) {
         selectedItemTemplate={props.selectedItemTemplate}
         loading={props.loading}
         virtualScrollerOptions={props.virtualScrollerOptions}
-        className={props.hidden ? 'hidden-multiselect' : ''}
+        className={props.hidden ? "hidden-multiselect" : ""}
         removeIcon="pi pi-times"
         pt={{
           labelContainer: () => ({
             style: {
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
             },
           }),
         }}

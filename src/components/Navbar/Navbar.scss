@@ -1,0 +1,108 @@
+@use "../../styles/variables" as v;
+
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1.5rem;
+  height: 60px;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+
+  .navbar-left,
+  .navbar-right {
+    flex: 1; // Occupano lo stesso spazio per spingere il centro al mezzo
+    display: flex;
+    align-items: center;
+  }
+
+  .navbar-right {
+    justify-content: flex-end;
+  }
+
+  .navbar-center {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+
+    .navbar-logo {
+      font-weight: 800;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
+      color: v.$text-main;
+    }
+  }
+
+  .hamburger {
+    display: flex; // SEMPRE visibile (Desktop e Mobile)
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+    z-index: 1100;
+
+    .bar {
+      width: 22px;
+      height: 2px;
+      background-color: v.$text-main;
+      transition: 0.3s;
+    }
+
+    &.open {
+      .bar:nth-child(1) {
+        transform: translateY(7px) rotate(45deg);
+      }
+      .bar:nth-child(2) {
+        opacity: 0;
+      }
+      .bar:nth-child(3) {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+    }
+  }
+}
+
+/* Sidebar che scorre da sinistra */
+.nav-sidebar {
+  position: fixed;
+  left: -280px; // Nascosta a sinistra
+  top: 0;
+  width: 280px;
+  height: 100%;
+  background-color: v.$bg-card;
+  z-index: 1050;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  padding: 5rem 1.5rem;
+
+  &.active {
+    transform: translateX(280px); // Entra in scena
+  }
+
+  .nav-links {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    a {
+      text-decoration: none;
+      font-size: 1.1rem;
+      color: v.$text-main;
+      font-weight: 500;
+
+      &.active {
+        color: v.$green;
+        font-weight: 700;
+      }
+    }
+  }
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 1040;
+}

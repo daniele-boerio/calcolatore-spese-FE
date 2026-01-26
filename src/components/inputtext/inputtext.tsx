@@ -1,6 +1,7 @@
-import { InputText as InputTextPrime } from 'primereact/inputtext';
-import React from 'react';
-import './inputtext.scss';
+import { InputText as InputTextPrime } from "primereact/inputtext";
+import React from "react";
+import "./InputText.scss";
+import { KeyFilterType } from "primereact/keyfilter";
 
 export type InputTextProps = {
   id?: string;
@@ -15,14 +16,14 @@ export type InputTextProps = {
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   icon?: string;
-  iconPos?: 'left' | 'right';
+  iconPos?: "left" | "right";
   invalid?: boolean;
+  keyfilter?: KeyFilterType | undefined;
 };
 
 export default function InputText(props: InputTextProps) {
-
   return (
-    <div className={`div-inputtext ${props.className ?? ''}`}>
+    <div className={`div-inputtext ${props.className ?? ""}`}>
       {props.label && (
         <p className={`label-inputtext`}>
           <label htmlFor={props.id}>{props.label}</label>
@@ -30,22 +31,27 @@ export default function InputText(props: InputTextProps) {
       )}
 
       <div className={`div-div-inputtext`}>
-        {props.icon && props.iconPos === 'left' && <i className={`icon-inputtext ${props.icon ?? ''}`} />}
+        {props.icon && props.iconPos === "left" && (
+          <i className={`icon-inputtext ${props.icon ?? ""}`} />
+        )}
 
         <InputTextPrime
           id={props.id}
           value={props.value}
           onChange={props.onChange}
-          placeholder={props.placeholder || ''}
+          placeholder={props.placeholder || ""}
           autoFocus={props.autoFocus}
           onClick={props.onClick}
           onBlur={props.onBlur}
           onKeyDown={props.onKeyDown}
           disabled={props.disabled}
           invalid={props.invalid}
+          keyfilter={props.keyfilter}
         />
 
-        {props.icon && props.iconPos === 'right' && <i className={`icon-inputtext ${props.icon ?? ''}`} />}
+        {props.icon && props.iconPos === "right" && (
+          <i className={`icon-inputtext ${props.icon ?? ""}`} />
+        )}
       </div>
     </div>
   );

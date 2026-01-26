@@ -1,0 +1,41 @@
+@use "../../styles/variables" as v;
+
+.filters-panel {
+  width: 25rem; // Larghezza standard desktop
+  max-width: 100vw; // Sicurezza per evitare overflow laterale
+  background-color: v.$bg-card; // Assicuriamo che il pannello abbia lo sfondo corretto
+  border-left: 1px solid v.$border-color; // Spesso i pannelli filtro sono laterali
+  height: 100%;
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 16px;
+    padding: 1.5rem; // Usiamo il tuo padding standard
+  }
+
+  .filter-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    gap: 1rem;
+    padding-right: 4px; // Spazio per la scrollbar
+
+    // Personalizzazione scrollbar per renderla discreta
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: v.$border-color;
+      border-radius: 10px;
+    }
+  }
+
+  // Supporto Mobile
+  @media (max-width: v.$mobile) {
+    width: 100%; // Il pannello diventa a tutto schermo su mobile
+    border-left: none;
+  }
+}

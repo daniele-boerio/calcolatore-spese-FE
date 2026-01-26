@@ -1,0 +1,50 @@
+@use "../../styles/variables" as v;
+
+.transaction-list-container {
+  margin-top: 2rem;
+  .transaction-list-title {
+    margin-bottom: 1rem;
+    color: v.$text-main;
+    font-size: 1.5rem;
+  }
+
+  .transaction-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem; // Spazio verticale tra le righe
+  }
+
+  .transaction-card {
+    display: flex;
+    flex-direction: row; // Forza gli elementi sulla stessa riga
+    align-items: center;
+    gap: 0.5rem; // Spazio orizzontale tra data, importo e descrizione
+
+    .transaction-date {
+      color: v.$text-muted;
+      white-space: nowrap; // Evita che la data vada a capo
+    }
+
+    .transaction-amount {
+      font-weight: bold;
+      min-width: 70px; // Mantiene gli importi leggermente incolonnati se vuoi
+
+      &.entrata {
+        color: v.$green;
+      }
+      &.uscita {
+        color: v.$red;
+      }
+      &.rimborso {
+        color: v.$light-blue;
+      }
+    }
+
+    .transaction-desc {
+      color: v.$text-main;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+}

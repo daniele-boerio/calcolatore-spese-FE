@@ -1,10 +1,26 @@
+@use "../../styles/variables" as v;
+
 .div-dropdown {
   width: 20rem;
-  border-bottom: 1px solid var(--bko-color-tertiary);
+  // Usiamo il bordo standard del tema
+  border-bottom: 1px solid v.$border-color;
+  transition: border-color 0.2s ease;
+
+  &:focus-within {
+    border-bottom-color: v.$bg-button-primary;
+  }
+
+  @media (max-width: v.$mobile) {
+    width: 100%; // Responsive su mobile
+  }
 }
 
 .label-dropdown {
   margin: 0 0 5px 0;
+  color: v.$text-muted;
+  font-family: v.$font-main;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .hidden-dropdown {
@@ -12,19 +28,57 @@
 }
 
 .p-dropdown {
-  background-color: transparent;
-  border: none;
-  outline: none;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
   width: 100%;
   font-size: 1rem;
   display: flex;
   align-items: center;
+  color: v.$text-main;
+  font-family: v.$font-main;
+
+  &:not(.p-disabled).p-focus {
+    box-shadow: none !important; // Rimuoviamo il raggio blu di default di Prime
+  }
+
+  .p-dropdown-label {
+    padding: 0.5rem 0;
+    &.p-placeholder {
+      color: v.$text-muted; // Sostituito text-secondary
+    }
+  }
+
+  .p-dropdown-trigger {
+    color: v.$text-muted;
+  }
 }
 
-.p-placeholder {
-  color: var(--bko-color-text-secondary);
-}
+// Stili per il pannello (la lista che si apre)
+.p-dropdown-panel {
+  background-color: v.$bg-card !important;
+  border: 1px solid v.$border-color !important;
+  box-shadow: v.$shadow-color !important;
 
-.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
-  color: white !important;
+  .p-dropdown-items {
+    padding: 0.5rem 0;
+
+    .p-dropdown-item {
+      color: v.$text-main;
+      font-family: v.$font-main;
+      transition: background-color 0.2s;
+
+      &:not(.p-highlight):not(.p-disabled):hover {
+        background-color: v.$bg-app;
+        color: v.$text-main;
+      }
+
+      &.p-highlight {
+        // Colore quando l'elemento è selezionato nella lista
+        color: v.$text-main !important; // Rimosso white per coerenza Dark/Light
+        background-color: rgba(v.$bg-button-primary, 0.15) !important;
+        font-weight: 600;
+      }
+    }
+  }
 }

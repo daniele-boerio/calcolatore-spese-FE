@@ -1,0 +1,51 @@
+@use "../../styles/variables" as v;
+
+/* Voce di menu "Danger" (es. Elimina) */
+.p-menu .menu-item-danger {
+  div a span {
+    color: v.$text-red !important; // Sostituito red fisso
+  }
+
+  &:hover {
+    background-color: rgba(v.$text-red, 0.1) !important;
+  }
+}
+
+/* OverlayPanel (Il contenitore fluttuante) */
+.p-overlaypanel {
+  border: 1px solid v.$border-color; // Aggiunto un leggero bordo per stacco visivo
+  background-color: v.$bg-card;
+  box-shadow: v.$shadow-color;
+  width: 8.375rem;
+  border-radius: 12px;
+
+  /* Rimuove la "frecce" (triangolini) sopra/sotto l'overlay */
+  &:before,
+  &:after {
+    display: none !important;
+    content: none !important;
+    border: 0 !important;
+  }
+}
+
+/* Menu (PrimeReact Component) */
+.p-menu.p-component.p-ripple-disabled {
+  background-color: v.$bg-card; // Usiamo lo sfondo card per i menu
+  border: none;
+  padding: 0.5rem 0;
+
+  .p-menuitem {
+    .p-menuitem-link {
+      color: v.$text-main;
+      transition: background-color 0.2s;
+
+      .p-menuitem-icon {
+        color: v.$text-muted;
+      }
+
+      &:hover {
+        background-color: v.$bg-app; // Effetto hover discreto
+      }
+    }
+  }
+}

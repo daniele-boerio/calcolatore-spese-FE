@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -7,7 +7,7 @@ const api = axios.create({
 // Questo "Interceptor" viene eseguito PRIMA di ogni chiamata
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (token) {
       // Se il token esiste, lo aggiungiamo a tutte le richieste
       config.headers.Authorization = `Bearer ${token}`;
@@ -16,7 +16,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // (Opzionale) Interceptor per gestire errori 401 (token scaduto)
@@ -25,11 +25,11 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // Se il server dice che il token non è più valido, facciamo logout
-      localStorage.removeItem('token');
-      window.location.href = '/'; // O una logica per resettare Redux
+      localStorage.removeItem("token");
+      window.location.href = "/"; // O una logica per resettare Redux
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

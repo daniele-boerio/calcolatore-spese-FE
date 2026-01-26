@@ -1,5 +1,8 @@
-import { Dropdown as DropdownPrime, type DropdownChangeEvent } from 'primereact/dropdown';
-import './dropdown.scss';
+import {
+  Dropdown as DropdownPrime,
+  type DropdownChangeEvent,
+} from "primereact/dropdown";
+import "./Dropdown.scss";
 
 export type DropdownProps = {
   panelWidth?: string;
@@ -25,7 +28,7 @@ export type DropdownProps = {
 
 export default function Dropdown(props: DropdownProps) {
   return (
-    <div className={`div-dropdown ${props.className ?? ''}`}>
+    <div className={`div-dropdown ${props.className ?? ""}`}>
       {props.label && <p className="label-dropdown">{props.label}</p>}
       <DropdownPrime
         id={props.id}
@@ -42,7 +45,7 @@ export default function Dropdown(props: DropdownProps) {
         disabled={props.disabled}
         itemTemplate={props.itemTemplate}
         valueTemplate={props.valueTemplate}
-        className={props.hidden ? 'hidden-dropdown' : ''}
+        className={props.hidden ? "hidden-dropdown" : ""}
         showClear={props.showClear}
         pt={{
           panel: {

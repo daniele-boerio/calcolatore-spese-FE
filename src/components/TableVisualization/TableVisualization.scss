@@ -1,0 +1,94 @@
+@use "../../styles/variables" as v;
+
+.div-table-visualization {
+  &.invisible {
+    display: none;
+  }
+
+  .table-row-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+}
+
+/* Header Tabella */
+.p-datatable-thead tr {
+  // Usiamo il gradiente dinamico definito nel passaggio precedente
+  background: linear-gradient(
+    to right,
+    v.$bg-card,
+    v.$bg-gradient-table
+  ) !important;
+  border: 1px solid v.$border-color !important;
+}
+
+.p-datatable-thead th {
+  border-bottom: none;
+  background: transparent !important;
+  color: v.$text-main;
+  font-family: v.$font-main;
+}
+
+/* Corpo Tabella */
+.p-datatable-tbody {
+  tr {
+    background: transparent !important;
+    color: v.$text-main;
+
+    // Stato selezionato (Highlight)
+    &.p-highlight,
+    &[aria-selected="true"] {
+      color: v.$text-green !important; // O v.$color-primary se preferisci il blu
+      background-color: rgba(v.$bg-button-primary, 0.05) !important;
+
+      td {
+        border-top: 1px solid v.$bg-button-primary !important;
+        border-bottom: 1px solid v.$bg-button-primary !important;
+
+        &:first-child {
+          border-left: 1px solid v.$bg-button-primary !important;
+          border-top-left-radius: 6px !important;
+          border-bottom-left-radius: 6px !important;
+        }
+
+        &:last-child {
+          border-right: 1px solid v.$bg-button-primary !important;
+          border-top-right-radius: 6px !important;
+          border-bottom-right-radius: 6px !important;
+        }
+      }
+    }
+  }
+
+  td {
+    border-bottom: none;
+    border-top: 0.3px solid v.$border-color;
+    background: transparent !important;
+    padding: 1rem;
+  }
+}
+
+/* Paginator */
+.p-paginator-bottom.p-paginator.p-component {
+  border: none !important;
+  background-color: v.$bg-app !important; // Sfondo on-background
+  padding: 1rem;
+
+  .p-paginator-element {
+    color: v.$text-muted;
+    border-radius: 10px;
+    transition: background-color 0.2s;
+
+    &:enabled:hover {
+      background-color: v.$bg-card-gray;
+      color: v.$text-main;
+    }
+
+    &.p-highlight {
+      background-color: v.$bg-card !important;
+      border: 1px solid v.$bg-button-primary !important;
+      color: v.$bg-button-primary !important;
+    }
+  }
+}

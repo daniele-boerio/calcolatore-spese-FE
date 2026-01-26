@@ -1,8 +1,54 @@
-.p-inputswitch-slider:before {
-  background-color: var(--bko-color-background-on-background);
-  border-radius: 5rem;
+@use "../../styles/variables" as v;
+
+/* Wrapper del componente */
+.p-inputswitch {
+  width: 3rem;
+  height: 1.75rem;
+
+  .p-inputswitch-slider {
+    background-color: v.$bar-gray; // Sfondo dello switch quando è spento
+    border-radius: 10px;
+    transition:
+      background-color 0.2s,
+      box-shadow 0.2s;
+
+    &:before {
+      // La "pallina" dello switch
+      background-color: v.$bg-card !important; // Bianco in Light, Antracite in Dark
+      border-radius: 50%;
+      width: 1.25rem;
+      height: 1.25rem;
+      left: 0.25rem;
+      margin-top: -0.625rem; // Centratura verticale
+      transition: transform 0.2s;
+    }
+  }
+
+  /* Stato ATTIVO (Highlight) */
+  &.p-inputswitch-checked {
+    .p-inputswitch-slider {
+      background-color: v.$bg-button-primary !important; // Diventa blu (o il tuo primario)
+
+      &:before {
+        transform: translateX(1.25rem); // Sposta la pallina a destra
+      }
+    }
+  }
+
+  /* Stato Focus */
+  &:not(.p-disabled):focus-within {
+    .p-inputswitch-slider {
+      box-shadow: 0 0 0 0.2rem rgba(v.$bg-button-primary, 0.25) !important;
+    }
+  }
 }
 
+/* Label sopra lo switch */
 .label-switch {
+  display: block;
   margin: 0 0 5px 0;
+  color: v.$text-muted;
+  font-family: v.$font-main;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
