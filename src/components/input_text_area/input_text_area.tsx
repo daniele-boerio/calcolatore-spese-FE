@@ -1,41 +1,39 @@
-import { Password as PasswordPrime } from "primereact/password";
+import { InputTextarea as InputTextareaPrime } from "primereact/inputtextarea";
 import React from "react";
-import "./password.scss";
+import "./input_text_area.scss";
 
-export type InputTextProps = {
+export type InputTextareaProps = {
   id?: string;
   value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   placeholder?: string;
   className?: string;
   label?: string;
   autoFocus?: boolean;
   onClick?: (e: React.MouseEvent<HTMLElement>) => void;
-  onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
-  onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   disabled?: boolean;
   icon?: string;
   iconPos?: "left" | "right";
-  invalid?: boolean;
-  feedback?: boolean;
-  toggleMask?: boolean;
+  rows?: number;
 };
 
-export default function Password(props: InputTextProps) {
+export default function InputTextarea(props: InputTextareaProps) {
   return (
-    <div className={`div-inputtext ${props.className ?? ""}`}>
+    <div className={`div-inputtextarea ${props.className ?? ""}`}>
       {props.label && (
-        <p className={`label-inputtext`}>
+        <p className={`label-inputtextarea`}>
           <label htmlFor={props.id}>{props.label}</label>
         </p>
       )}
 
-      <div className={`div-div-inputtext`}>
+      <div className={`div-div-inputtextarea`}>
         {props.icon && props.iconPos === "left" && (
-          <i className={`icon-inputtext ${props.icon ?? ""}`} />
+          <i className={`icon-inputtextarea ${props.icon ?? ""}`} />
         )}
 
-        <PasswordPrime
+        <InputTextareaPrime
           id={props.id}
           value={props.value}
           onChange={props.onChange}
@@ -45,13 +43,11 @@ export default function Password(props: InputTextProps) {
           onBlur={props.onBlur}
           onKeyDown={props.onKeyDown}
           disabled={props.disabled}
-          invalid={props.invalid}
-          feedback={props.feedback}
-          toggleMask={props.toggleMask || false}
+          rows={props.rows}
         />
 
         {props.icon && props.iconPos === "right" && (
-          <i className={`icon-inputtext ${props.icon ?? ""}`} />
+          <i className={`icon-inputtextarea ${props.icon ?? ""}`} />
         )}
       </div>
     </div>

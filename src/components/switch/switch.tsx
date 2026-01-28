@@ -2,7 +2,7 @@ import {
   InputSwitch as SwitchPrime,
   type InputSwitchChangeEvent,
 } from "primereact/inputswitch";
-import "./Switch.scss";
+import "./switch.scss";
 
 export type SwitchProps = {
   className?: string;

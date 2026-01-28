@@ -1,6 +1,7 @@
-import { Password as PasswordPrime } from "primereact/password";
+import { InputText as InputTextPrime } from "primereact/inputtext";
 import React from "react";
-import "./password.scss";
+import "./input_text.scss";
+import { KeyFilterType } from "primereact/keyfilter";
 
 export type InputTextProps = {
   id?: string;
@@ -17,11 +18,10 @@ export type InputTextProps = {
   icon?: string;
   iconPos?: "left" | "right";
   invalid?: boolean;
-  feedback?: boolean;
-  toggleMask?: boolean;
+  keyfilter?: KeyFilterType | undefined;
 };
 
-export default function Password(props: InputTextProps) {
+export default function InputText(props: InputTextProps) {
   return (
     <div className={`div-inputtext ${props.className ?? ""}`}>
       {props.label && (
@@ -35,7 +35,7 @@ export default function Password(props: InputTextProps) {
           <i className={`icon-inputtext ${props.icon ?? ""}`} />
         )}
 
-        <PasswordPrime
+        <InputTextPrime
           id={props.id}
           value={props.value}
           onChange={props.onChange}
@@ -46,8 +46,7 @@ export default function Password(props: InputTextProps) {
           onKeyDown={props.onKeyDown}
           disabled={props.disabled}
           invalid={props.invalid}
-          feedback={props.feedback}
-          toggleMask={props.toggleMask || false}
+          keyfilter={props.keyfilter}
         />
 
         {props.icon && props.iconPos === "right" && (

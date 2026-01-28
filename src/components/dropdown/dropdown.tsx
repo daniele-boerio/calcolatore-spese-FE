@@ -2,7 +2,7 @@ import {
   Dropdown as DropdownPrime,
   type DropdownChangeEvent,
 } from "primereact/dropdown";
-import "./Dropdown.scss";
+import "./dropdown.scss";
 
 export type DropdownProps = {
   panelWidth?: string;

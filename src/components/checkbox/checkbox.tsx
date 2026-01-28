@@ -2,7 +2,7 @@ import {
   Checkbox as CheckboxPrime,
   type CheckboxChangeEvent,
 } from "primereact/checkbox";
-import "./Checkbox.scss";
+import "./checkbox.scss";
 
 export type CheckboxProps = {
   onChange: (e: CheckboxChangeEvent) => void;

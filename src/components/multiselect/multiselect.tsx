@@ -4,7 +4,7 @@ import {
 } from "primereact/multiselect";
 import type { VirtualScrollerProps } from "primereact/virtualscroller";
 import React from "react";
-import "./MultiSelect.scss";
+import "./multiselect.scss";
 
 export type MultiselectProps = {
   id?: string;

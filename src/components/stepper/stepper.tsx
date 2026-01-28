@@ -1,7 +1,7 @@
 import { Stepper as StepperPrime } from "primereact/stepper";
 import { StepperPanel } from "primereact/stepperpanel";
 import React, { useState } from "react";
-import "./Stepper.scss";
+import "./stepper.scss";
 
 export type StepperProps = {
   id?: string;

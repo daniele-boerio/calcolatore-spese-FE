@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { Badge } from "primereact/badge";
 import { Button as ButtonPrime } from "primereact/button";
 import React from "react";
-import "./Button.scss";
+import "./button.scss";
 
 export type ButtonProps = {
   label?: string;
@@ -28,7 +28,7 @@ export default function Button(props: ButtonProps) {
       className={clsx(
         "icon-button",
         props.icon,
-        props.showIconBadge && "p-overlay-badge"
+        props.showIconBadge && "p-overlay-badge",
       )}
     >
       {props.showIconBadge && <Badge />}

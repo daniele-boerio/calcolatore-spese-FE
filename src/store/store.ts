@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-import trasactionReducer from "../features/transactions/transactionSlice";
-import profileReducer from "../features/profile/profileSlice";
-import contoReducer from "../features/conti/contoSlice";
-import categoriaReducer from "../features/categorie/categoriaSlice";
-import tagReducer from "../features/tags/tagSlice";
-import errorReducer from "../features/error/errorSlice";
+import trasactionReducer from "../features/transactions/transaction_slice";
+import profileReducer from "../features/profile/profile_slice";
+import contoReducer from "../features/conti/conto_slice";
+import categoriaReducer from "../features/categorie/categoria_slice";
+import tagReducer from "../features/tags/tag_slice";
+import errorReducer from "../features/error/error_slice";
 import { useDispatch, useSelector } from "react-redux";
-import { errorMiddleware } from "./errorMiddleware";
+import { errorMiddleware } from "./error_middleware";
 
 export const store = configureStore({
   reducer: {

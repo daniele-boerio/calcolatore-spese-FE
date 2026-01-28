@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
-import AuthPage from "./pages/AuthPage/AuthPage";
-import HomePage from "./pages/HomePage/HomePage";
-import Navbar from "./components/Navbar/Navbar"; // Importa la tua nuova Navbar
+import AuthPage from "./pages/auth_page/auth_page";
+import HomePage from "./pages/home_page/home_page";
+import Navbar from "./components/navbar/navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.scss";
-import TransactionPage from "./pages/TransactionPage/TransactionPage";
-import CategoryTagsPage from "./pages/CategoryTagsPage/CategoryTagsPage";
+import TransactionPage from "./pages/transaction_page/transaction_page";
+import CategoryTagsPage from "./pages/category_tags_page/category_tags_page";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
