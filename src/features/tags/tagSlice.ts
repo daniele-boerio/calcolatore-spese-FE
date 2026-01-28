@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import { Tag, TagState } from "./interfaces";
+import { createTag, deleteTag, getTags, updateTag } from "./apiCalls";
 
 const initialState: TagState = {
   loading: false,
@@ -27,8 +28,30 @@ const tagSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Qui aggiungerai i .addCase per getTags, createTag, etc.
-      // Esempio: .addCase(getTags.fulfilled, (state, action) => { state.tags = action.payload; })
+      .addCase(getTags.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tags = action.payload;
+      })
+
+      .addCase(createTag.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tags.push(action.payload);
+      })
+
+      .addCase(updateTag.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.tags.findIndex(
+          (tag) => tag.id === action.payload.id,
+        );
+        if (index !== -1) {
+          state.tags[index] = action.payload;
+        }
+      })
+
+      .addCase(deleteTag.fulfilled, (state, action) => {
+        state.loading = false;
+        state.tags = state.tags.filter((tag) => tag.id !== action.payload);
+      })
 
       .addMatcher(
         (action: Action) =>

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import "./HomePage.scss";
 import CustomPieChart from "../../components/Charts/CustomPieChart";
 import BudgetCard from "../../components/BudgetCard/BudgetCard";
@@ -11,6 +11,7 @@ import {
   getCurrentMonthExpensesByCategory,
 } from "../../features/conti/apiCalls";
 import Button from "../../components/Button/Button";
+import CreateTransactionDialog from "../../components/Dialog/CreateTransazioneDialog/CreateTransazioneDialog";
 
 const HomePage: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -20,6 +21,11 @@ const HomePage: React.FC = () => {
   const monthlyExpensesByCategory = useAppSelector(
     (state) => state.conto.monthlyExpensesByCategory,
   );
+
+  const [
+    isCreateTransactionDialogVisible,
+    setIsCreateTransactionDialogVisible,
+  ] = useState<boolean>(false);
 
   useEffect(() => {
     // Caricamento dati iniziale
@@ -32,8 +38,8 @@ const HomePage: React.FC = () => {
   // Trasformiamo { categoria: string, totale: number } in { id, value, label }
   const pieChartData = monthlyExpensesByCategory.map((item, index) => ({
     id: index,
-    value: item.totale,
-    label: item.categoria,
+    value: item.value,
+    label: item.label,
   }));
 
   return (
@@ -55,9 +61,13 @@ const HomePage: React.FC = () => {
           icon="pi pi-plus"
           compact
           rounded
-          onClick={() => console.log("Apri modal nuova transazione")}
+          onClick={() => setIsCreateTransactionDialogVisible(true)}
         />
       </div>
+      <CreateTransactionDialog
+        visible={isCreateTransactionDialogVisible}
+        onHide={() => setIsCreateTransactionDialogVisible(false)}
+      />
     </div>
   );
 };

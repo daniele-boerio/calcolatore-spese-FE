@@ -30,12 +30,9 @@ export const updateBudget = createAsyncThunk<
   UpdateBudgetParams
 >("conti/monthlyBudget", async (payload, { rejectWithValue }) => {
   try {
-    const response = await api.put<MonthlyBudgetResponse>(
-      `/budget/monthlyBudget`,
-      {
-        totalBudget: payload.totalBudget,
-      },
-    );
+    const response = await api.put<MonthlyBudgetResponse>(`/monthlyBudget`, {
+      totalBudget: payload.totalBudget,
+    });
     return response.data;
   } catch (error) {
     const err = error as AxiosError;

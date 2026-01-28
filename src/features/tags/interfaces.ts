@@ -9,3 +9,16 @@ export interface TagState {
   tags: Tag[];
   selectedTag: Tag | null;
 }
+
+export interface createTagParams {
+  nome: string;
+}
+
+export interface UpdateTagParams {
+  id: string;
+  nome: string;
+}
+
+export interface DeleteTagParams {
+  id: string;
+}

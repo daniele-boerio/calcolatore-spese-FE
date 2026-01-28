@@ -39,7 +39,7 @@ export interface DeleteCategoriaParams {
 
 export interface CreateSottoCategoriaParams {
   id: string; // ID della categoria padre
-  nomeList: string[];
+  nomeList: { nome: string }[];
 }
 
 export interface UpdateSottoCategoriaParams {

@@ -8,8 +8,8 @@ export interface Conto {
 }
 
 export interface ExpenseByCategory {
-  categoria: string;
-  totale: number;
+  label: string;
+  value: number;
 }
 
 export interface MonthlyBudget {

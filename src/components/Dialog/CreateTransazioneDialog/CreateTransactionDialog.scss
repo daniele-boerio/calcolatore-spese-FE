@@ -1,0 +1,40 @@
+.transaction-form {
+  padding-top: 1rem;
+
+  .type-selector {
+    display: flex;
+    .p-button {
+      flex: 1;
+      justify-content: center;
+    }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      label {
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+
+      &.full-width {
+        grid-column: span 2;
+      }
+
+      &.highlight-field {
+        grid-column: span 2;
+        background: #f0f7ff;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px dashed #3b82f6;
+      }
+    }
+  }
+}
