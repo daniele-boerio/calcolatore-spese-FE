@@ -5,7 +5,7 @@ import {
   deleteCategoria,
 } from "../../features/categorie/api_calls";
 import "./category_tags_page.scss";
-import Button from "../../components/Button/Button";
+import Button from "../../components/button/button";
 import { Categoria } from "../../features/categorie/interfaces";
 import { deleteTag, getTags } from "../../features/tags/api_calls";
 import { Tag } from "../../features/tags/interfaces";
