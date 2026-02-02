@@ -1,4 +1,11 @@
-# Stage 1: Build ... (rimane uguale)
+# Stage 1: Build
+FROM node:20-slim AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+# Vite genera la cartella /dist
+RUN npm run build
 
 # Stage 2: Serve con Nginx
 FROM nginx:alpine
