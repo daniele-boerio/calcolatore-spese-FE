@@ -1,9 +1,12 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import {
+  createConto,
+  deleteConto,
   getConti,
   getCurrentMonthExpenses,
   getCurrentMonthExpensesByCategory,
   updateBudget,
+  updateConto,
 } from "./api_calls";
 import {
   Conto,
@@ -44,7 +47,6 @@ const contoSlice = createSlice({
       .addCase(
         getCurrentMonthExpenses.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
-          state.loading = false;
           const { monthly_budget } = action.payload;
           state.monthlyBudget.totalBudget = monthly_budget.totalBudget;
           state.monthlyBudget.expenses = monthly_budget.expenses;
@@ -54,7 +56,6 @@ const contoSlice = createSlice({
       .addCase(
         updateBudget.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
-          state.loading = false;
           const { monthly_budget } = action.payload;
           state.monthlyBudget.totalBudget = monthly_budget.totalBudget;
           state.monthlyBudget.expenses = monthly_budget.expenses;
@@ -64,7 +65,6 @@ const contoSlice = createSlice({
 
       // getConti
       .addCase(getConti.fulfilled, (state, action: PayloadAction<Conto[]>) => {
-        state.loading = false;
         state.conti = action.payload;
       })
 
@@ -72,8 +72,31 @@ const contoSlice = createSlice({
       .addCase(
         getCurrentMonthExpensesByCategory.fulfilled,
         (state, action: PayloadAction<ExpenseByCategory[]>) => {
-          state.loading = false;
           state.monthlyExpensesByCategory = action.payload;
+        },
+      )
+
+      // createConto
+      .addCase(createConto.fulfilled, (state, action: PayloadAction<Conto>) => {
+        state.conti.push(action.payload);
+      })
+
+      // updateConto
+      .addCase(updateConto.fulfilled, (state, action: PayloadAction<Conto>) => {
+        const index = state.conti.findIndex(
+          (conto) => conto.id === action.payload.id,
+        );
+        if (index !== -1) {
+          state.conti[index] = action.payload;
+        }
+      })
+
+      .addCase(
+        deleteConto.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.conti = state.conti.filter(
+            (conto) => conto.id !== action.payload,
+          );
         },
       )
 

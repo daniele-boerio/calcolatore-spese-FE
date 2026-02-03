@@ -7,6 +7,7 @@ import {
   CreateSottoCategoriaParams,
   DeleteCategoriaParams,
   DeleteSottoCategoriaParams,
+  DeleteSottoCategoriaResponse,
   SottoCategoria,
   UpdateCategoriaParams,
   UpdateSottoCategoriaParams,
@@ -73,7 +74,7 @@ export const deleteCategoria = createAsyncThunk<string, DeleteCategoriaParams>(
   "categorie/deleteCategoria",
   async ({ id }, { rejectWithValue }) => {
     try {
-      await api.delete(`/categorie/${id}`);
+      await api.delete<void>(`/categorie/${id}`);
       return id; // Restituisce l'ID (stringa) eliminato
     } catch (error) {
       const err = error as AxiosError;
@@ -129,13 +130,13 @@ export const updateSottoCategoria = createAsyncThunk<
 
 // Eliminazione SottoCategoria
 export const deleteSottoCategoria = createAsyncThunk<
-  { catId: string; subId: string },
+  DeleteSottoCategoriaResponse,
   DeleteSottoCategoriaParams
 >(
   "categorie/deleteSottoCategoria",
   async ({ catId, subId }, { rejectWithValue }) => {
     try {
-      await api.delete(`/sottocategorie/${subId}`);
+      await api.delete<void>(`/sottocategorie/${subId}`);
       return { catId, subId };
     } catch (error) {
       const err = error as AxiosError;

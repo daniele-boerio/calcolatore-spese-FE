@@ -41,46 +41,58 @@ const transactionsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       // GET LastTransactions
-      .addCase(getLastTransactions.fulfilled, (state, action) => {
-        state.loading = false;
-        state.transactions = action.payload;
-      })
+      .addCase(
+        getLastTransactions.fulfilled,
+        (state, action: PayloadAction<Transaction[]>) => {
+          state.transactions = action.payload;
+        },
+      )
 
       // GET TransactionsPaginated
-      .addCase(getTransactionsPaginated.fulfilled, (state, action) => {
-        state.loading = false;
-        state.transactions = action.payload.data;
-        state.pagination.total = action.payload.total;
-        state.pagination.page = action.payload.page;
-        state.pagination.size = action.payload.size;
-      })
+      .addCase(
+        getTransactionsPaginated.fulfilled,
+        (state, action: PayloadAction<PaginatedResponse>) => {
+          state.transactions = action.payload.data;
+          state.pagination.total = action.payload.total;
+          state.pagination.page = action.payload.page;
+          state.pagination.size = action.payload.size;
+        },
+      )
 
-      .addCase(createTransaction.fulfilled, (state, action) => {
-        state.loading = false;
-        state.transactions.push(action.payload);
-      })
+      .addCase(
+        createTransaction.fulfilled,
+        (state, action: PayloadAction<Transaction>) => {
+          state.transactions.push(action.payload);
+        },
+      )
 
-      .addCase(updateTransaction.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.transactions.findIndex(
-          (tran) => tran.id === action.payload.id,
-        );
-        if (index !== -1) {
-          state.transactions[index] = action.payload;
-        }
-      })
+      .addCase(
+        updateTransaction.fulfilled,
+        (state, action: PayloadAction<Transaction>) => {
+          const index = state.transactions.findIndex(
+            (tran) => tran.id === action.payload.id,
+          );
+          if (index !== -1) {
+            state.transactions[index] = action.payload;
+          }
+        },
+      )
 
-      .addCase(deleteTransaction.fulfilled, (state, action) => {
-        state.loading = false;
-        state.transactions = state.transactions.filter(
-          (tran) => tran.id !== action.payload,
-        );
-      })
+      .addCase(
+        deleteTransaction.fulfilled,
+        (state, action: PayloadAction<string>) => {
+          state.transactions = state.transactions.filter(
+            (tran) => tran.id !== action.payload,
+          );
+        },
+      )
 
-      .addCase(getTransactionsByTag.fulfilled, (state, action) => {
-        state.loading = false;
-        state.transactions = action.payload;
-      })
+      .addCase(
+        getTransactionsByTag.fulfilled,
+        (state, action: PayloadAction<Transaction[]>) => {
+          state.transactions = action.payload;
+        },
+      )
 
       // Matchers per caricamento ed errori del modulo transazioni
       .addMatcher(

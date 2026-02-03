@@ -28,18 +28,15 @@ const tagSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(getTags.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(getTags.fulfilled, (state, action: PayloadAction<Tag[]>) => {
         state.tags = action.payload;
       })
 
-      .addCase(createTag.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(createTag.fulfilled, (state, action: PayloadAction<Tag>) => {
         state.tags.push(action.payload);
       })
 
-      .addCase(updateTag.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(updateTag.fulfilled, (state, action: PayloadAction<Tag>) => {
         const index = state.tags.findIndex(
           (tag) => tag.id === action.payload.id,
         );
@@ -48,8 +45,7 @@ const tagSlice = createSlice({
         }
       })
 
-      .addCase(deleteTag.fulfilled, (state, action) => {
-        state.loading = false;
+      .addCase(deleteTag.fulfilled, (state, action: PayloadAction<string>) => {
         state.tags = state.tags.filter((tag) => tag.id !== action.payload);
       })
 

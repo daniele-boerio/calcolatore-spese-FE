@@ -6,6 +6,9 @@ import {
   MonthlyBudgetResponse,
   ExpenseByCategory,
   UpdateBudgetParams,
+  CreateContoParams,
+  UpdateContoParams,
+  DeleteContoParams,
 } from "./interfaces";
 
 export const getCurrentMonthExpenses = createAsyncThunk<
@@ -28,10 +31,10 @@ export const getCurrentMonthExpenses = createAsyncThunk<
 export const updateBudget = createAsyncThunk<
   MonthlyBudgetResponse,
   UpdateBudgetParams
->("conti/monthlyBudget", async (payload, { rejectWithValue }) => {
+>("conti/monthlyBudget", async (params, { rejectWithValue }) => {
   try {
     const response = await api.put<MonthlyBudgetResponse>(`/monthlyBudget`, {
-      totalBudget: payload.totalBudget,
+      totalBudget: params.totalBudget,
     });
     return response.data;
   } catch (error) {
@@ -66,6 +69,48 @@ export const getConti = createAsyncThunk<Conto[], void>(
     } catch (error) {
       const err = error as AxiosError;
       return rejectWithValue(err.response?.data || "Errore ricezione conti");
+    }
+  },
+);
+
+export const createConto = createAsyncThunk<Conto, CreateContoParams>(
+  "conti/createConto",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await api.post<Conto>(`/conti`, params);
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(err.response?.data || "Errore creazione conto");
+    }
+  },
+);
+
+export const updateConto = createAsyncThunk<Conto, UpdateContoParams>(
+  "conti/updateConto",
+  async (params, { rejectWithValue }) => {
+    try {
+      const { id, ...body } = params;
+      const response = await api.put<Conto>(`/conti/${id}`, body);
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore aggiornamento conto",
+      );
+    }
+  },
+);
+
+export const deleteConto = createAsyncThunk<string, DeleteContoParams>(
+  "conti/deleteConto",
+  async (params, { rejectWithValue }) => {
+    try {
+      await api.delete<void>(`/conti/${params.id}`);
+      return params.id;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(err.response?.data || "Errore eliminazione conto");
     }
   },
 );

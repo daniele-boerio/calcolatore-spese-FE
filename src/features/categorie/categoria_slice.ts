@@ -8,7 +8,12 @@ import {
   updateCategoria,
   updateSottoCategoria,
 } from "./api_calls";
-import { Categoria, CategorieState, SottoCategoria } from "./interfaces";
+import {
+  Categoria,
+  CategorieState,
+  DeleteSottoCategoriaResponse,
+  SottoCategoria,
+} from "./interfaces";
 
 const initialState: CategorieState = {
   loading: false,
@@ -36,7 +41,6 @@ const categorieSlice = createSlice({
       .addCase(
         getCategorie.fulfilled,
         (state, action: PayloadAction<Categoria[]>) => {
-          state.loading = false;
           state.categorie = action.payload;
         },
       )
@@ -45,7 +49,6 @@ const categorieSlice = createSlice({
       .addCase(
         createCategoria.fulfilled,
         (state, action: PayloadAction<Categoria>) => {
-          state.loading = false;
           const newCat = {
             ...action.payload,
             sottocategorie: action.payload.sottocategorie || [],
@@ -58,7 +61,6 @@ const categorieSlice = createSlice({
       .addCase(
         updateCategoria.fulfilled,
         (state, action: PayloadAction<Categoria>) => {
-          state.loading = false;
           const index = state.categorie.findIndex(
             (cat) => cat.id === action.payload.id,
           );
@@ -75,7 +77,6 @@ const categorieSlice = createSlice({
       .addCase(
         deleteCategoria.fulfilled,
         (state, action: PayloadAction<string>) => {
-          state.loading = false;
           state.categorie = state.categorie.filter(
             (cat) => cat.id !== action.payload,
           );
@@ -86,7 +87,6 @@ const categorieSlice = createSlice({
       .addCase(
         createSottoCategorie.fulfilled,
         (state, action: PayloadAction<SottoCategoria[]>) => {
-          state.loading = false;
           const newSub = action.payload;
           const categoria = state.categorie.find(
             (cat) => cat.id === newSub[0].categoria_id,
@@ -102,7 +102,6 @@ const categorieSlice = createSlice({
       .addCase(
         updateSottoCategoria.fulfilled,
         (state, action: PayloadAction<SottoCategoria>) => {
-          state.loading = false;
           const updatedSub = action.payload;
           const categoria = state.categorie.find(
             (cat) => cat.id === updatedSub.categoria_id,
@@ -121,8 +120,7 @@ const categorieSlice = createSlice({
       // deleteSottoCategoria
       .addCase(
         deleteSottoCategoria.fulfilled,
-        (state, action: PayloadAction<{ catId: string; subId: string }>) => {
-          state.loading = false;
+        (state, action: PayloadAction<DeleteSottoCategoriaResponse>) => {
           const { catId, subId } = action.payload;
           const categoria = state.categorie.find((cat) => cat.id === catId);
           if (categoria && categoria.sottocategorie) {

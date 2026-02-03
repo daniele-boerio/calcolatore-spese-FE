@@ -51,3 +51,8 @@ export interface DeleteSottoCategoriaParams {
   catId: string;
   subId: string;
 }
+
+export interface DeleteSottoCategoriaResponse {
+  catId: string;
+  subId: string;
+}

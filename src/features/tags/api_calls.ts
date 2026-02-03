@@ -65,7 +65,7 @@ export const deleteTag = createAsyncThunk<string, DeleteTagParams>(
   "tags/deleteTag",
   async (params, { rejectWithValue }) => {
     try {
-      const response = await api.delete<Tag>(`/tags/${params.id}`);
+      await api.delete<void>(`/tags/${params.id}`);
       return params.id;
     } catch (error) {
       const err = error as AxiosError;

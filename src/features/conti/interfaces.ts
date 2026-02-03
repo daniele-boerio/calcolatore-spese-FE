@@ -4,7 +4,14 @@ export interface Conto {
   id: string;
   nome: string;
   saldo: number;
-  // aggiungi altri campi se presenti nel tuo oggetto Conto
+  ricarica_automatica: boolean;
+  budget_obiettivo?: number;
+  soglia_minima?: number;
+  conto_sorgente_id?: string;
+  frequenza_controllo?: string;
+  prossimo_controllo?: string;
+  creationDate: string;
+  lastUpdate: string;
 }
 
 export interface ExpenseByCategory {
@@ -42,4 +49,31 @@ export interface ContoState {
 // Interfaccia per il payload di aggiornamento budget
 export interface UpdateBudgetParams {
   totalBudget: number | null;
+}
+
+export interface CreateContoParams {
+  nome: string;
+  saldo: number;
+  ricarica_automatica: boolean;
+  budget_obiettivo?: number;
+  soglia_minima?: number;
+  conto_sorgente_id?: number;
+  frequenza_controllo?: string;
+  prossimo_controllo?: string;
+}
+
+export interface UpdateContoParams {
+  id: string;
+  nome?: string;
+  saldo?: number;
+  ricarica_automatica?: boolean;
+  budget_obiettivo?: number;
+  soglia_minima?: number;
+  conto_sorgente_id?: number;
+  frequenza_controllo?: string;
+  prossimo_controllo?: string;
+}
+
+export interface DeleteContoParams {
+  id: string;
 }

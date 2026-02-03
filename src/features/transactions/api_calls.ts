@@ -89,7 +89,7 @@ export const deleteTransaction = createAsyncThunk<
   DeleteTransactionParams
 >("transazioni/deleteTransaction", async (params, { rejectWithValue }) => {
   try {
-    await api.delete<string>(`/transazioni/${params.id}`);
+    await api.delete<void>(`/transazioni/${params.id}`);
     return params.id;
   } catch (error) {
     const err = error as AxiosError;

@@ -5,10 +5,22 @@ import Navbar from "./components/navbar/navbar";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.scss";
 import TransactionPage from "./pages/transaction_page/transaction_page";
+import { useAppDispatch } from "./store/store";
+import { useEffect } from "react";
 import CategoryTagsPage from "./pages/category_tags_page/category_tags_page";
+import { getProfile } from "./features/profile/api_calls";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(getProfile());
+    }
+  }, [dispatch]);
 
   return (
     <Router>

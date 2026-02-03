@@ -1,14 +1,18 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
-import { login, register } from "./api_calls";
-import { AuthResponse, ProfileState } from "./interfaces";
+import { getProfile, login, register } from "./api_calls";
+import { AuthResponse, ProfileResponse, ProfileState } from "./interfaces";
 
 // --- STATO INIZIALE ---
+
+const savedToken = localStorage.getItem("token");
+const savedUsername = localStorage.getItem("username");
 
 const initialState: ProfileState = {
   loading: false,
   token: localStorage.getItem("token") || null,
-  username: localStorage.getItem("username") || null,
-  isAuthenticated: !!localStorage.getItem("token"),
+  username: savedUsername ? ({ username: savedUsername } as any) : null,
+  email: null,
+  isAuthenticated: !!savedToken,
 };
 
 // --- HELPERS ---
@@ -39,7 +43,6 @@ const profileSlice = createSlice({
       .addCase(
         login.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
-          state.loading = false;
           state.token = action.payload.access_token;
           state.username = action.payload.username;
           state.isAuthenticated = true;
@@ -51,7 +54,6 @@ const profileSlice = createSlice({
       .addCase(
         register.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
-          state.loading = false;
           state.token = action.payload.access_token;
           state.username = action.payload.username;
           state.isAuthenticated = true;
@@ -61,6 +63,15 @@ const profileSlice = createSlice({
         },
       )
 
+      .addCase(
+        getProfile.fulfilled,
+        (state, action: PayloadAction<ProfileResponse>) => {
+          state.isAuthenticated = true;
+
+          state.username = action.payload.username;
+          state.email = action.payload.email;
+        },
+      )
       // Matchers per caricamento ed errori del modulo profile
       .addMatcher(
         (action: Action) =>

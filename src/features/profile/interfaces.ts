@@ -18,5 +18,11 @@ export interface ProfileState {
   loading: boolean;
   token: string | null;
   username: string | null;
+  email: string | null;
   isAuthenticated: boolean;
+}
+
+export interface ProfileResponse {
+  username: string;
+  email: string;
 }

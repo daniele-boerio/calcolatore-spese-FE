@@ -1,7 +1,12 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../services/api";
 import { AxiosError } from "axios";
-import { AuthResponse, LoginParams, RegisterParams } from "./interfaces";
+import {
+  AuthResponse,
+  LoginParams,
+  ProfileResponse,
+  RegisterParams,
+} from "./interfaces";
 
 export const login = createAsyncThunk<AuthResponse, LoginParams>(
   "profile/login",
@@ -38,6 +43,18 @@ export const register = createAsyncThunk<AuthResponse, RegisterParams>(
       return rejectWithValue(
         err.response?.data || "Errore durante la registrazione",
       );
+    }
+  },
+);
+
+export const getProfile = createAsyncThunk<ProfileResponse, void>(
+  "profile/getProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get<ProfileResponse>("/me");
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue("Sessione non valida");
     }
   },
 );
