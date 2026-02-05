@@ -9,6 +9,7 @@ import { useAppDispatch } from "./store/store";
 import { useEffect } from "react";
 import CategoryTagsPage from "./pages/category_tags_page/category_tags_page";
 import { getProfile } from "./features/profile/api_calls";
+import { ErrorDialog } from "./components/dialog/error_dialog/error_dialog";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -41,6 +42,7 @@ function App() {
           </>
         )}
       </div>
+      <ErrorDialog />
     </Router>
   );
 }

@@ -1,0 +1,40 @@
+@use "../../styles/variables.scss" as v;
+
+.doughnut-chart-wrapper {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .custom-chart-object {
+    width: 100%;
+    height: 100%;
+  }
+
+  .doughnut-chart-overlay {
+    position: absolute;
+    // Spostiamo leggermente in alto per compensare la legenda in basso
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    pointer-events: none; // Evita di bloccare i tooltip del grafico
+
+    .total-title {
+      font-size: 0.85rem;
+      color: v.$text-muted;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .total-amount {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: v.$text-main;
+    }
+  }
+}

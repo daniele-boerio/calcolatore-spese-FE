@@ -3,8 +3,10 @@ import { Dialog } from "primereact/dialog";
 import Button from "../../button/button";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { hideError } from "../../../features/error/error_slice";
+import { useI18n } from "../../../i18n/use-i18n";
 
-export const ErrorDialog: React.FC = () => {
+export default function ErrorDialog() {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Grazie al setup di store.ts, lo stato 'error' è già tipizzato
@@ -17,7 +19,7 @@ export const ErrorDialog: React.FC = () => {
   const footerContent = (
     <div>
       <Button
-        label="Chiudi"
+        label={t("close")}
         icon="pi pi-check"
         onClick={onHide}
         className="p-button-text"
@@ -27,7 +29,7 @@ export const ErrorDialog: React.FC = () => {
 
   return (
     <Dialog
-      header={title || "Errore"} // Fallback se il titolo è vuoto
+      header={title || t("error")}
       visible={isOpen}
       style={{ width: "90vw", maxWidth: "450px" }}
       onHide={onHide}
@@ -36,13 +38,9 @@ export const ErrorDialog: React.FC = () => {
       resizable={false}
       closable={false}
     >
-      <div className="flex align-items-center" style={{ gap: "1rem" }}>
-        <i
-          className="pi pi-exclamation-triangle"
-          style={{ fontSize: "2.5rem", color: "var(--red-500)" }}
-        ></i>
-        <span style={{ lineHeight: "1.5" }}>{message}</span>
+      <div>
+        <span>{message}</span>
       </div>
     </Dialog>
   );
-};
+}

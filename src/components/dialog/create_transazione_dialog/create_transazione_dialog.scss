@@ -1,40 +1,64 @@
+@use "../../../styles/variables.scss" as v;
+
+.create-transaction-dialog {
+  width: 100vw;
+  max-width: 700px;
+
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    padding-top: 1rem;
+  }
+}
+
 .transaction-form {
-  padding-top: 1rem;
+  padding-top: 0.5rem;
 
   .type-selector {
+    margin-bottom: 1.5rem;
     display: flex;
+
+    // Per far sì che i bottoni occupino spazio uguale
     .p-button {
       flex: 1;
-      justify-content: center;
     }
   }
 
   .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.2rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
 
     .field {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
-
-      label {
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
+      gap: 0.4rem;
 
       &.full-width {
         grid-column: span 2;
       }
 
-      &.highlight-field {
-        grid-column: span 2;
-        background: #f0f7ff;
-        padding: 10px;
-        border-radius: 8px;
-        border: 1px dashed #3b82f6;
+      .field-label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: v.$text-main;
+      }
+
+      // Stili per componenti PrimeReact per forzare la larghezza
+      .p-inputnumber,
+      .p-calendar,
+      .p-dropdown,
+      .p-inputtext {
+        width: 100%;
       }
     }
   }
+}
+
+// Stile per evidenziare la sezione rimborsi se necessario
+.highlight-field {
+  background-color: rgba(white, 0.05);
+  padding: 0.5rem;
+  border-radius: 4px;
 }

@@ -3,12 +3,14 @@ import CreditCard from "../credit_card/credit_card";
 import "./card_carousel.scss";
 // Importiamo l'interfaccia Conto definita nello slice dei conti
 import { Conto } from "../../features/conti/interfaces";
+import { useI18n } from "../../i18n/use-i18n";
 
 interface CardCarouselProps {
   conti: Conto[];
 }
 
-const CardCarousel: React.FC<CardCarouselProps> = ({ conti }) => {
+export default function CardCarousel({ conti }: CardCarouselProps) {
+  const { t } = useI18n();
   // Definiamo i colori disponibili come un array di stringhe costanti (readonly)
   const availableColors: string[] = [
     "card-blue",
@@ -20,7 +22,7 @@ const CardCarousel: React.FC<CardCarouselProps> = ({ conti }) => {
 
   return (
     <div className="card-carousel-wrapper">
-      <h3 className="carousel-title">Conti:</h3>
+      <h3 className="carousel-title">{t("bank_accounts")}</h3>
       <div className="card-carousel">
         {conti.map((conto, index) => (
           <CreditCard
@@ -34,6 +36,4 @@ const CardCarousel: React.FC<CardCarouselProps> = ({ conti }) => {
       </div>
     </div>
   );
-};
-
-export default CardCarousel;
+}

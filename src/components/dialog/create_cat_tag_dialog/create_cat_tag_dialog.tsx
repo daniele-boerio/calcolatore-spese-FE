@@ -10,6 +10,7 @@ import {
   createSottoCategorie,
 } from "../../../features/categorie/api_calls";
 import { createTag } from "../../../features/tags/api_calls";
+import { useI18n } from "../../../i18n/use-i18n";
 
 interface CreateCatTagDialogProps {
   visible: boolean;
@@ -17,23 +18,23 @@ interface CreateCatTagDialogProps {
   loading?: boolean;
 }
 
-const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
+export default function CreateCatTagDialog({
   visible,
   onHide,
   loading: externalLoading,
-}) => {
+}: CreateCatTagDialogProps) {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Opzioni per il SelectButton
   const options = [
-    { label: "Categoria", value: "CATEGORY" },
-    { label: "Tag", value: "TAG" },
+    { label: t("category"), value: "CATEGORY" },
+    { label: t("tag"), value: "TAG" },
   ];
 
   const [type, setType] = useState("CATEGORY");
   const [nome, setNome] = useState("");
   const [subs, setSubs] = useState<{ nome: string }[]>([]);
-  const [internalLoading, setInternalLoading] = useState(false);
 
   // Reset dello stato alla chiusura/apertura
   useEffect(() => {
@@ -58,53 +59,48 @@ const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
 
   const handleConfirm = async () => {
     if (!nome.trim()) return;
-    setInternalLoading(true);
 
-    try {
-      if (type === "TAG") {
-        // --- LOGICA CREAZIONE TAG ---
-        await dispatch(createTag({ nome: nome.trim() })).unwrap();
-      } else {
-        // --- LOGICA CREAZIONE CATEGORIA + SOTTOCATEGORIE ---
-        const newCat = await dispatch(
-          createCategoria({ nome: nome.trim() }),
+    if (type === "TAG") {
+      await dispatch(createTag({ nome: nome.trim() })).unwrap();
+    } else {
+      const newCat = await dispatch(
+        createCategoria({ nome: nome.trim() }),
+      ).unwrap();
+
+      const newNames = subs
+        .filter((s) => s.nome.trim() !== "")
+        .map((s) => s.nome.trim());
+
+      if (newNames.length > 0) {
+        await dispatch(
+          createSottoCategorie({
+            id: newCat.id,
+            nomeList: newNames.map((n) => ({ nome: n })),
+          }),
         ).unwrap();
-
-        const newNames = subs
-          .filter((s) => s.nome.trim() !== "")
-          .map((s) => s.nome.trim());
-
-        if (newNames.length > 0) {
-          await dispatch(
-            createSottoCategorie({
-              id: newCat.id,
-              nomeList: newNames.map((n) => ({ nome: n })),
-            }),
-          ).unwrap();
-        }
       }
-      onHide();
-    } catch (error) {
-      console.error("Errore durante la creazione:", error);
-    } finally {
-      setInternalLoading(false);
     }
+    onHide();
   };
 
   return (
     <Dialog
-      header="Crea Nuovo"
+      header={t("create_new")}
       visible={visible}
       className="category-dialog"
       style={{ width: "90vw", maxWidth: "450px" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">
-          <Button label="Annulla" className="reset-button" onClick={onHide} />
           <Button
-            label="Crea"
+            label={t("cancel")}
+            className="reset-button"
+            onClick={onHide}
+          />
+          <Button
+            label={t("save")}
             onClick={handleConfirm}
-            loading={externalLoading || internalLoading}
+            loading={externalLoading}
             disabled={!nome.trim()}
           />
         </div>
@@ -127,10 +123,10 @@ const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
 
         <div className="main-category-section">
           <InputText
-            label={`Nome ${type === "CATEGORY" ? "Categoria" : "Tag"}`}
+            label={`${t("name")} ${type === "CATEGORY" ? t("category") : t("tag")}`}
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            placeholder={type === "CATEGORY" ? "Es: Alimentari" : "Es: Urgente"}
+            placeholder={type === "CATEGORY" ? t("ex_grocery") : t("ex_urgent")}
             autoFocus
           />
         </div>
@@ -139,12 +135,12 @@ const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
         {type === "CATEGORY" && (
           <div className="subcategories-section">
             <div className="section-header">
-              <span>Sottocategorie (Tag interni)</span>
+              <span>{t("sub_categories")}</span>
             </div>
 
             <div className="subs-list">
               {subs.length === 0 && (
-                <p className="empty-subs">Nessuna sottocategoria aggiunta.</p>
+                <p className="empty-subs">{t("no_sub_categories")}</p>
               )}
 
               {subs.map((sub, index) => (
@@ -152,7 +148,7 @@ const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
                   <InputText
                     value={sub.nome}
                     onChange={(e) => handleSubChange(index, e.target.value)}
-                    placeholder="Nome sottocategoria"
+                    placeholder={t("name_sub_categories")}
                   />
                   <Button
                     icon="pi pi-trash"
@@ -166,7 +162,6 @@ const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
 
               <Button
                 icon="pi pi-plus"
-                label="Aggiungi Sottocategoria"
                 className="add-sub-btn p-button-text"
                 onClick={handleAddSub}
                 compact
@@ -177,6 +172,4 @@ const CreateCatTagDialog: React.FC<CreateCatTagDialogProps> = ({
       </div>
     </Dialog>
   );
-};
-
-export default CreateCatTagDialog;
+}

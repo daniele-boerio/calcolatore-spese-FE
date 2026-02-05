@@ -5,8 +5,11 @@ import BudgetSettingsDialog from "../dialog/budget_settings_dialog/budget_settin
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { updateBudget } from "../../features/conti/api_calls";
 import { BudgetUpdateData } from "../../features/conti/interfaces";
+import { useI18n } from "../../i18n/use-i18n";
+import { ProgressBar } from "primereact/progressbar";
 
-const BudgetCard: React.FC = () => {
+export default function BudgetCard() {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Selettori ora tipizzati correttamente dallo store globale
@@ -29,7 +32,6 @@ const BudgetCard: React.FC = () => {
       await dispatch(updateBudget(updatedData)).unwrap();
       setIsDialogVisible(false);
     } catch (error) {
-      // L'errore viene già gestito dal middleware globale, qui logghiamo solo per debug
       console.error("Errore salvataggio budget:", error);
     }
   };
@@ -53,7 +55,7 @@ const BudgetCard: React.FC = () => {
     <div className={`budget-card ${getStatusClass()}`}>
       <div className="budget-card__header-row">
         <span className="budget-card__label">
-          {hasTotalBudget ? "Budget Mensile" : "Spese Mensili"}
+          {hasTotalBudget ? t("monthly_budget") : t("monthly_expenses")}
         </span>
 
         <Button
@@ -79,16 +81,11 @@ const BudgetCard: React.FC = () => {
       {hasPercentage && (
         <div className="budget-card__footer-row">
           <div className="budget-card__progress-container">
-            <div className="budget-card__track">
-              <div
-                className="budget-card__fill"
-                style={{ width: `${Math.min(percentage, 100)}%` }}
-                role="progressbar"
-                aria-valuenow={percentage}
-                aria-valuemin={0}
-                aria-valuemax={100}
-              ></div>
-            </div>
+            <ProgressBar
+              value={Math.min(percentage, 100)}
+              showValue={false}
+              style={{ height: "6px", flex: 1 }}
+            />
             <span className="budget-card__percentage">
               {Math.round(percentage)}%
             </span>
@@ -105,6 +102,4 @@ const BudgetCard: React.FC = () => {
       />
     </div>
   );
-};
-
-export default BudgetCard;
+}

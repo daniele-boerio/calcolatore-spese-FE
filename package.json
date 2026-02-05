@@ -17,6 +17,7 @@
     "@mui/x-charts": "^8.24.0",
     "@reduxjs/toolkit": "^2.11.2",
     "axios": "^1.13.2",
+    "chart.js": "^4.5.1",
     "clsx": "^2.1.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.7",

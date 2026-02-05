@@ -3,12 +3,14 @@ import "./transaction_list.scss";
 import { useAppSelector, useAppDispatch } from "../../store/store";
 import { getLastTransactions } from "../../features/transactions/api_calls";
 import { Transaction } from "../../features/transactions/interfaces";
+import { useI18n } from "../../i18n/use-i18n";
 
 interface TransactionListProps {
   num: number;
 }
 
-const TransactionList: React.FC<TransactionListProps> = ({ num }) => {
+export default function TransactionList({ num }: TransactionListProps) {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Utilizziamo lo stato tipizzato. Nota: assicurati che nel rootReducer si chiami 'transactions'
@@ -31,7 +33,7 @@ const TransactionList: React.FC<TransactionListProps> = ({ num }) => {
 
   return (
     <div className="transaction-list-container">
-      <h3 className="transaction-list-title">Ultime Transazioni:</h3>
+      <h3 className="transaction-list-title">{t("latest_transactions")}</h3>
 
       {loading ? (
         <div className="loading-spinner">
@@ -39,17 +41,17 @@ const TransactionList: React.FC<TransactionListProps> = ({ num }) => {
             className="pi pi-spin pi-spinner"
             style={{ marginRight: "10px" }}
           ></i>
-          Caricamento...
+          {t("loading")}
         </div>
       ) : transactions.length === 0 ? (
-        <p className="empty-message">Nessuna transazione trovata.</p>
+        <p className="empty-message">{t("no_transactions")}</p>
       ) : (
         <div className="transaction-list-wrapper">
           {transactions.map((t: Transaction) => (
             <div key={t.id} className="transaction-card">
               <span className="transaction-date">{formatDate(t.data)}:</span>
               <span className={`transaction-amount ${t.tipo.toLowerCase()}`}>
-                {t.tipo === "uscita" ? "-" : "+"}€
+                {t.tipo === "USCITA" ? "-" : "+"}€
                 {t.importo.toLocaleString("it-IT")}
               </span>
               <span className="transaction-desc">{t.descrizione}</span>
@@ -59,6 +61,4 @@ const TransactionList: React.FC<TransactionListProps> = ({ num }) => {
       )}
     </div>
   );
-};
-
-export default TransactionList;
+}

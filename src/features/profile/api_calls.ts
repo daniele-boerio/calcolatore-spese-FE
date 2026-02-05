@@ -16,13 +16,10 @@ export const login = createAsyncThunk<AuthResponse, LoginParams>(
       formData.append("username", username);
       formData.append("password", password);
 
-      // Specifichiamo che la risposta è di tipo AuthResponse
       const response = await api.post<AuthResponse>(`/login`, formData);
       return response.data;
-    } catch (error) {
-      const err = error as AxiosError;
-      console.log("Errore durante il login: ", err);
-      return rejectWithValue(err.response?.data || "Errore durante il login");
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Errore sconosciuto");
     }
   },
 );
@@ -37,12 +34,8 @@ export const register = createAsyncThunk<AuthResponse, RegisterParams>(
         password,
       });
       return response.data;
-    } catch (error) {
-      const err = error as AxiosError;
-      console.log("Errore durante la registrazione: ", err);
-      return rejectWithValue(
-        err.response?.data || "Errore durante la registrazione",
-      );
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data || "Errore sconosciuto");
     }
   },
 );
@@ -54,7 +47,7 @@ export const getProfile = createAsyncThunk<ProfileResponse, void>(
       const response = await api.get<ProfileResponse>("/me");
       return response.data;
     } catch (error: any) {
-      return rejectWithValue("Sessione non valida");
+      return rejectWithValue(error.response?.data || "Errore sconosciuto");
     }
   },
 );

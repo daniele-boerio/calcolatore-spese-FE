@@ -72,6 +72,14 @@ const profileSlice = createSlice({
           state.email = action.payload.email;
         },
       )
+
+      .addCase(getProfile.rejected, (state) => {
+        state.isAuthenticated = false;
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+      })
+
       // Matchers per caricamento ed errori del modulo profile
       .addMatcher(
         (action: Action) =>

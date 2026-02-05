@@ -1,5 +1,6 @@
 import React from "react";
 import "./credit_card.scss";
+import { useI18n } from "../../i18n/use-i18n";
 
 // 1. Definiamo l'interfaccia per le Props
 interface CreditCardProps {
@@ -9,12 +10,13 @@ interface CreditCardProps {
   colorClass: string;
 }
 
-const CreditCard: React.FC<CreditCardProps> = ({
+export default function CreditCard({
   name,
   balance,
   logo,
   colorClass,
-}) => {
+}: CreditCardProps) {
+  const { t } = useI18n();
   // Formattazione del saldo localizzata
   const formattedBalance = new Intl.NumberFormat("it-IT", {
     style: "currency",
@@ -29,13 +31,11 @@ const CreditCard: React.FC<CreditCardProps> = ({
         {logo && <img src={logo} alt={name} className="credit-card__logo" />}
       </div>
       <div className="credit-card__footer">
-        <span className="credit-card__balance-label">Saldo:</span>
+        <span className="credit-card__balance-label">{t("balance")}</span>
         <span className="credit-card__balance-value">{formattedBalance}</span>
       </div>
       {/* Decorazione cerchio in basso a destra */}
       <div className="credit-card__decoration"></div>
     </div>
   );
-};
-
-export default CreditCard;
+}

@@ -3,8 +3,8 @@ import { Dialog } from "primereact/dialog";
 import { SelectButton } from "primereact/selectbutton";
 import { Calendar } from "primereact/calendar";
 import { InputNumber } from "primereact/inputnumber";
-import InputText from "../../input_text/input_text"; // Tuo componente custom
-import Button from "../../button/button"; // Tuo componente custom
+import InputText from "../../input_text/input_text";
+import Button from "../../button/button";
 import Dropdown from "../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import "./create_transazione_dialog.scss";
@@ -13,19 +13,20 @@ import {
   CreateTransactionParams,
   tipoTransaction,
 } from "../../../features/transactions/interfaces";
+import { useI18n } from "../../../i18n/use-i18n";
 
 interface CreateTransactionDialogProps {
   visible: boolean;
   onHide: () => void;
 }
 
-const CreateTransactionDialog: React.FC<CreateTransactionDialogProps> = ({
+export default function CreateTransactionDialog({
   visible,
   onHide,
-}) => {
+}: CreateTransactionDialogProps) {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
 
-  // Dati dallo store per le dropdown
   const conti = useAppSelector((state) => state.conto.conti);
   const categorie = useAppSelector((state) => state.categoria.categorie);
   const tags = useAppSelector((state) => state.tag.tags);
@@ -33,7 +34,6 @@ const CreateTransactionDialog: React.FC<CreateTransactionDialogProps> = ({
     (state) => state.transaction.transactions,
   );
 
-  // Stato Form
   const [tipo, setTipo] = useState<tipoTransaction>("USCITA");
   const [importo, setImporto] = useState<number | null>(0);
   const [data, setData] = useState<Date | null>(new Date());
@@ -47,12 +47,11 @@ const CreateTransactionDialog: React.FC<CreateTransactionDialogProps> = ({
   );
 
   const tipoOptions = [
-    { label: "Entrata", value: "ENTRATA" },
-    { label: "Uscita", value: "USCITA" },
-    { label: "Rimborso", value: "RIMBORSO" },
+    { label: t("income"), value: "ENTRATA" },
+    { label: t("expenses"), value: "USCITA" },
+    { label: t("compensation"), value: "RIMBORSO" },
   ];
 
-  // Reset dello stato alla chiusura
   useEffect(() => {
     if (!visible) {
       setTipo("USCITA");
@@ -67,34 +66,10 @@ const CreateTransactionDialog: React.FC<CreateTransactionDialogProps> = ({
     }
   }, [visible]);
 
-  // Filtro dinamico per le Sottocategorie basato sulla categoria scelta
   const filteredSottoCategorie = useMemo(() => {
     const cat = categorie.find((c) => c.id === categoriaId);
     return cat?.sottocategorie || [];
   }, [categoriaId, categorie]);
-
-  // Filtro per Transazioni "Padre" (solo per RIMBORSO)
-  const transazioniFiltrate = useMemo(() => {
-    if (tipo !== "RIMBORSO") return [];
-    return tutteLeTransazioni.filter((t) => {
-      return (
-        t.categoria_id === categoriaId &&
-        (!sottoCategoriaId || t.sottocategoria_id === sottoCategoriaId) &&
-        (!tagId || t.tag_id === tagId)
-      );
-    });
-  }, [tipo, categoriaId, sottoCategoriaId, tagId, tutteLeTransazioni]);
-
-  // Auto-popolamento dati se viene selezionata una transazione padre nel rimborso
-  const handleParentChange = (e: { value: string }) => {
-    setParentTransactionId(e.value);
-    const parent = tutteLeTransazioni.find((t) => t.id === e.value);
-    if (parent) {
-      setImporto(parent.importo);
-      setDescrizione(`Rimborso: ${parent.descrizione}`);
-      setContoId(parent.conto_id);
-    }
-  };
 
   const handleSave = async () => {
     const payload: CreateTransactionParams = {
@@ -114,15 +89,19 @@ const CreateTransactionDialog: React.FC<CreateTransactionDialogProps> = ({
 
   return (
     <Dialog
-      header="Nuova Transazione"
+      header={t("new_transaction")}
       visible={visible}
-      style={{ width: "95vw", maxWidth: "500px" }}
+      className="create-transaction-dialog"
       onHide={onHide}
       footer={
-        <div className="flex justify-content-end gap-2">
-          <Button label="Annulla" className="reset-button" onClick={onHide} />
+        <div className="dialog-footer">
           <Button
-            label="Salva"
+            label={t("cancel")}
+            className="reset-button"
+            onClick={onHide}
+          />
+          <Button
+            label={t("save")}
             onClick={handleSave}
             disabled={!importo || !contoId}
           />
@@ -137,131 +116,90 @@ const CreateTransactionDialog: React.FC<CreateTransactionDialogProps> = ({
           value={tipo}
           options={tipoOptions}
           onChange={(e) => setTipo(e.value || "USCITA")}
-          className="type-selector mb-4"
+          className="type-selector"
         />
 
         <div className="form-grid">
-          {/* Categoria, Sottocategoria e Tag sono necessari per filtrare i rimborsi */}
           <div className="field">
             <Dropdown
-              label="Categoria"
+              label={t("category")}
               value={categoriaId}
               options={categorie}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setCategoriaId(e.value)}
-              placeholder="Seleziona Categoria"
-              className="w-full"
+              placeholder={t("category_placeholder")}
             />
           </div>
 
           <div className="field">
             <Dropdown
-              label="Sottocategoria"
+              label={t("sub_category")}
               value={sottoCategoriaId}
               options={filteredSottoCategorie}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setSottoCategoriaId(e.value)}
-              placeholder="Seleziona Sottocategoria"
-              className="w-full"
+              placeholder={t("sub_category_placeholder")}
               disabled={!categoriaId}
             />
           </div>
 
           <div className="field">
             <Dropdown
-              label="Tag"
+              label={t("tag")}
               value={tagId}
               options={tags}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setTagId(e.value)}
-              placeholder="Seleziona Tag"
-              className="w-full"
+              placeholder={t("tag_placeholder")}
             />
           </div>
 
-          {/* SEZIONE RIMBORSO: Elenco transazioni collegabili */}
-          {tipo === "RIMBORSO" && (
-            <div className="field highlight-field">
-              {/*<Dropdown
-                label="Transazione da rimborsare"
-                value={parentTransactionId}
-                options={transazioniFiltrate}
-                // optionLabel deve essere una stringa, usiamo 'descrizione' come fallback
-                optionLabel="descrizione"
-                optionValue="id"
-                onChange={handleParentChange}
-                placeholder="Seleziona transazione originale"
-                className="w-full"
-                // Questo definisce come appare l'elemento nella lista
-                itemTemplate={(option) => (
-                  <span>
-                    {option.descrizione} ({option.importo}€)
-                  </span>
-                )}
-                // Questo definisce come appare l'elemento quando è selezionato
-                valueTemplate={(option: any, props) => {
-                  if (!option) return props.placeholder;
-                  return (
-                    <span>
-                      {option.descrizione} ({option.importo}€)
-                    </span>
-                  );
-                }}
-              />*/}
-            </div>
-          )}
-
           <div className="field">
-            <label>Importo</label>
+            <label className="field-label">{t("amount")}</label>
             <InputNumber
               value={importo}
               onValueChange={(e) => setImporto(e.value ?? null)}
               mode="currency"
               currency="EUR"
               locale="it-IT"
-              className="w-full"
             />
           </div>
 
           <div className="field">
             <Dropdown
-              label="Conto"
+              label={t("bank_account")}
               value={contoId}
               options={conti}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setContoId(e.value)}
-              placeholder="Seleziona Conto"
-              className="w-full"
+              placeholder={t("bank_account_placeholder")}
             />
           </div>
 
           <div className="field">
-            <label>Data</label>
+            <label className="field-label">{t("date")}</label>
             <Calendar
               value={data}
               onChange={(e) => setData(e.value as Date)}
               showIcon
               dateFormat="dd/mm/yy"
-              className="w-full"
             />
           </div>
 
           <div className="field full-width">
             <InputText
-              label="Descrizione"
+              label={t("description")}
               value={descrizione}
               onChange={(e) => setDescrizione(e.target.value)}
-              placeholder="Es: Spesa mensile"
+              placeholder={t("description_placeholder")}
             />
           </div>
         </div>
       </div>
     </Dialog>
   );
-};
-
-export default CreateTransactionDialog;
+}

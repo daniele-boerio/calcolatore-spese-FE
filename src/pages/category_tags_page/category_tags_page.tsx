@@ -13,8 +13,10 @@ import UpdateCategoryDialog from "../../components/dialog/update_category_dialog
 import UpdateTagDialog from "../../components/dialog/update_tag_dialog/update_tag_dialog";
 import CreateCatTagDialog from "../../components/dialog/create_cat_tag_dialog/create_cat_tag_dialog";
 import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { useI18n } from "../../i18n/use-i18n";
 
-const CategoryTagsPage: React.FC = () => {
+export default function CategoryTagsPage() {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
   const categorie = useAppSelector((state: any) => state.categoria.categorie);
   const CatLoading = useAppSelector((state: any) => state.categoria.loading);
@@ -56,11 +58,11 @@ const CategoryTagsPage: React.FC = () => {
   const deleteObject = (event: any, id: string, type: string) => {
     confirmPopup({
       target: event.currentTarget,
-      message: "Sei sicuro di voler eliminare questo elemento?",
+      message: t("delete_message"),
       icon: "pi pi-exclamation-triangle",
       acceptClassName: "p-button-danger",
-      acceptLabel: "Sì",
-      rejectLabel: "No",
+      acceptLabel: t("yes"),
+      rejectLabel: t("no"),
       accept: () => {
         type === "cat"
           ? dispatch(deleteCategoria({ id }))
@@ -80,7 +82,7 @@ const CategoryTagsPage: React.FC = () => {
               className="pi pi-tags"
               style={{ fontSize: "1.5rem", marginRight: "10px" }}
             ></i>
-            Gestione Categorie e Tag
+            {t("category_tags_title")}
           </h1>
         </div>
 
@@ -88,8 +90,8 @@ const CategoryTagsPage: React.FC = () => {
           {/* SEZIONE CATEGORIE */}
           <section className="category-list">
             <div className="header-row sticky-header">
-              <span>Categorie</span>
-              <span>Azioni</span>
+              <span>{t("categories")}</span>
+              <span>{t("actions")}</span>
             </div>
             <div className="scrollable-area">
               {categorie.map((cat: Categoria) => (
@@ -149,8 +151,8 @@ const CategoryTagsPage: React.FC = () => {
           {/* SEZIONE TAGS */}
           <section className="category-list">
             <div className="header-row sticky-header">
-              <span>Tags</span>
-              <span>Azioni</span>
+              <span>{t("tags")}</span>
+              <span>{t("actions")}</span>
             </div>
             <div className="scrollable-area">
               {tags.map((tag: Tag) => (
@@ -208,6 +210,4 @@ const CategoryTagsPage: React.FC = () => {
       </div>
     </>
   );
-};
-
-export default CategoryTagsPage;
+}

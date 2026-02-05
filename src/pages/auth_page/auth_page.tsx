@@ -6,17 +6,14 @@ import { Dialog } from "primereact/dialog";
 import "./auth_page.scss";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import Password from "../../components/password/password";
+import { useI18n } from "../../i18n/use-i18n";
 
-const AuthPage: React.FC = () => {
+export default function AuthPage() {
+  const { t } = useI18n();
   const [isLogin, setIsLogin] = useState<boolean>(true);
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-
-  // Stati per la Dialog di errore locale
-  const [dialogVisible, setDialogVisible] = useState<boolean>(false);
-  const [dialogHeader, setDialogHeader] = useState<string>("");
-  const [dialogContent, setDialogContent] = useState<string>("");
 
   const loading = useAppSelector((state: any) => state.profile.loading);
   const dispatch = useAppDispatch();
@@ -24,23 +21,10 @@ const AuthPage: React.FC = () => {
   const handleSubmit = async (e?: React.BaseSyntheticEvent) => {
     if (e) e.preventDefault();
 
-    if (!username || !password || (!isLogin && !email)) {
-      setDialogHeader("Campi Mancanti");
-      setDialogContent("Assicurati di aver compilato tutti i campi richiesti.");
-      setDialogVisible(true);
-      return;
-    }
-
-    try {
-      if (isLogin) {
-        await dispatch(login({ username, password })).unwrap();
-      } else {
-        await dispatch(register({ email, username, password })).unwrap();
-      }
-    } catch (error: any) {
-      setDialogHeader("Errore");
-      setDialogContent(error?.detail || "Si è verificato un errore.");
-      setDialogVisible(true);
+    if (isLogin) {
+      await dispatch(login({ username, password }));
+    } else {
+      await dispatch(register({ email, username, password }));
     }
   };
 
@@ -53,38 +37,38 @@ const AuthPage: React.FC = () => {
   return (
     <div className="auth-page-wrapper">
       <div className="auth-container" onKeyDown={handleKeyDown}>
-        <h2>{isLogin ? "Accedi" : "Registrati"}</h2>
+        <h2>{isLogin ? t("login") : t("sign_in")}</h2>
 
         {!isLogin && (
           <InputText
             className="input-email"
-            label="Email"
+            label={t("email")}
             value={email}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setEmail(e.target.value)
             }
-            placeholder="Inserisci la tua email"
+            placeholder={t("email_placeholder")}
           />
         )}
 
         <InputText
           className="input-username"
-          label="Username"
+          label={t("username")}
           value={username}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setUsername(e.target.value)
           }
-          placeholder="Inserisci il tuo username"
+          placeholder={t("username_placeholder")}
         />
 
         <Password
           className="input-password"
-          label="Password"
+          label={t("password")}
           value={password}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setPassword(e.target.value)
           }
-          placeholder="Inserisci la tua password"
+          placeholder={t("password_placeholder")}
           feedback={!isLogin}
           toggleMask={true}
         />
@@ -92,28 +76,17 @@ const AuthPage: React.FC = () => {
         <Button
           className="btn-submit"
           onClick={handleSubmit}
-          label={isLogin ? "Login" : "Crea Account"}
+          label={isLogin ? t("login") : t("sign_in")}
           loading={loading}
         />
 
         <p className="auth-toggle-text">
           {isLogin ? "Non hai un account?" : "Hai già un account?"}
           <span onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? " Registrati" : " Accedi"}
+            {isLogin ? t("sign_in_space") : t("login_space")}
           </span>
         </p>
       </div>
-
-      <Dialog
-        header={dialogHeader}
-        visible={dialogVisible}
-        onHide={() => setDialogVisible(false)}
-        style={{ width: "90vw", maxWidth: "400px" }}
-      >
-        <p>{dialogContent}</p>
-      </Dialog>
     </div>
   );
-};
-
-export default AuthPage;
+}

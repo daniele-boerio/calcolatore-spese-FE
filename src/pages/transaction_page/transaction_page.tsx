@@ -6,17 +6,9 @@ import TableVisualization, {
   VisualizationColumnProps,
 } from "../../components/table_visualization/table_visualization";
 import "./transaction_page.scss";
-import { Transaction } from "../../features/transactions/interfaces";
 import { Conto } from "../../features/conti/interfaces";
 
-// Definiamo l'interfaccia per la struttura delle colonne
-interface TableColumn {
-  field: string;
-  header: string;
-  body?: (row: Transaction) => React.ReactNode;
-}
-
-function TransactionPage() {
+export default function TransactionPage() {
   const dispatch = useAppDispatch();
 
   // Utilizziamo lo stato tipizzato 'transactions'
@@ -112,5 +104,3 @@ function TransactionPage() {
     </div>
   );
 }
-
-export default TransactionPage;

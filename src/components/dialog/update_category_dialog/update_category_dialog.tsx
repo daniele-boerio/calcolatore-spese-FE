@@ -11,6 +11,7 @@ import {
   createSottoCategorie,
   deleteSottoCategoria,
 } from "../../../features/categorie/api_calls";
+import { useI18n } from "../../../i18n/use-i18n";
 
 interface UpdateCategoryDialogProps {
   visible: boolean;
@@ -24,17 +25,17 @@ interface SubState {
   nome: string;
 }
 
-const UpdateCategoryDialog: React.FC<UpdateCategoryDialogProps> = ({
+export default function CardCarousel({
   visible,
   onHide,
   category,
   loading: externalLoading,
-}) => {
+}: UpdateCategoryDialogProps) {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
   const [nome, setNome] = useState("");
   const [subs, setSubs] = useState<SubState[]>([]);
   const [subsToDelete, setSubsToDelete] = useState<string[]>([]);
-  const [internalLoading, setInternalLoading] = useState(false);
 
   useEffect(() => {
     if (visible && category) {
@@ -65,90 +66,79 @@ const UpdateCategoryDialog: React.FC<UpdateCategoryDialogProps> = ({
   const handleConfirm = async () => {
     if (!nome.trim() || !category.id) return;
 
-    setInternalLoading(true);
     const promises: Promise<any>[] = [];
 
-    try {
-      // 1. Update Categoria principale se il nome è cambiato
-      if (nome.trim() !== category.nome) {
-        promises.push(
-          dispatch(
-            updateCategoria({ id: category.id, nome: nome.trim() }),
-          ).unwrap(),
-        );
-      }
-
-      // 2. Eliminazione sottocategorie rimosse
-      subsToDelete.forEach((subId) => {
-        promises.push(
-          dispatch(
-            deleteSottoCategoria({ catId: category.id, subId }),
-          ).unwrap(),
-        );
-      });
-
-      // 3. Update sottocategorie esistenti modificate
-      subs.forEach((sub) => {
-        if (sub.id) {
-          const original = category.sottocategorie?.find(
-            (s) => s.id === sub.id,
-          );
-          if (
-            original &&
-            sub.nome.trim() !== original.nome &&
-            sub.nome.trim() !== ""
-          ) {
-            promises.push(
-              dispatch(
-                updateSottoCategoria({ id: sub.id, nome: sub.nome.trim() }),
-              ).unwrap(),
-            );
-          }
-        }
-      });
-
-      // 4. Creazione nuove sottocategorie aggiunte (quelle senza ID)
-      const newNames = subs
-        .filter((s) => !s.id && s.nome.trim() !== "")
-        .map((s) => s.nome.trim());
-
-      if (newNames.length > 0) {
-        promises.push(
-          dispatch(
-            createSottoCategorie({
-              id: category.id,
-              nomeList: newNames.map((n) => ({ nome: n })),
-            }),
-          ).unwrap(),
-        );
-      }
-
-      if (promises.length > 0) {
-        await Promise.all(promises);
-      }
-
-      onHide();
-    } catch (error) {
-      console.error("Errore durante la modifica:", error);
-    } finally {
-      setInternalLoading(false);
+    if (nome.trim() !== category.nome) {
+      promises.push(
+        dispatch(
+          updateCategoria({ id: category.id, nome: nome.trim() }),
+        ).unwrap(),
+      );
     }
+
+    subsToDelete.forEach((subId) => {
+      promises.push(
+        dispatch(deleteSottoCategoria({ catId: category.id, subId })).unwrap(),
+      );
+    });
+
+    subs.forEach((sub) => {
+      if (sub.id) {
+        const original = category.sottocategorie?.find((s) => s.id === sub.id);
+        if (
+          original &&
+          sub.nome.trim() !== original.nome &&
+          sub.nome.trim() !== ""
+        ) {
+          promises.push(
+            dispatch(
+              updateSottoCategoria({ id: sub.id, nome: sub.nome.trim() }),
+            ).unwrap(),
+          );
+        }
+      }
+    });
+
+    const newNames = subs
+      .filter((s) => !s.id && s.nome.trim() !== "")
+      .map((s) => s.nome.trim());
+
+    if (newNames.length > 0) {
+      promises.push(
+        dispatch(
+          createSottoCategorie({
+            id: category.id,
+            nomeList: newNames.map((n) => ({ nome: n })),
+          }),
+        ).unwrap(),
+      );
+    }
+
+    if (promises.length > 0) {
+      await Promise.all(promises);
+    }
+
+    onHide();
   };
 
   return (
     <Dialog
-      header="Modifica Categoria"
+      header={t("edit_category")}
       visible={visible}
       className="category-dialog"
       style={{ width: "90vw", maxWidth: "450px" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">
-          <Button label="Annulla" className="reset-button" onClick={onHide} />
           <Button
-            label="Salva Modifiche"
+            label={t("cancel")}
+            className="reset-button"
+            onClick={onHide}
+          />
+          <Button
+            label={t("save_changes")}
             onClick={handleConfirm}
-            loading={externalLoading || internalLoading}
+            loading={externalLoading}
             disabled={!nome.trim()}
           />
         </div>
@@ -160,22 +150,22 @@ const UpdateCategoryDialog: React.FC<UpdateCategoryDialogProps> = ({
       <div className="category-settings-dialog-content">
         <div className="main-category-section">
           <InputText
-            label="Nome Categoria"
+            label={t("category_name")}
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            placeholder="Es: Alimentari"
+            placeholder={t("category_placeholder")}
             autoFocus
           />
         </div>
 
         <div className="subcategories-section">
           <div className="section-header">
-            <span>Sottocategorie (Tag)</span>
+            <span>{t("subcategories_title")}</span>
           </div>
 
           <div className="subs-list">
             {subs.length === 0 && (
-              <p className="empty-subs">Nessuna sottocategoria aggiunta.</p>
+              <p className="empty-subs">{t("no_subcategories")}</p>
             )}
 
             {subs.map((sub, index) => (
@@ -183,7 +173,7 @@ const UpdateCategoryDialog: React.FC<UpdateCategoryDialogProps> = ({
                 <InputText
                   value={sub.nome}
                   onChange={(e) => handleSubChange(index, e.target.value)}
-                  placeholder="Nome sottocategoria"
+                  placeholder={t("subcategory_name_placeholder")}
                 />
                 <Button
                   icon="pi pi-trash"
@@ -197,7 +187,7 @@ const UpdateCategoryDialog: React.FC<UpdateCategoryDialogProps> = ({
 
             <Button
               icon="pi pi-plus"
-              label="Aggiungi Tag"
+              label={t("add_tag")}
               className="add-sub-btn p-button-text"
               onClick={handleAddSub}
               compact
@@ -207,6 +197,4 @@ const UpdateCategoryDialog: React.FC<UpdateCategoryDialogProps> = ({
       </div>
     </Dialog>
   );
-};
-
-export default UpdateCategoryDialog;
+}

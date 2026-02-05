@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useI18n } from "../../i18n/use-i18n"; // Verifica che il path sia corretto
 import "./navbar.scss";
 
-const Navbar = () => {
+export default function Navbar() {
+  const { t } = useI18n();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
@@ -27,7 +29,7 @@ const Navbar = () => {
         <div className="navbar-logo">SpassoConto</div>
       </div>
 
-      {/* 3. LATO DESTRO: Spazio vuoto per bilanciare il Flexbox (o icone profilo) */}
+      {/* 3. LATO DESTRO: Spazio vuoto */}
       <div className="navbar-right"></div>
 
       {/* Menu Laterale (Sidebar) */}
@@ -35,27 +37,27 @@ const Navbar = () => {
         <ul className="nav-links">
           <li>
             <NavLink to="/" onClick={closeMenu}>
-              Dashboard
+              {t("nav_dashboard")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/categorie-tags" onClick={closeMenu}>
-              Categorie/Tags
+              {t("nav_categories_tags")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/transazioni" onClick={closeMenu}>
-              Transazioni
+              {t("nav_transactions")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/conti" onClick={closeMenu}>
-              Conti
+              {t("nav_accounts")}
             </NavLink>
           </li>
           <li>
             <NavLink to="/investimenti" onClick={closeMenu}>
-              Investimenti
+              {t("nav_investments")}
             </NavLink>
           </li>
         </ul>
@@ -64,6 +66,4 @@ const Navbar = () => {
       {isOpen && <div className="overlay" onClick={closeMenu}></div>}
     </nav>
   );
-};
-
-export default Navbar;
+}

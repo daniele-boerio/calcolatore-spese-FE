@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./home_page.scss";
+import "./conti_page.scss";
 import BudgetCard from "../../components/budget_card/budget_card";
 import CardCarousel from "../../components/card_carousel/card_carousel";
 import TransactionList from "../../components/transaction_list/transaction_list";
@@ -14,7 +14,7 @@ import CreateTransactionDialog from "../../components/dialog/create_transazione_
 import { useI18n } from "../../i18n/use-i18n";
 import CustomDoughnutChart from "../../components/charts/custom_doughnut_chart";
 
-export default function HomePage() {
+export default function ContiPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 

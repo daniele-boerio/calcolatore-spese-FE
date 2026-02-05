@@ -1,7 +1,6 @@
 @use "../../styles/variables" as v;
 
 .transaction-list-container {
-  margin-top: 2rem;
   .transaction-list-title {
     margin-bottom: 1rem;
     color: v.$text-main;
