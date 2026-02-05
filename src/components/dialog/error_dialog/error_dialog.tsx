@@ -1,4 +1,3 @@
-import React from "react";
 import { Dialog } from "primereact/dialog";
 import Button from "../../button/button";
 import { useAppDispatch, useAppSelector } from "../../../store/store";

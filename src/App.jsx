@@ -9,7 +9,8 @@ import { useAppDispatch } from "./store/store";
 import { useEffect } from "react";
 import CategoryTagsPage from "./pages/category_tags_page/category_tags_page";
 import { getProfile } from "./features/profile/api_calls";
-import { ErrorDialog } from "./components/dialog/error_dialog/error_dialog";
+import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
+import ContiPage from "./pages/conti_page/conti_page";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -37,6 +38,7 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/transazioni" element={<TransactionPage />} />
                 <Route path="/categorie-tags" element={<CategoryTagsPage />} />
+                <Route path="/conti" element={<ContiPage />} />
               </Routes>
             </div>
           </>
