@@ -1,60 +1,109 @@
-@use "../../styles/variables" as v;
+@use "../../styles/variables.scss" as v;
 
 .credit-card {
-  min-width: 240px;
-  height: 140px;
-  border-radius: 12px;
-  padding: 1.25rem;
-  position: relative;
-  overflow: hidden;
+  position: relative; // Necessario per il posizionamento dei pulsanti
+  padding: 1.5rem;
+  border-radius: 16px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: #ffffff; // Testo sempre bianco sulle carte colorate
-  box-shadow: v.$shadow-color;
-  flex-shrink: 0; // Impedisce alla carta di rimpicciolirsi nel flex
+  overflow: hidden;
+  color: white;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  width: 100%;
+
+  &__actions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 2; // Sopra la decorazione
+
+    .action-btn {
+      width: 2rem !important;
+      height: 2rem !important;
+      color: white !important;
+      background: rgba(255, 255, 255, 0.15); // Effetto vetro
+      border: none;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3) !important;
+      }
+
+      &.p-button-danger:hover {
+        background: rgba(v.$text-red, 0.4) !important;
+      }
+    }
+  }
 
   &__name {
-    font-size: 1.4rem;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-
-  &__footer {
-    display: flex;
-    gap: 8px;
-    align-items: baseline;
-    z-index: 1;
-  }
-
-  &__balance-label {
-    font-size: 0.9rem;
+    font-size: 1.1rem;
+    font-weight: 600;
     opacity: 0.9;
   }
 
+  &__balance-label {
+    display: block;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
   &__balance-value {
-    font-size: 1.1rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 800;
   }
 
   &__decoration {
     position: absolute;
-    bottom: -10px;
-    right: -10px;
-    width: 60px;
-    height: 60px;
-    background: rgba(255, 255, 255, 0.15);
+    bottom: -20px;
+    right: -20px;
+    width: 100px;
+    height: 100px;
+    background: rgba(255, 255, 255, 0.1);
     border-radius: 50%;
   }
 
-  // Varianti colore (puoi aggiungerne altre dal BE)
+  // Esempio colori
+  // Blue - Deep Ocean
   &.card-blue {
-    background-color: #3498db;
+    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
   }
+
+  // Green - Emerald Forest
+  &.card-green {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+  }
+
+  // Red - Sunset Fire
   &.card-red {
-    background-color: #e74c3c;
+    background: linear-gradient(135deg, #ff5f6d 0%, #ffc371 100%);
   }
+
+  // Dark - Midnight Graphite
   &.card-dark {
-    background-color: #2c3e50;
+    background: linear-gradient(135deg, #232526 0%, #414345 100%);
+  }
+
+  // Purple - Royal Amethyst
+  &.card-purple {
+    background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  }
+
+  // Orange - Solar Energy
+  &.card-orange {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  }
+
+  // Turquoise - Tropical Water
+  &.card-turquoise {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+  }
+
+  // Indigo - Deep Space
+  &.card-indigo {
+    background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
   }
 }

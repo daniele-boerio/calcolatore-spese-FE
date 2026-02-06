@@ -11,6 +11,7 @@ import CategoryTagsPage from "./pages/category_tags_page/category_tags_page";
 import { getProfile } from "./features/profile/api_calls";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import ContiPage from "./pages/conti_page/conti_page";
+import { ConfirmPopup } from "primereact/confirmpopup";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -44,6 +45,7 @@ function App() {
           </>
         )}
       </div>
+      <ConfirmPopup />
       <ErrorDialog />
     </Router>
   );

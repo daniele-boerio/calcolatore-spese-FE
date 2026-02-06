@@ -74,7 +74,6 @@ export default function CategoryTagsPage() {
 
   return (
     <>
-      <ConfirmPopup />
       <div className="categorie-page">
         <div className="page-header">
           <h1>

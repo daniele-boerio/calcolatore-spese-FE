@@ -57,7 +57,7 @@ export interface CreateContoParams {
   ricarica_automatica: boolean;
   budget_obiettivo?: number;
   soglia_minima?: number;
-  conto_sorgente_id?: number;
+  conto_sorgente_id?: string;
   frequenza_controllo?: string;
   prossimo_controllo?: string;
 }
@@ -69,7 +69,7 @@ export interface UpdateContoParams {
   ricarica_automatica?: boolean;
   budget_obiettivo?: number;
   soglia_minima?: number;
-  conto_sorgente_id?: number;
+  conto_sorgente_id?: string;
   frequenza_controllo?: string;
   prossimo_controllo?: string;
 }

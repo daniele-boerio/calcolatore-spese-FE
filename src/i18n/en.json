@@ -84,5 +84,27 @@
   "nav_categories_tags": "Categories & Tags",
   "nav_transactions": "Transactions",
   "nav_accounts": "Accounts",
-  "nav_investments": "Investments"
+  "nav_investments": "Investments",
+
+  "manage_accounts_subtitle": "View and manage your bank accounts and wallets",
+  "add_account": "Add Account",
+  "no_accounts_found": "No accounts found. Add your first one to start tracking!",
+
+  "edit_account": "Edit Account",
+  "account_name": "Account Name",
+  "current_balance": "Current Balance",
+  "automatic_recharge": "Automatic Recharge",
+  "minimum_threshold": "Minimum Threshold",
+  "source_account": "Source Account",
+  "select_source_account": "Select source account",
+  "account_placeholder": "e.g. Main Bank",
+  "target_budget": "Target Budget",
+  "weekly": "Weekly",
+  "monthly": "Monthly",
+  "frequency": "Frequency",
+  "select_frequency": "Select frequency",
+  "next_check": "Next Scheduled Check",
+  "select_source": "Select source",
+  "initial_balance": "Initial Balance",
+  "create_account": "Create Account"
 }

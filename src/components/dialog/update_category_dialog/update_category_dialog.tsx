@@ -25,7 +25,7 @@ interface SubState {
   nome: string;
 }
 
-export default function CardCarousel({
+export default function UpdateCategoryDialog({
   visible,
   onHide,
   category,
