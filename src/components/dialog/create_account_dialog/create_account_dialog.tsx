@@ -73,7 +73,7 @@ export default function CreateAccountDialog({
       header={t("add_account")}
       visible={visible}
       className="account-dialog"
-      style={{ width: "95vw", maxWidth: "34.375rem" }}
+      style={{ width: "90vw", maxWidth: "50rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">

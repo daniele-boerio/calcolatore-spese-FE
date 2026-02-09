@@ -126,7 +126,7 @@ export default function UpdateCategoryDialog({
       header={t("edit_category")}
       visible={visible}
       className="category-dialog"
-      style={{ width: "90vw", maxWidth: "28.125rem" }}
+      style={{ width: "90vw", maxWidth: "50rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">

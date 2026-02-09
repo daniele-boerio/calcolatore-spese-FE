@@ -92,6 +92,7 @@ export default function CreateTransactionDialog({
       header={t("new_transaction")}
       visible={visible}
       className="create-transaction-dialog"
+      style={{ width: "90vw", maxWidth: "70rem" }}
       onHide={onHide}
       footer={
         <div className="dialog-footer">

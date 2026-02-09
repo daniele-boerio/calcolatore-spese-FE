@@ -28,9 +28,9 @@ export default function ErrorDialog() {
 
   return (
     <Dialog
+      style={{ width: "90vw", maxWidth: "25rem" }}
       header={title || t("error")}
       visible={isOpen}
-      style={{ width: "90vw", maxWidth: "28.125rem" }}
       onHide={onHide}
       footer={footerContent}
       draggable={false}

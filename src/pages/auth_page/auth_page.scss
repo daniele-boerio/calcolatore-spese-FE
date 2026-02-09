@@ -57,11 +57,9 @@
     font-weight: 600;
     transition: transform 0.2s;
 
-    .p-button {
+    button {
       width: 100%;
-      background-color: v.$bg-button-primary;
-      border-color: v.$bc-button-primary;
-      height: 100%;
+      max-width: 100%;
     }
 
     &:active {

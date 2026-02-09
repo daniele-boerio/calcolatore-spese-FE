@@ -54,6 +54,31 @@
     }
   }
 
+  .buttons-footer-dialog {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+
+    .div-button {
+      flex: 1;
+
+      button {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
+
+    // Stile specifico per il tasto "Crea" per distinguerlo dal "Salva"
+    .p-button:not(.reset-button) {
+      border: none;
+
+      &:hover {
+        filter: brightness(1.1);
+      }
+    }
+  }
+
   // Assicuriamoci che l'InputText occupi tutto lo spazio
   .main-category-section {
     width: 100%;

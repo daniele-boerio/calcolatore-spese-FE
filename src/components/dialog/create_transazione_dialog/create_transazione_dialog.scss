@@ -1,14 +1,17 @@
 @use "../../../styles/variables.scss" as v;
 
 .create-transaction-dialog {
-  width: 100vw;
-  max-width: 43.75rem;
-
   .dialog-footer {
     display: flex;
-    justify-content: flex-end;
     gap: 0.5rem;
     padding-top: 1rem;
+    .div-button {
+      flex: 1;
+      button {
+        width: 100%;
+        max-width: 100%;
+      }
+    }
   }
 }
 
