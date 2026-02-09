@@ -3,10 +3,13 @@
 .create-transaction-dialog {
   .dialog-footer {
     display: flex;
-    gap: 0.5rem;
+    justify-content: flex-end;
+    gap: 0.75rem;
     padding-top: 1rem;
+
     .div-button {
       flex: 1;
+
       button {
         width: 100%;
         max-width: 100%;
@@ -16,52 +19,82 @@
 }
 
 .transaction-form {
-  padding-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
 
   .type-selector {
-    margin-bottom: 1.5rem;
+    align-self: center;
+    width: 100%;
     display: flex;
 
-    // Per far sì che i bottoni occupino spazio uguale
     .p-button {
       flex: 1;
+      font-weight: 600;
+      min-width: 0;
+
+      .p-button-label {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 0 0.5rem;
+      }
     }
   }
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1.25rem;
+  .form-row {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
 
     .field {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 0.4rem;
-
-      &.full-width {
-        grid-column: span 2;
-      }
+      gap: 1rem;
 
       .field-label {
         font-size: 0.85rem;
-        font-weight: 600;
+        font-weight: 700;
         color: v.$text-main;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
 
-      // Stili per componenti PrimeReact per forzare la larghezza
+      // Forza i componenti PrimeReact a prendersi tutto il Flex
       .p-inputnumber,
       .p-calendar,
       .p-dropdown,
-      .p-inputtext {
-        width: 100%;
+      .p-inputtext,
+      .p-selectbutton {
+        flex: 1;
       }
+    }
+  }
+
+  .type-selector {
+    .p-button {
+      flex: 1;
+      font-weight: 600;
     }
   }
 }
 
-// Stile per evidenziare la sezione rimborsi se necessario
-.highlight-field {
-  background-color: rgba(white, 0.05);
-  padding: 0.5rem;
-  border-radius: 4px;
+// Semplice animazione per la sottocategoria che appare
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

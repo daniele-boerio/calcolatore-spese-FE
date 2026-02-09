@@ -11,8 +11,8 @@
 
   "missing_fields": "Campi mancanti",
   "missing_fields_response": "Assicurati di aver compilato tutti i campi obbligatori",
-  "login": "Login",
-  "sign_in": "Accedi",
+  "login": "Accedi",
+  "sign_in": "Registrati",
   "email": "Email",
   "email_placeholder": "Inserisci la tua email",
   "username": "Nome utente",
@@ -22,8 +22,8 @@
   "no_account": "Non hai un account?",
   "account": "Hai già un account?",
   "register": "Registrati",
-  "login_space": " Login",
-  "sign_in_space": " Accedi",
+  "login_space": " Accedi",
+  "sign_in_space": " Registrati",
 
   "delete_message": "Sei sicuro di voler eliminare questo elemento?",
   "category_tags_title": "Gestione Categorie e Tag",
@@ -44,7 +44,7 @@
   "latest_transactions": "Ultime Transazioni:",
   "no_transactions": "Nessuna transazione trovata.",
 
-  "compensation": "Compensazione",
+  "compensation": "Rimborso",
   "income": "Entrate",
   "expenses": "Uscite",
   "new_transaction": "Nuova Transazione",

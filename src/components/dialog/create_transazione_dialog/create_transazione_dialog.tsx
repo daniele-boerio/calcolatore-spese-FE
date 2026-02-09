@@ -92,7 +92,7 @@ export default function CreateTransactionDialog({
       header={t("new_transaction")}
       visible={visible}
       className="create-transaction-dialog"
-      style={{ width: "90vw", maxWidth: "70rem" }}
+      style={{ width: "90vw", maxWidth: "50rem" }}
       onHide={onHide}
       footer={
         <div className="dialog-footer">
@@ -110,9 +110,9 @@ export default function CreateTransactionDialog({
       }
       draggable={false}
       resizable={false}
-      closable={false}
     >
       <div className="transaction-form">
+        {/* Selettore Tipo */}
         <SelectButton
           value={tipo}
           options={tipoOptions}
@@ -120,44 +120,8 @@ export default function CreateTransactionDialog({
           className="type-selector"
         />
 
-        <div className="form-grid">
-          <div className="field">
-            <Dropdown
-              label={t("category")}
-              value={categoriaId}
-              options={categorie}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setCategoriaId(e.value)}
-              placeholder={t("category_placeholder")}
-            />
-          </div>
-
-          <div className="field">
-            <Dropdown
-              label={t("sub_category")}
-              value={sottoCategoriaId}
-              options={filteredSottoCategorie}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setSottoCategoriaId(e.value)}
-              placeholder={t("sub_category_placeholder")}
-              disabled={!categoriaId}
-            />
-          </div>
-
-          <div className="field">
-            <Dropdown
-              label={t("tag")}
-              value={tagId}
-              options={tags}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setTagId(e.value)}
-              placeholder={t("tag_placeholder")}
-            />
-          </div>
-
+        {/* Importo e Data (Spesso stanno bene vicini) */}
+        <div className="form-row">
           <div className="field">
             <label className="field-label">{t("amount")}</label>
             <InputNumber
@@ -166,9 +130,22 @@ export default function CreateTransactionDialog({
               mode="currency"
               currency="EUR"
               locale="it-IT"
+              autoFocus
             />
           </div>
+          <div className="field">
+            <label className="field-label">{t("date")}</label>
+            <Calendar
+              value={data}
+              onChange={(e) => setData(e.value as Date)}
+              showIcon
+              dateFormat="dd/mm/yy"
+            />
+          </div>
+        </div>
 
+        {/* Conto e Categoria */}
+        <div className="form-row">
           <div className="field">
             <Dropdown
               label={t("bank_account")}
@@ -180,18 +157,46 @@ export default function CreateTransactionDialog({
               placeholder={t("bank_account_placeholder")}
             />
           </div>
-
           <div className="field">
-            <label className="field-label">{t("date")}</label>
-            <Calendar
-              value={data}
-              onChange={(e) => setData(e.value as Date)}
-              showIcon
-              dateFormat="dd/mm/yy"
+            <Dropdown
+              label={t("tag")}
+              value={tagId}
+              options={tags}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => setTagId(e.value)}
+              placeholder={t("tag_placeholder")}
             />
           </div>
+        </div>
 
-          <div className="field full-width">
+        <div className="form-row">
+          <div className="field">
+            <Dropdown
+              label={t("category")}
+              value={categoriaId}
+              options={categorie}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => setCategoriaId(e.value)}
+              placeholder={t("category_placeholder")}
+            />
+          </div>
+          <div className="field">
+            <Dropdown
+              label={t("sub_category")}
+              value={sottoCategoriaId}
+              options={filteredSottoCategorie}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => setSottoCategoriaId(e.value)}
+              placeholder={t("sub_category_placeholder")}
+            />
+          </div>
+        </div>
+
+        <div className="form-row">
+          <div className="field">
             <InputText
               label={t("description")}
               value={descrizione}
