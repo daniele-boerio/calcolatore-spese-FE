@@ -7,9 +7,19 @@
 .card-carousel {
   display: flex;
   gap: 1rem;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
+
+  &.is-horizontal {
+    flex-direction: row;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 1rem; // Spazio per l'ombra delle card e scrollbar
+  }
+
+  &.is-vertical {
+    flex-direction: column;
+    overflow-y: visible; // In verticale di solito scorre tutta la pagina
+  }
 
   // --- STILE SCROLLBAR PER DESKTOP ---
   &::-webkit-scrollbar {

@@ -29,7 +29,7 @@ export default function ContiPage() {
         </header>
 
         <div className="conti-carousel">
-          <CardCarousel conti={conti} />
+          <CardCarousel conti={conti} direction="vertical" />
         </div>
         <Button
           icon="pi pi-plus"

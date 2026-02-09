@@ -55,7 +55,7 @@ export default function HomePage() {
           <CustomDoughnutChart data={pieChartData} />
         </div>
 
-        <CardCarousel conti={conti} />
+        <CardCarousel conti={conti} direction="horizontal" />
 
         <TransactionList num={3} />
 

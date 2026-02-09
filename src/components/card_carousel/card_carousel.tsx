@@ -9,19 +9,25 @@ import UpdateAccountDialog from "../dialog/update_account_dialog/update_account_
 
 interface CardCarouselProps {
   conti: Conto[];
+  direction?: "horizontal" | "vertical";
 }
 
-export default function CardCarousel({ conti }: CardCarouselProps) {
+export default function CardCarousel({
+  conti,
+  direction = "horizontal",
+}: CardCarouselProps) {
   const { t } = useI18n();
   const accountLoading = useAppSelector((state) => state.conto.loading);
   const [isDialogUpdateVisible, setIsDialogUpdateVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Conto | null>(null);
 
+  const containerClass = `card-carousel is-${direction}`;
+
   return (
     <>
       <div className="card-carousel-wrapper">
         <h3 className="carousel-title">{t("bank_accounts")}</h3>
-        <div className="card-carousel">
+        <div className={containerClass}>
           {conti.map((account, index) => (
             <CreditCard
               id={account.id}
