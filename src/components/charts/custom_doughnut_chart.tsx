@@ -84,7 +84,7 @@ export default function CustomDoughnutChart({
       tooltip: { enabled: total > 0 },
     },
     maintainAspectRatio: false,
-    spacing: 5,
+    spacing: total > 0 ? 5 : 0,
   };
 
   return (

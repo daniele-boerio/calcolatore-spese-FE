@@ -78,7 +78,7 @@ export default function UpdateAccountDialog({
       header={t("edit_account")}
       visible={visible}
       className="account-dialog"
-      style={{ width: "95vw", maxWidth: "550px" }}
+      style={{ width: "95vw", maxWidth: "34.375rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">

@@ -16,7 +16,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.75rem;
-      max-height: 250px;
+      max-height: 15.625rem;
       overflow-y: auto;
       padding: 0.25rem;
 
@@ -50,7 +50,7 @@
   display: flex;
   justify-content: stretch;
   align-items: center;
-  gap: 12px;
+  gap: 0.75rem;
   padding: 1rem 0;
   width: 100%;
 
@@ -63,7 +63,7 @@
   }
 
   @media (max-width: v.$mobile) {
-    gap: 8px;
+    gap: 0.5rem;
     padding: 0.5rem 0;
   }
 }

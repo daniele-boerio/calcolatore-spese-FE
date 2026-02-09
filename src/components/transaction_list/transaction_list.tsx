@@ -39,7 +39,7 @@ export default function TransactionList({ num }: TransactionListProps) {
         <div className="loading-spinner">
           <i
             className="pi pi-spin pi-spinner"
-            style={{ marginRight: "10px" }}
+            style={{ marginRight: "0.625rem" }}
           ></i>
           {t("loading")}
         </div>

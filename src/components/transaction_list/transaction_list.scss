@@ -26,7 +26,7 @@
 
     .transaction-amount {
       font-weight: bold;
-      min-width: 70px; // Mantiene gli importi leggermente incolonnati se vuoi
+      min-width: 4.375rem; // Mantiene gli importi leggermente incolonnati se vuoi
 
       &.entrata {
         color: v.$green;

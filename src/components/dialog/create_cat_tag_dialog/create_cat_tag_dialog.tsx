@@ -88,7 +88,7 @@ export default function CreateCatTagDialog({
       header={t("create_new")}
       visible={visible}
       className="category-dialog"
-      style={{ width: "90vw", maxWidth: "450px" }}
+      style={{ width: "90vw", maxWidth: "28.125rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">

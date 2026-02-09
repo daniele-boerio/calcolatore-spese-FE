@@ -33,7 +33,7 @@
     padding: 0.5rem 0;
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
+    gap: 0.25rem;
 
     &.p-placeholder {
       color: v.$text-muted;
@@ -50,10 +50,10 @@
   background-color: v.$bg-button-primary !important; // Usiamo il primario per coerenza
   color: #ffffff !important;
   border-radius: 4px;
-  padding: 2px 8px;
+  padding: 0.125rem 0.5rem;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 0.25rem;
   font-size: 0.85rem;
 
   .p-multiselect-token-icon {

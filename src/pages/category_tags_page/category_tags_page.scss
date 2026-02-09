@@ -2,7 +2,7 @@
 
 .categorie-page {
   margin: 0 2rem 0 2rem;
-  height: calc(100vh - 130px); // Sottrae l'altezza della navbar/margini
+  height: calc(100vh - 8.125rem); // Sottrae l'altezza della navbar/margini
   display: flex;
   flex-direction: column;
   overflow: hidden; // Evita lo scroll della pagina intera
@@ -49,11 +49,11 @@
     .scrollable-area {
       flex: 1;
       overflow-y: auto; // Attiva lo scroll solo qui
-      padding-right: 5px;
+      padding-right: 0.313rem;
 
       // Stile scrollbar discreto
       &::-webkit-scrollbar {
-        width: 5px;
+        width: 0.313rem;
       }
       &::-webkit-scrollbar-thumb {
         background: v.$bar-neutral;
@@ -65,13 +65,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 15px 0 15px 15px;
+      padding: 0.938rem 0 0.938rem 0.938rem;
       width: 100%;
 
       .info {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 0.625rem;
         flex: 1;
         min-width: 0;
         cursor: pointer;
@@ -87,11 +87,11 @@
     }
 
     .subcategory-list {
-      padding: 0 0 10px 40px;
+      padding: 0 0 0.625rem 2.5rem;
       .subcategory-row {
         display: flex;
         justify-content: space-between;
-        padding: 8px 0;
+        padding: 0.5rem 0;
         font-size: 0.9rem;
       }
     }
@@ -99,7 +99,7 @@
 
   .actions {
     display: flex;
-    gap: 8px;
-    margin-right: 15px; // Allineamento estetico
+    gap: 0.5rem;
+    margin-right: 0.938rem; // Allineamento estetico
   }
 }

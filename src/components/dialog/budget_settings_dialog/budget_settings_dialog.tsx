@@ -63,7 +63,7 @@ export default function BudgetSettingsDialog({
       header={t("dialog_budget_title")}
       visible={visible}
       className="budget-settings-dialog"
-      style={{ width: "90vw", maxWidth: "400px" }}
+      style={{ width: "90vw", maxWidth: "25rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">

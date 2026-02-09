@@ -57,7 +57,7 @@ export default function UpdateTagDialog({
       header={t("edit_tag")}
       visible={visible}
       className="tag-dialog"
-      style={{ width: "90vw", maxWidth: "400px" }}
+      style={{ width: "90vw", maxWidth: "25rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">

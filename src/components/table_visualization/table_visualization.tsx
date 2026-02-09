@@ -78,7 +78,7 @@ export default function TableVisualization(props: TableVisualizationProps) {
         }
         // Altro
         removableSort
-        breakpoint="960px"
+        breakpoint="60rem"
       >
         {props.columns.map((col, i) => (
           <Column
@@ -87,7 +87,7 @@ export default function TableVisualization(props: TableVisualizationProps) {
             header={col.header}
             sortable={col.sortable}
             filter={col.filter}
-            style={col.width ? { width: col.width } : { minWidth: "120px" }}
+            style={col.width ? { width: col.width } : { minWidth: "7.5rem" }}
             body={col.body} // PrimeReact gestisce sia ReactNode che Function
           />
         ))}

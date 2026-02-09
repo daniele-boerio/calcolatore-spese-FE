@@ -19,7 +19,7 @@
 }
 
 .p-stepper-title {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: v.$text-main;
   font-family: v.$font-main;
 }
@@ -92,7 +92,7 @@
   position: relative;
 
   &.pi.pi-check::before {
-    font-size: 12px;
+    font-size: 0.875rem;
     color: #ffffff; // Icona bianca
     position: absolute;
     left: 50%;

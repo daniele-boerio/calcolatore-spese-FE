@@ -8,7 +8,7 @@
   margin-bottom: 2rem; // Aggiunto per distanziare il titolo dal contenuto del pannello
 
   .title {
-    font-size: 32px;
+    font-size: 2rem;
     font-weight: 500;
     color: v.$text-main;
     font-family: v.$font-main;
@@ -30,7 +30,7 @@
   // Ottimizzazione per mobile
   @media (max-width: v.$mobile) {
     .title {
-      font-size: 24px; // Testo leggermente più piccolo su smartphone
+      font-size: 1.5rem; // Testo leggermente più piccolo su smartphone
     }
     .subtitle {
       font-size: 0.9rem;

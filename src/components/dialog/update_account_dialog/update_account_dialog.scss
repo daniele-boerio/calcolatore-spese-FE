@@ -17,7 +17,7 @@
       gap: 1.2rem;
       align-items: end; // Allinea gli input se le label hanno altezze diverse
 
-      @media (max-width: 500px) {
+      @media (max-width: 31.25rem) {
         grid-template-columns: 1fr; // Una colonna su mobile
       }
     }

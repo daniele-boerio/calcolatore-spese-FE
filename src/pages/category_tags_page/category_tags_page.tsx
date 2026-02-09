@@ -79,7 +79,7 @@ export default function CategoryTagsPage() {
           <h1>
             <i
               className="pi pi-tags"
-              style={{ fontSize: "1.5rem", marginRight: "10px" }}
+              style={{ fontSize: "1.5rem", marginRight: "0.625rem" }}
             ></i>
             {t("category_tags_title")}
           </h1>
@@ -133,7 +133,7 @@ export default function CategoryTagsPage() {
                               className="pi pi-minus"
                               style={{
                                 fontSize: "0.7rem",
-                                marginRight: "10px",
+                                marginRight: "0.625rem",
                               }}
                             ></i>
                             <span>{sub.nome}</span>

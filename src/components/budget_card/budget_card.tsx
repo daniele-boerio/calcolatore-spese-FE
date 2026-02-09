@@ -84,7 +84,7 @@ export default function BudgetCard() {
             <ProgressBar
               value={Math.min(percentage, 100)}
               showValue={false}
-              style={{ height: "6px", flex: 1 }}
+              style={{ height: "0.375rem", flex: 1 }}
             />
             <span className="budget-card__percentage">
               {Math.round(percentage)}%

@@ -2,7 +2,7 @@
 
 .conti-page {
   padding: 2rem;
-  max-width: 1200px;
+  max-width: 75rem;
   margin: 0 auto;
 
   &__header {
@@ -32,7 +32,7 @@
 }
 
 // Responsive mobile
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
   .conti-page {
     padding: 1rem;
 

@@ -4,7 +4,7 @@
   // Impostiamo un'altezza minima per evitare che la dialog "salti"
   // quando si nascondono le sottocategorie
   .p-dialog-content {
-    min-height: 350px;
+    min-height: 34.375rem;
     display: flex;
     flex-direction: column;
   }
