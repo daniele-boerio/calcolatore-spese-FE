@@ -5,6 +5,13 @@
   max-width: 62.5rem;
   margin: 0 auto;
 
+  .add-transaction-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000; // Assicura che il pulsante sia sopra altri elementi
+  }
+
   .page-header {
     display: flex;
     justify-content: space-between;

@@ -62,7 +62,18 @@ const transactionsSlice = createSlice({
       .addCase(
         createTransaction.fulfilled,
         (state, action: PayloadAction<Transaction>) => {
-          state.transactions.push(action.payload);
+          state.pagination.total = (state.pagination.total || 0) + 1;
+          const updatedList = [...state.transactions, action.payload];
+          updatedList.sort(
+            (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
+          );
+          const pageSize = state.pagination.size || 10;
+
+          if (updatedList.length > pageSize) {
+            state.transactions = updatedList.slice(0, pageSize);
+          } else {
+            state.transactions = updatedList;
+          }
         },
       )
 
@@ -72,8 +83,12 @@ const transactionsSlice = createSlice({
           const index = state.transactions.findIndex(
             (tran) => tran.id === action.payload.id,
           );
+
           if (index !== -1) {
             state.transactions[index] = action.payload;
+            state.transactions.sort(
+              (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
+            );
           }
         },
       )
@@ -84,6 +99,9 @@ const transactionsSlice = createSlice({
           state.transactions = state.transactions.filter(
             (tran) => tran.id !== action.payload,
           );
+          state.pagination.total = state.pagination.total
+            ? state.pagination.total - 1
+            : 0;
         },
       )
 

@@ -4,45 +4,32 @@ import {
   getCategorie,
   deleteCategoria,
 } from "../../features/categorie/api_calls";
-import "./category_tags_page.scss";
+import "./category_page.scss";
 import Button from "../../components/button/button";
 import { Categoria } from "../../features/categorie/interfaces";
-import { deleteTag, getTags } from "../../features/tags/api_calls";
-import { Tag } from "../../features/tags/interfaces";
-import UpdateCategoryDialog from "../../components/dialog/update_category_dialog/update_category_dialog";
-import UpdateTagDialog from "../../components/dialog/update_tag_dialog/update_tag_dialog";
-import CreateCatTagDialog from "../../components/dialog/create_cat_tag_dialog/create_cat_tag_dialog";
-import { ConfirmPopup, confirmPopup } from "primereact/confirmpopup";
+import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../i18n/use-i18n";
+import CategoryDialog from "../../components/dialog/category_dialog/category_dialog";
 
-export default function CategoryTagsPage() {
+export default function CategoryPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
   const categorie = useAppSelector((state: any) => state.categoria.categorie);
   const CatLoading = useAppSelector((state: any) => state.categoria.loading);
-  const TagLoading = useAppSelector((state: any) => state.tag.loading);
-
-  // Supponendo tu abbia i tag nello store (aggiungi se mancano)
-  const tags = useAppSelector((state: any) => state.tag?.tags || []);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
-  const [isCreateDialogVisible, setIsCreateDialogVisible] = useState(false);
   const [isDialogCatVisible, setIsDialogCatVisible] = useState(false);
-  const [isDialogTagVisible, setIsDialogTagVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Categoria | null>(
     null,
   );
-  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
 
   useEffect(() => {
     dispatch(getCategorie());
-    dispatch(getTags()); // Assicurati di chiamare anche i tag
   }, [dispatch]);
 
   const handleOpenCreate = () => {
     setSelectedCategory(null);
-    setSelectedTag(null);
-    setIsCreateDialogVisible(true);
+    setIsDialogCatVisible(true);
   };
 
   const handleOpenCatEdit = (cat: Categoria) => {
@@ -50,12 +37,7 @@ export default function CategoryTagsPage() {
     setIsDialogCatVisible(true);
   };
 
-  const handleOpenTagEdit = (tag: Tag) => {
-    setSelectedTag(tag);
-    setIsDialogTagVisible(true);
-  };
-
-  const deleteObject = (event: any, id: string, type: string) => {
+  const deleteObject = (event: any, id: string) => {
     confirmPopup({
       target: event.currentTarget,
       message: t("delete_message"),
@@ -64,9 +46,7 @@ export default function CategoryTagsPage() {
       acceptLabel: t("yes"),
       rejectLabel: t("no"),
       accept: () => {
-        type === "cat"
-          ? dispatch(deleteCategoria({ id }))
-          : dispatch(deleteTag({ id }));
+        dispatch(deleteCategoria({ id }));
       },
       reject: () => {},
     });
@@ -81,7 +61,7 @@ export default function CategoryTagsPage() {
               className="pi pi-tags"
               style={{ fontSize: "1.5rem", marginRight: "0.625rem" }}
             ></i>
-            {t("category_tags_title")}
+            {t("category_title")}
           </h1>
         </div>
 
@@ -120,7 +100,7 @@ export default function CategoryTagsPage() {
                         className="trasparent-danger-button"
                         icon="pi pi-trash"
                         compact
-                        onClick={(e) => deleteObject(e, cat.id, "cat")}
+                        onClick={(e) => deleteObject(e, cat.id)}
                       />
                     </div>
                   </div>
@@ -146,37 +126,6 @@ export default function CategoryTagsPage() {
               ))}
             </div>
           </section>
-
-          {/* SEZIONE TAGS */}
-          <section className="category-list">
-            <div className="header-row sticky-header">
-              <span>{t("tags")}</span>
-              <span>{t("actions")}</span>
-            </div>
-            <div className="scrollable-area">
-              {tags.map((tag: Tag) => (
-                <div key={tag.id} className="category-row">
-                  <div className="info">
-                    <span className="cat-name">{tag.nome}</span>
-                  </div>
-                  <div className="actions">
-                    <Button
-                      className="trasparent-button"
-                      icon="pi pi-pencil"
-                      compact
-                      onClick={() => handleOpenTagEdit(tag)}
-                    />
-                    <Button
-                      className="trasparent-danger-button"
-                      icon="pi pi-trash"
-                      compact
-                      onClick={(e) => deleteObject(e, tag.id, "tag")}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         </div>
 
         <Button
@@ -187,24 +136,11 @@ export default function CategoryTagsPage() {
           onClick={handleOpenCreate}
         />
 
-        <UpdateCategoryDialog
+        <CategoryDialog
           visible={isDialogCatVisible}
           category={selectedCategory!}
           onHide={() => setIsDialogCatVisible(false)}
           loading={CatLoading}
-        />
-
-        <UpdateTagDialog
-          visible={isDialogTagVisible}
-          tag={selectedTag!}
-          onHide={() => setIsDialogTagVisible(false)}
-          loading={TagLoading}
-        />
-
-        <CreateCatTagDialog
-          visible={isCreateDialogVisible}
-          onHide={() => setIsCreateDialogVisible(false)}
-          loading={CatLoading || TagLoading}
         />
       </div>
     </>

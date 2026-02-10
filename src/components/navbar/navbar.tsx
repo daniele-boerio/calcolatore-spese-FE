@@ -41,17 +41,22 @@ export default function Navbar() {
             </NavLink>
           </li>
           <li>
-            <NavLink to="/categorie-tags" onClick={closeMenu}>
-              {t("nav_categories_tags")}
+            <NavLink to="/categories" onClick={closeMenu}>
+              {t("nav_categories")}
             </NavLink>
           </li>
           <li>
-            <NavLink to="/transazioni" onClick={closeMenu}>
+            <NavLink to="/tags" onClick={closeMenu}>
+              {t("nav_tags")}
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/transactions" onClick={closeMenu}>
               {t("nav_transactions")}
             </NavLink>
           </li>
           <li>
-            <NavLink to="/conti" onClick={closeMenu}>
+            <NavLink to="/accounts" onClick={closeMenu}>
               {t("nav_accounts")}
             </NavLink>
           </li>

@@ -5,7 +5,7 @@ import "./card_carousel.scss";
 import { Conto } from "../../features/conti/interfaces";
 import { useI18n } from "../../i18n/use-i18n";
 import { useAppSelector } from "../../store/store";
-import UpdateAccountDialog from "../dialog/update_account_dialog/update_account_dialog";
+import AccountDialog from "../dialog/account_dialog/account_dialog";
 
 interface CardCarouselProps {
   conti: Conto[];
@@ -44,7 +44,7 @@ export default function CardCarousel({
         </div>
       </div>
       {selectedAccount && (
-        <UpdateAccountDialog
+        <AccountDialog
           visible={isDialogUpdateVisible}
           account={selectedAccount} // Niente più "!"
           onHide={() => {

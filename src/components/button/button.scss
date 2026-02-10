@@ -40,7 +40,6 @@
   }
 
   button {
-    max-width: 12rem;
     &.compact {
       width: fit-content;
     }
@@ -113,11 +112,15 @@
 }
 
 .add-category-button,
-.add-account-button {
+.add-account-button,
+.add-tag-button,
+.add-transaction-button {
   .p-button {
     justify-content: center !important;
     max-width: 4rem !important;
     max-height: 4rem !important;
+    width: 4rem;
+    height: 4rem;
     color: v.$text-dark;
     border: none;
     background-color: v.$btn-light;

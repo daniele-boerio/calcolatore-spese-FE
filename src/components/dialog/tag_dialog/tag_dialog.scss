@@ -1,15 +1,14 @@
 @use "../../../styles/variables.scss" as v;
 
-.category-dialog {
+.tag-dialog {
   // Impostiamo un'altezza minima per evitare che la dialog "salti"
   // quando si nascondono le sottocategorie
   .p-dialog-content {
-    min-height: 34.375rem;
     display: flex;
     flex-direction: column;
   }
 
-  .category-settings-dialog-content {
+  .tag-settings-dialog-content {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
@@ -80,7 +79,7 @@
   }
 
   // Assicuriamoci che l'InputText occupi tutto lo spazio
-  .main-category-section {
+  .main-tag-section {
     width: 100%;
   }
 }

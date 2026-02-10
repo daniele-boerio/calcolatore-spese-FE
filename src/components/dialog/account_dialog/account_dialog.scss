@@ -1,0 +1,125 @@
+@use "../../../styles/variables" as v;
+
+.account-dialog {
+  .p-dialog-content {
+    padding: 1.5rem;
+  }
+
+  .account-settings-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    // Struttura a righe per i campi
+    .form-row {
+      display: flex;
+      flex-direction: row;
+      gap: 1.25rem;
+      width: 100%;
+
+      .field {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        min-width: 0; // Evita che i flex-item rompano il layout con contenuti lunghi
+
+        .field-label {
+          font-size: 0.85rem;
+          font-weight: 700;
+          color: v.$text-main;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        // Stile per i componenti PrimeReact (Calendar e Dropdown interna)
+        .p-calendar,
+        .p-dropdown {
+          width: 100%;
+        }
+      }
+    }
+
+    // Sezione Ricarica Automatica
+    .recharge-section {
+      margin-top: 1rem;
+      padding: 1.25rem;
+      background-color: rgba(v.$text-main, 0.03);
+      border-radius: 8px;
+      border: 1px solid v.$border-color;
+
+      .switch-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+
+        label {
+          font-weight: 600;
+          color: v.$text-main;
+        }
+      }
+
+      .calendar-field {
+        .field-label {
+          color: v.$text-muted;
+        }
+      }
+
+      .recharge-details {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px dashed v.$border-color;
+      }
+    }
+  }
+
+  .buttons-footer-dialog {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+
+    button {
+      min-width: 10rem;
+    }
+  }
+}
+
+// Animazione per l'apertura dei dettagli ricarica
+.animate-fade-in {
+  animation: fadeInDown 0.3s ease-out;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Mobile Responsive
+@media screen and (max-width: 48rem) {
+  .account-dialog {
+    .account-settings-dialog-content {
+      .form-row {
+        flex-direction: column; // I campi vanno uno sotto l'altro su mobile
+        gap: 1.5rem;
+      }
+    }
+
+    .buttons-footer-dialog {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

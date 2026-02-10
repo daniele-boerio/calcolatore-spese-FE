@@ -1,39 +1,43 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { Dialog } from "primereact/dialog";
 import { SelectButton } from "primereact/selectbutton";
-import { Calendar } from "primereact/calendar";
-import { InputNumber } from "primereact/inputnumber";
 import InputText from "../../input_text/input_text";
 import Button from "../../button/button";
 import Dropdown from "../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import "./create_transazione_dialog.scss";
-import { createTransaction } from "../../../features/transactions/api_calls";
+import "./transaction_dialog.scss";
 import {
-  CreateTransactionParams,
-  tipoTransaction,
-} from "../../../features/transactions/interfaces";
+  createTransaction,
+  updateTransaction,
+} from "../../../features/transactions/api_calls";
+import { tipoTransaction } from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
+import InputNumber from "../../input_number/input_number";
+import { Calendar } from "primereact/calendar";
+import { getConti } from "../../../features/conti/api_calls";
+import { getCategorie } from "../../../features/categorie/api_calls";
+import { getTags } from "../../../features/tags/api_calls";
 
-interface CreateTransactionDialogProps {
+interface TransactionDialogProps {
   visible: boolean;
   onHide: () => void;
+  transaction?: any; // Se passata, siamo in modalità EDIT
 }
 
-export default function CreateTransactionDialog({
+export default function TransactionDialog({
   visible,
   onHide,
-}: CreateTransactionDialogProps) {
+  transaction,
+}: TransactionDialogProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
+  // Dati da store
   const conti = useAppSelector((state) => state.conto.conti);
   const categorie = useAppSelector((state) => state.categoria.categorie);
   const tags = useAppSelector((state) => state.tag.tags);
-  const tutteLeTransazioni = useAppSelector(
-    (state) => state.transaction.transactions,
-  );
 
+  // Stati del form
   const [tipo, setTipo] = useState<tipoTransaction>("USCITA");
   const [importo, setImporto] = useState<number | null>(0);
   const [data, setData] = useState<Date | null>(new Date());
@@ -42,29 +46,40 @@ export default function CreateTransactionDialog({
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
   const [sottoCategoriaId, setSottoCategoriaId] = useState<string | null>(null);
   const [tagId, setTagId] = useState<string | null>(null);
-  const [parentTransactionId, setParentTransactionId] = useState<string | null>(
-    null,
-  );
 
-  const tipoOptions = [
-    { label: t("income"), value: "ENTRATA" },
-    { label: t("expenses"), value: "USCITA" },
-    { label: t("compensation"), value: "RIMBORSO" },
-  ];
-
+  // Effetto per il popolamento (Edit) o reset (Create)
   useEffect(() => {
-    if (!visible) {
-      setTipo("USCITA");
-      setImporto(0);
-      setData(new Date());
-      setDescrizione("");
-      setContoId(null);
-      setCategoriaId(null);
-      setSottoCategoriaId(null);
-      setTagId(null);
-      setParentTransactionId(null);
+    if (visible) {
+      if (transaction) {
+        // Modalità UPDATE
+        setTipo(transaction.tipo);
+        setImporto(transaction.importo);
+        setData(new Date(transaction.data));
+        setDescrizione(transaction.descrizione || "");
+        setContoId(transaction.conto_id);
+        setCategoriaId(transaction.categoria_id);
+        setSottoCategoriaId(transaction.sottocategoria_id);
+        setTagId(transaction.tag_id);
+      } else {
+        // Modalità CREATE (Reset)
+        setTipo("USCITA");
+        setImporto(0);
+        setData(new Date());
+        setDescrizione("");
+        setContoId(null);
+        setCategoriaId(null);
+        setSottoCategoriaId(null);
+        setTagId(null);
+      }
     }
-  }, [visible]);
+  }, [visible, transaction]);
+
+  // Caricamento dati iniziali
+  useEffect(() => {
+    dispatch(getConti());
+    dispatch(getCategorie());
+    dispatch(getTags());
+  }, [dispatch]);
 
   const filteredSottoCategorie = useMemo(() => {
     const cat = categorie.find((c) => c.id === categoriaId);
@@ -72,27 +87,44 @@ export default function CreateTransactionDialog({
   }, [categoriaId, categorie]);
 
   const handleSave = async () => {
-    const payload: CreateTransactionParams = {
+    const formattedDate = data
+      ? `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-${String(data.getDate()).padStart(2, "0")}`
+      : "";
+
+    const payload: any = {
       importo: importo ?? 0,
       tipo,
-      data: data ? data.toISOString() : "",
+      data: formattedDate,
       descrizione,
       conto_id: contoId ?? "",
       categoria_id: categoriaId,
       sottocategoria_id: sottoCategoriaId,
       tag_id: tagId,
-      parent_transaction_id: parentTransactionId,
     };
-    await dispatch(createTransaction(payload));
+
+    if (transaction?.id) {
+      // Chiamata Update se abbiamo l'ID
+      await dispatch(updateTransaction({ id: transaction.id, ...payload }));
+    } else {
+      // Chiamata Create
+      await dispatch(createTransaction(payload));
+    }
+
     onHide();
   };
 
+  const tipoOptions = [
+    { label: t("income"), value: "ENTRATA" },
+    { label: t("expenses"), value: "USCITA" },
+    { label: t("compensation"), value: "RIMBORSO" },
+  ];
+
   return (
     <Dialog
-      header={t("new_transaction")}
+      header={transaction ? t("edit_transaction") : t("new_transaction")}
       visible={visible}
       className="create-transaction-dialog"
-      style={{ width: "90vw", maxWidth: "50rem" }}
+      style={{ width: "95vw", maxWidth: "45rem" }}
       onHide={onHide}
       footer={
         <div className="dialog-footer">
@@ -102,7 +134,7 @@ export default function CreateTransactionDialog({
             onClick={onHide}
           />
           <Button
-            label={t("save")}
+            label={transaction ? t("save_changes") : t("save")}
             onClick={handleSave}
             disabled={!importo || !contoId}
           />
@@ -112,25 +144,24 @@ export default function CreateTransactionDialog({
       resizable={false}
     >
       <div className="transaction-form">
-        {/* Selettore Tipo */}
-        <SelectButton
-          value={tipo}
-          options={tipoOptions}
-          onChange={(e) => setTipo(e.value || "USCITA")}
-          className="type-selector"
-        />
+        <div className="form-row">
+          <SelectButton
+            value={tipo}
+            options={tipoOptions}
+            onChange={(e) => setTipo(e.value || "USCITA")}
+            className="type-selector"
+          />
+        </div>
 
-        {/* Importo e Data (Spesso stanno bene vicini) */}
         <div className="form-row">
           <div className="field">
-            <label className="field-label">{t("amount")}</label>
             <InputNumber
               value={importo}
-              onValueChange={(e) => setImporto(e.value ?? null)}
+              onChange={(e) => setImporto(e.value ?? null)}
               mode="currency"
               currency="EUR"
               locale="it-IT"
-              autoFocus
+              label={t("amount")}
             />
           </div>
           <div className="field">
@@ -140,11 +171,12 @@ export default function CreateTransactionDialog({
               onChange={(e) => setData(e.value as Date)}
               showIcon
               dateFormat="dd/mm/yy"
+              showTime={false}
+              hourFormat="24"
             />
           </div>
         </div>
 
-        {/* Conto e Categoria */}
         <div className="form-row">
           <div className="field">
             <Dropdown
@@ -191,6 +223,7 @@ export default function CreateTransactionDialog({
               optionValue="id"
               onChange={(e) => setSottoCategoriaId(e.value)}
               placeholder={t("sub_category_placeholder")}
+              disabled={!categoriaId}
             />
           </div>
         </div>

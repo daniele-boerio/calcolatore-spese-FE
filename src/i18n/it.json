@@ -26,7 +26,8 @@
   "sign_in_space": " Registrati",
 
   "delete_message": "Sei sicuro di voler eliminare questo elemento?",
-  "category_tags_title": "Gestione Categorie e Tag",
+  "category_title": "Gestione Categorie",
+  "tags_title": "Gestione Tags",
   "categories": "Categorie",
   "actions": "Azioni",
   "tags": "Tag",
@@ -60,6 +61,7 @@
   "description_placeholder": "Es: Spese mensili",
 
   "create_new": "Crea Nuovo",
+  "create_new_f": "Crea Nuova",
   "ex_grocery": "Es: Spesa",
   "ex_urgent": "Es: Urgente",
   "name": "Nome",
@@ -81,7 +83,8 @@
   "total": "Totale",
 
   "nav_dashboard": "Dashboard",
-  "nav_categories_tags": "Categorie e Tag",
+  "nav_categories": "Categorie",
+  "nav_tags": "Tags",
   "nav_transactions": "Transazioni",
   "nav_accounts": "Conti",
   "nav_investments": "Investimenti",

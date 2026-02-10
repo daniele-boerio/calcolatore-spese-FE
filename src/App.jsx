@@ -7,11 +7,12 @@ import "./App.scss";
 import TransactionPage from "./pages/transaction_page/transaction_page";
 import { useAppDispatch } from "./store/store";
 import { useEffect } from "react";
-import CategoryTagsPage from "./pages/category_tags_page/category_tags_page";
+import CategoryPage from "./pages/category_page/category_page";
 import { getProfile } from "./features/profile/api_calls";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import ContiPage from "./pages/conti_page/conti_page";
 import { ConfirmPopup } from "primereact/confirmpopup";
+import TagsPage from "./pages/tags_page/tags_page";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -37,9 +38,10 @@ function App() {
               <Routes>
                 {/* Quando l'URL cambia, React Router decide cosa mostrare qui sotto */}
                 <Route path="/" element={<HomePage />} />
-                <Route path="/transazioni" element={<TransactionPage />} />
-                <Route path="/categorie-tags" element={<CategoryTagsPage />} />
-                <Route path="/conti" element={<ContiPage />} />
+                <Route path="/transactions" element={<TransactionPage />} />
+                <Route path="/categories" element={<CategoryPage />} />
+                <Route path="/tags" element={<TagsPage />} />
+                <Route path="/accounts" element={<ContiPage />} />
               </Routes>
             </div>
           </>

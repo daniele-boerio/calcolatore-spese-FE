@@ -5,7 +5,7 @@ import Button from "../../components/button/button";
 import "./conti_page.scss";
 import { getConti } from "../../features/conti/api_calls";
 import CardCarousel from "../../components/card_carousel/card_carousel";
-import CreateAccountDialog from "../../components/dialog/create_account_dialog/create_account_dialog";
+import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
 
 export default function ContiPage() {
   const { t } = useI18n();
@@ -39,7 +39,7 @@ export default function ContiPage() {
           onClick={() => setIsCreateDialogVisible(true)}
         />
       </div>
-      <CreateAccountDialog
+      <AccountDialog
         visible={isCreateDialogVisible}
         onHide={() => {
           setIsCreateDialogVisible(false);

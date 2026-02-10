@@ -3,9 +3,10 @@ import { Dialog } from "primereact/dialog";
 import InputText from "../../input_text/input_text";
 import Button from "../../button/button";
 import { Categoria } from "../../../features/categorie/interfaces";
-import "./update_category_dialog.scss";
+import "./category_dialog.scss"; // Unifica i due file SCSS in uno
 import { useAppDispatch } from "../../../store/store";
 import {
+  createCategoria,
   updateCategoria,
   updateSottoCategoria,
   createSottoCategorie,
@@ -13,10 +14,10 @@ import {
 } from "../../../features/categorie/api_calls";
 import { useI18n } from "../../../i18n/use-i18n";
 
-interface UpdateCategoryDialogProps {
+interface CategoryDialogProps {
   visible: boolean;
   onHide: () => void;
-  category: Categoria;
+  category?: Categoria | null; // Se presente, siamo in UPDATE
   loading?: boolean;
 }
 
@@ -25,25 +26,35 @@ interface SubState {
   nome: string;
 }
 
-export default function UpdateCategoryDialog({
+export default function CategoryDialog({
   visible,
   onHide,
   category,
   loading: externalLoading,
-}: UpdateCategoryDialogProps) {
+}: CategoryDialogProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+
   const [nome, setNome] = useState("");
   const [subs, setSubs] = useState<SubState[]>([]);
   const [subsToDelete, setSubsToDelete] = useState<string[]>([]);
+  const [internalLoading, setInternalLoading] = useState(false);
 
+  // Sincronizzazione dati: popola se EDIT, resetta se CREATE
   useEffect(() => {
-    if (visible && category) {
-      setNome(category.nome);
-      setSubs(
-        category.sottocategorie?.map((s) => ({ id: s.id, nome: s.nome })) || [],
-      );
-      setSubsToDelete([]);
+    if (visible) {
+      if (category) {
+        setNome(category.nome);
+        setSubs(
+          category.sottocategorie?.map((s) => ({ id: s.id, nome: s.nome })) ||
+            [],
+        );
+        setSubsToDelete([]);
+      } else {
+        setNome("");
+        setSubs([]);
+        setSubsToDelete([]);
+      }
     }
   }, [visible, category]);
 
@@ -64,69 +75,89 @@ export default function UpdateCategoryDialog({
   };
 
   const handleConfirm = async () => {
-    if (!nome.trim() || !category.id) return;
+    if (!nome.trim()) return;
+    setInternalLoading(true);
 
-    const promises: Promise<any>[] = [];
+    try {
+      let currentCatId = category?.id;
 
-    if (nome.trim() !== category.nome) {
-      promises.push(
-        dispatch(
-          updateCategoria({ id: category.id, nome: nome.trim() }),
-        ).unwrap(),
-      );
-    }
-
-    subsToDelete.forEach((subId) => {
-      promises.push(
-        dispatch(deleteSottoCategoria({ catId: category.id, subId })).unwrap(),
-      );
-    });
-
-    subs.forEach((sub) => {
-      if (sub.id) {
-        const original = category.sottocategorie?.find((s) => s.id === sub.id);
-        if (
-          original &&
-          sub.nome.trim() !== original.nome &&
-          sub.nome.trim() !== ""
-        ) {
-          promises.push(
-            dispatch(
-              updateSottoCategoria({ id: sub.id, nome: sub.nome.trim() }),
-            ).unwrap(),
-          );
-        }
+      // 1. GESTIONE CATEGORIA PADRE
+      if (!currentCatId) {
+        // Creazione nuova categoria
+        const newCat = await dispatch(
+          createCategoria({ nome: nome.trim() }),
+        ).unwrap();
+        currentCatId = newCat.id;
+      } else if (nome.trim() !== category?.nome) {
+        // Aggiornamento nome categoria esistente
+        await dispatch(
+          updateCategoria({ id: currentCatId, nome: nome.trim() }),
+        ).unwrap();
       }
-    });
 
-    const newNames = subs
-      .filter((s) => !s.id && s.nome.trim() !== "")
-      .map((s) => s.nome.trim());
+      // 2. GESTIONE SOTTOCATEGORIE (Solo se abbiamo un ID categoria)
+      const promises: Promise<any>[] = [];
 
-    if (newNames.length > 0) {
-      promises.push(
-        dispatch(
-          createSottoCategorie({
-            id: category.id,
-            nomeList: newNames.map((n) => ({ nome: n })),
-          }),
-        ).unwrap(),
-      );
+      // Eliminazione
+      subsToDelete.forEach((subId) => {
+        promises.push(
+          dispatch(
+            deleteSottoCategoria({ catId: currentCatId!, subId }),
+          ).unwrap(),
+        );
+      });
+
+      // Aggiornamento esistenti
+      subs.forEach((sub) => {
+        if (sub.id) {
+          const original = category?.sottocategorie?.find(
+            (s) => s.id === sub.id,
+          );
+          if (
+            original &&
+            sub.nome.trim() !== original.nome &&
+            sub.nome.trim() !== ""
+          ) {
+            promises.push(
+              dispatch(
+                updateSottoCategoria({ id: sub.id, nome: sub.nome.trim() }),
+              ).unwrap(),
+            );
+          }
+        }
+      });
+
+      // Creazione nuove
+      const newNames = subs
+        .filter((s) => !s.id && s.nome.trim() !== "")
+        .map((s) => ({ nome: s.nome.trim() }));
+
+      if (newNames.length > 0) {
+        promises.push(
+          dispatch(
+            createSottoCategorie({ id: currentCatId!, nomeList: newNames }),
+          ).unwrap(),
+        );
+      }
+
+      if (promises.length > 0) await Promise.all(promises);
+
+      onHide();
+    } catch (error) {
+      console.error("Error saving category/subs:", error);
+    } finally {
+      setInternalLoading(false);
     }
-
-    if (promises.length > 0) {
-      await Promise.all(promises);
-    }
-
-    onHide();
   };
 
   return (
     <Dialog
-      header={t("edit_category")}
+      header={
+        category ? t("edit_category") : `${t("create_new_f")} ${t("category")}`
+      }
       visible={visible}
       className="category-dialog"
-      style={{ width: "90vw", maxWidth: "50rem" }}
+      style={{ width: "95vw", maxWidth: "40rem" }}
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">
@@ -136,9 +167,9 @@ export default function UpdateCategoryDialog({
             onClick={onHide}
           />
           <Button
-            label={t("save_changes")}
+            label={category ? t("save_changes") : t("save")}
             onClick={handleConfirm}
-            loading={externalLoading}
+            loading={externalLoading || internalLoading}
             disabled={!nome.trim()}
           />
         </div>
@@ -153,19 +184,19 @@ export default function UpdateCategoryDialog({
             label={t("category_name")}
             value={nome}
             onChange={(e) => setNome(e.target.value)}
-            placeholder={t("category_placeholder")}
+            placeholder={t("ex_grocery")}
             autoFocus
           />
         </div>
 
         <div className="subcategories-section">
           <div className="section-header">
-            <span>{t("subcategories_title")}</span>
+            <span>{t("sub_categories")}</span>
           </div>
 
           <div className="subs-list">
             {subs.length === 0 && (
-              <p className="empty-subs">{t("no_subcategories")}</p>
+              <p className="empty-subs">{t("no_sub_categories")}</p>
             )}
 
             {subs.map((sub, index) => (
@@ -173,7 +204,7 @@ export default function UpdateCategoryDialog({
                 <InputText
                   value={sub.nome}
                   onChange={(e) => handleSubChange(index, e.target.value)}
-                  placeholder={t("subcategory_name_placeholder")}
+                  placeholder={t("name_sub_categories")}
                 />
                 <Button
                   icon="pi pi-trash"
@@ -187,8 +218,7 @@ export default function UpdateCategoryDialog({
 
             <Button
               icon="pi pi-plus"
-              label={t("add_tag")}
-              className="add-sub-btn p-button-text"
+              className="add-sub-btn"
               onClick={handleAddSub}
               compact
             />

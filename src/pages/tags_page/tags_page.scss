@@ -1,0 +1,105 @@
+@use "../../styles/variables.scss" as v;
+
+.tag-page {
+  margin: 0 2rem 0 2rem;
+  height: calc(100vh - 8.125rem); // Sottrae l'altezza della navbar/margini
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; // Evita lo scroll della pagina intera
+
+  .page-header {
+    flex: 0 0 auto;
+    margin-bottom: 1rem;
+  }
+
+  // Wrapper per dividere lo spazio a metà
+  .split-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    flex: 1;
+    min-height: 0; // Fondamentale per attivare lo scroll interno nei flex-item
+  }
+
+  .add-tag-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+  }
+
+  .tag-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1; // Ogni lista occupa il 50%
+    min-height: 0;
+    border: 1px solid v.$bar-neutral;
+    border-radius: 8px;
+
+    .sticky-header {
+      flex: 0 0 auto;
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem 3.5rem 1rem 2rem;
+      font-weight: bold;
+      border-bottom: 2px solid v.$bar-neutral;
+      border-radius: 8px 8px 0 0;
+    }
+
+    .scrollable-area {
+      flex: 1;
+      overflow-y: auto; // Attiva lo scroll solo qui
+      padding-right: 0.313rem;
+
+      // Stile scrollbar discreto
+      &::-webkit-scrollbar {
+        width: 0.313rem;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: v.$bar-neutral;
+        border-radius: 10px;
+      }
+    }
+
+    .tag-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.938rem 0 0.938rem 0.938rem;
+      width: 100%;
+
+      .info {
+        display: flex;
+        align-items: center;
+        gap: 0.625rem;
+        flex: 1;
+        min-width: 0;
+        cursor: pointer;
+
+        .cat-name {
+          font-weight: bold;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          flex: 1;
+        }
+      }
+    }
+
+    .subtag-list {
+      padding: 0 0 0.625rem 2.5rem;
+      .subtag-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  .actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-right: 0.938rem; // Allineamento estetico
+  }
+}

@@ -10,9 +10,9 @@ import {
   getCurrentMonthExpensesByCategory,
 } from "../../features/conti/api_calls";
 import Button from "../../components/button/button";
-import CreateTransactionDialog from "../../components/dialog/create_transazione_dialog/create_transazione_dialog";
 import { useI18n } from "../../i18n/use-i18n";
 import CustomDoughnutChart from "../../components/charts/custom_doughnut_chart";
+import TransactionDialog from "../../components/dialog/transaction_dialog/transaction_dialog";
 
 export default function HomePage() {
   const { t } = useI18n();
@@ -37,7 +37,6 @@ export default function HomePage() {
   }, [dispatch]);
 
   // Mappiamo i dati per il grafico a torta
-  // Trasformiamo { categoria: string, totale: number } in { id, value, label }
   const pieChartData = monthlyExpensesByCategory.map(
     (item: { value: number; label: string }, index: number) => ({
       id: index,
@@ -67,7 +66,7 @@ export default function HomePage() {
           onClick={() => setIsCreateTransactionDialogVisible(true)}
         />
       </div>
-      <CreateTransactionDialog
+      <TransactionDialog
         visible={isCreateTransactionDialogVisible}
         onHide={() => setIsCreateTransactionDialogVisible(false)}
       />

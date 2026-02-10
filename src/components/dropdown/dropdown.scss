@@ -1,7 +1,6 @@
 @use "../../styles/variables" as v;
 
 .div-dropdown {
-  width: 20rem;
   // Usiamo il bordo standard del tema
   border-bottom: 1px solid v.$border-color;
   transition: border-color 0.2s ease;
@@ -37,6 +36,7 @@
   align-items: center;
   color: v.$text-main;
   font-family: v.$font-main;
+  padding: 0.25rem 0;
 
   &:not(.p-disabled).p-focus {
     box-shadow: none !important; // Rimuoviamo il raggio blu di default di Prime

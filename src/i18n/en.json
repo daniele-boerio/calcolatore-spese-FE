@@ -26,7 +26,8 @@
   "sign_in_space": " Sign in",
 
   "delete_message": "Are you sure you want to delete this item?",
-  "category_tags_title": "Category and Tag Management",
+  "category_title": "Category Management",
+  "tags_title": "Tag Management",
   "categories": "Categories",
   "actions": "Actions",
   "tags": "Tags",
@@ -60,6 +61,7 @@
   "description_placeholder": "Ex: Monthly Expenses",
 
   "create_new": "Create New",
+  "create_new_f": "Create New",
   "ex_grocery": "Ex: Grocery",
   "ex_urgent": "Ex: Urgent",
   "name": "Name",
@@ -81,7 +83,8 @@
   "total": "Total",
 
   "nav_dashboard": "Dashboard",
-  "nav_categories_tags": "Categories & Tags",
+  "nav_categories": "Categories",
+  "nav_tags": "Tags",
   "nav_transactions": "Transactions",
   "nav_accounts": "Accounts",
   "nav_investments": "Investments",
