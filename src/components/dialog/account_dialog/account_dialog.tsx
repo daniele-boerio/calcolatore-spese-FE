@@ -4,7 +4,6 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Calendar } from "primereact/calendar"; // Tornato al componente standard
 import Dropdown from "../../dropdown/dropdown";
 import InputText from "../../input_text/input_text";
-import InputNumber from "../../input_number/input_number";
 import Button from "../../button/button";
 import "./account_dialog.scss";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
@@ -30,10 +29,10 @@ export default function AccountDialog({
   const allAccounts = useAppSelector((state) => state.conto.conti);
 
   const [nome, setNome] = useState("");
-  const [saldo, setSaldo] = useState<number | null>(0);
-  const [budgetObiettivo, setBudgetObiettivo] = useState<number | null>(0);
+  const [saldo, setSaldo] = useState<string>("");
+  const [budgetObiettivo, setBudgetObiettivo] = useState<string>("");
   const [ricaricaAutomatica, setRicaricaAutomatica] = useState(false);
-  const [sogliaMinima, setSogliaMinima] = useState<number | null>(0);
+  const [sogliaMinima, setSogliaMinima] = useState<string>("");
   const [contoSorgenteId, setContoSorgenteId] = useState<string | null>(null);
   const [frequenzaControllo, setFrequenzaControllo] = useState<string | null>(
     null,
@@ -44,10 +43,14 @@ export default function AccountDialog({
     if (visible) {
       if (account) {
         setNome(account.nome);
-        setSaldo(account.saldo);
-        setBudgetObiettivo(account.budget_obiettivo ?? 0);
+        setSaldo(account.saldo.toString());
+        setBudgetObiettivo(
+          account.budget_obiettivo ? account.budget_obiettivo.toString() : "",
+        );
         setRicaricaAutomatica(account.ricarica_automatica);
-        setSogliaMinima(account.soglia_minima ?? 0);
+        setSogliaMinima(
+          account.soglia_minima ? account.soglia_minima.toString() : "",
+        );
         setContoSorgenteId(account.conto_sorgente_id ?? null);
         setFrequenzaControllo(account.frequenza_controllo ?? null);
         setProssimoControllo(
@@ -57,10 +60,10 @@ export default function AccountDialog({
         );
       } else {
         setNome("");
-        setSaldo(0);
-        setBudgetObiettivo(0);
+        setSaldo("");
+        setBudgetObiettivo("");
         setRicaricaAutomatica(false);
-        setSogliaMinima(0);
+        setSogliaMinima("");
         setContoSorgenteId(null);
         setFrequenzaControllo(null);
         setProssimoControllo(null);
@@ -76,12 +79,20 @@ export default function AccountDialog({
   const handleConfirm = async () => {
     if (!nome.trim()) return;
 
+    const numericSaldo = parseFloat(saldo);
+    const numericBudget = parseFloat(budgetObiettivo);
+    const numericSogliaMinima = parseFloat(sogliaMinima);
+
     const payload = {
       nome: nome.trim(),
-      saldo: saldo ?? 0,
-      budget_obiettivo: budgetObiettivo ?? 0,
+      saldo: isNaN(numericSaldo) ? 0 : numericSaldo,
+      budget_obiettivo: isNaN(numericBudget) ? 0 : numericBudget,
       ricarica_automatica: ricaricaAutomatica,
-      soglia_minima: ricaricaAutomatica ? (sogliaMinima ?? 0) : undefined,
+      soglia_minima: ricaricaAutomatica
+        ? isNaN(numericSogliaMinima)
+          ? 0
+          : numericSogliaMinima
+        : 0,
       conto_sorgente_id: ricaricaAutomatica
         ? (contoSorgenteId ?? undefined)
         : undefined,
@@ -101,6 +112,13 @@ export default function AccountDialog({
     }
 
     onHide();
+  };
+
+  const handleNumberChange = (val: string, fun: any) => {
+    let cleanedValue = val.replace(",", ".");
+    if (cleanedValue === "" || /^\d*\.?\d{0,2}$/.test(cleanedValue)) {
+      fun(cleanedValue);
+    }
   };
 
   return (
@@ -143,21 +161,29 @@ export default function AccountDialog({
 
         <div className="form-row">
           <div className="field">
-            <InputNumber
-              label={t("current_balance")}
+            <InputText
               value={saldo}
-              onChange={(e) => setSaldo(e.value ?? 0)}
-              mode="currency"
-              currency="EUR"
+              onChange={(e) => handleNumberChange(e.target.value, setSaldo)}
+              label={t("current_balance")}
+              icon="pi pi-euro"
+              iconPos="right"
+              keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+              inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
+              placeholder="0.00"
             />
           </div>
           <div className="field">
-            <InputNumber
-              label={t("target_budget")}
+            <InputText
               value={budgetObiettivo}
-              onChange={(e) => setBudgetObiettivo(e.value ?? 0)}
-              mode="currency"
-              currency="EUR"
+              onChange={(e) =>
+                handleNumberChange(e.target.value, setBudgetObiettivo)
+              }
+              label={t("target_budget")}
+              icon="pi pi-euro"
+              iconPos="right"
+              keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+              inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
+              placeholder="0.00"
             />
           </div>
         </div>
@@ -175,12 +201,17 @@ export default function AccountDialog({
             <div className="recharge-details animate-fade-in">
               <div className="form-row">
                 <div className="field">
-                  <InputNumber
-                    label={t("minimum_threshold")}
+                  <InputText
                     value={sogliaMinima}
-                    onChange={(e) => setSogliaMinima(e.value ?? 0)}
-                    mode="currency"
-                    currency="EUR"
+                    onChange={(e) =>
+                      handleNumberChange(e.target.value, setSogliaMinima)
+                    }
+                    label={t("minimum_threshold")}
+                    icon="pi pi-euro"
+                    iconPos="right"
+                    keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+                    inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
+                    placeholder="0.00"
                   />
                 </div>
                 <div className="field">

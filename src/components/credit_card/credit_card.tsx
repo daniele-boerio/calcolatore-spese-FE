@@ -28,7 +28,7 @@ export default function CreditCard({
   const formattedBalance = new Intl.NumberFormat("it-IT", {
     style: "currency",
     currency: "EUR",
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(balance);
 
   const handleDeleteAccount = (event: any) => {

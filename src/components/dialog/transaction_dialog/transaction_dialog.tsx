@@ -10,9 +10,11 @@ import {
   createTransaction,
   updateTransaction,
 } from "../../../features/transactions/api_calls";
-import { tipoTransaction } from "../../../features/transactions/interfaces";
+import {
+  tipoTransaction,
+  Transaction,
+} from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
-import InputNumber from "../../input_number/input_number";
 import { Calendar } from "primereact/calendar";
 import { getConti } from "../../../features/conti/api_calls";
 import { getCategorie } from "../../../features/categorie/api_calls";
@@ -21,7 +23,7 @@ import { getTags } from "../../../features/tags/api_calls";
 interface TransactionDialogProps {
   visible: boolean;
   onHide: () => void;
-  transaction?: any; // Se passata, siamo in modalità EDIT
+  transaction?: Transaction; // Se passata, siamo in modalità EDIT
 }
 
 export default function TransactionDialog({
@@ -39,7 +41,7 @@ export default function TransactionDialog({
 
   // Stati del form
   const [tipo, setTipo] = useState<tipoTransaction>("USCITA");
-  const [importo, setImporto] = useState<number | null>(0);
+  const [importo, setImporto] = useState<string>("");
   const [data, setData] = useState<Date | null>(new Date());
   const [descrizione, setDescrizione] = useState("");
   const [contoId, setContoId] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export default function TransactionDialog({
       if (transaction) {
         // Modalità UPDATE
         setTipo(transaction.tipo);
-        setImporto(transaction.importo);
+        setImporto(transaction.importo.toString());
         setData(new Date(transaction.data));
         setDescrizione(transaction.descrizione || "");
         setContoId(transaction.conto_id);
@@ -63,7 +65,7 @@ export default function TransactionDialog({
       } else {
         // Modalità CREATE (Reset)
         setTipo("USCITA");
-        setImporto(0);
+        setImporto("");
         setData(new Date());
         setDescrizione("");
         setContoId(null);
@@ -91,8 +93,10 @@ export default function TransactionDialog({
       ? `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-${String(data.getDate()).padStart(2, "0")}`
       : "";
 
+    const numericImporto = parseFloat(importo);
+
     const payload: any = {
-      importo: importo ?? 0,
+      importo: isNaN(numericImporto) ? 0 : numericImporto,
       tipo,
       data: formattedDate,
       descrizione,
@@ -118,6 +122,13 @@ export default function TransactionDialog({
     { label: t("expenses"), value: "USCITA" },
     { label: t("compensation"), value: "RIMBORSO" },
   ];
+
+  const handleImportoChange = (val: string) => {
+    let cleanedValue = val.replace(",", ".");
+    if (cleanedValue === "" || /^\d*\.?\d{0,2}$/.test(cleanedValue)) {
+      setImporto(cleanedValue);
+    }
+  };
 
   return (
     <Dialog
@@ -155,13 +166,15 @@ export default function TransactionDialog({
 
         <div className="form-row">
           <div className="field">
-            <InputNumber
+            <InputText
               value={importo}
-              onChange={(e) => setImporto(e.value ?? null)}
-              mode="currency"
-              currency="EUR"
-              locale="it-IT"
+              onChange={(e) => handleImportoChange(e.target.value)}
               label={t("amount")}
+              icon="pi pi-euro"
+              iconPos="right"
+              keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+              inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
+              placeholder="0.00"
             />
           </div>
           <div className="field">

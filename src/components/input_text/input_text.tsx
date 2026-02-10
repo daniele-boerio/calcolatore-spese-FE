@@ -18,7 +18,17 @@ export type InputTextProps = {
   icon?: string;
   iconPos?: "left" | "right";
   invalid?: boolean;
-  keyfilter?: KeyFilterType | undefined;
+  type?: string;
+  inputMode?:
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal"
+    | "search";
+  keyfilter?: KeyFilterType;
 };
 
 export default function InputText(props: InputTextProps) {
@@ -46,6 +56,8 @@ export default function InputText(props: InputTextProps) {
           onKeyDown={props.onKeyDown}
           disabled={props.disabled}
           invalid={props.invalid}
+          type={props.type || "text"}
+          inputMode={props.inputMode}
           keyfilter={props.keyfilter}
         />
 

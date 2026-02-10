@@ -109,5 +109,7 @@
   "next_check": "Next Scheduled Check",
   "select_source": "Select source",
   "initial_balance": "Initial Balance",
-  "create_account": "Create Account"
+  "create_account": "Create Account",
+
+  "amount_placeholder": "Ex: 10,50"
 }
