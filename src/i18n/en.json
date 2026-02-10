@@ -49,6 +49,7 @@
   "income": "Income",
   "expenses": "Expenses",
   "new_transaction": "New Transaction",
+  "edit_transaction": "Edit Transaction",
   "category": "Category",
   "category_placeholder": "Select Category",
   "sub_category": "Sub Category",
@@ -111,5 +112,6 @@
   "initial_balance": "Initial Balance",
   "create_account": "Create Account",
 
-  "amount_placeholder": "Ex: 10,50"
+  "amount_placeholder": "Ex: 10,50",
+  "account_color": "Account Color"
 }

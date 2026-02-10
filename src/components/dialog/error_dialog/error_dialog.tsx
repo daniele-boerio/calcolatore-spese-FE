@@ -29,6 +29,7 @@ export default function ErrorDialog() {
   return (
     <Dialog
       style={{ width: "90vw", maxWidth: "25rem" }}
+      className="dialog-custom"
       header={title || t("error")}
       visible={isOpen}
       onHide={onHide}

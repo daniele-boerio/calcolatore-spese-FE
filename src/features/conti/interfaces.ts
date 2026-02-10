@@ -12,6 +12,7 @@ export interface Conto {
   prossimo_controllo?: string;
   creationDate: string;
   lastUpdate: string;
+  color: string;
 }
 
 export interface ExpenseByCategory {

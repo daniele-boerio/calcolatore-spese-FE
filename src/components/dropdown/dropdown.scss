@@ -16,7 +16,7 @@
 
 .label-dropdown {
   margin: 0 0 0.313rem 0;
-  color: v.$text-muted;
+  color: v.$text-main;
   font-family: v.$font-main;
   font-size: 0.85rem;
   font-weight: 600;
@@ -45,12 +45,12 @@
   .p-dropdown-label {
     padding: 0.5rem 0;
     &.p-placeholder {
-      color: v.$text-muted; // Sostituito text-secondary
+      color: v.$text-muted;
     }
   }
 
   .p-dropdown-trigger {
-    color: v.$text-muted;
+    color: v.$text-main;
   }
 }
 
@@ -81,4 +81,8 @@
       }
     }
   }
+}
+
+.p-dropdown-empty-message {
+  color: v.$text-main;
 }

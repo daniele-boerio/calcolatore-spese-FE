@@ -24,17 +24,6 @@ export default function Switch(props: SwitchProps) {
         onChange={props.onChange}
         disabled={props.disabled}
         className={props.hidden ? "hidden-switch" : ""}
-        pt={{
-          slider: {
-            style: {
-              backgroundColor: props.checked
-                ? "var(--bko-color-primary)"
-                : "var(--bko-color-tertiary)",
-              color: "black",
-              borderRadius: "5rem",
-            },
-          },
-        }}
       />
     </div>
   );

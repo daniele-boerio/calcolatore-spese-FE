@@ -1,7 +1,7 @@
 @use "../../styles/variables.scss" as v;
 .action-button {
   .p-button {
-    color: v.$text-main;
+    color: v.$text-on-dark;
     border-color: v.$bc-button-primary;
     background-color: v.$bg-button-primary;
   }
@@ -9,7 +9,7 @@
 
 .reset-button {
   .p-button {
-    color: v.$text-main;
+    color: v.$text-on-dark;
     border-color: v.$bc-button-secondary;
     background-color: v.$bg-button-secondary;
   }
@@ -18,6 +18,14 @@
 .trasparent-button {
   .p-button {
     color: v.$text-main;
+    border-color: transparent;
+    background-color: transparent;
+  }
+}
+
+.trasparent-button-clear {
+  .p-button {
+    color: v.$text-on-dark;
     border-color: transparent;
     background-color: transparent;
   }
@@ -102,7 +110,7 @@
     justify-content: center !important;
     max-width: 4rem !important;
     max-height: 4rem !important;
-    color: v.$text-dark;
+    color: v.$text-on-dark;
     border: none;
     background-color: v.$btn-light;
     .icon-button {
@@ -121,7 +129,7 @@
     max-height: 4rem !important;
     width: 4rem;
     height: 4rem;
-    color: v.$text-dark;
+    color: v.$text-on-dark;
     border: none;
     background-color: v.$btn-light;
     .icon-button {

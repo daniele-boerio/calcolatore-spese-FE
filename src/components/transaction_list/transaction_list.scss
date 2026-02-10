@@ -20,7 +20,7 @@
     gap: 0.5rem; // Spazio orizzontale tra data, importo e descrizione
 
     .transaction-date {
-      color: v.$text-muted;
+      color: v.$text-main;
       white-space: nowrap; // Evita che la data vada a capo
     }
 

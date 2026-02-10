@@ -134,7 +134,7 @@ export default function TransactionDialog({
     <Dialog
       header={transaction ? t("edit_transaction") : t("new_transaction")}
       visible={visible}
-      className="create-transaction-dialog"
+      className="dialog-custom create-transaction-dialog"
       style={{ width: "95vw", maxWidth: "45rem" }}
       onHide={onHide}
       footer={
@@ -145,6 +145,7 @@ export default function TransactionDialog({
             onClick={onHide}
           />
           <Button
+            className="action-button"
             label={transaction ? t("save_changes") : t("save")}
             onClick={handleSave}
             disabled={!importo || !contoId}

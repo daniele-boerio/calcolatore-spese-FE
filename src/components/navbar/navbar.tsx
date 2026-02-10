@@ -60,11 +60,6 @@ export default function Navbar() {
               {t("nav_accounts")}
             </NavLink>
           </li>
-          <li>
-            <NavLink to="/investimenti" onClick={closeMenu}>
-              {t("nav_investments")}
-            </NavLink>
-          </li>
         </ul>
       </div>
 

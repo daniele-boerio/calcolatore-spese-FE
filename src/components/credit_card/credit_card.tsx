@@ -12,6 +12,7 @@ interface CreditCardProps {
   logo?: string;
   index: number;
   onEdit: () => void;
+  color: string;
 }
 
 export default function CreditCard({
@@ -21,6 +22,7 @@ export default function CreditCard({
   logo,
   index,
   onEdit,
+  color,
 }: CreditCardProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
@@ -46,25 +48,37 @@ export default function CreditCard({
     });
   };
 
-  const availableColors = [
-    "card-blue",
-    "card-green",
-    "card-red",
-    "card-dark",
-    "card-purple",
-    "card-orange",
-    "card-turquoise",
-    "card-indigo",
-  ];
+  const darkenColor = (hex: string, percent: number) => {
+    const num = parseInt(hex.replace("#", ""), 16),
+      amt = Math.round(2.55 * percent),
+      R = (num >> 16) - amt,
+      G = ((num >> 8) & 0x00ff) - amt,
+      B = (num & 0x0000ff) - amt;
+    return (
+      "#" +
+      (
+        0x1000000 +
+        (R < 255 ? (R < 1 ? 0 : R) : 255) * 0x10000 +
+        (G < 255 ? (G < 1 ? 0 : G) : 255) * 0x100 +
+        (B < 255 ? (B < 1 ? 0 : B) : 255)
+      )
+        .toString(16)
+        .slice(1)
+    );
+  };
 
-  const colorClass = availableColors[index % availableColors.length];
+  const secondaryColor = darkenColor(color, 30);
+
+  const cardStyle = {
+    background: `linear-gradient(135deg, ${color} 0%, ${secondaryColor} 100%)`,
+  };
 
   return (
-    <div className={`credit-card ${colorClass}`}>
+    <div className={`credit-card`} style={cardStyle}>
       <div className="credit-card__actions">
         <Button
           icon="pi pi-pencil"
-          className="trasparent-button"
+          className="trasparent-button-clear"
           compact
           onClick={(e) => {
             onEdit();

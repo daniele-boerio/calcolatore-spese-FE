@@ -10,6 +10,8 @@ import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { createConto, updateConto } from "../../../features/conti/api_calls";
 import { useI18n } from "../../../i18n/use-i18n";
 import { Conto } from "../../../features/conti/interfaces";
+import { ColorPicker } from "primereact/colorpicker";
+import Switch from "../../switch/switch";
 
 interface AccountDialogProps {
   visible: boolean;
@@ -39,6 +41,8 @@ export default function AccountDialog({
   );
   const [prossimoControllo, setProssimoControllo] = useState<Date | null>(null);
 
+  const [color, setColor] = useState("4b6cb7");
+
   useEffect(() => {
     if (visible) {
       if (account) {
@@ -58,6 +62,7 @@ export default function AccountDialog({
             ? new Date(account.prossimo_controllo)
             : null,
         );
+        setColor(account.color || "4b6cb7");
       } else {
         setNome("");
         setSaldo("");
@@ -67,6 +72,7 @@ export default function AccountDialog({
         setContoSorgenteId(null);
         setFrequenzaControllo(null);
         setProssimoControllo(null);
+        setColor("4b6cb7");
       }
     }
   }, [visible, account]);
@@ -103,6 +109,7 @@ export default function AccountDialog({
         ricaricaAutomatica && prossimoControllo
           ? prossimoControllo.toISOString().split("T")[0]
           : undefined,
+      color: `#${color}`,
     };
 
     if (account?.id) {
@@ -125,7 +132,7 @@ export default function AccountDialog({
     <Dialog
       header={account ? t("edit_account") : t("add_account")}
       visible={visible}
-      className="account-dialog"
+      className="dialog-custom account-dialog"
       style={{ width: "95vw", maxWidth: "50rem" }}
       onHide={onHide}
       footer={
@@ -136,6 +143,7 @@ export default function AccountDialog({
             onClick={onHide}
           />
           <Button
+            className="action-button"
             label={account ? t("save_changes") : t("create_account")}
             onClick={handleConfirm}
             loading={externalLoading}
@@ -188,10 +196,35 @@ export default function AccountDialog({
           </div>
         </div>
 
+        <div className="form-row">
+          <div className="field">
+            <label className="field-label">{t("account_color")}</label>
+            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+              <ColorPicker
+                className="color-picker-custom"
+                style={
+                  { "--selected-color": `#${color}` } as React.CSSProperties
+                }
+                value={color}
+                onChange={(e) => setColor(e.value as string)}
+              />
+              <span
+                style={{
+                  fontSize: "0.9rem",
+                  color: "var(--text-muted)",
+                  fontFamily: "monospace",
+                }}
+              >
+                #{color}
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div className="recharge-section">
           <div className="switch-container">
             <label className="field-label">{t("automatic_recharge")}</label>
-            <InputSwitch
+            <Switch
               checked={ricaricaAutomatica}
               onChange={(e) => setRicaricaAutomatica(e.value)}
             />

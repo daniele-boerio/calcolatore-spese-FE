@@ -69,7 +69,7 @@ export default function TagDialog({
     <Dialog
       header={tag ? t("edit_tag") : `${t("create_new")} ${t("tag")}`}
       visible={visible}
-      className="tag-dialog"
+      className="dialog-custom tag-dialog"
       style={{ width: "95vw", maxWidth: "25rem" }}
       onHide={onHide}
       footer={
@@ -80,6 +80,7 @@ export default function TagDialog({
             onClick={onHide}
           />
           <Button
+            className="action-button"
             label={tag ? t("save_changes") : t("save")}
             onClick={handleConfirm}
             loading={externalLoading || internalLoading}

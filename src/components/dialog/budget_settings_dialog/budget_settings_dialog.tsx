@@ -63,7 +63,7 @@ export default function BudgetSettingsDialog({
       style={{ width: "90vw", maxWidth: "25rem" }}
       header={t("dialog_budget_title")}
       visible={visible}
-      className="budget-settings-dialog"
+      className="dialog-custom budget-settings-dialog"
       onHide={onHide}
       footer={
         <div className="buttons-footer-dialog">
@@ -72,7 +72,12 @@ export default function BudgetSettingsDialog({
             className="reset-button"
             onClick={onHide}
           />
-          <Button label={t("save")} onClick={handleSave} loading={loading} />
+          <Button
+            className="action-button"
+            label={t("save")}
+            onClick={handleSave}
+            loading={loading}
+          />
         </div>
       }
       draggable={false}

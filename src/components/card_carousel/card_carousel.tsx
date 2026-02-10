@@ -39,6 +39,7 @@ export default function CardCarousel({
                 setIsDialogUpdateVisible(true);
                 setSelectedAccount(account);
               }}
+              color={account.color ? account.color : "4b6cb7"}
             />
           ))}
         </div>

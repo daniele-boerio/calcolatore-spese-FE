@@ -173,7 +173,7 @@ export default function TransactionPage() {
         />
         <Button
           className="add-transaction-button"
-          icon={selectedTransaction ? "pi pi-pencil" : "pi pi-plus"}
+          icon={"pi pi-plus"}
           compact
           rounded
           onClick={() => setIsTransactionDialogVisible(true)}

@@ -4,10 +4,15 @@
   // Tema Chiaro (Default)
   --bg-app: #f4f7f6;
   --bg-card: #ffffff;
-  --bg-card-gray: #e0e0e0;
+  --bg-dialog: #ffffff;
+  --border-dialog: #dce2e1;
+  --bg-table-paginator-selected: #e0e0e0;
   --bg-gradient-table: #f9f9f9;
+  --border-table: #dce2e1;
+  --bg-datepicker-header: #1f2937;
+  --bg-datepicker-today: rgba(34, 211, 238, 0.16);
   --text-main: #333333;
-  --text-dark: #f0f0f0;
+  --text-on-dark: #f0f0f0;
   --text-muted: #95a5a6;
   --border-color: #e0e0e0;
   --bar-neutral: #333333;
@@ -21,10 +26,13 @@
   :root {
     --bg-app: #121212;
     --bg-card: #1e1e1e;
-    --bg-card-gray: #2c2c2c;
+    --bg-dialog: #1e1e1e;
+    --border-dialog: #333333;
+    --bg-table-paginator-selected: #2c2c2c;
     --bg-gradient-table: #252525;
+    --border-table: #333333;
     --text-main: #f0f0f0;
-    --text-dark: #333333;
+    --text-on-dark: #333333;
     --text-muted: #b0b0b0;
     --border-color: #333333;
     --bar-neutral: #f0f0f0;
@@ -43,15 +51,20 @@ $green: #2ecc71;
 // Mappatura variabili SCSS
 $bg-app: var(--bg-app);
 $bg-card: var(--bg-card);
-$bg-card-gray: var(--bg-card-gray);
+$bg-dialog: var(--bg-dialog);
+$border-dialog: var(--border-dialog);
+$border-table: var(--border-table);
+$bg-table-paginator-selected: var(--bg-table-paginator-selected);
+$bg-datepicker-header: var(--bg-datepicker-header);
+$bg-datepicker-today: var(--bg-datepicker-today);
 $bg-chips: $light-gray;
-$bg-button-primary: $light-gray;
-$bc-button-primary: $light-gray;
+$bg-button-primary: $light-blue;
+$bc-button-primary: $light-blue;
 $bg-button-secondary: $light-gray;
 $bc-button-secondary: $light-gray;
 $bg-gradient-table: var(--bg-gradient-table);
 $text-main: var(--text-main);
-$text-dark: var(--text-dark);
+$text-on-dark: var(--text-on-dark);
 $text-muted: var(--text-muted);
 $text-red: $red;
 $text-green: $green;

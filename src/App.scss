@@ -18,3 +18,84 @@ body {
     background-color 0.3s ease,
     color 0.3s ease;
 }
+
+.dialog-custom {
+  border: 1px solid v.$border-dialog;
+  > div {
+    background-color: v.$bg-dialog;
+    color: v.$text-main;
+  }
+}
+
+.p-button:focus {
+  box-shadow: none;
+}
+
+.p-confirm-popup {
+  border: 1px solid v.$border-dialog;
+  background-color: v.$bg-dialog;
+  color: v.$text-main;
+}
+
+.p-calendar {
+  border: 1px solid v.$border-dialog;
+  border-radius: 6px;
+
+  .p-datepicker-trigger {
+    background-color: v.$bg-button-primary;
+    color: v.$text-on-dark;
+  }
+
+  .p-inputtext {
+    padding: 0 0.5rem 0 0.5rem;
+  }
+}
+
+.p-datepicker {
+  background-color: v.$bg-dialog;
+  color: v.$text-main;
+  border: 1px solid v.$border-dialog;
+
+  .p-datepicker-header {
+    background-color: v.$bg-datepicker-header;
+
+    .p-datepicker-month {
+      color: v.$text-on-dark;
+    }
+    .p-datepicker-year {
+      color: v.$text-on-dark;
+    }
+  }
+
+  td {
+    span {
+      background-color: transparent;
+      color: v.$text-main;
+    }
+    .p-highlight {
+      background-color: v.$bg-button-primary;
+      color: v.$text-on-dark;
+    }
+  }
+  .p-datepicker-today {
+    span {
+      background-color: v.$bg-datepicker-today;
+      color: v.$text-main;
+    }
+  }
+}
+
+.p-calendar:not(.p-calendar-disabled).p-focus > .p-inputtext {
+  box-shadow: none !important;
+}
+
+.type-selector {
+  .p-button {
+    background-color: v.$bg-card;
+    color: v.$text-main;
+  }
+  .p-highlight {
+    background-color: v.$bg-button-primary;
+    color: v.$text-on-dark;
+  }
+}

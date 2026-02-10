@@ -156,7 +156,7 @@ export default function CategoryDialog({
         category ? t("edit_category") : `${t("create_new_f")} ${t("category")}`
       }
       visible={visible}
-      className="category-dialog"
+      className="dialog-custom category-dialog"
       style={{ width: "95vw", maxWidth: "40rem" }}
       onHide={onHide}
       footer={
@@ -167,6 +167,7 @@ export default function CategoryDialog({
             onClick={onHide}
           />
           <Button
+            className="action-button"
             label={category ? t("save_changes") : t("save")}
             onClick={handleConfirm}
             loading={externalLoading || internalLoading}
@@ -218,7 +219,7 @@ export default function CategoryDialog({
 
             <Button
               icon="pi pi-plus"
-              className="add-sub-btn"
+              className="action-button icon-button"
               onClick={handleAddSub}
               compact
             />

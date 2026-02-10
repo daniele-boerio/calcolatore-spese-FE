@@ -64,9 +64,13 @@
   td {
     border-bottom: none;
     border-top: 0.3px solid v.$border-color;
-    background: transparent !important;
+    background: #f9fafa !important; //v.$bg-gradient-table !important;
     padding: 1rem;
   }
+}
+
+.p-datatable-wrapper {
+  border: 1px solid v.$border-table;
 }
 
 /* Paginator */
@@ -81,7 +85,7 @@
     transition: background-color 0.2s;
 
     &:enabled:hover {
-      background-color: v.$bg-card-gray;
+      background-color: v.$bg-table-paginator-selected;
       color: v.$text-main;
     }
 

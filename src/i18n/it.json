@@ -49,6 +49,7 @@
   "income": "Entrate",
   "expenses": "Uscite",
   "new_transaction": "Nuova Transazione",
+  "edit_transaction": "Modifica Transazione",
   "category": "Categoria",
   "category_placeholder": "Seleziona Categoria",
   "sub_category": "Sottocategoria",
@@ -109,5 +110,6 @@
   "next_check": "Prossimo Controllo Programmato",
   "select_source": "Seleziona sorgente",
   "initial_balance": "Saldo Iniziale",
-  "create_account": "Crea Conto"
+  "create_account": "Crea Conto",
+  "account_color": "Colore Conto"
 }
