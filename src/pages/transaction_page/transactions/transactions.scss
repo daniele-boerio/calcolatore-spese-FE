@@ -5,6 +5,10 @@
   max-width: 62.5rem;
   margin: 0 auto;
 
+  @media screen and (max-width: v.$mobile) {
+    padding: 2rem 0.5rem !important; // Riduce il padding orizzontale a soli 8px (0.5rem)
+  }
+
   .add-transaction-button {
     position: fixed;
     bottom: 2rem;
