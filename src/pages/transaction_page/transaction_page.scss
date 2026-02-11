@@ -1,105 +1,91 @@
 @use "../../styles/variables" as v;
 
-.transaction-page {
-  padding: 2rem;
-  max-width: 62.5rem;
-  margin: 0 auto;
+.transaction-page-container {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 
-  .add-transaction-button {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000; // Assicura che il pulsante sia sopra altri elementi
+  .card-menu {
+    background: rgba(v.$text-main, 0.03); // Leggera tinta basata sul testo
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 1px solid rgba(v.$text-main, 0.08);
+    backdrop-filter: blur(10px);
   }
 
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
+  /* Personalizzazione TabMenu di PrimeReact */
+  .p-tabmenu {
+    .p-tabmenu-nav {
+      background: transparent !important;
+      border: none !important;
+      display: flex;
+      justify-content: center; // Centra i tab
+      gap: 0.5rem;
 
-    h1 {
-      color: v.$text-main;
-      font-size: 1.5rem;
-    }
-    .stats {
-      color: v.$text-main;
-      font-size: 1rem;
-    }
-  }
+      .p-tabmenuitem {
+        margin-right: 0;
 
-  .transaction-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: v.$bg-card;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        .p-menuitem-link {
+          background: transparent !important;
+          border: none !important;
+          color: v.$text-muted !important;
+          transition: all 0.3s ease;
+          border-radius: 8px;
+          padding: 0.75rem 1.25rem;
+          font-weight: 500;
 
-    th,
-    td {
-      padding: 1rem;
-      text-align: left;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
+          .p-menuitem-icon {
+            margin-right: 0.5rem;
+            color: v.$text-muted;
+          }
 
-    th {
-      background: rgba(0, 0, 0, 0.02);
-      color: v.$text-muted;
-      font-weight: 600;
-    }
+          &:focus {
+            box-shadow: none !important;
+          }
+        }
 
-    tr.uscita .amount {
-      color: v.$red;
-      font-weight: bold;
-    }
-    tr.entrata .amount {
-      color: v.$green;
-      font-weight: bold;
-    }
-    tr.rimborso .amount {
-      color: #3498db;
-      font-weight: bold;
-    }
+        /* Stato Attivo */
+        &.p-highlight {
+          .p-menuitem-link {
+            color: v.$text-main !important; // Usa il tuo colore primario (es. blu)
+            background: v.$bg-dark !important;
 
-    .badge {
-      font-size: 0.7rem;
-      padding: 0.125rem 0.5rem;
-      border-radius: 0.625rem;
-      background: #eee;
-      text-transform: uppercase;
-    }
-  }
-
-  .pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-    margin-top: 2rem;
-
-    .btn-pagination {
-      padding: 0.5rem 1rem;
-      border: 1px solid v.$text-muted;
-      background: white;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.2s;
-
-      &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-      }
-
-      &:not(:disabled):hover {
-        background: v.$text-main;
-        color: white;
+            .p-menuitem-icon {
+              color: v.$text-main !important;
+            }
+          }
+        }
       }
     }
+  }
+}
 
-    .page-info {
-      color: v.$text-main;
-      font-size: 0.9rem;
+/* Animazione per il cambio tab */
+.tab-content-area {
+  animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: v.$mobile) {
+  .p-tabmenu .p-tabmenu-nav {
+    justify-content: flex-start;
+    overflow-x: auto; // Permette lo scroll orizzontale su mobile
+    padding-bottom: 0.5rem;
+
+    &::-webkit-scrollbar {
+      display: none; // Nasconde la barra scroll su mobile
     }
   }
 }

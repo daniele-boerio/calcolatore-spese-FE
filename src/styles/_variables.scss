@@ -3,6 +3,7 @@
 :root {
   // Tema Chiaro (Default)
   --bg-app: #f4f7f6;
+  --bg-dark: #121212;
   --bg-card: #ffffff;
   --bg-dialog: #ffffff;
   --border-dialog: #dce2e1;
@@ -26,6 +27,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-app: #121212;
+    --bg-dark: #f4f7f6;
     --bg-card: #1e1e1e;
     --bg-dialog: #1e1e1e;
     --border-dialog: #333333;
@@ -54,6 +56,7 @@ $green: #2ecc71;
 
 // Mappatura variabili SCSS
 $bg-app: var(--bg-app);
+$bg-dark: var(--border-dialog);
 $bg-card: var(--bg-card);
 $bg-dialog: var(--bg-dialog);
 $border-dialog: var(--border-dialog);
