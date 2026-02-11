@@ -207,6 +207,7 @@ export default function AccountDialog({
                 }
                 value={color}
                 onChange={(e) => setColor(e.value as string)}
+                appendTo="self"
               />
               <span
                 style={{

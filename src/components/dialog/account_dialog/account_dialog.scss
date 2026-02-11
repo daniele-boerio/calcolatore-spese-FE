@@ -5,6 +5,10 @@
     padding: 1.5rem;
   }
 
+  &.p-dialog-maximized {
+    overflow: hidden;
+  }
+
   .account-settings-dialog-content {
     display: flex;
     flex-direction: column;
@@ -87,6 +91,11 @@
       min-width: 10rem;
     }
   }
+}
+
+.p-colorpicker-panel {
+  touch-action: none;
+  position: fixed;
 }
 
 .color-picker-custom {
