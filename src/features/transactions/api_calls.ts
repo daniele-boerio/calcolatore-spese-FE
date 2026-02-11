@@ -76,7 +76,7 @@ export const updateTransaction = createAsyncThunk<
     // Estraiamo l'id e raccogliamo tutto il resto in 'body'
     const { id, ...body } = params;
 
-    const response = await api.post<Transaction>(`/transazioni/${id}`, body);
+    const response = await api.put<Transaction>(`/transazioni/${id}`, body);
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
