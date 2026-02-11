@@ -62,7 +62,10 @@ export default function AccountDialog({
             ? new Date(account.prossimo_controllo)
             : null,
         );
-        setColor(account.color || "4b6cb7");
+        const cleanColor = account.color
+          ? account.color.replace("#", "")
+          : "4b6cb7";
+        setColor(cleanColor);
       } else {
         setNome("");
         setSaldo("");
