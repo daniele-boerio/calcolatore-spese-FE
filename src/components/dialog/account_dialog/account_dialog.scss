@@ -96,6 +96,8 @@
 .p-colorpicker-panel {
   touch-action: none;
   position: fixed;
+  background-color: v.$bg-dialog;
+  border: 1px solid v.$border-dialog;
 }
 
 .color-picker-custom {
