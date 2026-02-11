@@ -126,7 +126,7 @@
 }
 
 // Mobile Responsive
-@media screen and (max-width: 48rem) {
+@media screen and (max-width: v.$mobile) {
   .account-dialog {
     .account-settings-dialog-content {
       .form-row {
