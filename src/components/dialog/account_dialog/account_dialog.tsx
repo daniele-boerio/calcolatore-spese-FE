@@ -181,23 +181,6 @@ export default function AccountDialog({
             />
           </div>
           <div className="field">
-            <InputText
-              value={budgetObiettivo}
-              onChange={(e) =>
-                handleNumberChange(e.target.value, setBudgetObiettivo)
-              }
-              label={t("target_budget")}
-              icon="pi pi-euro"
-              iconPos="right"
-              keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
-              inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-              placeholder="0.00"
-            />
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="field">
             <label className="field-label">{t("account_color")}</label>
             <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
               <ColorPicker
@@ -236,6 +219,22 @@ export default function AccountDialog({
               <div className="form-row">
                 <div className="field">
                   <InputText
+                    value={budgetObiettivo}
+                    onChange={(e) =>
+                      handleNumberChange(e.target.value, setBudgetObiettivo)
+                    }
+                    label={t("target_budget")}
+                    icon="pi pi-euro"
+                    iconPos="right"
+                    keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+                    inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
+                    placeholder="70.00"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
+                <div className="field">
+                  <InputText
                     value={sogliaMinima}
                     onChange={(e) =>
                       handleNumberChange(e.target.value, setSogliaMinima)
@@ -245,7 +244,7 @@ export default function AccountDialog({
                     iconPos="right"
                     keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
                     inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-                    placeholder="0.00"
+                    placeholder="60.00"
                   />
                 </div>
                 <div className="field">
