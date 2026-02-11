@@ -23,6 +23,15 @@
   }
 }
 
+.trasparent-button-account {
+  .p-button {
+    background: transparent !important;
+    border: none !important;
+    color: v.$text-account !important;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.4));
+  }
+}
+
 .trasparent-button-clear {
   .p-button {
     color: v.$text-on-dark;
@@ -36,6 +45,7 @@
     color: v.$text-red;
     border-color: transparent;
     background-color: transparent;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.4));
   }
 }
 

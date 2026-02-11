@@ -22,28 +22,13 @@
     display: flex;
     gap: 0.25rem;
     z-index: 2; // Sopra la decorazione
-
-    .action-btn {
-      width: 2rem !important;
-      height: 2rem !important;
-      color: white !important;
-      background: rgba(255, 255, 255, 0.15); // Effetto vetro
-      border: none;
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.3) !important;
-      }
-
-      &.p-button-danger:hover {
-        background: rgba(v.$text-red, 0.4) !important;
-      }
-    }
   }
 
   &__name {
     font-size: 1.1rem;
     font-weight: 600;
     opacity: 0.9;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.6));
   }
 
   &__balance-label {
@@ -51,11 +36,13 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     opacity: 0.8;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.3));
   }
 
   &__balance-value {
     font-size: 1.8rem;
     font-weight: 800;
+    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.5));
   }
 
   &__decoration {

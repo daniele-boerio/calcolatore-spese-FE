@@ -64,7 +64,7 @@
   td {
     border-bottom: none;
     border-top: 0.3px solid v.$border-color;
-    background: #f9fafa !important; //v.$bg-gradient-table !important;
+    background: v.$bg-gradient-table !important; //v.$bg-gradient-table !important;
     padding: 1rem;
   }
 }

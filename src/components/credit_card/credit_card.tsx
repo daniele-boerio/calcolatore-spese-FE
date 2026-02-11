@@ -67,10 +67,11 @@ export default function CreditCard({
     );
   };
 
-  const secondaryColor = darkenColor(color, 30);
+  const baseColor = color.startsWith("#") ? color : `#${color}`;
+  const secondaryColor = darkenColor(baseColor, 30);
 
   const cardStyle = {
-    background: `linear-gradient(135deg, ${color} 0%, ${secondaryColor} 100%)`,
+    background: `linear-gradient(135deg, ${baseColor} 0%, ${secondaryColor} 100%)`,
   };
 
   return (
@@ -78,7 +79,7 @@ export default function CreditCard({
       <div className="credit-card__actions">
         <Button
           icon="pi pi-pencil"
-          className="trasparent-button-clear"
+          className="trasparent-button-account"
           compact
           onClick={(e) => {
             onEdit();

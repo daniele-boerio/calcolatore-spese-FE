@@ -62,10 +62,7 @@ export default function AccountDialog({
             ? new Date(account.prossimo_controllo)
             : null,
         );
-        const cleanColor = account.color
-          ? account.color.replace("#", "")
-          : "4b6cb7";
-        setColor(cleanColor);
+        setColor(account.color ?? "4b6cb7");
       } else {
         setNome("");
         setSaldo("");
@@ -112,7 +109,7 @@ export default function AccountDialog({
         ricaricaAutomatica && prossimoControllo
           ? prossimoControllo.toISOString().split("T")[0]
           : undefined,
-      color: `#${color}`,
+      color: color,
     };
 
     if (account?.id) {

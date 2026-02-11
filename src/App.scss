@@ -65,6 +65,13 @@ body {
     .p-datepicker-year {
       color: v.$text-on-dark;
     }
+
+    .p-datepicker-next,
+    .p-datepicker-prev {
+      svg {
+        color: v.$text-on-dark;
+      }
+    }
   }
 
   td {
@@ -77,10 +84,11 @@ body {
       color: v.$text-on-dark;
     }
   }
+
   .p-datepicker-today {
     span {
-      background-color: v.$bg-datepicker-today;
-      color: v.$text-main;
+      background-color: v.$bg-datepicker-header;
+      color: v.$text-on-dark;
     }
   }
 }

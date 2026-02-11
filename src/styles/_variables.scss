@@ -12,6 +12,7 @@
   --bg-datepicker-header: #1f2937;
   --bg-datepicker-today: rgba(34, 211, 238, 0.16);
   --text-main: #333333;
+  --text-account: #f0f0f0;
   --text-on-dark: #f0f0f0;
   --text-muted: #95a5a6;
   --border-color: #e0e0e0;
@@ -31,7 +32,10 @@
     --bg-table-paginator-selected: #2c2c2c;
     --bg-gradient-table: #252525;
     --border-table: #333333;
+    --bg-datepicker-header: #e0e3e7;
+    --bg-datepicker-today: #3cfbfba1;
     --text-main: #f0f0f0;
+    --text-account: #f0f0f0;
     --text-on-dark: #333333;
     --text-muted: #b0b0b0;
     --border-color: #333333;
@@ -64,6 +68,7 @@ $bg-button-secondary: $light-gray;
 $bc-button-secondary: $light-gray;
 $bg-gradient-table: var(--bg-gradient-table);
 $text-main: var(--text-main);
+$text-account: var(--text-account);
 $text-on-dark: var(--text-on-dark);
 $text-muted: var(--text-muted);
 $text-red: $red;
