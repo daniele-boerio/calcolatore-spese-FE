@@ -153,7 +153,6 @@ export default function AccountDialog({
       }
       draggable={false}
       resizable={false}
-      blockScroll={true}
     >
       <div className="account-settings-dialog-content">
         <div className="form-row">
@@ -208,6 +207,7 @@ export default function AccountDialog({
                 }
                 value={color}
                 onChange={(e) => setColor(e.value as string)}
+                appendTo="self"
               />
               <span
                 style={{
