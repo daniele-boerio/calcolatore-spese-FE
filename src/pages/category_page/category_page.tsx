@@ -10,12 +10,16 @@ import { Categoria } from "../../features/categorie/interfaces";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../i18n/use-i18n";
 import CategoryDialog from "../../components/dialog/category_dialog/category_dialog";
+import {
+  selectCategoriaCategorie,
+  selectCategoriaLoading,
+} from "../../features/categorie/categoria_slice";
 
 export default function CategoryPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const categorie = useAppSelector((state: any) => state.categoria.categorie);
-  const CatLoading = useAppSelector((state: any) => state.categoria.loading);
+  const categorie = useAppSelector(selectCategoriaCategorie);
+  const CatLoading = useAppSelector(selectCategoriaLoading);
 
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [isDialogCatVisible, setIsDialogCatVisible] = useState(false);

@@ -6,12 +6,16 @@ import "./conti_page.scss";
 import { getConti } from "../../features/conti/api_calls";
 import CardCarousel from "../../components/card_carousel/card_carousel";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
+import {
+  selectContiConti,
+  selectContiLoading,
+} from "../../features/conti/conto_slice";
 
 export default function ContiPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const conti = useAppSelector((state) => state.conto.conti);
-  const accountLoading = useAppSelector((state) => state.conto.loading);
+  const conti = useAppSelector(selectContiConti);
+  const accountLoading = useAppSelector(selectContiLoading);
   const [isCreateDialogVisible, setIsCreateDialogVisible] = useState(false);
 
   useEffect(() => {

@@ -6,6 +6,7 @@ import { Conto } from "../../features/conti/interfaces";
 import { useI18n } from "../../i18n/use-i18n";
 import { useAppSelector } from "../../store/store";
 import AccountDialog from "../dialog/account_dialog/account_dialog";
+import { selectContiLoading } from "../../features/conti/conto_slice";
 
 interface CardCarouselProps {
   conti: Conto[];
@@ -17,7 +18,7 @@ export default function CardCarousel({
   direction = "horizontal",
 }: CardCarouselProps) {
   const { t } = useI18n();
-  const accountLoading = useAppSelector((state) => state.conto.loading);
+  const accountLoading = useAppSelector(selectContiLoading);
   const [isDialogUpdateVisible, setIsDialogUpdateVisible] = useState(false);
   const [selectedAccount, setSelectedAccount] = useState<Conto | null>(null);
 

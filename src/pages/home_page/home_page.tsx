@@ -13,15 +13,19 @@ import Button from "../../components/button/button";
 import { useI18n } from "../../i18n/use-i18n";
 import CustomDoughnutChart from "../../components/charts/custom_doughnut_chart";
 import TransactionDialog from "../../components/dialog/transaction_dialog/transaction_dialog";
+import {
+  selectContiConti,
+  selectContiMonthlyExpensesByCategory,
+} from "../../features/conti/conto_slice";
 
 export default function HomePage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Selettori tipizzati dallo store
-  const conti = useAppSelector((state: any) => state.conto.conti);
+  const conti = useAppSelector(selectContiConti);
   const monthlyExpensesByCategory = useAppSelector(
-    (state: any) => state.conto.monthlyExpensesByCategory,
+    selectContiMonthlyExpensesByCategory,
   );
 
   const [

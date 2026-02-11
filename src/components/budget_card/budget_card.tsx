@@ -7,14 +7,18 @@ import { updateBudget } from "../../features/conti/api_calls";
 import { BudgetUpdateData } from "../../features/conti/interfaces";
 import { useI18n } from "../../i18n/use-i18n";
 import { ProgressBar } from "primereact/progressbar";
+import {
+  selectContiLoading,
+  selectContiMonthlyBudget,
+} from "../../features/conti/conto_slice";
 
 export default function BudgetCard() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Selettori ora tipizzati correttamente dallo store globale
-  const monthlyBudget = useAppSelector((state) => state.conto.monthlyBudget);
-  const loading = useAppSelector((state) => state.conto.loading);
+  const monthlyBudget = useAppSelector(selectContiMonthlyBudget);
+  const loading = useAppSelector(selectContiLoading);
 
   const { totalBudget, expenses, percentage } = monthlyBudget;
 
@@ -41,7 +45,7 @@ export default function BudgetCard() {
     return new Intl.NumberFormat("it-IT", {
       style: "currency",
       currency: "EUR",
-      maximumFractionDigits: 0,
+      maximumFractionDigits: 2,
     }).format(value);
   };
 

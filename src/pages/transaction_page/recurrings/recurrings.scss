@@ -1,0 +1,105 @@
+@use "../../../styles/variables" as v;
+
+.transaction-page {
+  padding: 2rem;
+  max-width: 62.5rem;
+  margin: 0 auto;
+
+  .add-transaction-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000; // Assicura che il pulsante sia sopra altri elementi
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      color: v.$text-main;
+      font-size: 1.5rem;
+    }
+    .stats {
+      color: v.$text-main;
+      font-size: 1rem;
+    }
+  }
+
+  .transaction-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: v.$bg-card;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+
+    th,
+    td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    th {
+      background: rgba(0, 0, 0, 0.02);
+      color: v.$text-muted;
+      font-weight: 600;
+    }
+
+    tr.uscita .amount {
+      color: v.$red;
+      font-weight: bold;
+    }
+    tr.entrata .amount {
+      color: v.$green;
+      font-weight: bold;
+    }
+    tr.rimborso .amount {
+      color: #3498db;
+      font-weight: bold;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      padding: 0.125rem 0.5rem;
+      border-radius: 0.625rem;
+      background: #eee;
+      text-transform: uppercase;
+    }
+  }
+
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 2rem;
+
+    .btn-pagination {
+      padding: 0.5rem 1rem;
+      border: 1px solid v.$text-muted;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      &:not(:disabled):hover {
+        background: v.$text-main;
+        color: white;
+      }
+    }
+
+    .page-info {
+      color: v.$text-main;
+      font-size: 0.9rem;
+    }
+  }
+}

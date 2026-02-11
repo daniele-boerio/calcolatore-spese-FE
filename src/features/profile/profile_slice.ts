@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import { getProfile, login, register } from "./api_calls";
 import { AuthResponse, ProfileResponse, ProfileState } from "./interfaces";
+import { RootState } from "../../store/store";
 
 // --- STATO INIZIALE ---
 
@@ -98,4 +99,17 @@ const profileSlice = createSlice({
 });
 
 export const { setLogout } = profileSlice.actions;
+
+export const selectProfileLoading = (state: RootState) => state.profile.loading;
+
+export const selectProfileToken = (state: RootState) => state.profile.token;
+
+export const selectProfileUsername = (state: RootState) =>
+  state.profile.username;
+
+export const selectProfileEmail = (state: RootState) => state.profile.email;
+
+export const selectProfileIsAuthenticated = (state: RootState) =>
+  state.profile.isAuthenticated;
+
 export default profileSlice.reducer;

@@ -15,6 +15,7 @@
   --text-main: #333333;
   --text-account: #f0f0f0;
   --text-on-dark: #f0f0f0;
+  --text-on-button: #f0f0f0;
   --text-muted: #95a5a6;
   --border-color: #e0e0e0;
   --bar-neutral: #333333;
@@ -39,6 +40,7 @@
     --text-main: #f0f0f0;
     --text-account: #f0f0f0;
     --text-on-dark: #333333;
+    --text-on-button: #f0f0f0;
     --text-muted: #b0b0b0;
     --border-color: #333333;
     --bar-neutral: #f0f0f0;
@@ -73,6 +75,7 @@ $bg-gradient-table: var(--bg-gradient-table);
 $text-main: var(--text-main);
 $text-account: var(--text-account);
 $text-on-dark: var(--text-on-dark);
+$text-on-button: var(--text-on-button);
 $text-muted: var(--text-muted);
 $text-red: $red;
 $text-green: $green;

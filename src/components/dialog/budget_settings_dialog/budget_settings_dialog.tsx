@@ -5,6 +5,7 @@ import "./budget_settings_dialog.scss";
 import { useAppSelector } from "../../../store/store";
 import Button from "../../button/button";
 import { useI18n } from "../../../i18n/use-i18n";
+import { selectContiLoading } from "../../../features/conti/conto_slice";
 
 // 1. Definiamo la struttura dei dati del budget
 interface BudgetData {
@@ -27,7 +28,7 @@ export default function BudgetSettingsDialog({
 }: BudgetSettingsDialogProps) {
   const { t } = useI18n();
   // Prendiamo il loading dallo slice del profilo (o conto, a seconda di dove lo gestisci)
-  const loading = useAppSelector((state) => state.conto.loading);
+  const loading = useAppSelector(selectContiLoading);
 
   const [formData, setFormData] = useState({
     amount: initialData?.totalBudget?.toString() || "",

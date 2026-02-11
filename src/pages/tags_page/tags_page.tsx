@@ -7,12 +7,13 @@ import { Tag } from "../../features/tags/interfaces";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../i18n/use-i18n";
 import TagDialog from "../../components/dialog/tag_dialog/tag_dialog";
+import { selectTagLoading, selectTagTags } from "../../features/tags/tag_slice";
 
 export default function TagsPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const TagLoading = useAppSelector((state: any) => state.tag.loading);
-  const tags = useAppSelector((state: any) => state.tag?.tags || []);
+  const TagLoading = useAppSelector(selectTagLoading);
+  const tags = useAppSelector(selectTagTags);
 
   const [isDialogTagVisible, setIsDialogTagVisible] = useState(false);
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);

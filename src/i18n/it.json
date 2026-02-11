@@ -111,5 +111,19 @@
   "select_source": "Seleziona sorgente",
   "initial_balance": "Saldo Iniziale",
   "create_account": "Crea Conto",
-  "account_color": "Colore Conto"
+  "account_color": "Colore Conto",
+
+  "transactions": "Transazioni",
+  "recurring": "Ricorrenze",
+  "new_recurring": "Nuova Transazione Ricorrente",
+  "edit_recurring": "Modifica Ricorrenza",
+  "recurrence_name": "Nome Ricorrenza",
+  "recurrence_name_placeholder": "Es: Affitto, Netflix, Stipendio...",
+  "yearly": "Annuale",
+  "next_execution": "Prossima Scadenza",
+  "active": "Attiva",
+  "recurrence_dashboard": "Dashboard Ricorrenze",
+  "recurring_list": "Lista Pagamenti Ricorrenti",
+  "status_active": "ATTIVA",
+  "status_inactive": "SOSPESA"
 }

@@ -6,6 +6,7 @@ import "./auth_page.scss";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import Password from "../../components/password/password";
 import { useI18n } from "../../i18n/use-i18n";
+import { selectProfileLoading } from "../../features/profile/profile_slice";
 
 export default function AuthPage() {
   const { t } = useI18n();
@@ -14,7 +15,7 @@ export default function AuthPage() {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const loading = useAppSelector((state: any) => state.profile.loading);
+  const loading = useAppSelector(selectProfileLoading);
   const dispatch = useAppDispatch();
 
   const handleSubmit = async (e?: React.BaseSyntheticEvent) => {

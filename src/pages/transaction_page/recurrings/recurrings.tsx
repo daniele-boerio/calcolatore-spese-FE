@@ -8,61 +8,59 @@ import { getConti } from "../../../features/conti/api_calls";
 import TableVisualization, {
   VisualizationColumnProps,
 } from "../../../components/table_visualization/table_visualization";
-import "./transactions.scss";
+import "./recurrings.scss";
 import { Conto } from "../../../features/conti/interfaces";
 import Button from "../../../components/button/button";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../../i18n/use-i18n";
 import TransactionDialog from "../../../components/dialog/transaction_dialog/transaction_dialog";
-import { selectContiConti } from "../../../features/conti/conto_slice";
 import {
-  selectTransactionLoading,
-  selectTransactionPagination,
-  selectTransactionTransactions,
-} from "../../../features/transactions/transaction_slice";
+  selectRecurringLoading,
+  selectRecurringRecurrings,
+} from "../../../features/recurrings/recurring_slice";
+import { selectContiConti } from "../../../features/conti/conto_slice";
 import {
   selectCategoriaCategorie,
   selectCategoriaSottocategorie,
 } from "../../../features/categorie/categoria_slice";
+import {
+  deleteRecurring,
+  getRecurrings,
+} from "../../../features/recurrings/api_calls";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import {
   Categoria,
   SottoCategoria,
 } from "../../../features/categorie/interfaces";
-import { selectTagTags } from "../../../features/tags/tag_slice";
-import { getTags } from "../../../features/tags/api_calls";
 import { Tag } from "../../../features/tags/interfaces";
+import { selectTagTags } from "../../../features/tags/tag_slice";
+import RecurrenceDialog from "../../../components/dialog/recurrence_dialog/recurrence_dialog";
 
-export default function Transactions() {
+export default function Recurrings() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Utilizziamo lo stato tipizzato 'transactions'
-  const transactions = useAppSelector(selectTransactionTransactions);
-  const loading = useAppSelector(selectTransactionLoading);
-  const pagination = useAppSelector(selectTransactionPagination);
+  const recurrings = useAppSelector(selectRecurringRecurrings);
+  const loading = useAppSelector(selectRecurringLoading);
   const conti = useAppSelector(selectContiConti);
   const categorie = useAppSelector(selectCategoriaCategorie);
   const sottocategorie = useAppSelector(selectCategoriaSottocategorie);
   const tags = useAppSelector(selectTagTags);
 
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
-  const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
-    null,
-  );
+  const [selectedRecurring, setselectedRecurring] = useState<any | null>(null);
 
   const [isTransactionDialogVisible, setIsTransactionDialogVisible] =
     useState<boolean>(false);
 
-  const onRowClick = (transaction: any) => {
-    setSelectedTransaction(transaction);
+  const onRowClick = (recurring: any) => {
+    setselectedRecurring(recurring);
     setIsTransactionDialogVisible(true);
   };
 
   const handleCloseDialog = () => {
     setIsTransactionDialogVisible(false);
-    setSelectedTransaction(null);
+    setselectedRecurring(null);
   };
 
   useEffect(() => {
@@ -70,15 +68,12 @@ export default function Transactions() {
     const fetchData = async () => {
       await Promise.all([
         dispatch(getConti()),
+        dispatch(getRecurrings()),
         dispatch(getCategorie()),
-        dispatch(getTags()),
-        dispatch(
-          getTransactionsPaginated({ page: currentPage + 1, size: pageSize }),
-        ),
       ]);
     };
     fetchData();
-  }, [dispatch, currentPage, pageSize]);
+  }, [dispatch]);
 
   const deleteObject = (event: any, id: string) => {
     confirmPopup({
@@ -89,7 +84,7 @@ export default function Transactions() {
       acceptLabel: t("yes"),
       rejectLabel: t("no"),
       accept: () => {
-        dispatch(deleteTransaction({ id }));
+        dispatch(deleteRecurring({ id }));
       },
       reject: () => {},
     });
@@ -98,22 +93,10 @@ export default function Transactions() {
   const columns: VisualizationColumnProps[] = useMemo(
     () => [
       {
-        field: "data",
-        header: "Data",
-        body: (row: any) =>
-          new Date(row.data).toLocaleDateString("it-IT", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }),
-      },
-      {
-        field: "tipo",
-        header: "Tipo",
+        field: "nome",
+        header: "Nome",
         body: (row: any) => (
-          <span className={`badge-${row.tipo.toLowerCase()}`}>
-            {row.tipo.toUpperCase()}
-          </span>
+          <span style={{ fontWeight: "600" }}>{row.nome}</span>
         ),
       },
       {
@@ -134,12 +117,42 @@ export default function Transactions() {
           </span>
         ),
       },
-      { field: "descrizione", header: "Descrizione" },
+      {
+        field: "frequenza",
+        header: "Frequenza",
+        body: (row: any) => (
+          <span className="badge-frequenza">{row.frequenza}</span>
+        ),
+      },
+      {
+        field: "prossima_esecuzione",
+        header: "Prossima Scadenza",
+        body: (row: any) =>
+          new Date(row.prossima_esecuzione).toLocaleDateString("it-IT", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+          }),
+      },
+      {
+        field: "attiva",
+        header: "Stato",
+        body: (row: any) => (
+          <span
+            className={row.attiva ? "status-active" : "status-inactive"}
+            style={{
+              fontWeight: "bold",
+              color: !row.attiva ? "var(--red-500)" : "var(--green-500)",
+            }}
+          >
+            {row.attiva ? "ATTIVA" : "SOSPESA"}
+          </span>
+        ),
+      },
       {
         field: "conto_id",
         header: "Conto",
         body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'conti' si popola
           const conto = conti.find(
             (c: Conto) => String(c.id) === String(row.conto_id),
           );
@@ -150,7 +163,6 @@ export default function Transactions() {
         field: "categoria_id",
         header: "Categoria",
         body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'categoria' si popola
           const categoria = categorie.find(
             (c: Categoria) => String(c.id) === String(row.categoria_id),
           );
@@ -187,7 +199,6 @@ export default function Transactions() {
           <Button
             className="trasparent-danger-button"
             icon="pi pi-trash"
-            compact
             onClick={(e) => {
               e.stopPropagation();
               deleteObject(e, row.id);
@@ -196,34 +207,23 @@ export default function Transactions() {
         ),
       },
     ],
-    [conti, categorie, tags, t],
+    [conti, categorie, t],
   );
 
   return (
     <>
       <div className="transaction-page">
         <header className="page-header">
-          <h1>Storico Transazioni</h1>
-          <div className="stats">Totale: {pagination?.total || 0}</div>
+          <h1>Transazioni Ricorrenti</h1>
+          <div className="stats">Totale: {recurrings.length}</div>
         </header>
 
         <TableVisualization
-          value={transactions}
+          value={recurrings}
           columns={columns}
           selectionRow={{
-            selectedRow: selectedTransaction,
+            selectedRow: selectedRecurring,
             onSelectionChange: (e) => onRowClick(e),
-          }}
-          paginator={{
-            row: pageSize,
-            totalRecords: pagination?.total || 0,
-            first: currentPage * pageSize,
-            loading: loading,
-            lazy: true,
-            onPage: (e: { page: number; rows: number }) => {
-              setCurrentPage(e.page);
-              setPageSize(e.rows);
-            },
           }}
         />
         <Button
@@ -234,9 +234,9 @@ export default function Transactions() {
           onClick={() => setIsTransactionDialogVisible(true)}
         />
       </div>
-      <TransactionDialog
+      <RecurrenceDialog
         visible={isTransactionDialogVisible}
-        transaction={selectedTransaction}
+        recurring={selectedRecurring}
         onHide={() => handleCloseDialog()}
       />
     </>

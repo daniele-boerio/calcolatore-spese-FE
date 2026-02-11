@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ErrorPayload, ErrorState } from "./interfaces";
+import { RootState } from "../../store/store";
 
 const initialState: ErrorState = {
   isOpen: false,
@@ -27,4 +28,5 @@ const errorSlice = createSlice({
 });
 
 export const { showError, hideError } = errorSlice.actions;
+export const selectError = (state: RootState) => state.error;
 export default errorSlice.reducer;

@@ -4,11 +4,7 @@ import { useI18n } from "../../i18n/use-i18n";
 import { MenuItem } from "primereact/menuitem";
 import { TabMenu } from "primereact/tabmenu";
 import Transactions from "./transactions/transactions";
-
-// Importa i componenti delle tue sottopagine (esempi)
-// import TransactionDashboard from "./tabs/TransactionDashboard";
-// import TransactionHistory from "./tabs/TransactionHistory";
-// import RecurringTransactions from "./tabs/RecurringTransactions";
+import Recurrings from "./recurrings/recurrings";
 
 export default function TransactionPage() {
   const { t } = useI18n();
@@ -28,7 +24,7 @@ export default function TransactionPage() {
       case 0:
         return <Transactions />;
       case 1:
-        return <div>Contenuto Lista Transazioni</div>; // <TransactionHistory />
+        return <Recurrings />;
       default:
         return null;
     }

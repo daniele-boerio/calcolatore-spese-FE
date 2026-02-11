@@ -1,7 +1,7 @@
 import { Dialog } from "primereact/dialog";
 import Button from "../../button/button";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { hideError } from "../../../features/error/error_slice";
+import { hideError, selectError } from "../../../features/error/error_slice";
 import { useI18n } from "../../../i18n/use-i18n";
 
 export default function ErrorDialog() {
@@ -9,7 +9,7 @@ export default function ErrorDialog() {
   const dispatch = useAppDispatch();
 
   // Grazie al setup di store.ts, lo stato 'error' è già tipizzato
-  const { isOpen, message, title } = useAppSelector((state) => state.error);
+  const { isOpen, message, title } = useAppSelector(selectError);
 
   const onHide = () => {
     dispatch(hideError());

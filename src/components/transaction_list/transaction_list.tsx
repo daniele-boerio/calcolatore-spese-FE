@@ -4,6 +4,10 @@ import { useAppSelector, useAppDispatch } from "../../store/store";
 import { getLastTransactions } from "../../features/transactions/api_calls";
 import { Transaction } from "../../features/transactions/interfaces";
 import { useI18n } from "../../i18n/use-i18n";
+import {
+  selectTransactionLoading,
+  selectTransactionTransactions,
+} from "../../features/transactions/transaction_slice";
 
 interface TransactionListProps {
   num: number;
@@ -14,9 +18,8 @@ export default function TransactionList({ num }: TransactionListProps) {
   const dispatch = useAppDispatch();
 
   // Utilizziamo lo stato tipizzato. Nota: assicurati che nel rootReducer si chiami 'transactions'
-  const { transactions, loading } = useAppSelector(
-    (state) => state.transaction,
-  );
+  const loading = useAppSelector(selectTransactionLoading);
+  const transactions = useAppSelector(selectTransactionTransactions);
 
   useEffect(() => {
     dispatch(getLastTransactions(num));

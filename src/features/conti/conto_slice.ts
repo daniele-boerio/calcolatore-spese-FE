@@ -14,6 +14,7 @@ import {
   ExpenseByCategory,
   MonthlyBudgetResponse,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 const initialState: ContoState = {
   loading: false,
@@ -115,5 +116,14 @@ const contoSlice = createSlice({
       );
   },
 });
+
+export const selectContiLoading = (state: RootState) => state.conto.loading;
+export const selectContiConti = (state: RootState) => state.conto.conti;
+export const selectContiSelectedConto = (state: RootState) =>
+  state.conto.selectedConto;
+export const selectContiMonthlyBudget = (state: RootState) =>
+  state.conto.monthlyBudget;
+export const selectContiMonthlyExpensesByCategory = (state: RootState) =>
+  state.conto.monthlyExpensesByCategory;
 
 export default contoSlice.reducer;

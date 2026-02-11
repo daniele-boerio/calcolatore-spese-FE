@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import { Tag, TagState } from "./interfaces";
 import { createTag, deleteTag, getTags, updateTag } from "./api_calls";
+import { RootState } from "../../store/store";
 
 const initialState: TagState = {
   loading: false,
@@ -65,4 +66,11 @@ const tagSlice = createSlice({
 });
 
 export const { setSelectedTag } = tagSlice.actions;
+
+export const selectTagLoading = (state: RootState) => state.tag.loading;
+
+export const selectTagTags = (state: RootState) => state.tag.tags;
+
+export const selectTagSelectedTag = (state: RootState) => state.tag.selectedTag;
+
 export default tagSlice.reducer;

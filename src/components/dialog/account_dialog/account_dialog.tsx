@@ -12,6 +12,7 @@ import { useI18n } from "../../../i18n/use-i18n";
 import { Conto } from "../../../features/conti/interfaces";
 import { ColorPicker } from "primereact/colorpicker";
 import Switch from "../../switch/switch";
+import { selectContiConti } from "../../../features/conti/conto_slice";
 
 interface AccountDialogProps {
   visible: boolean;
@@ -28,7 +29,7 @@ export default function AccountDialog({
 }: AccountDialogProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const allAccounts = useAppSelector((state) => state.conto.conti);
+  const allAccounts = useAppSelector(selectContiConti);
 
   const [nome, setNome] = useState("");
   const [saldo, setSaldo] = useState<string>("");

@@ -14,6 +14,7 @@ import {
   updateInvestimento,
   updateOperazione,
 } from "./api_calls";
+import { RootState } from "../../store/store";
 
 const initialState: InvestimentoState = {
   loading: false,
@@ -142,5 +143,12 @@ const investimentoSlice = createSlice({
       );
   },
 });
+
+export const selectInvestimentoLoading = (state: RootState) =>
+  state.investimento.loading;
+export const selectInvestimentoInvestimenti = (state: RootState) =>
+  state.investimento.investimenti;
+export const selectInvestimentoSelectedInvestimento = (state: RootState) =>
+  state.investimento.selectedInvestimento;
 
 export default investimentoSlice.reducer;

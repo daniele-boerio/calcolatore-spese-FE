@@ -12,6 +12,7 @@ import {
   Transaction,
   TransactionsState,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 const initialState: TransactionsState = {
   loading: false,
@@ -128,5 +129,17 @@ const transactionsSlice = createSlice({
       );
   },
 });
+
+export const selectTransactionLoading = (state: RootState) =>
+  state.transaction.loading;
+
+export const selectTransactionTransactions = (state: RootState) =>
+  state.transaction.transactions;
+
+export const selectTransactionSelectedTransaction = (state: RootState) =>
+  state.transaction.selectedTransaction;
+
+export const selectTransactionPagination = (state: RootState) =>
+  state.transaction.pagination;
 
 export default transactionsSlice.reducer;

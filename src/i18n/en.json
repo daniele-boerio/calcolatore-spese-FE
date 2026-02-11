@@ -113,5 +113,19 @@
   "create_account": "Create Account",
 
   "amount_placeholder": "Ex: 10,50",
-  "account_color": "Account Color"
+  "account_color": "Account Color",
+
+  "transactions": "Transactions",
+  "recurring": "Recurring",
+  "new_recurring": "New Recurring Transaction",
+  "edit_recurring": "Edit Recurring",
+  "recurrence_name": "Recurrence Name",
+  "recurrence_name_placeholder": "e.g. Rent, Netflix, Salary...",
+  "yearly": "Yearly",
+  "next_execution": "Next Due Date",
+  "active": "Active",
+  "recurrence_dashboard": "Recurring Dashboard",
+  "recurring_list": "Recurring Payments List",
+  "status_active": "ACTIVE",
+  "status_inactive": "PAUSED"
 }

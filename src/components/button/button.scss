@@ -1,7 +1,7 @@
 @use "../../styles/variables.scss" as v;
 .action-button {
   .p-button {
-    color: v.$text-on-dark;
+    color: v.$text-on-button;
     border-color: v.$bc-button-primary;
     background-color: v.$bg-button-primary;
   }
@@ -9,7 +9,7 @@
 
 .reset-button {
   .p-button {
-    color: v.$text-on-dark;
+    color: v.$text-on-button;
     border-color: v.$bc-button-secondary;
     background-color: v.$bg-button-secondary;
   }

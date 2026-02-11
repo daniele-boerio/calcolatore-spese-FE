@@ -14,6 +14,7 @@ import {
   DeleteSottoCategoriaResponse,
   SottoCategoria,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 const initialState: CategorieState = {
   loading: false,
@@ -147,5 +148,16 @@ const categorieSlice = createSlice({
       );
   },
 });
+
+export const selectCategoriaLoading = (state: RootState) =>
+  state.categoria.loading;
+export const selectCategoriaCategorie = (state: RootState) =>
+  state.categoria.categorie;
+export const selectCategoriaSelectedCategoria = (state: RootState) =>
+  state.categoria.selectedCategoria;
+export const selectCategoriaSelectedSottoCategoria = (state: RootState) =>
+  state.categoria.selectedSottoCategoria;
+export const selectCategoriaSottocategorie = (state: RootState) =>
+  state.categoria.categorie.flatMap((cat) => cat.sottocategorie);
 
 export default categorieSlice.reducer;
