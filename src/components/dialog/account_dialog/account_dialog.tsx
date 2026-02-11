@@ -153,6 +153,7 @@ export default function AccountDialog({
       }
       draggable={false}
       resizable={false}
+      blockScroll={true}
     >
       <div className="account-settings-dialog-content">
         <div className="form-row">
