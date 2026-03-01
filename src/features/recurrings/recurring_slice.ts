@@ -12,6 +12,10 @@ const initialState: RecurringsState = {
   loading: false,
   recurrings: [],
   selectedRecurring: null,
+  filters: {
+    sort_by: "prossima_esecuzione",
+    sort_order: "asc",
+  },
 };
 
 // --- HELPERS ---
@@ -89,5 +93,7 @@ export const selectRecurringRecurrings = (state: RootState) =>
   state.recurring.recurrings;
 export const selectRecurringSelectedRecurring = (state: RootState) =>
   state.recurring.selectedRecurring;
+export const selectRecurringFilters = (state: RootState) =>
+  state.recurring.filters;
 
 export default recurringsSlice.reducer;

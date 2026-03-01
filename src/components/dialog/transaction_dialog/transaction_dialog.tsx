@@ -79,13 +79,6 @@ export default function TransactionDialog({
     }
   }, [visible, transaction]);
 
-  // Caricamento dati iniziali
-  useEffect(() => {
-    dispatch(getConti());
-    dispatch(getCategorie());
-    dispatch(getTags());
-  }, [dispatch]);
-
   const filteredSottoCategorie = useMemo(() => {
     const cat = categorie.find((c) => c.id === categoriaId);
     return cat?.sottocategorie || [];
@@ -135,11 +128,13 @@ export default function TransactionDialog({
 
   return (
     <Dialog
+      id="transaction-dialog"
       header={transaction ? t("edit_transaction") : t("new_transaction")}
       visible={visible}
       className="dialog-custom create-transaction-dialog"
       style={{ width: "95vw", maxWidth: "45rem" }}
       onHide={onHide}
+      blockScroll={true}
       footer={
         <div className="dialog-footer">
           <Button

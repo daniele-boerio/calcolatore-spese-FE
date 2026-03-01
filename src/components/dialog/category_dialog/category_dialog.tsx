@@ -159,6 +159,7 @@ export default function CategoryDialog({
       className="dialog-custom category-dialog"
       style={{ width: "95vw", maxWidth: "40rem" }}
       onHide={onHide}
+      blockScroll={true}
       footer={
         <div className="buttons-footer-dialog">
           <Button

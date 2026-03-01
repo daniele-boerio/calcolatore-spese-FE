@@ -7,6 +7,10 @@ const initialState: TagState = {
   loading: false,
   tags: [],
   selectedTag: null,
+  filters: {
+    sort_by: "nome",
+    sort_order: "asc",
+  },
 };
 
 // 3. Helper per i matcher tipizzati
@@ -72,5 +76,7 @@ export const selectTagLoading = (state: RootState) => state.tag.loading;
 export const selectTagTags = (state: RootState) => state.tag.tags;
 
 export const selectTagSelectedTag = (state: RootState) => state.tag.selectedTag;
+
+export const selectTagFilters = (state: RootState) => state.tag.filters;
 
 export default tagSlice.reducer;

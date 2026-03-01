@@ -66,6 +66,7 @@ export default function BudgetSettingsDialog({
       visible={visible}
       className="dialog-custom budget-settings-dialog"
       onHide={onHide}
+      blockScroll={true}
       footer={
         <div className="buttons-footer-dialog">
           <Button

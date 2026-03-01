@@ -1,8 +1,8 @@
 @use "../../../styles/variables" as v;
 
-.transaction-page {
+.transaction-page-recurring {
   padding: 2rem;
-  max-width: 62.5rem;
+  max-width: 95rem;
   margin: 0 auto;
 
   @media screen and (max-width: v.$mobile) {
@@ -27,6 +27,8 @@
       font-size: 1.5rem;
     }
     .stats {
+      display: flex;
+      gap: 1rem;
       color: v.$text-main;
       font-size: 1rem;
     }

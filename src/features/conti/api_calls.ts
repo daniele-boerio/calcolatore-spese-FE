@@ -9,7 +9,9 @@ import {
   CreateContoParams,
   UpdateContoParams,
   DeleteContoParams,
+  ContoFilters,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 export const getCurrentMonthExpenses = createAsyncThunk<
   MonthlyBudgetResponse,
@@ -60,14 +62,30 @@ export const getCurrentMonthExpensesByCategory = createAsyncThunk<
   }
 });
 
-export const getConti = createAsyncThunk<Conto[], void>(
-  "conti/conti",
-  async (_, { rejectWithValue }) => {
+export const getConti = createAsyncThunk<Conto[], undefined>(
+  "conti/getConti", // Nome più descrittivo
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await api.get<Conto[]>(`/conti`);
+      const params = new URLSearchParams();
+
+      const state = getState() as RootState;
+      const filters = state.conto.filters;
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            // Gestione corretta delle LISTE per FastAPI
+            value.forEach((v) => params.append(key, v.toString()));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
+      });
+
+      const response = await api.get<Conto[]>(`/conti?${params.toString()}`);
       return response.data;
     } catch (error) {
-      const err = error as AxiosError;
+      const err = error as AxiosError<{ message: string }>;
       return rejectWithValue(err.response?.data || "Errore ricezione conti");
     }
   },

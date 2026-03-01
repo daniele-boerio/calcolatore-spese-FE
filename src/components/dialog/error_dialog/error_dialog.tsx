@@ -33,6 +33,7 @@ export default function ErrorDialog() {
       header={title || t("error")}
       visible={isOpen}
       onHide={onHide}
+      blockScroll={true}
       footer={footerContent}
       draggable={false}
       resizable={false}

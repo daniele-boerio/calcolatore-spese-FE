@@ -8,18 +8,41 @@ import {
   CreateTransactionParams,
   UpdateTransactionParams,
   DeleteTransactionParams,
-  TransactionByTagParams,
+  LastTransactionsParams,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 // Parametri per la paginazione
 
-export const getLastTransactions = createAsyncThunk<Transaction[], number>(
+export const getLastTransactions = createAsyncThunk<
+  Transaction[],
+  LastTransactionsParams
+>(
   "transazioni/getLastTransactions",
-  async (n, { rejectWithValue }) => {
+  async ({ n }, { getState, rejectWithValue }) => {
     try {
-      const response = await api.get<Transaction[]>("/transazioni", {
-        params: { n },
+      const params = new URLSearchParams();
+
+      // Aggiungiamo n ai parametri
+      params.append("n", n.toString());
+
+      const state = getState() as RootState;
+      const filters = state.transaction.filters;
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v.toString()));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
       });
+
+      // Passiamo i parametri SOLO nell'URL tramite la stringa generata
+      const response = await api.get<Transaction[]>(
+        `/transazioni?${params.toString()}`,
+      );
       return response.data;
     } catch (error) {
       const err = error as AxiosError;
@@ -35,13 +58,29 @@ export const getTransactionsPaginated = createAsyncThunk<
   PaginationParams
 >(
   "transazioni/getTransactionsPaginated",
-  async ({ page, size }, { rejectWithValue }) => {
+  async ({ page, size }, { getState, rejectWithValue }) => {
     try {
+      const params = new URLSearchParams();
+
+      // Aggiungiamo i parametri di paginazione
+      params.append("page", page.toString());
+      params.append("size", size.toString());
+
+      const state = getState() as RootState;
+      const filters = state.transaction.filters;
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            value.forEach((v) => params.append(key, v.toString()));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
+      });
+
       const response = await api.get<PaginatedResponse>(
-        `/transazioni/paginated`,
-        {
-          params: { page, size },
-        },
+        `/transazioni/paginated?${params.toString()}`,
       );
       return response.data;
     } catch (error) {
@@ -95,24 +134,6 @@ export const deleteTransaction = createAsyncThunk<
     const err = error as AxiosError;
     return rejectWithValue(
       err.response?.data || "Errore eliminazione transazione",
-    );
-  }
-});
-
-export const getTransactionsByTag = createAsyncThunk<
-  Transaction[],
-  TransactionByTagParams
->("transazioni/getTransactionsByTag", async (params, { rejectWithValue }) => {
-  try {
-    const response = await api.get<Transaction[]>(
-      `/transazioni/tag/${params.tagId}`,
-    );
-    return response.data;
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(
-      err.response?.data ||
-        `Errore ricezione transazioni per tag ${params.tagId}`,
     );
   }
 });

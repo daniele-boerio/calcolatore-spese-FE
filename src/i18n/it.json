@@ -125,5 +125,9 @@
   "recurrence_dashboard": "Dashboard Ricorrenze",
   "recurring_list": "Lista Pagamenti Ricorrenti",
   "status_active": "ATTIVA",
-  "status_inactive": "SOSPESA"
+  "status_inactive": "SOSPESA",
+
+  "transaction_history": "Storico Transazioni",
+  "total_transactions": "Transazioni Totali",
+  "recurring_history": "Storico Transazioni Ricorrenti"
 }

@@ -136,6 +136,7 @@ export default function AccountDialog({
       className="dialog-custom account-dialog"
       style={{ width: "95vw", maxWidth: "50rem" }}
       onHide={onHide}
+      blockScroll={true}
       footer={
         <div className="buttons-footer-dialog">
           <Button

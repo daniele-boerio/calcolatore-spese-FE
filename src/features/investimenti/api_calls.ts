@@ -8,16 +8,36 @@ import {
   DeleteOperazioneOutput,
   DeleteOperazioneParams,
   Investimento,
+  InvestimentoFilters,
   Operazione,
   UpdateInvestimentoParams,
   UpdateOperazioneParams,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
-export const getInvestimenti = createAsyncThunk<Investimento[], void>(
+export const getInvestimenti = createAsyncThunk<Investimento[], undefined>(
   "investimenti/investimenti",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await api.get<Investimento[]>(`/investimenti`);
+      const params = new URLSearchParams();
+
+      const state = getState() as RootState;
+      const filters = state.investimento.filters;
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            // Gestione corretta delle LISTE per FastAPI
+            value.forEach((v) => params.append(key, v.toString()));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
+      });
+
+      const response = await api.get<Investimento[]>(
+        `/investimenti?${params.toString()}`,
+      );
       return response.data;
     } catch (error) {
       const err = error as AxiosError;

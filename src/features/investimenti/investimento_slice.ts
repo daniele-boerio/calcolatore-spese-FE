@@ -20,6 +20,7 @@ const initialState: InvestimentoState = {
   loading: false,
   investimenti: [],
   selectedInvestimento: null,
+  filters: {},
 };
 
 // --- HELPERS ---
@@ -150,5 +151,7 @@ export const selectInvestimentoInvestimenti = (state: RootState) =>
   state.investimento.investimenti;
 export const selectInvestimentoSelectedInvestimento = (state: RootState) =>
   state.investimento.selectedInvestimento;
+export const selectInvestimentoFilters = (state: RootState) =>
+  state.investimento.filters;
 
 export default investimentoSlice.reducer;

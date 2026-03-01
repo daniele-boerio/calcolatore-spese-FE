@@ -22,6 +22,7 @@ export interface InvestimentoState {
   loading: boolean;
   investimenti: Investimento[];
   selectedInvestimento: Investimento | null;
+  filters: InvestimentoFilters;
 }
 
 export interface CreateInvestimentoParams {
@@ -67,4 +68,18 @@ export interface DeleteOperazioneParams {
 export interface DeleteOperazioneOutput {
   op_id: string;
   inv_id: string;
+}
+
+export interface InvestimentoFilters {
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  isin?: string;
+  ticker?: string;
+  nome_titolo?: string;
+  quantita_min?: number;
+  quantita_max?: number;
+  valore_attuale_min?: number;
+  valore_attuale_max?: number;
+  data_inizio?: string;
+  data_fine?: string;
 }

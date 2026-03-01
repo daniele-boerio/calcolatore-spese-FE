@@ -212,10 +212,14 @@ export default function Recurrings() {
 
   return (
     <>
-      <div className="transaction-page">
+      <div className="transaction-page-recurring">
         <header className="page-header">
-          <h1>Transazioni Ricorrenti</h1>
-          <div className="stats">Totale: {recurrings.length}</div>
+          <h1>{t("recurring_history")}</h1>
+          <div className="stats">
+            <h3 className="stats-item">
+              {t("total_transactions")}: {recurrings.length}
+            </h3>
+          </div>
         </header>
 
         <TableVisualization

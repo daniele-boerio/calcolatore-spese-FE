@@ -7,15 +7,32 @@ import {
   Tag,
   UpdateTagParams,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 // --- API CALLS ---
 
 // Recupero Tags
-export const getTags = createAsyncThunk<Tag[], void>(
+export const getTags = createAsyncThunk<Tag[], undefined>(
   "tags/getTags",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await api.get<Tag[]>(`/tags`);
+      const params = new URLSearchParams();
+
+      const state = getState() as RootState;
+      const filters = state.tag.filters;
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            // Gestione corretta delle LISTE per FastAPI
+            value.forEach((v) => params.append(key, v.toString()));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
+      });
+
+      const response = await api.get<Tag[]>(`/tags?${params.toString()}`);
       return response.data;
     } catch (error) {
       const err = error as AxiosError;

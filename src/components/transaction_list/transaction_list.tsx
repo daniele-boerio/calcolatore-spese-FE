@@ -22,7 +22,7 @@ export default function TransactionList({ num }: TransactionListProps) {
   const transactions = useAppSelector(selectTransactionTransactions);
 
   useEffect(() => {
-    dispatch(getLastTransactions(num));
+    dispatch(getLastTransactions({ n: num }));
   }, [dispatch, num]);
 
   // Formattatore per la data (es: 22 gen 2026)

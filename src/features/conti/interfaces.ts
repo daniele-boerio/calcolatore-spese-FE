@@ -45,6 +45,7 @@ export interface ContoState {
   selectedConto: Conto | null;
   monthlyBudget: MonthlyBudget;
   monthlyExpensesByCategory: ExpenseByCategory[];
+  filters: ContoFilters;
 }
 
 // Interfaccia per il payload di aggiornamento budget
@@ -77,4 +78,13 @@ export interface UpdateContoParams {
 
 export interface DeleteContoParams {
   id: string;
+}
+
+export interface ContoFilters {
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  nome?: string;
+  saldo_min?: number;
+  saldo_max?: number;
+  ricarica_automatica?: boolean;
 }

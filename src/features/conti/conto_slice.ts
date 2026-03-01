@@ -15,6 +15,8 @@ import {
   MonthlyBudgetResponse,
 } from "./interfaces";
 import { RootState } from "../../store/store";
+import { createTransaction } from "../transactions/api_calls";
+import { Transaction } from "../transactions/interfaces";
 
 const initialState: ContoState = {
   loading: false,
@@ -26,6 +28,10 @@ const initialState: ContoState = {
     percentage: null,
   },
   monthlyExpensesByCategory: [],
+  filters: {
+    sort_by: "saldo",
+    sort_order: "desc",
+  },
 };
 
 // --- HELPERS ---
@@ -101,6 +107,76 @@ const contoSlice = createSlice({
         },
       )
 
+      .addCase(
+        createTransaction.fulfilled,
+        (state, action: PayloadAction<Transaction>) => {
+          const newTx = action.payload;
+          const isThisMonth =
+            new Date(newTx.data).getMonth() === new Date().getMonth() &&
+            new Date(newTx.data).getFullYear() === new Date().getFullYear();
+
+          // 1. Aggiorna il saldo del conto coinvolto
+          const contoIndex = state.conti.findIndex(
+            (c) => String(c.id) === String(newTx.conto_id),
+          );
+          if (contoIndex !== -1) {
+            const mod = newTx.tipo === "USCITA" ? -1 : 1;
+            state.conti[contoIndex].saldo += newTx.importo * mod;
+          }
+
+          // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget
+          if (
+            isThisMonth &&
+            (newTx.tipo === "USCITA" || newTx.tipo === "RIMBORSO")
+          ) {
+            const txMod = newTx.tipo === "USCITA" ? 1 : -1;
+            const importoNetto = newTx.importo * txMod;
+
+            // Aggiorna Monthly Budget
+            if (state.monthlyBudget.expenses !== null) {
+              state.monthlyBudget.expenses += importoNetto;
+
+              // Ricalcola la percentuale se esiste un budget totale
+              if (
+                state.monthlyBudget.totalBudget &&
+                state.monthlyBudget.totalBudget > 0
+              ) {
+                state.monthlyBudget.percentage = Number(
+                  (
+                    (state.monthlyBudget.expenses /
+                      state.monthlyBudget.totalBudget) *
+                    100
+                  ).toFixed(1),
+                );
+              }
+            }
+
+            // Aggiorna Expenses By Category
+            // Nota: assumiamo che l'oggetto categoria sia presente nella risposta della transazione
+            const categoryName = newTx.categoria_id
+              ? (newTx as any).categoria_nome || "Uncategorized"
+              : "Uncategorized";
+
+            const catIndex = state.monthlyExpensesByCategory.findIndex(
+              (item) => item.label === categoryName,
+            );
+
+            if (catIndex !== -1) {
+              state.monthlyExpensesByCategory[catIndex].value += importoNetto;
+            } else {
+              state.monthlyExpensesByCategory.push({
+                label: categoryName,
+                value: importoNetto,
+              });
+            }
+
+            // Rimuove categorie con valore <= 0 (es. dopo un rimborso totale)
+            state.monthlyExpensesByCategory =
+              state.monthlyExpensesByCategory.filter((c) => c.value > 0);
+          }
+        },
+      )
+
       // Matchers per caricamento ed errori del modulo conti
       .addMatcher(
         (action: Action) =>
@@ -125,5 +201,6 @@ export const selectContiMonthlyBudget = (state: RootState) =>
   state.conto.monthlyBudget;
 export const selectContiMonthlyExpensesByCategory = (state: RootState) =>
   state.conto.monthlyExpensesByCategory;
+export const selectContiFilters = (state: RootState) => state.conto.filters;
 
 export default contoSlice.reducer;

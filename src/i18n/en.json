@@ -127,5 +127,9 @@
   "recurrence_dashboard": "Recurring Dashboard",
   "recurring_list": "Recurring Payments List",
   "status_active": "ACTIVE",
-  "status_inactive": "PAUSED"
+  "status_inactive": "PAUSED",
+
+  "transaction_history": "Transaction History",
+  "total_transactions": "Total Transactions",
+  "recurring_history": "Recurring Transactions History"
 }

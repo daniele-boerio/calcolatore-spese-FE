@@ -8,6 +8,7 @@ export interface TagState {
   loading: boolean;
   tags: Tag[];
   selectedTag: Tag | null;
+  filters: TagsFilters;
 }
 
 export interface createTagParams {
@@ -21,4 +22,9 @@ export interface UpdateTagParams {
 
 export interface DeleteTagParams {
   id: string;
+}
+
+export interface TagsFilters {
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
 }

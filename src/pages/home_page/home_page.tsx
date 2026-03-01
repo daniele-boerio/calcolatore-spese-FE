@@ -17,6 +17,8 @@ import {
   selectContiConti,
   selectContiMonthlyExpensesByCategory,
 } from "../../features/conti/conto_slice";
+import { getCategorie } from "../../features/categorie/api_calls";
+import { getTags } from "../../features/tags/api_calls";
 
 export default function HomePage() {
   const { t } = useI18n();
@@ -38,6 +40,8 @@ export default function HomePage() {
     dispatch(getCurrentMonthExpenses());
     dispatch(getCurrentMonthExpensesByCategory());
     dispatch(getConti());
+    dispatch(getCategorie());
+    dispatch(getTags());
   }, [dispatch]);
 
   // Mappiamo i dati per il grafico a torta

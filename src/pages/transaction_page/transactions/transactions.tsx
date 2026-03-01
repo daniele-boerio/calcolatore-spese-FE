@@ -66,18 +66,27 @@ export default function Transactions() {
   };
 
   useEffect(() => {
-    // Dispatch simultaneo per garantire che le chiamate partano subito
-    const fetchData = async () => {
-      await Promise.all([
-        dispatch(getConti()),
-        dispatch(getCategorie()),
-        dispatch(getTags()),
-        dispatch(
-          getTransactionsPaginated({ page: currentPage + 1, size: pageSize }),
-        ),
-      ]);
+    const fetchReferenceData = async () => {
+      try {
+        await Promise.all([
+          dispatch(getConti()).unwrap(),
+          dispatch(getCategorie()).unwrap(),
+          dispatch(getTags()).unwrap(),
+        ]);
+      } catch (error) {
+        console.error("Errore nel caricamento dei dati di riferimento", error);
+      }
     };
-    fetchData();
+    fetchReferenceData();
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(
+      getTransactionsPaginated({
+        page: currentPage + 1,
+        size: pageSize,
+      }),
+    );
   }, [dispatch, currentPage, pageSize]);
 
   const deleteObject = (event: any, id: string) => {
@@ -106,15 +115,6 @@ export default function Transactions() {
             month: "2-digit",
             year: "numeric",
           }),
-      },
-      {
-        field: "tipo",
-        header: "Tipo",
-        body: (row: any) => (
-          <span className={`badge-${row.tipo.toLowerCase()}`}>
-            {row.tipo.toUpperCase()}
-          </span>
-        ),
       },
       {
         field: "importo",
@@ -196,18 +196,34 @@ export default function Transactions() {
         ),
       },
     ],
-    [conti, categorie, tags, t],
+    [conti, categorie, sottocategorie, tags, t],
   );
+
+  const dataReadyKey = useMemo(() => {
+    return `table-${conti.length > 0}-${categorie.length > 0}-${tags.length > 0}`;
+  }, [conti.length, categorie.length, tags.length]);
 
   return (
     <>
       <div className="transaction-page">
         <header className="page-header">
-          <h1>Storico Transazioni</h1>
-          <div className="stats">Totale: {pagination?.total || 0}</div>
+          <h1>{t("transaction_history")}</h1>
+          <div className="stats">
+            <h3 className="stats-item">
+              {t("income")}: {pagination?.total_incomes || 0} €
+            </h3>
+            <h3 className="stats-item">
+              {t("expenses")}: {pagination?.total_expenses || 0} €
+            </h3>
+            <h3 className="stats-item">
+              {t("total_transactions")}: {pagination?.total || 0}
+            </h3>
+          </div>
         </header>
 
         <TableVisualization
+          className="transaction-table"
+          key={dataReadyKey}
           value={transactions}
           columns={columns}
           selectionRow={{

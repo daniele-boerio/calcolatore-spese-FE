@@ -20,6 +20,7 @@ export interface RecurringsState {
   loading: boolean;
   recurrings: Recurring[];
   selectedRecurring: Recurring | null;
+  filters: RecurringFilters;
 }
 
 export interface CreateRecurringParams {
@@ -51,4 +52,21 @@ export interface UpdateRecurringParams {
 
 export interface DeleteRecurringParams {
   id: string;
+}
+
+export interface RecurringFilters {
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  nome?: string;
+  tipo?: string;
+  importo_min?: number;
+  importo_max?: number;
+  frequenza?: string;
+  prossima_esecuzione_inizio?: string;
+  prossima_esecuzione_fine?: string;
+  attiva?: boolean;
+  conto_id?: string[];
+  categoria_id?: string[];
+  sottocategoria_id?: string[];
+  tag_id?: string[];
 }

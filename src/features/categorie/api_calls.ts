@@ -3,6 +3,7 @@ import api from "../../services/api";
 import { AxiosError } from "axios";
 import {
   Categoria,
+  CategoriesFilters,
   CreateCategoriaParams,
   CreateSottoCategoriaParams,
   DeleteCategoriaParams,
@@ -12,15 +13,34 @@ import {
   UpdateCategoriaParams,
   UpdateSottoCategoriaParams,
 } from "./interfaces";
+import { RootState } from "../../store/store";
 
 // --- API CALLS ---
 
 // Recupero Categorie
-export const getCategorie = createAsyncThunk<Categoria[], void>(
+export const getCategorie = createAsyncThunk<Categoria[], undefined>(
   "categorie/getCategoria",
-  async (_, { rejectWithValue }) => {
+  async (_, { getState, rejectWithValue }) => {
     try {
-      const response = await api.get<Categoria[]>(`/categorie`);
+      const params = new URLSearchParams();
+
+      const state = getState() as RootState;
+      const filters = state.categoria.filters;
+
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            // Gestione corretta delle LISTE per FastAPI
+            value.forEach((v) => params.append(key, v.toString()));
+          } else {
+            params.append(key, value.toString());
+          }
+        }
+      });
+
+      const response = await api.get<Categoria[]>(
+        `/categorie?${params.toString()}`,
+      );
       return response.data;
     } catch (error) {
       const err = error as AxiosError;

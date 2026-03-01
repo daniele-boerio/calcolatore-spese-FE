@@ -3,7 +3,6 @@ import {
   createTransaction,
   deleteTransaction,
   getLastTransactions,
-  getTransactionsByTag,
   getTransactionsPaginated,
   updateTransaction,
 } from "./api_calls";
@@ -22,6 +21,10 @@ const initialState: TransactionsState = {
     total: null,
     page: null,
     size: null,
+  },
+  filters: {
+    sort_by: "data",
+    sort_order: "desc",
   },
 };
 
@@ -57,6 +60,8 @@ const transactionsSlice = createSlice({
           state.pagination.total = action.payload.total;
           state.pagination.page = action.payload.page;
           state.pagination.size = action.payload.size;
+          state.pagination.total_incomes = action.payload.total_entrata;
+          state.pagination.total_expenses = action.payload.total_uscita;
         },
       )
 
@@ -106,13 +111,6 @@ const transactionsSlice = createSlice({
         },
       )
 
-      .addCase(
-        getTransactionsByTag.fulfilled,
-        (state, action: PayloadAction<Transaction[]>) => {
-          state.transactions = action.payload;
-        },
-      )
-
       // Matchers per caricamento ed errori del modulo transazioni
       .addMatcher(
         (action: Action) =>
@@ -141,5 +139,8 @@ export const selectTransactionSelectedTransaction = (state: RootState) =>
 
 export const selectTransactionPagination = (state: RootState) =>
   state.transaction.pagination;
+
+export const selectTransactionFilters = (state: RootState) =>
+  state.transaction.filters;
 
 export default transactionsSlice.reducer;

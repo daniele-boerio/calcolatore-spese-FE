@@ -21,6 +21,10 @@ const initialState: CategorieState = {
   categorie: [],
   selectedCategoria: null,
   selectedSottoCategoria: null,
+  filters: {
+    sort_by: "nome",
+    sort_order: "asc",
+  },
 };
 
 // Helper per i matcher
@@ -159,5 +163,7 @@ export const selectCategoriaSelectedSottoCategoria = (state: RootState) =>
   state.categoria.selectedSottoCategoria;
 export const selectCategoriaSottocategorie = (state: RootState) =>
   state.categoria.categorie.flatMap((cat) => cat.sottocategorie);
+export const selectCategoriaFilters = (state: RootState) =>
+  state.categoria.filters;
 
 export default categorieSlice.reducer;

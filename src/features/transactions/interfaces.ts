@@ -3,6 +3,10 @@ export interface PaginationParams {
   size: number;
 }
 
+export interface LastTransactionsParams {
+  n: number;
+}
+
 export type tipoTransaction = "ENTRATA" | "USCITA" | "RIMBORSO";
 
 export interface Transaction {
@@ -25,6 +29,8 @@ export interface PaginatedResponse {
   total: number;
   page: number;
   size: number;
+  total_entrata: number;
+  total_uscita: number;
 }
 
 export interface TransactionsState {
@@ -35,7 +41,10 @@ export interface TransactionsState {
     total: number | null;
     page: number | null;
     size: number | null;
+    total_incomes?: number | null;
+    total_expenses?: number | null;
   };
+  filters: TransactionsFilters;
 }
 
 export interface CreateTransactionParams {
@@ -69,4 +78,19 @@ export interface DeleteTransactionParams {
 
 export interface TransactionByTagParams {
   tagId: string;
+}
+
+export interface TransactionsFilters {
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
+  importo_min?: number;
+  importo_max?: number;
+  tipo?: string;
+  data_inizio?: string;
+  data_fine?: string;
+  descrizione?: string;
+  conto_id?: string[];
+  categoria_id?: string[];
+  sottocategoria_id?: string[];
+  tag_id?: string[];
 }

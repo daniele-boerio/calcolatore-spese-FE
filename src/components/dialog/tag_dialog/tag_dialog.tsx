@@ -72,6 +72,7 @@ export default function TagDialog({
       className="dialog-custom tag-dialog"
       style={{ width: "95vw", maxWidth: "25rem" }}
       onHide={onHide}
+      blockScroll={true}
       footer={
         <div className="buttons-footer-dialog">
           <Button
