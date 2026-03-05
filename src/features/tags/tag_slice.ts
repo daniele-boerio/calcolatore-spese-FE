@@ -8,8 +8,7 @@ const initialState: TagState = {
   tags: [],
   selectedTag: null,
   filters: {
-    sort_by: "nome",
-    sort_order: "asc",
+    sort_by: ["nome:asc"],
   },
 };
 

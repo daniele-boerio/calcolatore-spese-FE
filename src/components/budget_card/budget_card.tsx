@@ -52,7 +52,7 @@ export default function BudgetCard() {
   // Logica dinamica per le classi di stato
   const getStatusClass = (): string => {
     if (!hasTotalBudget || expenses === null) return "is-neutral";
-    return totalBudget < expenses ? "is-danger" : "is-success";
+    return totalBudget > expenses ? "is-danger" : "is-success";
   };
 
   return (
@@ -77,7 +77,8 @@ export default function BudgetCard() {
 
         {hasTotalBudget && (
           <span className="budget-card__summary">
-            <span className="text-muted">di</span> {formatEuro(totalBudget)}
+            <span className="text-muted">{t("of")}</span>{" "}
+            {formatEuro(totalBudget)}
           </span>
         )}
       </div>

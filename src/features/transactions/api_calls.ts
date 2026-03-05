@@ -92,6 +92,41 @@ export const getTransactionsPaginated = createAsyncThunk<
   },
 );
 
+export const getTransactionsByCategory = createAsyncThunk<
+  Transaction[],
+  {
+    categoria_id?: string | null;
+    sottocategoria_id?: string | null;
+    data_inizio?: string;
+    data_fine?: string;
+  }
+>(
+  "transazioni/getTransactionsByCategory",
+  async (
+    { categoria_id, sottocategoria_id, data_inizio, data_fine },
+    { rejectWithValue },
+  ) => {
+    try {
+      const params = new URLSearchParams();
+      if (categoria_id) params.append("categoria_id", categoria_id);
+      if (sottocategoria_id)
+        params.append("sottocategoria_id", sottocategoria_id);
+      if (data_inizio) params.append("data_inizio", data_inizio);
+      if (data_fine) params.append("data_fine", data_fine);
+
+      const response = await api.get<Transaction[]>(
+        `/transazioni/?${params.toString()}`,
+      );
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore ricezione transazioni per categoria",
+      );
+    }
+  },
+);
+
 export const createTransaction = createAsyncThunk<
   Transaction,
   CreateTransactionParams

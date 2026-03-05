@@ -23,8 +23,7 @@ const initialState: TransactionsState = {
     size: null,
   },
   filters: {
-    sort_by: "data",
-    sort_order: "desc",
+    sort_by: ["data:desc", "lastUpdate:desc"],
   },
 };
 

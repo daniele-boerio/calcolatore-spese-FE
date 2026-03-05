@@ -22,8 +22,7 @@ const initialState: CategorieState = {
   selectedCategoria: null,
   selectedSottoCategoria: null,
   filters: {
-    sort_by: "nome",
-    sort_order: "asc",
+    sort_by: ["nome:asc"],
   },
 };
 

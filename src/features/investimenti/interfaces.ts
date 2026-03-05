@@ -71,8 +71,7 @@ export interface DeleteOperazioneOutput {
 }
 
 export interface InvestimentoFilters {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_by?: string[];
   isin?: string;
   ticker?: string;
   nome_titolo?: string;

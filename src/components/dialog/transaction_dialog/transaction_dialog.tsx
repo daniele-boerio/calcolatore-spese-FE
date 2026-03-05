@@ -16,6 +16,7 @@ import {
 } from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
 import { Calendar } from "primereact/calendar";
+import Compensation from "./compensation/compensation";
 import { getConti } from "../../../features/conti/api_calls";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import { getTags } from "../../../features/tags/api_calls";
@@ -51,6 +52,10 @@ export default function TransactionDialog({
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
   const [sottoCategoriaId, setSottoCategoriaId] = useState<string | null>(null);
   const [tagId, setTagId] = useState<string | null>(null);
+  const [from_data, setFromData] = useState<Date | null>(null);
+  const [to_data, setToData] = useState<Date | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [transactionId, setTransactionId] = useState<string | null>(null);
 
   // Effetto per il popolamento (Edit) o reset (Create)
   useEffect(() => {
@@ -75,6 +80,10 @@ export default function TransactionDialog({
         setCategoriaId(null);
         setSottoCategoriaId(null);
         setTagId(null);
+        setFromData(null);
+        setToData(null);
+        setTransactions([]);
+        setTransactionId(null);
       }
     }
   }, [visible, transaction]);
@@ -85,21 +94,24 @@ export default function TransactionDialog({
   }, [categoriaId, categorie]);
 
   const handleSave = async () => {
+    // If compensation selected, prefer its values from compValues
+
     const formattedDate = data
       ? `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-${String(data.getDate()).padStart(2, "0")}`
       : "";
 
-    const numericImporto = parseFloat(importo);
+    const numericImporto = parseFloat(importo || "");
 
     const payload: any = {
       importo: isNaN(numericImporto) ? 0 : numericImporto,
       tipo,
       data: formattedDate,
-      descrizione,
-      conto_id: contoId ?? "",
+      descrizione: descrizione,
+      conto_id: contoId,
       categoria_id: categoriaId,
       sottocategoria_id: sottoCategoriaId,
       tag_id: tagId,
+      transactionId,
     };
 
     if (transaction?.id) {
@@ -146,7 +158,11 @@ export default function TransactionDialog({
             className="action-button"
             label={transaction ? t("save_changes") : t("save")}
             onClick={handleSave}
-            disabled={!importo || !contoId}
+            disabled={
+              tipo === "RIMBORSO"
+                ? !(importo && contoId && data && transactionId)
+                : !(importo && contoId && data)
+            }
           />
         </div>
       }
@@ -163,93 +179,120 @@ export default function TransactionDialog({
           />
         </div>
 
-        <div className="form-row">
-          <div className="field">
-            <InputText
-              value={importo}
-              onChange={(e) => handleImportoChange(e.target.value)}
-              label={t("amount")}
-              icon="pi pi-euro"
-              iconPos="right"
-              keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
-              inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-              placeholder="0.00"
-            />
-          </div>
-          <div className="field">
-            <label className="field-label">{t("date")}</label>
-            <Calendar
-              value={data}
-              onChange={(e) => setData(e.value as Date)}
-              showIcon
-              dateFormat="dd/mm/yy"
-              showTime={false}
-              hourFormat="24"
-            />
-          </div>
-        </div>
+        {tipo === "RIMBORSO" ? (
+          <Compensation
+            importo={importo}
+            setImporto={setImporto}
+            data={data}
+            setData={setData}
+            descrizione={descrizione}
+            setDescrizione={setDescrizione}
+            contoId={contoId}
+            setContoId={setContoId}
+            categoriaId={categoriaId}
+            setCategoriaId={setCategoriaId}
+            sottoCategoriaId={sottoCategoriaId}
+            setSottoCategoriaId={setSottoCategoriaId}
+            tagId={tagId}
+            setTagId={setTagId}
+            from_data={from_data}
+            setFromData={setFromData}
+            to_data={to_data}
+            setToData={setToData}
+            transactionId={transactionId}
+            setTransactionId={setTransactionId}
+          />
+        ) : (
+          <>
+            <div className="form-row">
+              <div className="field">
+                <InputText
+                  value={importo}
+                  onChange={(e) => handleImportoChange(e.target.value)}
+                  label={t("amount")}
+                  icon="pi pi-euro"
+                  iconPos="right"
+                  keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+                  inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
+                  placeholder="0.00"
+                />
+              </div>
+              <div className="field">
+                <label className="field-label">{t("date")}</label>
+                <Calendar
+                  value={data}
+                  onChange={(e) => setData(e.value as Date)}
+                  showIcon
+                  dateFormat="dd/mm/yy"
+                  showTime={false}
+                  hourFormat="24"
+                />
+              </div>
+            </div>
 
-        <div className="form-row">
-          <div className="field">
-            <Dropdown
-              label={t("bank_account")}
-              value={contoId}
-              options={conti}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setContoId(e.value)}
-              placeholder={t("bank_account_placeholder")}
-            />
-          </div>
-          <div className="field">
-            <Dropdown
-              label={t("tag")}
-              value={tagId}
-              options={tags}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setTagId(e.value)}
-              placeholder={t("tag_placeholder")}
-            />
-          </div>
-        </div>
+            <div className="form-row">
+              <div className="field">
+                <Dropdown
+                  label={t("bank_account")}
+                  value={contoId}
+                  options={conti}
+                  optionLabel="nome"
+                  optionValue="id"
+                  onChange={(e) => setContoId(e.value)}
+                  placeholder={t("bank_account_placeholder")}
+                />
+              </div>
+              <div className="field">
+                <Dropdown
+                  label={t("tag")}
+                  value={tagId}
+                  options={tags}
+                  optionLabel="nome"
+                  optionValue="id"
+                  onChange={(e) => setTagId(e.value)}
+                  placeholder={t("tag_placeholder")}
+                />
+              </div>
+            </div>
 
-        <div className="form-row">
-          <div className="field">
-            <Dropdown
-              label={t("category")}
-              value={categoriaId}
-              options={categorie}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setCategoriaId(e.value)}
-              placeholder={t("category_placeholder")}
-            />
-          </div>
-          <div className="field">
-            <Dropdown
-              label={t("sub_category")}
-              value={sottoCategoriaId}
-              options={filteredSottoCategorie}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setSottoCategoriaId(e.value)}
-              placeholder={t("sub_category_placeholder")}
-              disabled={!categoriaId}
-            />
-          </div>
-        </div>
+            <div className="form-row">
+              <div className="field">
+                <Dropdown
+                  label={t("category")}
+                  value={categoriaId}
+                  options={categorie}
+                  optionLabel="nome"
+                  optionValue="id"
+                  onChange={(e) => setCategoriaId(e.value)}
+                  placeholder={t("category_placeholder")}
+                />
+              </div>
+              <div className="field">
+                <Dropdown
+                  label={t("sub_category")}
+                  value={sottoCategoriaId}
+                  options={filteredSottoCategorie}
+                  optionLabel="nome"
+                  optionValue="id"
+                  onChange={(e) => setSottoCategoriaId(e.value)}
+                  placeholder={t("sub_category_placeholder")}
+                  disabled={!categoriaId}
+                />
+              </div>
+            </div>
 
-        <div className="form-row">
-          <div className="field">
-            <InputText
-              label={t("description")}
-              value={descrizione}
-              onChange={(e) => setDescrizione(e.target.value)}
-              placeholder={t("description_placeholder")}
-            />
-          </div>
-        </div>
+            <div className="form-row">
+              <div className="field">
+                <InputText
+                  label={t("description")}
+                  value={descrizione}
+                  onChange={(e) => setDescrizione(e.target.value)}
+                  placeholder={t("description_placeholder")}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Dialog>
   );

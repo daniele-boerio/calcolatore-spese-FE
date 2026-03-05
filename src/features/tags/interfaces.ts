@@ -25,6 +25,5 @@ export interface DeleteTagParams {
 }
 
 export interface TagsFilters {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_by?: string[];
 }

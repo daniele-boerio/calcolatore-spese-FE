@@ -14,6 +14,7 @@ export interface Transaction {
   data: string;
   descrizione: string;
   importo: number;
+  importo_netto: number;
   tipo: tipoTransaction;
   conto_id: string;
   categoria_id: string;
@@ -81,8 +82,7 @@ export interface TransactionByTagParams {
 }
 
 export interface TransactionsFilters {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_by?: string[];
   importo_min?: number;
   importo_max?: number;
   tipo?: string;

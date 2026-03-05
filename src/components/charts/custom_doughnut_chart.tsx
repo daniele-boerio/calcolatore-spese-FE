@@ -84,7 +84,7 @@ export default function CustomDoughnutChart({
       tooltip: { enabled: total > 0 },
     },
     maintainAspectRatio: false,
-    spacing: data.length > 1 && total > 0 ? 5 : 0,
+    spacing: 0,
   };
 
   return (
@@ -97,7 +97,7 @@ export default function CustomDoughnutChart({
       />
 
       <div className="doughnut-chart-overlay">
-        <span className="total-title">{t("total")}</span>
+        <span className="total-title">{t("expenses")}</span>
         <span className="total-amount">
           €{total.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
         </span>

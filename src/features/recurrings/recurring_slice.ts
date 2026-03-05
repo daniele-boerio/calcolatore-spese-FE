@@ -13,8 +13,7 @@ const initialState: RecurringsState = {
   recurrings: [],
   selectedRecurring: null,
   filters: {
-    sort_by: "prossima_esecuzione",
-    sort_order: "asc",
+    sort_by: ["prossima_esecuzione:asc"],
   },
 };
 

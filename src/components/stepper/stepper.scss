@@ -24,6 +24,20 @@
   font-family: v.$font-main;
 }
 
+.p-stepper-action {
+  gap: 0.5rem;
+  padding: 0;
+}
+
+.p-stepper-content {
+  padding-left: 0.7rem;
+}
+
+.p-stepper-toggleable-content {
+  background: transparent;
+  flex: none;
+}
+
 /* Header Disabilitato (Step futuri) */
 .p-stepper-header.p-disabled,
 .p-stepper-header-bottom.p-disabled {
@@ -43,6 +57,17 @@
       border: 1px solid v.$border-color;
     }
   }
+}
+
+.p-stepper-header.p-highlight {
+  padding: 0;
+}
+
+.p-stepper-number {
+  height: 1.5rem;
+  min-width: 1.5rem;
+  font-size: 0.9rem;
+  border: none;
 }
 
 /* Header Attivo (Highlight) */
@@ -70,7 +95,7 @@
   flex-direction: column;
   align-items: center;
   color: v.$text-main;
-  font-size: 0.7rem;
+  font-size: 1.25rem;
   margin-top: 1rem;
   font-family: v.$font-main;
 

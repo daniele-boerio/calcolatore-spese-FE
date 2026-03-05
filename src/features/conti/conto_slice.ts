@@ -29,8 +29,7 @@ const initialState: ContoState = {
   },
   monthlyExpensesByCategory: [],
   filters: {
-    sort_by: "saldo",
-    sort_order: "desc",
+    sort_by: ["saldo:desc"],
   },
 };
 

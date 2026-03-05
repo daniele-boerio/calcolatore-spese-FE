@@ -8,6 +8,11 @@
   "amount": "Importo",
   "close": "Chiudi",
   "error": "Errore",
+  "of": "di",
+  "from_date": "Da Data",
+  "to_date": "A Data",
+  "next": "Avanti",
+  "previous": "Indietro",
 
   "missing_fields": "Campi mancanti",
   "missing_fields_response": "Assicurati di aver compilato tutti i campi obbligatori",
@@ -32,7 +37,7 @@
   "actions": "Azioni",
   "tags": "Tag",
 
-  "monthly_budget": "Budget Mensile",
+  "monthly_budget": "Risparmio Mensile",
   "monthly_expenses": "Spese Mensili",
 
   "dialog_budget_title": "Impostazioni Budget Mensile",
@@ -129,5 +134,9 @@
 
   "transaction_history": "Storico Transazioni",
   "total_transactions": "Transazioni Totali",
-  "recurring_history": "Storico Transazioni Ricorrenti"
+  "recurring_history": "Storico Transazioni Ricorrenti",
+  "transaction_placeholder": "Seleziona una transazione",
+  "category_and_subcategory": "Categoria & Sottocategoria",
+  "transaction_details": "Dettagli Transazione",
+  "basic_info": "Informazioni Base"
 }

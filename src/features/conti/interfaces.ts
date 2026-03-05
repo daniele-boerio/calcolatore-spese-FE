@@ -81,8 +81,7 @@ export interface DeleteContoParams {
 }
 
 export interface ContoFilters {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_by?: string[];
   nome?: string;
   saldo_min?: number;
   saldo_max?: number;

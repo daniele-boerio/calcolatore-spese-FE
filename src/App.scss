@@ -43,7 +43,9 @@ body {
 
   .p-datepicker-trigger {
     background-color: v.$bg-button-primary;
-    color: v.$text-on-dark;
+    svg {
+      color: v.$text-on-button;
+    }
   }
 
   .p-inputtext {
@@ -104,6 +106,6 @@ body {
   }
   .p-highlight {
     background-color: v.$bg-button-primary;
-    color: v.$text-on-dark;
+    color: v.$text-on-button;
   }
 }

@@ -55,8 +55,7 @@ export interface DeleteRecurringParams {
 }
 
 export interface RecurringFilters {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_by?: string[];
   nome?: string;
   tipo?: string;
   importo_min?: number;

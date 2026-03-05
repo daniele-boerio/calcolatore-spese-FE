@@ -7,7 +7,12 @@
   "date": "Date",
   "amount": "Amount",
   "close": "Close",
-  "error": "Errore",
+  "error": "Error",
+  "of": "of",
+  "from_date": "From Date",
+  "to_date": "To Date",
+  "next": "Next",
+  "previous": "Previous",
 
   "missing_fields": "Missing Fields",
   "missing_fields_response": "Make sure you have filled out all the required fields",
@@ -32,7 +37,7 @@
   "actions": "Actions",
   "tags": "Tags",
 
-  "monthly_budget": "Monthly Budget",
+  "monthly_budget": "Monthly Savings",
   "monthly_expenses": "Monthly Expenses",
 
   "dialog_budget_title": "Monthly Budget Settings",
@@ -131,5 +136,9 @@
 
   "transaction_history": "Transaction History",
   "total_transactions": "Total Transactions",
-  "recurring_history": "Recurring Transactions History"
+  "recurring_history": "Recurring Transactions History",
+  "transaction_placeholder": "Select a transaction",
+  "category_and_subcategory": "Category & Subcategory",
+  "transaction_details": "Transaction Details",
+  "basic_info": "Basic Information"
 }

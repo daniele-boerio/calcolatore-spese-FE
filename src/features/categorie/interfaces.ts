@@ -59,8 +59,7 @@ export interface DeleteSottoCategoriaResponse {
 }
 
 export interface CategoriesFilters {
-  sort_by?: string;
-  sort_order?: "asc" | "desc";
+  sort_by?: string[];
   solo_entrata?: boolean;
   solo_uscita?: boolean;
   solo_rimborso?: boolean;
