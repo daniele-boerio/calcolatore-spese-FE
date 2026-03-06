@@ -87,11 +87,6 @@ export default function TransactionDialog({
     }
   }, [visible, transaction]);
 
-  const filteredSottoCategorie = useMemo(() => {
-    const cat = categorie.find((c) => c.id === categoriaId);
-    return cat?.sottocategorie || [];
-  }, [categoriaId, categorie]);
-
   const handleSave = async () => {
     // If compensation selected, prefer its values from compValues
 
@@ -136,6 +131,38 @@ export default function TransactionDialog({
       setImporto(cleanedValue);
     }
   };
+
+  const categorieFiltrate = React.useMemo(() => {
+    if (!categorie) return [];
+
+    return categorie.filter((cat) => {
+      if (tipo === "ENTRATA") {
+        return cat.solo_entrata === true;
+      }
+      if (tipo === "USCITA") {
+        return cat.solo_uscita === true;
+      }
+      return true; // Caso di fallback se tipo non è ancora definito
+    });
+  }, [categorie, tipo]);
+
+  const filteredSottoCategorie = useMemo(() => {
+    // 1. Trova la categoria selezionata
+    const cat = categorie.find((c) => c.id === categoriaId);
+
+    if (!cat || !cat.sottocategorie) return [];
+
+    // 2. Ritorna solo le sottocategorie che corrispondono al "tipo" attuale
+    return cat.sottocategorie.filter((sub) => {
+      if (tipo === "ENTRATA") {
+        return sub.solo_entrata === true;
+      }
+      if (tipo === "USCITA") {
+        return sub.solo_uscita === true;
+      }
+      return true; // Fallback
+    });
+  }, [categoriaId, categorie, tipo]); // Aggiunto 'tipo' alle dipendenze
 
   return (
     <Dialog
@@ -259,7 +286,7 @@ export default function TransactionDialog({
                 <Dropdown
                   label={t("category")}
                   value={categoriaId}
-                  options={categorie}
+                  options={categorieFiltrate}
                   optionLabel="nome"
                   optionValue="id"
                   onChange={(e) => setCategoriaId(e.value)}
