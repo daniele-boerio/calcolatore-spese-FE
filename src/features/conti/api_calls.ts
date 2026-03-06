@@ -36,7 +36,7 @@ export const updateBudget = createAsyncThunk<
 >("conti/monthlyBudget", async (params, { rejectWithValue }) => {
   try {
     const response = await api.put<MonthlyBudgetResponse>(`/monthlyBudget`, {
-      totalBudget: params.totalBudget,
+      total_budget: params.total_budget,
     });
     return response.data;
   } catch (error) {

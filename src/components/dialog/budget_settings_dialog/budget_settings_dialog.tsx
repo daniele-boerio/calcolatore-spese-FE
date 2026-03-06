@@ -9,7 +9,7 @@ import { selectContiLoading } from "../../../features/conti/conto_slice";
 
 // 1. Definiamo la struttura dei dati del budget
 interface BudgetData {
-  totalBudget: number | null;
+  total_budget: number | null;
 }
 
 // 2. Definiamo le Props del componente
@@ -31,13 +31,13 @@ export default function BudgetSettingsDialog({
   const loading = useAppSelector(selectContiLoading);
 
   const [formData, setFormData] = useState({
-    amount: initialData?.totalBudget?.toString() || "",
+    amount: initialData?.total_budget?.toString() || "",
   });
 
   // Sincronizziamo lo stato locale se initialData cambia (es. quando la dialog si riapre)
   useEffect(() => {
     setFormData({
-      amount: initialData?.totalBudget?.toString() || "",
+      amount: initialData?.total_budget?.toString() || "",
     });
   }, [initialData]);
 
@@ -52,7 +52,7 @@ export default function BudgetSettingsDialog({
 
   const handleSave = () => {
     const dataToSave: BudgetData = {
-      totalBudget: formData.amount
+      total_budget: formData.amount
         ? parseFloat(formData.amount.replace(",", "."))
         : null,
     };

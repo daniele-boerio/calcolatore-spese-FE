@@ -23,7 +23,7 @@ const initialState: ContoState = {
   conti: [],
   selectedConto: null,
   monthlyBudget: {
-    totalBudget: null,
+    total_budget: null,
     expenses: null,
     percentage: null,
   },
@@ -54,7 +54,7 @@ const contoSlice = createSlice({
         getCurrentMonthExpenses.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
           const { monthly_budget } = action.payload;
-          state.monthlyBudget.totalBudget = monthly_budget.totalBudget;
+          state.monthlyBudget.total_budget = monthly_budget.total_budget;
           state.monthlyBudget.expenses = monthly_budget.expenses;
           state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
         },
@@ -63,7 +63,7 @@ const contoSlice = createSlice({
         updateBudget.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
           const { monthly_budget } = action.payload;
-          state.monthlyBudget.totalBudget = monthly_budget.totalBudget;
+          state.monthlyBudget.total_budget = monthly_budget.total_budget;
           state.monthlyBudget.expenses = monthly_budget.expenses;
           state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
         },
@@ -137,13 +137,13 @@ const contoSlice = createSlice({
 
               // Ricalcola la percentuale se esiste un budget totale
               if (
-                state.monthlyBudget.totalBudget &&
-                state.monthlyBudget.totalBudget > 0
+                state.monthlyBudget.total_budget &&
+                state.monthlyBudget.total_budget > 0
               ) {
                 state.monthlyBudget.percentage = Number(
                   (
                     (state.monthlyBudget.expenses /
-                      state.monthlyBudget.totalBudget) *
+                      state.monthlyBudget.total_budget) *
                     100
                   ).toFixed(1),
                 );

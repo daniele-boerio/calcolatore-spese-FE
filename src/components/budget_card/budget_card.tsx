@@ -20,12 +20,12 @@ export default function BudgetCard() {
   const monthlyBudget = useAppSelector(selectContiMonthlyBudget);
   const loading = useAppSelector(selectContiLoading);
 
-  const { totalBudget, expenses, percentage } = monthlyBudget;
+  const { total_budget, expenses, percentage } = monthlyBudget;
 
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
 
   // Helper per la leggibilità del template
-  const hasTotalBudget = totalBudget !== null && totalBudget !== undefined;
+  const hasTotalBudget = total_budget !== null && total_budget !== undefined;
   // Gestiamo il caso in cui percentage sia 0 (valore falsy in JS)
   const hasPercentage = percentage !== null && percentage !== undefined;
 
@@ -52,7 +52,7 @@ export default function BudgetCard() {
   // Logica dinamica per le classi di stato
   const getStatusClass = (): string => {
     if (!hasTotalBudget || expenses === null) return "is-neutral";
-    return totalBudget > expenses ? "is-danger" : "is-success";
+    return total_budget > expenses ? "is-danger" : "is-success";
   };
 
   return (
@@ -78,7 +78,7 @@ export default function BudgetCard() {
         {hasTotalBudget && (
           <span className="budget-card__summary">
             <span className="text-muted">{t("of")}</span>{" "}
-            {formatEuro(totalBudget)}
+            {formatEuro(total_budget)}
           </span>
         )}
       </div>
@@ -102,7 +102,7 @@ export default function BudgetCard() {
         key={isDialogVisible ? "open" : "closed"}
         visible={isDialogVisible}
         onHide={() => setIsDialogVisible(false)}
-        initialData={{ totalBudget: totalBudget ?? null }}
+        initialData={{ total_budget: total_budget ?? null }}
         onSave={handleSaveBudget}
       />
     </div>

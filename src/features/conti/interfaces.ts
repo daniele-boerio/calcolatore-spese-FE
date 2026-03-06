@@ -21,19 +21,19 @@ export interface ExpenseByCategory {
 }
 
 export interface MonthlyBudget {
-  totalBudget: number | null;
+  total_budget: number | null;
   expenses: number | null;
   percentage: number | null;
 }
 
 export interface BudgetUpdateData {
-  totalBudget: number | null;
+  total_budget: number | null;
 }
 
 // Struttura specifica della risposta API per il budget
 export interface MonthlyBudgetResponse {
   monthly_budget: {
-    totalBudget: number | null;
+    total_budget: number | null;
     expenses: number | null;
     percentage: number | null;
   };
@@ -50,7 +50,7 @@ export interface ContoState {
 
 // Interfaccia per il payload di aggiornamento budget
 export interface UpdateBudgetParams {
-  totalBudget: number | null;
+  total_budget: number | null;
 }
 
 export interface CreateContoParams {
