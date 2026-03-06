@@ -5,17 +5,21 @@ export interface Investimento {
   isin?: string;
   ticker?: string;
   nome_titolo: string;
-  prezzo_attuale: number;
-  data_ultimo_aggiornamento: string;
+  quantita_totale: number | null;
+  valore_posizione: number | null;
+  prezzo_medio_carico: number | null;
+  prezzo_attuale: number | null;
+  data_ultimo_aggiornamento: string | null;
   storico: Operazione[];
 }
 
 export interface Operazione {
   id: string;
   data: string;
-  quantità: number;
+  quantita: number;
   prezzo_unitario: number;
   investimento_id: string;
+  valore_attuale: number;
 }
 
 export interface InvestimentoState {

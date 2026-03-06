@@ -54,7 +54,6 @@ export default function TransactionDialog({
   const [tagId, setTagId] = useState<string | null>(null);
   const [from_data, setFromData] = useState<Date | null>(null);
   const [to_data, setToData] = useState<Date | null>(null);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
   // Effetto per il popolamento (Edit) o reset (Create)
@@ -70,6 +69,7 @@ export default function TransactionDialog({
         setCategoriaId(transaction.categoria_id);
         setSottoCategoriaId(transaction.sottocategoria_id);
         setTagId(transaction.tag_id);
+        setTransactionId(transaction.parent_transaction_id);
       } else {
         // Modalità CREATE (Reset)
         setTipo("USCITA");
@@ -82,7 +82,6 @@ export default function TransactionDialog({
         setTagId(null);
         setFromData(null);
         setToData(null);
-        setTransactions([]);
         setTransactionId(null);
       }
     }
@@ -111,7 +110,7 @@ export default function TransactionDialog({
       categoria_id: categoriaId,
       sottocategoria_id: sottoCategoriaId,
       tag_id: tagId,
-      transactionId,
+      parent_transaction_id: transactionId,
     };
 
     if (transaction?.id) {

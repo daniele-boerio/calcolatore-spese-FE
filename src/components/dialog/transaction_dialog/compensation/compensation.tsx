@@ -88,6 +88,7 @@ export default function Compensation({
           data_fine: to_data
             ? `${to_data.getFullYear()}-${String(to_data.getMonth() + 1).padStart(2, "0")}-${String(to_data.getDate()).padStart(2, "0")}`
             : undefined,
+          tipo: "USCITA",
         }),
       ).unwrap();
       setTransactions(res || []);
@@ -181,6 +182,7 @@ export default function Compensation({
                 <div className="form-row">
                   <div className="field">
                     <Dropdown
+                      key={transactions.length}
                       label={t("transactions")}
                       value={transactionId}
                       options={transactions}

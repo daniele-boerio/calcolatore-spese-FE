@@ -58,9 +58,7 @@ export default function BudgetCard() {
   return (
     <div className={`budget-card ${getStatusClass()}`}>
       <div className="budget-card__header-row">
-        <span className="budget-card__label">
-          {hasTotalBudget ? t("monthly_budget") : t("monthly_expenses")}
-        </span>
+        <span className="budget-card__label">{t("monthly_budget")}</span>
 
         <Button
           className="trasparent-button"

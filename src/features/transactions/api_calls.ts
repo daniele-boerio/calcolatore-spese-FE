@@ -99,11 +99,12 @@ export const getTransactionsByCategory = createAsyncThunk<
     sottocategoria_id?: string | null;
     data_inizio?: string;
     data_fine?: string;
+    tipo?: string;
   }
 >(
   "transazioni/getTransactionsByCategory",
   async (
-    { categoria_id, sottocategoria_id, data_inizio, data_fine },
+    { categoria_id, sottocategoria_id, data_inizio, data_fine, tipo },
     { rejectWithValue },
   ) => {
     try {
@@ -113,6 +114,7 @@ export const getTransactionsByCategory = createAsyncThunk<
         params.append("sottocategoria_id", sottocategoria_id);
       if (data_inizio) params.append("data_inizio", data_inizio);
       if (data_fine) params.append("data_fine", data_fine);
+      if (tipo) params.append("tipo", tipo);
 
       const response = await api.get<Transaction[]>(
         `/transazioni/?${params.toString()}`,

@@ -49,13 +49,16 @@ const contoSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // currentMonthExpenses & updateBudget (usano la stessa struttura di risposta)
+      // currentMonthExpenses & updateBudget
       .addCase(
         getCurrentMonthExpenses.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
           const { monthly_budget } = action.payload;
-          state.monthlyBudget.total_budget = monthly_budget.total_budget;
-          state.monthlyBudget.expenses = monthly_budget.expenses;
+          // Cast a Number perché arrivano come stringhe dal backend
+          state.monthlyBudget.total_budget = Number(
+            monthly_budget.total_budget,
+          );
+          state.monthlyBudget.expenses = Number(monthly_budget.expenses);
           state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
         },
       )
@@ -63,28 +66,43 @@ const contoSlice = createSlice({
         updateBudget.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
           const { monthly_budget } = action.payload;
-          state.monthlyBudget.total_budget = monthly_budget.total_budget;
-          state.monthlyBudget.expenses = monthly_budget.expenses;
+          state.monthlyBudget.total_budget = Number(
+            monthly_budget.total_budget,
+          );
+          state.monthlyBudget.expenses = Number(monthly_budget.expenses);
           state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
         },
       )
 
       // getConti
       .addCase(getConti.fulfilled, (state, action: PayloadAction<Conto[]>) => {
-        state.conti = action.payload;
+        // Mappiamo i conti per assicurarci che i campi numerici siano effettivamente numeri nello stato
+        state.conti = action.payload.map((c) => ({
+          ...c,
+          saldo: Number(c.saldo),
+          budget_obiettivo: c.budget_obiettivo ? Number(c.budget_obiettivo) : 0,
+          soglia_minima: c.soglia_minima ? Number(c.soglia_minima) : 0,
+        }));
       })
 
       // getCurrentMonthExpensesByCategory
       .addCase(
         getCurrentMonthExpensesByCategory.fulfilled,
         (state, action: PayloadAction<ExpenseByCategory[]>) => {
-          state.monthlyExpensesByCategory = action.payload;
+          // Cast del valore per ogni categoria
+          state.monthlyExpensesByCategory = action.payload.map((item) => ({
+            ...item,
+            value: Number(item.value),
+          }));
         },
       )
 
       // createConto
       .addCase(createConto.fulfilled, (state, action: PayloadAction<Conto>) => {
-        state.conti.push(action.payload);
+        state.conti.push({
+          ...action.payload,
+          saldo: Number(action.payload.saldo),
+        });
       })
 
       // updateConto
@@ -93,7 +111,10 @@ const contoSlice = createSlice({
           (conto) => conto.id === action.payload.id,
         );
         if (index !== -1) {
-          state.conti[index] = action.payload;
+          state.conti[index] = {
+            ...action.payload,
+            saldo: Number(action.payload.saldo),
+          };
         }
       })
 
@@ -101,7 +122,7 @@ const contoSlice = createSlice({
         deleteConto.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.conti = state.conti.filter(
-            (conto) => conto.id !== action.payload,
+            (conto) => String(conto.id) !== String(action.payload),
           );
         },
       )
@@ -110,6 +131,8 @@ const contoSlice = createSlice({
         createTransaction.fulfilled,
         (state, action: PayloadAction<Transaction>) => {
           const newTx = action.payload;
+          const txImporto = Number(newTx.importo); // Fondamentale: cast dell'importo stringa
+
           const isThisMonth =
             new Date(newTx.data).getMonth() === new Date().getMonth() &&
             new Date(newTx.data).getFullYear() === new Date().getFullYear();
@@ -120,7 +143,8 @@ const contoSlice = createSlice({
           );
           if (contoIndex !== -1) {
             const mod = newTx.tipo === "USCITA" ? -1 : 1;
-            state.conti[contoIndex].saldo += newTx.importo * mod;
+            // Calcolo sicuro tra numeri
+            state.conti[contoIndex].saldo += txImporto * mod;
           }
 
           // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget
@@ -129,13 +153,13 @@ const contoSlice = createSlice({
             (newTx.tipo === "USCITA" || newTx.tipo === "RIMBORSO")
           ) {
             const txMod = newTx.tipo === "USCITA" ? 1 : -1;
-            const importoNetto = newTx.importo * txMod;
+            const importoNetto = txImporto * txMod;
 
             // Aggiorna Monthly Budget
             if (state.monthlyBudget.expenses !== null) {
               state.monthlyBudget.expenses += importoNetto;
 
-              // Ricalcola la percentuale se esiste un budget totale
+              // Ricalcola la percentuale
               if (
                 state.monthlyBudget.total_budget &&
                 state.monthlyBudget.total_budget > 0
@@ -151,10 +175,8 @@ const contoSlice = createSlice({
             }
 
             // Aggiorna Expenses By Category
-            // Nota: assumiamo che l'oggetto categoria sia presente nella risposta della transazione
-            const categoryName = newTx.categoria_id
-              ? (newTx as any).categoria_nome || "Uncategorized"
-              : "Uncategorized";
+            const categoryName =
+              (newTx as any).categoria?.nome || "Uncategorized";
 
             const catIndex = state.monthlyExpensesByCategory.findIndex(
               (item) => item.label === categoryName,
@@ -169,14 +191,13 @@ const contoSlice = createSlice({
               });
             }
 
-            // Rimuove categorie con valore <= 0 (es. dopo un rimborso totale)
+            // Filtro pulizia categorie
             state.monthlyExpensesByCategory =
               state.monthlyExpensesByCategory.filter((c) => c.value > 0);
           }
         },
       )
 
-      // Matchers per caricamento ed errori del modulo conti
       .addMatcher(
         (action: Action) =>
           action.type.endsWith("/pending") && action.type.startsWith("conti/"),
@@ -192,6 +213,7 @@ const contoSlice = createSlice({
   },
 });
 
+// Selectors (Invariati)
 export const selectContiLoading = (state: RootState) => state.conto.loading;
 export const selectContiConti = (state: RootState) => state.conto.conti;
 export const selectContiSelectedConto = (state: RootState) =>

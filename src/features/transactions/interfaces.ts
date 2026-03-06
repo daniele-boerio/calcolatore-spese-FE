@@ -14,7 +14,7 @@ export interface Transaction {
   data: string;
   descrizione: string;
   importo: number;
-  importo_netto: number;
+  importo_netto: number | null;
   tipo: tipoTransaction;
   conto_id: string;
   categoria_id: string;

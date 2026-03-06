@@ -3,7 +3,6 @@ import api from "../../services/api";
 import { AxiosError } from "axios";
 import {
   Categoria,
-  CategoriesFilters,
   CreateCategoriaParams,
   CreateSottoCategoriaParams,
   DeleteCategoriaParams,
@@ -57,10 +56,15 @@ export const createCategoria = createAsyncThunk<
   CreateCategoriaParams
 >(
   "categorie/createCategoria",
-  async ({ nome, sottocategorie }, { rejectWithValue }) => {
+  async (
+    { nome, solo_entrata, solo_uscita, sottocategorie },
+    { rejectWithValue },
+  ) => {
     try {
       const response = await api.post<Categoria>(`/categorie`, {
         nome,
+        solo_entrata,
+        solo_uscita,
         sottocategorie,
       });
       return response.data;
@@ -77,17 +81,24 @@ export const createCategoria = createAsyncThunk<
 export const updateCategoria = createAsyncThunk<
   Categoria,
   UpdateCategoriaParams
->("categorie/updateCategoria", async ({ id, nome }, { rejectWithValue }) => {
-  try {
-    const response = await api.put<Categoria>(`/categorie/${id}`, {
-      nome,
-    });
-    return response.data;
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(err.response?.data || "Errore durante la modifica");
-  }
-});
+>(
+  "categorie/updateCategoria",
+  async ({ id, nome, solo_entrata, solo_uscita }, { rejectWithValue }) => {
+    try {
+      const response = await api.put<Categoria>(`/categorie/${id}`, {
+        nome,
+        solo_entrata,
+        solo_uscita,
+      });
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore durante la modifica",
+      );
+    }
+  },
+);
 
 // Eliminazione Categoria
 export const deleteCategoria = createAsyncThunk<string, DeleteCategoriaParams>(
@@ -111,12 +122,19 @@ export const createSottoCategorie = createAsyncThunk<
   CreateSottoCategoriaParams
 >(
   "categorie/createSottoCategoria",
-  async ({ id, nomeList }, { rejectWithValue }) => {
+  async ({ id, subList }, { rejectWithValue }) => {
     try {
+      // Mappiamo la lista per aggiungere l'id della categoria a ogni elemento
+      const payload = subList.map((sub) => ({
+        ...sub,
+        categoria_id: id, // Inseriamo l'id ricevuto come parametro
+      }));
+
       const response = await api.post<SottoCategoria[]>(
         `/categorie/${id}/sottocategorie`,
-        nomeList,
+        payload, // Inviamo la lista arricchita
       );
+
       return response.data;
     } catch (error) {
       const err = error as AxiosError;
@@ -133,10 +151,12 @@ export const updateSottoCategoria = createAsyncThunk<
   UpdateSottoCategoriaParams
 >(
   "categorie/updateSottoCategoria",
-  async ({ id, nome }, { rejectWithValue }) => {
+  async ({ id, nome, solo_entrata, solo_uscita }, { rejectWithValue }) => {
     try {
       const response = await api.put<SottoCategoria>(`/sottocategorie/${id}`, {
         nome,
+        solo_entrata,
+        solo_uscita,
       });
       return response.data;
     } catch (error) {

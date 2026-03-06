@@ -12,6 +12,14 @@
 
     .main-category-section {
       width: 100%;
+      display: flex;
+      flex-direction: row;
+      .cat_choises {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+      }
     }
 
     .subcategories-section {
@@ -63,6 +71,12 @@
           .trasparent-danger-button {
             // Allineamento perfetto con la riga inferiore dell'input
             margin-top: 5px;
+          }
+          .sub_choises {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 1rem;
           }
         }
 

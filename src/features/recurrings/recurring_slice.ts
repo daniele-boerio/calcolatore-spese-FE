@@ -19,6 +19,12 @@ const initialState: RecurringsState = {
 
 // --- HELPERS ---
 
+// Converte l'importo da stringa (Decimal) a number per il frontend
+const mapRecurring = (rec: Recurring): Recurring => ({
+  ...rec,
+  importo: Number(rec.importo),
+});
+
 const handlePending = (state: RecurringsState) => {
   state.loading = true;
 };
@@ -33,18 +39,19 @@ const recurringsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      //get Recurring Transactions
+      // get Recurring Transactions
       .addCase(
         getRecurrings.fulfilled,
         (state, action: PayloadAction<Recurring[]>) => {
-          state.recurrings = action.payload;
+          // Mappiamo l'array convertendo gli importi
+          state.recurrings = action.payload.map(mapRecurring);
         },
       )
       // Create Recurring Transaction
       .addCase(
         createRecurring.fulfilled,
         (state, action: PayloadAction<Recurring>) => {
-          state.recurrings.push(action.payload);
+          state.recurrings.push(mapRecurring(action.payload));
         },
       )
 
@@ -55,7 +62,7 @@ const recurringsSlice = createSlice({
             (rec) => rec.id === action.payload.id,
           );
           if (index !== -1) {
-            state.recurrings[index] = action.payload;
+            state.recurrings[index] = mapRecurring(action.payload);
           }
         },
       )
@@ -64,12 +71,12 @@ const recurringsSlice = createSlice({
         deleteRecurring.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.recurrings = state.recurrings.filter(
-            (rec) => rec.id !== action.payload,
+            (rec) => String(rec.id) !== String(action.payload),
           );
         },
       )
 
-      // Matchers per caricamento ed errori del modulo transazioni
+      // Matchers (rimangono invariati)
       .addMatcher(
         (action: Action) =>
           action.type.endsWith("/pending") &&

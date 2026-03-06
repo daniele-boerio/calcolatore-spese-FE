@@ -29,6 +29,13 @@ const initialState: TransactionsState = {
 
 // --- HELPERS ---
 
+// Converte i campi Decimal (stringhe) in Number per il frontend
+const mapTransaction = (tx: Transaction): Transaction => ({
+  ...tx,
+  importo: Number(tx.importo),
+  importo_netto: tx.importo_netto !== null ? Number(tx.importo_netto) : null,
+});
+
 const handlePending = (state: TransactionsState) => {
   state.loading = true;
 };
@@ -47,7 +54,7 @@ const transactionsSlice = createSlice({
       .addCase(
         getLastTransactions.fulfilled,
         (state, action: PayloadAction<Transaction[]>) => {
-          state.transactions = action.payload;
+          state.transactions = action.payload.map(mapTransaction);
         },
       )
 
@@ -55,43 +62,53 @@ const transactionsSlice = createSlice({
       .addCase(
         getTransactionsPaginated.fulfilled,
         (state, action: PayloadAction<PaginatedResponse>) => {
-          state.transactions = action.payload.data;
+          state.transactions = action.payload.data.map(mapTransaction);
           state.pagination.total = action.payload.total;
           state.pagination.page = action.payload.page;
           state.pagination.size = action.payload.size;
-          state.pagination.total_incomes = action.payload.total_entrata;
-          state.pagination.total_expenses = action.payload.total_uscita;
-          state.pagination.total_compensation = action.payload.total_rimborsi;
+
+          // Cast obbligatorio per i totali aggregati che arrivano come stringhe
+          state.pagination.total_incomes = Number(
+            action.payload.total_entrata || 0,
+          );
+          state.pagination.total_expenses = Number(
+            action.payload.total_uscita || 0,
+          );
+          state.pagination.total_compensation = Number(
+            action.payload.total_rimborsi || 0,
+          );
         },
       )
 
       .addCase(
         createTransaction.fulfilled,
         (state, action: PayloadAction<Transaction>) => {
+          const newTx = mapTransaction(action.payload);
           state.pagination.total = (state.pagination.total || 0) + 1;
-          const updatedList = [...state.transactions, action.payload];
+
+          const updatedList = [...state.transactions, newTx];
           updatedList.sort(
             (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
           );
-          const pageSize = state.pagination.size || 10;
 
-          if (updatedList.length > pageSize) {
-            state.transactions = updatedList.slice(0, pageSize);
-          } else {
-            state.transactions = updatedList;
-          }
+          const pageSize = state.pagination.size || 10;
+          state.transactions =
+            updatedList.length > pageSize
+              ? updatedList.slice(0, pageSize)
+              : updatedList;
         },
       )
 
       .addCase(
         updateTransaction.fulfilled,
         (state, action: PayloadAction<Transaction>) => {
+          const updatedTx = mapTransaction(action.payload);
           const index = state.transactions.findIndex(
-            (tran) => tran.id === action.payload.id,
+            (tran) => tran.id === updatedTx.id,
           );
 
           if (index !== -1) {
-            state.transactions[index] = action.payload;
+            state.transactions[index] = updatedTx;
             state.transactions.sort(
               (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
             );
@@ -103,7 +120,7 @@ const transactionsSlice = createSlice({
         deleteTransaction.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.transactions = state.transactions.filter(
-            (tran) => tran.id !== action.payload,
+            (tran) => String(tran.id) !== String(action.payload),
           );
           state.pagination.total = state.pagination.total
             ? state.pagination.total - 1
@@ -111,7 +128,7 @@ const transactionsSlice = createSlice({
         },
       )
 
-      // Matchers per caricamento ed errori del modulo transazioni
+      // Matchers (invariati)
       .addMatcher(
         (action: Action) =>
           action.type.endsWith("/pending") &&

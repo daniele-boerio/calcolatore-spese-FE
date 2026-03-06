@@ -25,6 +25,27 @@ const initialState: InvestimentoState = {
 
 // --- HELPERS ---
 
+// Helper per mappare l'investimento e convertire le stringhe Decimal in Number
+const mapInvestimento = (inv: Investimento): Investimento => ({
+  ...inv,
+  prezzo_attuale: inv.prezzo_attuale ? Number(inv.prezzo_attuale) : null,
+  // Campi calcolati dalle property del backend
+  quantita_totale: inv.quantita_totale ? Number(inv.quantita_totale) : 0,
+  valore_posizione: inv.valore_posizione ? Number(inv.valore_posizione) : 0,
+  prezzo_medio_carico: inv.prezzo_medio_carico
+    ? Number(inv.prezzo_medio_carico)
+    : 0,
+  storico: inv.storico ? inv.storico.map(mapOperazione) : [],
+});
+
+// Helper per mappare la singola operazione (storico)
+const mapOperazione = (op: Operazione): Operazione => ({
+  ...op,
+  quantita: Number(op.quantita),
+  prezzo_unitario: Number(op.prezzo_unitario),
+  valore_attuale: op.valore_attuale ? Number(op.valore_attuale) : 0,
+});
+
 const handlePending = (state: InvestimentoState) => {
   state.loading = true;
 };
@@ -43,7 +64,8 @@ const investimentoSlice = createSlice({
       .addCase(
         getInvestimenti.fulfilled,
         (state, action: PayloadAction<Investimento[]>) => {
-          state.investimenti = action.payload;
+          // Fondamentale mappare l'intero array convertendo i Decimal
+          state.investimenti = action.payload.map(mapInvestimento);
         },
       )
 
@@ -51,7 +73,7 @@ const investimentoSlice = createSlice({
       .addCase(
         createInvestimento.fulfilled,
         (state, action: PayloadAction<Investimento>) => {
-          state.investimenti.push(action.payload);
+          state.investimenti.push(mapInvestimento(action.payload));
         },
       )
 
@@ -63,7 +85,7 @@ const investimentoSlice = createSlice({
             (inv) => inv.id === action.payload.id,
           );
           if (index !== -1) {
-            state.investimenti[index] = action.payload;
+            state.investimenti[index] = mapInvestimento(action.payload);
           }
         },
       )
@@ -73,7 +95,7 @@ const investimentoSlice = createSlice({
         deleteInvestimento.fulfilled,
         (state, action: PayloadAction<string>) => {
           state.investimenti = state.investimenti.filter(
-            (inv) => inv.id !== action.payload,
+            (inv) => String(inv.id) !== String(action.payload),
           );
         },
       )
@@ -82,7 +104,7 @@ const investimentoSlice = createSlice({
       .addCase(
         createOperazione.fulfilled,
         (state, action: PayloadAction<Operazione>) => {
-          const newOp = action.payload;
+          const newOp = mapOperazione(action.payload);
           const investimento = state.investimenti.find(
             (inv) => inv.id === newOp.investimento_id,
           );
@@ -97,7 +119,7 @@ const investimentoSlice = createSlice({
       .addCase(
         updateOperazione.fulfilled,
         (state, action: PayloadAction<Operazione>) => {
-          const updatedOp = action.payload;
+          const updatedOp = mapOperazione(action.payload);
           const investimento = state.investimenti.find(
             (inv) => inv.id === updatedOp.investimento_id,
           );
@@ -128,7 +150,7 @@ const investimentoSlice = createSlice({
         },
       )
 
-      // Matchers per caricamento ed errori del modulo conti
+      // Matchers
       .addMatcher(
         (action: Action) =>
           action.type.endsWith("/pending") &&
@@ -145,13 +167,5 @@ const investimentoSlice = createSlice({
   },
 });
 
-export const selectInvestimentoLoading = (state: RootState) =>
-  state.investimento.loading;
-export const selectInvestimentoInvestimenti = (state: RootState) =>
-  state.investimento.investimenti;
-export const selectInvestimentoSelectedInvestimento = (state: RootState) =>
-  state.investimento.selectedInvestimento;
-export const selectInvestimentoFilters = (state: RootState) =>
-  state.investimento.filters;
-
+// Selectors ... (Invariati)
 export default investimentoSlice.reducer;

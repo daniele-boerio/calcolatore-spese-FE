@@ -1,6 +1,8 @@
 export interface SottoCategoria {
   id: string;
   nome: string;
+  solo_entrata: boolean;
+  solo_uscita: boolean;
   categoria_id: string;
   creationDate: string;
   lastUpdate: string;
@@ -9,6 +11,8 @@ export interface SottoCategoria {
 export interface Categoria {
   id: string;
   nome: string;
+  solo_entrata: boolean;
+  solo_uscita: boolean;
   sottocategorie?: SottoCategoria[];
   creationDate: string;
   lastUpdate: string;
@@ -26,12 +30,21 @@ export interface CategorieState {
 
 export interface CreateCategoriaParams {
   nome: string;
-  sottocategorie?: string[];
+  solo_entrata: boolean;
+  solo_uscita: boolean;
+  sottocategorie?: {
+    nome: string;
+    solo_entrata: boolean;
+    solo_uscita: boolean;
+    categoria_id: string;
+  }[];
 }
 
 export interface UpdateCategoriaParams {
   id: string;
-  nome: string;
+  nome?: string;
+  solo_entrata?: boolean;
+  solo_uscita?: boolean;
 }
 
 export interface DeleteCategoriaParams {
@@ -40,12 +53,18 @@ export interface DeleteCategoriaParams {
 
 export interface CreateSottoCategoriaParams {
   id: string; // ID della categoria padre
-  nomeList: { nome: string }[];
+  subList: {
+    nome: string;
+    solo_entrata: boolean;
+    solo_uscita: boolean;
+  }[];
 }
 
 export interface UpdateSottoCategoriaParams {
   id: string; // ID della sottocategoria
-  nome: string;
+  nome?: string;
+  solo_entrata?: boolean;
+  solo_uscita?: boolean;
 }
 
 export interface DeleteSottoCategoriaParams {
@@ -62,5 +81,4 @@ export interface CategoriesFilters {
   sort_by?: string[];
   solo_entrata?: boolean;
   solo_uscita?: boolean;
-  solo_rimborso?: boolean;
 }
