@@ -32,6 +32,7 @@ export interface PaginatedResponse {
   size: number;
   total_entrata: number;
   total_uscita: number;
+  total_rimborsi: number;
 }
 
 export interface TransactionsState {
@@ -44,6 +45,7 @@ export interface TransactionsState {
     size: number | null;
     total_incomes?: number | null;
     total_expenses?: number | null;
+    total_compensation?: number | null;
   };
   filters: TransactionsFilters;
 }

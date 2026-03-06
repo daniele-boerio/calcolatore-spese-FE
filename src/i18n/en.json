@@ -51,6 +51,7 @@
   "no_transactions": "No transactions found.",
 
   "compensation": "Compensation",
+  "compensations": "Compensations",
   "income": "Income",
   "expenses": "Expenses",
   "new_transaction": "New Transaction",

@@ -61,6 +61,7 @@ const transactionsSlice = createSlice({
           state.pagination.size = action.payload.size;
           state.pagination.total_incomes = action.payload.total_entrata;
           state.pagination.total_expenses = action.payload.total_uscita;
+          state.pagination.total_compensation = action.payload.total_rimborsi;
         },
       )
 

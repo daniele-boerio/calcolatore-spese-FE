@@ -209,14 +209,15 @@ export default function Transactions() {
         <header className="page-header">
           <h1>{t("transaction_history")}</h1>
           <div className="stats">
-            <h3 className="stats-item">
-              {t("income")}: {pagination?.total_incomes || 0} €
+            <h3 className="stats-item income">
+              {t("income")}: <span>{pagination?.total_incomes || 0} €</span>
             </h3>
-            <h3 className="stats-item">
-              {t("expenses")}: {pagination?.total_expenses || 0} €
+            <h3 className="stats-item compensation">
+              {t("compensations")}:{" "}
+              <span>{pagination?.total_compensation || 0} €</span>
             </h3>
-            <h3 className="stats-item">
-              {t("total_transactions")}: {pagination?.total || 0}
+            <h3 className="stats-item expenses">
+              {t("expenses")}: <span>{pagination?.total_expenses || 0} €</span>
             </h3>
           </div>
         </header>

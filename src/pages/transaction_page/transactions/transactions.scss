@@ -31,6 +31,24 @@
       gap: 1rem;
       color: v.$text-main;
       font-size: 1rem;
+
+      .stats-item {
+        &.income {
+          span {
+            color: white;
+          }
+        }
+        &.compensation {
+          span {
+            color: white;
+          }
+        }
+        &.expenses {
+          span {
+            color: white;
+          }
+        }
+      }
     }
   }
 
