@@ -139,5 +139,6 @@
   "transaction_placeholder": "Seleziona una transazione",
   "category_and_subcategory": "Categoria & Sottocategoria",
   "transaction_details": "Dettagli Transazione",
-  "basic_info": "Informazioni Base"
+  "basic_info": "Informazioni Base",
+  "no_description": "Nessuna Descrizione"
 }

@@ -141,5 +141,6 @@
   "transaction_placeholder": "Select a transaction",
   "category_and_subcategory": "Category & Subcategory",
   "transaction_details": "Transaction Details",
-  "basic_info": "Basic Information"
+  "basic_info": "Basic Information",
+  "no_description": "No Description"
 }

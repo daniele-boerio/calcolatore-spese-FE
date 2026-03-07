@@ -38,6 +38,16 @@
         flex: 1;
         width: 100%; // Assicura che i componenti occupino tutta la larghezza
       }
+
+      .p-dropdown {
+        // Taglia il testo selezionato troppo lungo aggiungendo "..."
+        .p-dropdown-label {
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          padding-right: 2rem; // Lascia spazio per la freccina del dropdown
+        }
+      }
     }
   }
 

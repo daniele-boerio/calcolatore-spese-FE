@@ -148,11 +148,8 @@ const contoSlice = createSlice({
           }
 
           // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget
-          if (
-            isThisMonth &&
-            (newTx.tipo === "USCITA" || newTx.tipo === "RIMBORSO")
-          ) {
-            const txMod = newTx.tipo === "USCITA" ? 1 : -1;
+          if (isThisMonth) {
+            const txMod = newTx.tipo === "USCITA" ? -1 : 1;
             const importoNetto = txImporto * txMod;
 
             // Aggiorna Monthly Budget

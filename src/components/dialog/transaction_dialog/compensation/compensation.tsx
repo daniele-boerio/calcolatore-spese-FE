@@ -76,6 +76,32 @@ export default function Compensation({
     return cat?.sottocategorie || [];
   }, [categoriaId, categorie]);
 
+  // Creiamo le etichette formattate: Data - Importo - Descrizione
+  const transactionOptions = useMemo(() => {
+    return transactions.map((tx) => {
+      // Formattiamo la data (es. 15/04/2024)
+      const formattedDate = new Date(tx.data).toLocaleDateString("it-IT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+
+      // Formattiamo l'importo in Euro (es. 150,00 €)
+      const formattedAmount = Number(tx.importo).toLocaleString("it-IT", {
+        style: "currency",
+        currency: "EUR",
+      });
+
+      // Gestiamo l'eventuale assenza di descrizione
+      const desc = tx.descrizione ? tx.descrizione : t("no_description");
+
+      return {
+        ...tx,
+        displayLabel: `${formattedDate} - ${formattedAmount} - ${desc}`,
+      };
+    });
+  }, [transactions, t]);
+
   const handleFetchTransactionsAndNext = async () => {
     try {
       const res = await dispatch(
@@ -185,8 +211,8 @@ export default function Compensation({
                       key={transactions.length}
                       label={t("transactions")}
                       value={transactionId}
-                      options={transactions}
-                      optionLabel="descrizione"
+                      options={transactionOptions}
+                      optionLabel="displayLabel"
                       optionValue="id"
                       onChange={(e) => setTransactionId(e.value)}
                       placeholder={t("transaction_placeholder")}
