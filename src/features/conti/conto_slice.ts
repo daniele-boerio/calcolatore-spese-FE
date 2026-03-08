@@ -99,6 +99,15 @@ const contoSlice = createSlice({
 
       // createConto
       .addCase(createConto.fulfilled, (state, action: PayloadAction<Conto>) => {
+        // Stessa logica: se il nuovo conto nasce come default,
+        // spegniamo il flag a tutti gli altri prima di inserirlo.
+        if (action.payload.default) {
+          state.conti.forEach((conto) => {
+            conto.default = false;
+          });
+        }
+
+        // Inseriamo il nuovo conto (che avrà is_default: true dal payload)
         state.conti.push({
           ...action.payload,
           saldo: Number(action.payload.saldo),
@@ -107,9 +116,19 @@ const contoSlice = createSlice({
 
       // updateConto
       .addCase(updateConto.fulfilled, (state, action: PayloadAction<Conto>) => {
+        // Se il conto che stiamo salvando è contrassegnato come default,
+        // prima togliamo il flag "default" a tutti i conti esistenti nello state.
+        if (action.payload.default) {
+          state.conti.forEach((conto) => {
+            conto.default = false;
+          });
+        }
+
+        // Poi aggiorniamo (o inseriamo) il conto con i nuovi dati
         const index = state.conti.findIndex(
           (conto) => conto.id === action.payload.id,
         );
+
         if (index !== -1) {
           state.conti[index] = {
             ...action.payload,
@@ -172,6 +191,7 @@ const contoSlice = createSlice({
             }
 
             // Aggiorna Expenses By Category
+
             const categoryName =
               (newTx as any).categoria?.nome || "Uncategorized";
 
@@ -180,11 +200,11 @@ const contoSlice = createSlice({
             );
 
             if (catIndex !== -1) {
-              state.monthlyExpensesByCategory[catIndex].value += importoNetto;
+              state.monthlyExpensesByCategory[catIndex].value += txImporto;
             } else {
               state.monthlyExpensesByCategory.push({
                 label: categoryName,
-                value: importoNetto,
+                value: txImporto,
               });
             }
 

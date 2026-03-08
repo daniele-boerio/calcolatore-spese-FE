@@ -130,19 +130,42 @@ export const getTransactionsByCategory = createAsyncThunk<
 );
 
 export const createTransaction = createAsyncThunk<
-  Transaction,
-  CreateTransactionParams
->("transazioni/createTransazione", async (params, { rejectWithValue }) => {
-  try {
-    const response = await api.post<Transaction>(`/transazioni`, params);
-    return response.data;
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(
-      err.response?.data || "Errore creazione transazione",
-    );
-  }
-});
+  Transaction, // Tipo restituito dal thunk
+  CreateTransactionParams, // Tipo dei parametri in ingresso
+  { state: RootState } // Dichiariamo che vogliamo accedere al RootState
+>(
+  "transazioni/createTransazione",
+  async (params, { getState, rejectWithValue }) => {
+    try {
+      // 1. Facciamo la chiamata API standard
+      const response = await api.post<Transaction>(`/transazioni`, params);
+      const newTx = response.data;
+
+      // 2. Accediamo allo stato globale dell'app tramite getState()
+      const state = getState();
+
+      // 3. Troviamo la categoria corrispondente nello slice delle categorie
+      // Usiamo String() per sicurezza, nel caso ci siano discrepanze tra string e number
+      const categoriaTrovata = state.categoria.categorie.find(
+        (c) => String(c.id) === String(newTx.categoria_id),
+      );
+
+      // 4. Arricchiamo l'oggetto di ritorno iniettando l'oggetto 'categoria'
+      return {
+        ...newTx,
+        categoria: {
+          id: newTx.categoria_id,
+          nome: categoriaTrovata ? categoriaTrovata.nome : "Uncategorized",
+        },
+      } as Transaction; // Forziamo il tipo Transaction per TypeScript
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore creazione transazione",
+      );
+    }
+  },
+);
 
 export const updateTransaction = createAsyncThunk<
   Transaction,

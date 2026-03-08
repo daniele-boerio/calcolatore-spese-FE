@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
-import { InputSwitch } from "primereact/inputswitch";
 import { Calendar } from "primereact/calendar"; // Tornato al componente standard
 import Dropdown from "../../dropdown/dropdown";
 import InputText from "../../input_text/input_text";
@@ -33,6 +32,7 @@ export default function AccountDialog({
 
   const [nome, setNome] = useState("");
   const [saldo, setSaldo] = useState<string>("");
+  const [defaultAccount, setDefaultAccount] = useState<boolean>(false);
   const [budgetObiettivo, setBudgetObiettivo] = useState<string>("");
   const [ricaricaAutomatica, setRicaricaAutomatica] = useState(false);
   const [sogliaMinima, setSogliaMinima] = useState<string>("");
@@ -49,6 +49,7 @@ export default function AccountDialog({
       if (account) {
         setNome(account.nome);
         setSaldo(account.saldo.toString());
+        setDefaultAccount(account.default);
         setBudgetObiettivo(
           account.budget_obiettivo ? account.budget_obiettivo.toString() : "",
         );
@@ -67,6 +68,7 @@ export default function AccountDialog({
       } else {
         setNome("");
         setSaldo("");
+        setDefaultAccount(false);
         setBudgetObiettivo("");
         setRicaricaAutomatica(false);
         setSogliaMinima("");
@@ -93,6 +95,7 @@ export default function AccountDialog({
     const payload = {
       nome: nome.trim(),
       saldo: isNaN(numericSaldo) ? 0 : numericSaldo,
+      default: defaultAccount,
       budget_obiettivo: isNaN(numericBudget) ? 0 : numericBudget,
       ricarica_automatica: ricaricaAutomatica,
       soglia_minima: ricaricaAutomatica
@@ -205,11 +208,19 @@ export default function AccountDialog({
               </span>
             </div>
           </div>
+          <div className="field">
+            <label className="field-label">{t("default")}</label>
+            <Switch
+              checked={defaultAccount}
+              onChange={(e) => setDefaultAccount(e.value)}
+            />
+          </div>
         </div>
 
         <div className="recharge-section">
           <div className="switch-container">
             <label className="field-label">{t("automatic_recharge")}</label>
+
             <Switch
               checked={ricaricaAutomatica}
               onChange={(e) => setRicaricaAutomatica(e.value)}

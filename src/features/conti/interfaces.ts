@@ -13,6 +13,7 @@ export interface Conto {
   creationDate: string;
   lastUpdate: string;
   color: string;
+  default: boolean;
 }
 
 export interface ExpenseByCategory {
@@ -56,6 +57,7 @@ export interface UpdateBudgetParams {
 export interface CreateContoParams {
   nome: string;
   saldo: number;
+  default: boolean;
   ricarica_automatica: boolean;
   budget_obiettivo?: number;
   soglia_minima?: number;
@@ -68,6 +70,7 @@ export interface UpdateContoParams {
   id: string;
   nome?: string;
   saldo?: number;
+  default?: boolean;
   ricarica_automatica?: boolean;
   budget_obiettivo?: number;
   soglia_minima?: number;

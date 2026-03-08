@@ -27,11 +27,13 @@
         flex-direction: column;
         gap: 0.5rem;
         min-width: 0; // Evita che i flex-item rompano il layout con contenuti lunghi
+        justify-content: center;
 
         .field-label {
           color: v.$text-main;
           font-size: 0.85rem;
           font-weight: 600;
+          margin-bottom: 4px;
         }
 
         // Stile per i componenti PrimeReact (Calendar e Dropdown interna)

@@ -76,16 +76,18 @@ export default function TransactionDialog({
         setImporto("");
         setData(new Date());
         setDescrizione("");
-        setContoId(null);
         setCategoriaId(null);
         setSottoCategoriaId(null);
         setTagId(null);
         setFromData(null);
         setToData(null);
         setTransactionId(null);
+
+        const defaultConto = conti.find((c) => c.default === true);
+        setContoId(defaultConto ? defaultConto.id : null);
       }
     }
-  }, [visible, transaction]);
+  }, [visible, transaction, conti]);
 
   const handleSave = async () => {
     // If compensation selected, prefer its values from compValues
