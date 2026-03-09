@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Dialog } from "primereact/dialog";
 import { SelectButton } from "primereact/selectbutton";
 import InputText from "../../input_text/input_text";
@@ -10,9 +10,11 @@ import "./recurrence_dialog.scss";
 import { tipoTransaction } from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
 import { Calendar } from "primereact/calendar";
-import { getConti } from "../../../features/conti/api_calls";
-import { getCategorie } from "../../../features/categorie/api_calls";
-import { getTags } from "../../../features/tags/api_calls";
+import {
+  createCategoria,
+  createSottoCategorie,
+} from "../../../features/categorie/api_calls";
+import { createTag } from "../../../features/tags/api_calls";
 import { selectContiConti } from "../../../features/conti/conto_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../features/tags/tag_slice";
@@ -81,21 +83,94 @@ export default function RecurrenceDialog({
     }
   }, [visible, recurring]);
 
-  useEffect(() => {
-    dispatch(getConti());
-    dispatch(getCategorie());
-    dispatch(getTags());
-  }, [dispatch]);
-
   const filteredSottoCategorie = useMemo(() => {
     const cat = categorie.find((c) => c.id === categoriaId);
-    return cat?.sottocategorie || [];
-  }, [categoriaId, categorie]);
+    if (!cat || !cat.sottocategorie) return [];
+
+    return cat.sottocategorie.filter((sub) => {
+      if (tipo === "ENTRATA") return sub.solo_entrata === true;
+      if (tipo === "USCITA") return sub.solo_uscita === true;
+      return true;
+    });
+  }, [categoriaId, categorie, tipo]);
 
   const handleSave = async () => {
     const formattedDate = prossimaEsecuzione.toISOString().split("T")[0];
     const numericImporto = parseFloat(importo);
 
+    let finalTagId = tagId;
+    let finalCategoriaId = categoriaId;
+    let finalSottoCategoriaId = sottoCategoriaId;
+
+    // --- 1. CONTROLLO E CREAZIONE TAG ---
+    if (finalTagId) {
+      const tagExists = tags.find(
+        (t) =>
+          String(t.id) === String(finalTagId) ||
+          t.nome.toLowerCase() === String(finalTagId).toLowerCase(),
+      );
+      if (tagExists) {
+        finalTagId = tagExists.id;
+      } else {
+        const newTag = await dispatch(
+          createTag({ nome: String(finalTagId) }),
+        ).unwrap();
+        finalTagId = newTag.id;
+      }
+    }
+
+    // --- 2. CONTROLLO E CREAZIONE CATEGORIA ---
+    if (finalCategoriaId) {
+      const catExists = categorie.find(
+        (c) =>
+          String(c.id) === String(finalCategoriaId) ||
+          c.nome.toLowerCase() === String(finalCategoriaId).toLowerCase(),
+      );
+      if (catExists) {
+        finalCategoriaId = catExists.id;
+      } else {
+        const newCat = await dispatch(
+          createCategoria({
+            nome: String(finalCategoriaId),
+            solo_entrata: tipo === "ENTRATA" || tipo === "RIMBORSO",
+            solo_uscita: tipo === "USCITA" || tipo === "RIMBORSO",
+          }),
+        ).unwrap();
+        finalCategoriaId = newCat.id;
+      }
+    }
+
+    // --- 3. CONTROLLO E CREAZIONE SOTTOCATEGORIA ---
+    if (finalSottoCategoriaId && finalCategoriaId) {
+      const parentCat = categorie.find(
+        (c) => String(c.id) === String(finalCategoriaId),
+      );
+      const subExists = parentCat?.sottocategorie?.find(
+        (s) =>
+          String(s.id) === String(finalSottoCategoriaId) ||
+          s.nome.toLowerCase() === String(finalSottoCategoriaId).toLowerCase(),
+      );
+
+      if (subExists) {
+        finalSottoCategoriaId = subExists.id;
+      } else {
+        const createdSubs = await dispatch(
+          createSottoCategorie({
+            id: finalCategoriaId as string,
+            subList: [
+              {
+                nome: String(finalSottoCategoriaId),
+                solo_entrata: tipo === "ENTRATA" || tipo === "RIMBORSO",
+                solo_uscita: tipo === "USCITA" || tipo === "RIMBORSO",
+              },
+            ],
+          }),
+        ).unwrap();
+        finalSottoCategoriaId = createdSubs[0].id;
+      }
+    }
+
+    // --- 4. PREPARAZIONE PAYLOAD E SALVATAGGIO ---
     const payload: any = {
       nome,
       importo: isNaN(numericImporto) ? 0 : numericImporto,
@@ -104,9 +179,9 @@ export default function RecurrenceDialog({
       prossima_esecuzione: formattedDate,
       attiva,
       conto_id: contoId ?? "",
-      categoria_id: categoriaId,
-      sottocategoria_id: sottoCategoriaId,
-      tag_id: tagId,
+      categoria_id: finalCategoriaId,
+      sottocategoria_id: finalSottoCategoriaId,
+      tag_id: finalTagId,
     };
 
     if (recurring?.id) {
@@ -242,6 +317,7 @@ export default function RecurrenceDialog({
               optionValue="id"
               onChange={(e) => setCategoriaId(e.value)}
               placeholder={t("category_placeholder")}
+              editable
             />
           </div>
           <div className="field">
@@ -254,6 +330,7 @@ export default function RecurrenceDialog({
               onChange={(e) => setSottoCategoriaId(e.value)}
               placeholder={t("sub_category_placeholder")}
               disabled={!categoriaId}
+              editable
             />
           </div>
         </div>
@@ -268,6 +345,7 @@ export default function RecurrenceDialog({
               optionValue="id"
               onChange={(e) => setTagId(e.value)}
               placeholder={t("tag_placeholder")}
+              editable
             />
           </div>
         </div>

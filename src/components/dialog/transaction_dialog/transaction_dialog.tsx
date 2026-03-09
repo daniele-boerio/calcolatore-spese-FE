@@ -17,12 +17,14 @@ import {
 import { useI18n } from "../../../i18n/use-i18n";
 import { Calendar } from "primereact/calendar";
 import Compensation from "./compensation/compensation";
-import { getConti } from "../../../features/conti/api_calls";
-import { getCategorie } from "../../../features/categorie/api_calls";
-import { getTags } from "../../../features/tags/api_calls";
 import { selectContiConti } from "../../../features/conti/conto_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../features/tags/tag_slice";
+import { createTag } from "../../../features/tags/api_calls";
+import {
+  createCategoria,
+  createSottoCategorie,
+} from "../../../features/categorie/api_calls";
 
 interface TransactionDialogProps {
   visible: boolean;
@@ -90,31 +92,111 @@ export default function TransactionDialog({
   }, [visible, transaction, conti]);
 
   const handleSave = async () => {
-    // If compensation selected, prefer its values from compValues
-
     const formattedDate = data
       ? `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-${String(data.getDate()).padStart(2, "0")}`
       : "";
 
     const numericImporto = parseFloat(importo || "");
 
+    // Prepariamo delle variabili temporanee per gli ID che invieremo
+    let finalTagId = tagId;
+    let finalCategoriaId = categoriaId;
+    let finalSottoCategoriaId = sottoCategoriaId;
+
+    // --- 1. CONTROLLO E CREAZIONE TAG ---
+    if (finalTagId) {
+      // Cerchiamo se il valore corrisponde a un ID o a un nome esistente (case-insensitive)
+      const tagExists = tags.find(
+        (t) =>
+          String(t.id) === String(finalTagId) ||
+          t.nome.toLowerCase() === String(finalTagId).toLowerCase(),
+      );
+
+      if (tagExists) {
+        finalTagId = tagExists.id;
+      } else {
+        // Il tag non esiste, lo creiamo!
+        const newTag = await dispatch(
+          createTag({ nome: String(finalTagId) }),
+        ).unwrap();
+        finalTagId = newTag.id;
+      }
+    }
+
+    // --- 2. CONTROLLO E CREAZIONE CATEGORIA ---
+    if (finalCategoriaId) {
+      const catExists = categorie.find(
+        (c) =>
+          String(c.id) === String(finalCategoriaId) ||
+          c.nome.toLowerCase() === String(finalCategoriaId).toLowerCase(),
+      );
+
+      if (catExists) {
+        finalCategoriaId = catExists.id;
+      } else {
+        // La categoria non esiste, la creiamo in base al "tipo" attuale
+        const newCat = await dispatch(
+          createCategoria({
+            nome: String(finalCategoriaId),
+            solo_entrata: tipo === "ENTRATA" || tipo === "RIMBORSO",
+            solo_uscita: tipo === "USCITA" || tipo === "RIMBORSO",
+          }),
+        ).unwrap();
+        finalCategoriaId = newCat.id;
+      }
+    }
+
+    // --- 3. CONTROLLO E CREAZIONE SOTTOCATEGORIA ---
+    if (finalSottoCategoriaId && finalCategoriaId) {
+      // Cerchiamo la madre (appena creata o esistente) per vedere le sue sub
+      const parentCat = categorie.find(
+        (c) => String(c.id) === String(finalCategoriaId),
+      );
+      const subExists = parentCat?.sottocategorie?.find(
+        (s) =>
+          String(s.id) === String(finalSottoCategoriaId) ||
+          s.nome.toLowerCase() === String(finalSottoCategoriaId).toLowerCase(),
+      );
+
+      if (subExists) {
+        finalSottoCategoriaId = subExists.id;
+      } else {
+        // La sottocategoria non esiste, la creiamo (usando la tua API che accetta una lista)
+        const createdSubs = await dispatch(
+          createSottoCategorie({
+            id: finalCategoriaId as string, // ID della madre appena risolto
+            subList: [
+              {
+                nome: String(finalSottoCategoriaId),
+                solo_entrata: tipo === "ENTRATA" || tipo === "RIMBORSO",
+                solo_uscita: tipo === "USCITA" || tipo === "RIMBORSO",
+              },
+            ],
+          }),
+        ).unwrap();
+
+        // Prendiamo l'ID della prima (e unica) sottocategoria creata
+        finalSottoCategoriaId = createdSubs[0].id;
+      }
+    }
+
+    // --- 4. PREPARAZIONE DEL PAYLOAD FINALE ---
     const payload: any = {
       importo: isNaN(numericImporto) ? 0 : numericImporto,
       tipo,
       data: formattedDate,
       descrizione: descrizione,
       conto_id: contoId,
-      categoria_id: categoriaId,
-      sottocategoria_id: sottoCategoriaId,
-      tag_id: tagId,
+      categoria_id: finalCategoriaId,
+      sottocategoria_id: finalSottoCategoriaId,
+      tag_id: finalTagId,
       parent_transaction_id: transactionId,
     };
 
+    // --- 5. SALVATAGGIO TRANSAZIONE ---
     if (transaction?.id) {
-      // Chiamata Update se abbiamo l'ID
       await dispatch(updateTransaction({ id: transaction.id, ...payload }));
     } else {
-      // Chiamata Create
       await dispatch(createTransaction(payload));
     }
 
@@ -279,6 +361,7 @@ export default function TransactionDialog({
                   optionValue="id"
                   onChange={(e) => setTagId(e.value)}
                   placeholder={t("tag_placeholder")}
+                  editable
                 />
               </div>
             </div>
@@ -293,6 +376,7 @@ export default function TransactionDialog({
                   optionValue="id"
                   onChange={(e) => setCategoriaId(e.value)}
                   placeholder={t("category_placeholder")}
+                  editable
                 />
               </div>
               <div className="field">
@@ -305,6 +389,7 @@ export default function TransactionDialog({
                   onChange={(e) => setSottoCategoriaId(e.value)}
                   placeholder={t("sub_category_placeholder")}
                   disabled={!categoriaId}
+                  editable
                 />
               </div>
             </div>

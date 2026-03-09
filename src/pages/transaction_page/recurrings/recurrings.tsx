@@ -35,6 +35,7 @@ import {
 import { Tag } from "../../../features/tags/interfaces";
 import { selectTagTags } from "../../../features/tags/tag_slice";
 import RecurrenceDialog from "../../../components/dialog/recurrence_dialog/recurrence_dialog";
+import { getTags } from "../../../features/tags/api_calls";
 
 export default function Recurrings() {
   const { t } = useI18n();
@@ -70,6 +71,7 @@ export default function Recurrings() {
         dispatch(getConti()),
         dispatch(getRecurrings()),
         dispatch(getCategorie()),
+        dispatch(getTags()),
       ]);
     };
     fetchData();

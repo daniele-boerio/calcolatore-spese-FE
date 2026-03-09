@@ -67,15 +67,11 @@ export default function Transactions() {
 
   useEffect(() => {
     const fetchReferenceData = async () => {
-      try {
-        await Promise.all([
-          dispatch(getConti()).unwrap(),
-          dispatch(getCategorie()).unwrap(),
-          dispatch(getTags()).unwrap(),
-        ]);
-      } catch (error) {
-        console.error("Errore nel caricamento dei dati di riferimento", error);
-      }
+      await Promise.all([
+        dispatch(getConti()).unwrap(),
+        dispatch(getCategorie()).unwrap(),
+        dispatch(getTags()).unwrap(),
+      ]);
     };
     fetchReferenceData();
   }, [dispatch]);

@@ -24,6 +24,7 @@ export type DropdownProps = {
   valueTemplate?: (option: unknown) => React.ReactNode;
   hidden?: boolean;
   showClear?: boolean;
+  editable?: boolean;
 };
 
 export default function Dropdown(props: DropdownProps) {
@@ -47,6 +48,7 @@ export default function Dropdown(props: DropdownProps) {
         valueTemplate={props.valueTemplate}
         className={props.hidden ? "hidden-dropdown" : ""}
         showClear={props.showClear}
+        editable={props.editable}
         pt={{
           panel: {
             style: {

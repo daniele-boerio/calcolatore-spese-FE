@@ -151,6 +151,7 @@ export default function Compensation({
                       optionValue="id"
                       onChange={(e) => setCategoriaId(e.value)}
                       placeholder={t("category_placeholder")}
+                      editable
                     />
                   </div>
                   <div className="field">
@@ -163,6 +164,7 @@ export default function Compensation({
                       onChange={(e) => setSottoCategoriaId(e.value)}
                       placeholder={t("sub_category_placeholder")}
                       disabled={!categoriaId}
+                      editable
                     />
                   </div>
                 </div>
@@ -285,6 +287,7 @@ export default function Compensation({
                       optionValue="id"
                       onChange={(e) => setTagId(e.value)}
                       placeholder={t("tag_placeholder")}
+                      editable
                     />
                   </div>
                 </div>
