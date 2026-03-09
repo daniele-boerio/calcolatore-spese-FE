@@ -223,6 +223,7 @@ export default function Transactions() {
           key={dataReadyKey}
           value={transactions}
           columns={columns}
+          scrollable={true}
           selectionRow={{
             selectedRow: selectedTransaction,
             onSelectionChange: (e) => onRowClick(e),

@@ -21,6 +21,7 @@ export type TableVisualizationProps = {
   filters?: Record<string, { value: any; mode?: string }>;
   deleteRow?: (id: string) => void;
   customRowClassName?: (rowData: DataTableValue) => string | undefined;
+  scrollable?: boolean;
 };
 
 export type SelectionRow = {
@@ -76,6 +77,8 @@ export default function TableVisualization(props: TableVisualizationProps) {
         onSelectionChange={(e: any) =>
           props.selectionRow?.onSelectionChange(e.value)
         }
+        scrollable={props.scrollable}
+        scrollHeight={props.scrollable ? "50vh" : undefined}
         // Altro
         removableSort
         breakpoint="60rem"
