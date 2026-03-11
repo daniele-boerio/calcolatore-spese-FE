@@ -52,8 +52,11 @@ export default function TransactionDialog({
   const [descrizione, setDescrizione] = useState("");
   const [contoId, setContoId] = useState<string | null>(null);
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [sottoCategoriaId, setSottoCategoriaId] = useState<string | null>(null);
+  const [newSubCategoryName, setNewSubCategoryName] = useState<string>("");
   const [tagId, setTagId] = useState<string | null>(null);
+  const [newTagName, setNewTagName] = useState<string>("");
   const [from_data, setFromData] = useState<Date | null>(null);
   const [to_data, setToData] = useState<Date | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
@@ -84,6 +87,9 @@ export default function TransactionDialog({
         setFromData(null);
         setToData(null);
         setTransactionId(null);
+        setNewCategoryName("");
+        setNewSubCategoryName("");
+        setNewTagName("");
 
         const defaultConto = conti.find((c) => c.default === true);
         setContoId(defaultConto ? defaultConto.id : null);
@@ -99,9 +105,13 @@ export default function TransactionDialog({
     const numericImporto = parseFloat(importo || "");
 
     // Prepariamo delle variabili temporanee per gli ID che invieremo
-    let finalTagId = tagId;
-    let finalCategoriaId = categoriaId;
-    let finalSottoCategoriaId = sottoCategoriaId;
+    let finalTagId = tagId === "NEW_TAG" ? newTagName : tagId;
+    let finalCategoriaId =
+      categoriaId === "NEW_CATEGORY" ? newCategoryName : categoriaId;
+    let finalSottoCategoriaId =
+      sottoCategoriaId === "NEW_SUBCATEGORY"
+        ? newSubCategoryName
+        : sottoCategoriaId;
 
     // --- 1. CONTROLLO E CREAZIONE TAG ---
     if (finalTagId) {
@@ -216,7 +226,7 @@ export default function TransactionDialog({
     }
   };
 
-  const categorieFiltrate = React.useMemo(() => {
+  const categorieFiltrate = useMemo(() => {
     if (!categorie) return [];
 
     return categorie.filter((cat) => {
@@ -229,6 +239,16 @@ export default function TransactionDialog({
       return true; // Caso di fallback se tipo non è ancora definito
     });
   }, [categorie, tipo]);
+
+  const categorieOptions = useMemo(() => {
+    return [
+      ...categorieFiltrate,
+      {
+        id: "NEW_CATEGORY",
+        nome: `+ ${t("add_new_category")}`,
+      },
+    ];
+  }, [categorieFiltrate, t]);
 
   const filteredSottoCategorie = useMemo(() => {
     // 1. Trova la categoria selezionata
@@ -247,6 +267,26 @@ export default function TransactionDialog({
       return true; // Fallback
     });
   }, [categoriaId, categorie, tipo]); // Aggiunto 'tipo' alle dipendenze
+
+  const sottocategorieOptions = useMemo(() => {
+    return [
+      ...filteredSottoCategorie,
+      {
+        id: "NEW_SUBCATEGORY",
+        nome: `+ ${t("add_new_subcategory")}`,
+      },
+    ];
+  }, [filteredSottoCategorie, t]);
+
+  const tagOptions = useMemo(() => {
+    return [
+      ...tags,
+      {
+        id: "NEW_TAG",
+        nome: `+ ${t("add_new_tag")}`,
+      },
+    ];
+  }, [tags, t]);
 
   return (
     <Dialog
@@ -305,6 +345,8 @@ export default function TransactionDialog({
             setSottoCategoriaId={setSottoCategoriaId}
             tagId={tagId}
             setTagId={setTagId}
+            newTagName={newTagName}
+            setNewTagName={setNewTagName}
             from_data={from_data}
             setFromData={setFromData}
             to_data={to_data}
@@ -356,43 +398,77 @@ export default function TransactionDialog({
                 <Dropdown
                   label={t("tag")}
                   value={tagId}
-                  options={tags}
+                  options={tagOptions}
                   optionLabel="nome"
                   optionValue="id"
                   onChange={(e) => setTagId(e.value)}
                   placeholder={t("tag_placeholder")}
-                  editable
                 />
               </div>
             </div>
+            {tagId === "NEW_TAG" && (
+              <div className="form-row">
+                <div className="field" style={{ width: "100%" }}>
+                  <InputText
+                    label={t("new_tag_name")}
+                    value={newTagName}
+                    onChange={(e) => setNewTagName(e.target.value)}
+                    placeholder="Es. Corsica 2026"
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="form-row">
               <div className="field">
                 <Dropdown
                   label={t("category")}
                   value={categoriaId}
-                  options={categorieFiltrate}
+                  options={categorieOptions}
                   optionLabel="nome"
                   optionValue="id"
                   onChange={(e) => setCategoriaId(e.value)}
                   placeholder={t("category_placeholder")}
-                  editable
                 />
               </div>
               <div className="field">
                 <Dropdown
                   label={t("sub_category")}
                   value={sottoCategoriaId}
-                  options={filteredSottoCategorie}
+                  options={sottocategorieOptions}
                   optionLabel="nome"
                   optionValue="id"
                   onChange={(e) => setSottoCategoriaId(e.value)}
                   placeholder={t("sub_category_placeholder")}
                   disabled={!categoriaId}
-                  editable
                 />
               </div>
             </div>
+            {categoriaId === "NEW_CATEGORY" && (
+              <div className="form-row">
+                <div className="field" style={{ width: "100%" }}>
+                  <InputText
+                    label={t("new_category_name")}
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    placeholder="Es. Abbonamenti"
+                  />
+                </div>
+              </div>
+            )}
+
+            {sottoCategoriaId === "NEW_SUBCATEGORY" && (
+              <div className="form-row">
+                <div className="field" style={{ width: "100%" }}>
+                  <InputText
+                    label={t("new_subcategory_name")}
+                    value={newSubCategoryName}
+                    onChange={(e) => setNewSubCategoryName(e.target.value)}
+                    placeholder="Es. Netflix"
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="form-row">
               <div className="field">

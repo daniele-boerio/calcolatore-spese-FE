@@ -52,8 +52,11 @@ export default function RecurrenceDialog({
   const [attiva, setAttiva] = useState<boolean>(true);
   const [contoId, setContoId] = useState<string | null>(null);
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
+  const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [sottoCategoriaId, setSottoCategoriaId] = useState<string | null>(null);
+  const [newSubCategoryName, setNewSubCategoryName] = useState<string>("");
   const [tagId, setTagId] = useState<string | null>(null);
+  const [newTagName, setNewTagName] = useState<string>("");
 
   useEffect(() => {
     if (visible) {
@@ -79,9 +82,36 @@ export default function RecurrenceDialog({
         setCategoriaId(null);
         setSottoCategoriaId(null);
         setTagId(null);
+        setNewCategoryName("");
+        setNewSubCategoryName("");
+        setNewTagName("");
       }
     }
   }, [visible, recurring]);
+
+  const categorieFiltrate = useMemo(() => {
+    if (!categorie) return [];
+
+    return categorie.filter((cat) => {
+      if (tipo === "ENTRATA") {
+        return cat.solo_entrata === true;
+      }
+      if (tipo === "USCITA") {
+        return cat.solo_uscita === true;
+      }
+      return true; // Caso di fallback se tipo non è ancora definito
+    });
+  }, [categorie, tipo]);
+
+  const categorieOptions = useMemo(() => {
+    return [
+      ...categorieFiltrate,
+      {
+        id: "NEW_CATEGORY",
+        nome: `+ ${t("add_new_category")}`,
+      },
+    ];
+  }, [categorieFiltrate, t]);
 
   const filteredSottoCategorie = useMemo(() => {
     const cat = categorie.find((c) => c.id === categoriaId);
@@ -94,13 +124,37 @@ export default function RecurrenceDialog({
     });
   }, [categoriaId, categorie, tipo]);
 
+  const sottocategorieOptions = useMemo(() => {
+    return [
+      ...filteredSottoCategorie,
+      {
+        id: "NEW_SUBCATEGORY",
+        nome: `+ ${t("add_new_subcategory")}`,
+      },
+    ];
+  }, [filteredSottoCategorie, t]);
+
+  const tagOptions = useMemo(() => {
+    return [
+      ...tags,
+      {
+        id: "NEW_TAG",
+        nome: `+ ${t("add_new_tag")}`,
+      },
+    ];
+  }, [tags, t]);
+
   const handleSave = async () => {
     const formattedDate = prossimaEsecuzione.toISOString().split("T")[0];
     const numericImporto = parseFloat(importo);
 
-    let finalTagId = tagId;
-    let finalCategoriaId = categoriaId;
-    let finalSottoCategoriaId = sottoCategoriaId;
+    let finalTagId = tagId === "NEW_TAG" ? newTagName : tagId;
+    let finalCategoriaId =
+      categoriaId === "NEW_CATEGORY" ? newCategoryName : categoriaId;
+    let finalSottoCategoriaId =
+      sottoCategoriaId === "NEW_SUBCATEGORY"
+        ? newSubCategoryName
+        : sottoCategoriaId;
 
     // --- 1. CONTROLLO E CREAZIONE TAG ---
     if (finalTagId) {
@@ -312,43 +366,77 @@ export default function RecurrenceDialog({
             <Dropdown
               label={t("category")}
               value={categoriaId}
-              options={categorie}
+              options={categorieOptions}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setCategoriaId(e.value)}
               placeholder={t("category_placeholder")}
-              editable
             />
           </div>
           <div className="field">
             <Dropdown
               label={t("sub_category")}
               value={sottoCategoriaId}
-              options={filteredSottoCategorie}
+              options={sottocategorieOptions}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setSottoCategoriaId(e.value)}
               placeholder={t("sub_category_placeholder")}
               disabled={!categoriaId}
-              editable
             />
           </div>
         </div>
+        {categoriaId === "NEW_CATEGORY" && (
+          <div className="form-row">
+            <div className="field" style={{ width: "100%" }}>
+              <InputText
+                label={t("new_category_name")}
+                value={newCategoryName}
+                onChange={(e) => setNewCategoryName(e.target.value)}
+                placeholder="Es. Abbonamenti"
+              />
+            </div>
+          </div>
+        )}
+
+        {sottoCategoriaId === "NEW_SUBCATEGORY" && (
+          <div className="form-row">
+            <div className="field" style={{ width: "100%" }}>
+              <InputText
+                label={t("new_subcategory_name")}
+                value={newSubCategoryName}
+                onChange={(e) => setNewSubCategoryName(e.target.value)}
+                placeholder="Es. Netflix"
+              />
+            </div>
+          </div>
+        )}
 
         <div className="form-row">
           <div className="field">
             <Dropdown
               label={t("tag")}
               value={tagId}
-              options={tags}
+              options={tagOptions}
               optionLabel="nome"
               optionValue="id"
               onChange={(e) => setTagId(e.value)}
               placeholder={t("tag_placeholder")}
-              editable
             />
           </div>
         </div>
+        {tagId === "NEW_TAG" && (
+          <div className="form-row">
+            <div className="field" style={{ width: "100%" }}>
+              <InputText
+                label={t("new_tag_name")}
+                value={newTagName}
+                onChange={(e) => setNewTagName(e.target.value)}
+                placeholder="Es. Corsica 2026"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </Dialog>
   );

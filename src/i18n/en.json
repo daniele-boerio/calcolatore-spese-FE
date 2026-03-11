@@ -163,5 +163,11 @@
   "default": "Default",
 
   "month_statistics": "Month Statistics",
-  "year_statistics": "Year Statistics"
+  "year_statistics": "Year Statistics",
+  "add_new_category": "New Category",
+  "new_category_name": "New Category Name",
+  "add_new_subcategory": "New SubCategory",
+  "new_subcategory_name": "New SubCategory Name",
+  "add_new_tag": "New Tag",
+  "new_tag_name": "New Tag Name"
 }

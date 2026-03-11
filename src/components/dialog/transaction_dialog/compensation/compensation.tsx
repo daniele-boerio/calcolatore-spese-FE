@@ -29,6 +29,8 @@ interface CompensationDialogProps {
   setSottoCategoriaId: (val: string | null) => void;
   tagId: string | null;
   setTagId: (val: string | null) => void;
+  newTagName: string;
+  setNewTagName: (val: string) => void;
   transactionId: string | null;
   setTransactionId: (val: string | null) => void;
   descrizione: string;
@@ -52,6 +54,8 @@ export default function Compensation({
   setSottoCategoriaId,
   tagId,
   setTagId,
+  newTagName,
+  setNewTagName,
   transactionId,
   setTransactionId,
   descrizione,
@@ -75,6 +79,16 @@ export default function Compensation({
     const cat = categorie.find((c) => c.id === categoriaId);
     return cat?.sottocategorie || [];
   }, [categoriaId, categorie]);
+
+  const tagOptions = useMemo(() => {
+    return [
+      ...tags,
+      {
+        id: "NEW_TAG",
+        nome: `+ ${t("add_new_tag")}`,
+      },
+    ];
+  }, [tags, t]);
 
   // Creiamo le etichette formattate: Data - Importo - Descrizione
   const transactionOptions = useMemo(() => {
@@ -151,7 +165,6 @@ export default function Compensation({
                       optionValue="id"
                       onChange={(e) => setCategoriaId(e.value)}
                       placeholder={t("category_placeholder")}
-                      editable
                     />
                   </div>
                   <div className="field">
@@ -164,7 +177,6 @@ export default function Compensation({
                       onChange={(e) => setSottoCategoriaId(e.value)}
                       placeholder={t("sub_category_placeholder")}
                       disabled={!categoriaId}
-                      editable
                     />
                   </div>
                 </div>
@@ -282,15 +294,26 @@ export default function Compensation({
                     <Dropdown
                       label={t("tag")}
                       value={tagId}
-                      options={tags}
+                      options={tagOptions}
                       optionLabel="nome"
                       optionValue="id"
                       onChange={(e) => setTagId(e.value)}
                       placeholder={t("tag_placeholder")}
-                      editable
                     />
                   </div>
                 </div>
+                {tagId === "NEW_TAG" && (
+                  <div className="form-row">
+                    <div className="field" style={{ width: "100%" }}>
+                      <InputText
+                        label={t("new_tag_name")}
+                        value={newTagName}
+                        onChange={(e) => setNewTagName(e.target.value)}
+                        placeholder="Es. Corsica 2026"
+                      />
+                    </div>
+                  </div>
+                )}
                 <div className="form-row">
                   <div className="field">
                     <InputText
