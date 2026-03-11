@@ -1,45 +1,289 @@
 @use "../../../styles/variables" as v;
 
 .transaction-page-recurring {
-  padding: 2rem;
-  max-width: 95rem;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%; // Occupa tutta l'altezza
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-in;
 
   @media screen and (max-width: v.$mobile) {
-    padding: 2rem 0.5rem !important; // Riduce il padding orizzontale a soli 8px (0.5rem)
+    padding: 1rem 0.5rem;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid v.$border-color;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    h1 {
+      color: v.$text-main;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.9rem;
+
+      .stats-item {
+        margin: 0;
+        font-weight: normal;
+        color: v.$text-muted;
+
+        span {
+          font-weight: bold;
+          margin-left: 0.25rem;
+          color: v.$text-main;
+        }
+      }
+    }
+  }
+
+  .split-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .transaction-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+
+    .scrollable-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      padding-bottom: 6rem; // Spazio per FAB button
+
+      .transactions-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-content: flex-start;
+
+        .transaction-card {
+          flex: 1 1 25rem; // Larghezza base 25rem, si adatta
+          min-width: 20rem; // Su mobile andrà al 100%
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          background: v.$card-gradient;
+          border: 1px solid v.$border-card;
+          border-radius: 16px;
+          padding: 1rem;
+          cursor: pointer;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s,
+            opacity 0.2s;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          // Se la ricorrenza è disattivata, la rendiamo più trasparente
+          &.inactive {
+            opacity: 0.6;
+            filter: grayscale(80%);
+          }
+
+          .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(v.$text-muted, 0.1);
+            flex-shrink: 0;
+          }
+
+          .card-content {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            gap: 0.4rem;
+
+            .card-top {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-start;
+              gap: 1rem;
+
+              .desc-container {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                flex: 1;
+                min-width: 0;
+
+                .desc {
+                  font-weight: 600;
+                  font-size: 1.05rem;
+                  color: v.$text-main;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 1;
+                  line-clamp: 1;
+                  -webkit-box-orient: vertical;
+                  overflow: hidden;
+                  word-break: break-word;
+                  line-height: 1.2;
+                  margin-top: 0.15rem;
+                }
+
+                .status-badge.suspended {
+                  background-color: v.$red;
+                  color: white;
+                  font-size: 0.65rem;
+                  font-weight: bold;
+                  padding: 0.1rem 0.35rem;
+                  border-radius: 4px;
+                  flex-shrink: 0; // Impedisce al badge di schiacciarsi
+                }
+              }
+
+              .delete-btn {
+                flex-shrink: 0;
+                margin-top: -0.25rem;
+                margin-right: -0.5rem;
+              }
+            }
+
+            // MIDDLE RIGA (BADGES)
+            .card-middle {
+              display: flex;
+              align-items: center;
+              gap: 0.4rem;
+              width: 100%;
+
+              .info-badge {
+                display: inline-flex;
+                align-items: center;
+                font-size: 0.7rem;
+                font-weight: 500;
+                padding: 0.15rem 0.4rem;
+                border-radius: 4px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 0 1 auto;
+                min-width: 0;
+
+                &.frequency {
+                  background: v.$text-main;
+                  color: v.$bg-card; // Colore invertito per dare enfasi alla ricorrenza
+                }
+
+                &.cat {
+                  background: rgba(v.$text-muted, 0.1);
+                  color: v.$text-main;
+                }
+
+                &.subcat {
+                  background: transparent;
+                  color: v.$text-muted;
+                  border: 1px solid rgba(v.$text-muted, 0.3);
+                }
+
+                &.tag {
+                  background: rgba(41, 128, 185, 0.1);
+                  color: #2980b9;
+                }
+              }
+            }
+
+            .card-bottom {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end;
+              gap: 1rem;
+
+              .date-cat {
+                font-size: 0.8rem;
+                color: v.$text-muted;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1;
+                min-width: 0;
+                padding-bottom: 0.15rem;
+              }
+
+              .amount {
+                font-weight: 800;
+                font-size: 1.25rem;
+                white-space: nowrap;
+                flex-shrink: 0;
+              }
+            }
+          }
+
+          // Colori dinamici per Entrate/Uscite
+          &.uscita {
+            .icon-wrapper {
+              color: v.$red;
+              background: rgba(v.$red, 0.1);
+            }
+            .amount {
+              color: v.$red;
+            }
+          }
+          &.entrata {
+            .icon-wrapper {
+              color: v.$green;
+              background: rgba(v.$green, 0.1);
+            }
+            .amount {
+              color: v.$green;
+            }
+          }
+          &.rimborso {
+            .icon-wrapper {
+              color: #3498db;
+              background: rgba(52, 152, 219, 0.1);
+            }
+            .amount {
+              color: #3498db;
+            }
+          }
+        }
+
+        .no-data {
+          color: v.$text-muted;
+          font-style: italic;
+        }
+      }
+
+      // Scrollbar
+      &::-webkit-scrollbar {
+        width: 0.313rem;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: v.$border-color;
+        border-radius: 10px;
+      }
+    }
   }
 
   .add-transaction-button {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    z-index: 1000; // Assicura che il pulsante sia sopra altri elementi
-  }
-
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    h1 {
-      color: v.$text-main;
-      font-size: 1.5rem;
-    }
-    .stats {
-      display: flex;
-      gap: 1rem;
-      color: v.$text-main;
-      font-size: 1rem;
-    }
-  }
-
-  .transaction-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: v.$bg-card;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
 }

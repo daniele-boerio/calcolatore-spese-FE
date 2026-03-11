@@ -1,19 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import {
-  deleteTransaction,
-  getTransactionsPaginated,
-} from "../../../features/transactions/api_calls";
-import { getConti } from "../../../features/conti/api_calls";
-import TableVisualization, {
-  VisualizationColumnProps,
-} from "../../../components/table_visualization/table_visualization";
 import "./recurrings.scss";
 import { Conto } from "../../../features/conti/interfaces";
 import Button from "../../../components/button/button";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../../i18n/use-i18n";
-import TransactionDialog from "../../../components/dialog/transaction_dialog/transaction_dialog";
 import {
   selectRecurringLoading,
   selectRecurringRecurrings,
@@ -36,12 +27,12 @@ import { Tag } from "../../../features/tags/interfaces";
 import { selectTagTags } from "../../../features/tags/tag_slice";
 import RecurrenceDialog from "../../../components/dialog/recurrence_dialog/recurrence_dialog";
 import { getTags } from "../../../features/tags/api_calls";
+import { getConti } from "../../../features/conti/api_calls";
 
 export default function Recurrings() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
-  // Utilizziamo lo stato tipizzato 'transactions'
   const recurrings = useAppSelector(selectRecurringRecurrings);
   const loading = useAppSelector(selectRecurringLoading);
   const conti = useAppSelector(selectContiConti);
@@ -49,23 +40,20 @@ export default function Recurrings() {
   const sottocategorie = useAppSelector(selectCategoriaSottocategorie);
   const tags = useAppSelector(selectTagTags);
 
-  const [selectedRecurring, setselectedRecurring] = useState<any | null>(null);
-
-  const [isTransactionDialogVisible, setIsTransactionDialogVisible] =
-    useState<boolean>(false);
+  const [selectedRecurring, setSelectedRecurring] = useState<any | null>(null);
+  const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
 
   const onRowClick = (recurring: any) => {
-    setselectedRecurring(recurring);
-    setIsTransactionDialogVisible(true);
+    setSelectedRecurring(recurring);
+    setIsDialogVisible(true);
   };
 
   const handleCloseDialog = () => {
-    setIsTransactionDialogVisible(false);
-    setselectedRecurring(null);
+    setIsDialogVisible(false);
+    setSelectedRecurring(null);
   };
 
   useEffect(() => {
-    // Dispatch simultaneo per garantire che le chiamate partano subito
     const fetchData = async () => {
       await Promise.all([
         dispatch(getConti()),
@@ -77,7 +65,10 @@ export default function Recurrings() {
     fetchData();
   }, [dispatch]);
 
-  const deleteObject = (event: any, id: string) => {
+  const deleteObject = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    id: string,
+  ) => {
     confirmPopup({
       target: event.currentTarget,
       message: t("delete_message"),
@@ -92,156 +83,157 @@ export default function Recurrings() {
     });
   };
 
-  const columns: VisualizationColumnProps[] = useMemo(
-    () => [
-      {
-        field: "nome",
-        header: "Nome",
-        body: (row: any) => (
-          <span style={{ fontWeight: "600" }}>{row.nome}</span>
-        ),
-      },
-      {
-        field: "importo",
-        header: "Importo",
-        body: (row: any) => (
-          <span
-            style={{
-              fontWeight: "bold",
-              color:
-                row.tipo.toUpperCase() === "USCITA"
-                  ? "var(--red-500)"
-                  : "var(--green-500)",
-            }}
-          >
-            {row.tipo.toUpperCase() === "USCITA" ? "-" : "+"} €
-            {row.importo.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
-          </span>
-        ),
-      },
-      {
-        field: "frequenza",
-        header: "Frequenza",
-        body: (row: any) => (
-          <span className="badge-frequenza">{row.frequenza}</span>
-        ),
-      },
-      {
-        field: "prossima_esecuzione",
-        header: "Prossima Scadenza",
-        body: (row: any) =>
-          new Date(row.prossima_esecuzione).toLocaleDateString("it-IT", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }),
-      },
-      {
-        field: "attiva",
-        header: "Stato",
-        body: (row: any) => (
-          <span
-            className={row.attiva ? "status-active" : "status-inactive"}
-            style={{
-              fontWeight: "bold",
-              color: !row.attiva ? "var(--red-500)" : "var(--green-500)",
-            }}
-          >
-            {row.attiva ? "ATTIVA" : "SOSPESA"}
-          </span>
-        ),
-      },
-      {
-        field: "conto_id",
-        header: "Conto",
-        body: (row: any) => {
-          const conto = conti.find(
-            (c: Conto) => String(c.id) === String(row.conto_id),
-          );
-          return conto ? conto.nome : ``;
-        },
-      },
-      {
-        field: "categoria_id",
-        header: "Categoria",
-        body: (row: any) => {
-          const categoria = categorie.find(
-            (c: Categoria) => String(c.id) === String(row.categoria_id),
-          );
-          return categoria ? categoria.nome : ``;
-        },
-      },
-      {
-        field: "sottocategoria_id",
-        header: "Sottocategoria",
-        body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'sottocategorie' si popola
-          const sottocategoria = sottocategorie.find(
-            (c: SottoCategoria | undefined) =>
-              c && String(c.id) === String(row.sottocategoria_id),
-          );
-          return sottocategoria ? sottocategoria.nome : ``;
-        },
-      },
-      {
-        field: "tag_id",
-        header: "Tag",
-        body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'tags' si popola
-          const tag = tags.find(
-            (tag: Tag) => String(tag.id) === String(row.tag_id),
-          );
-          return tag ? tag.nome : ``;
-        },
-      },
-      {
-        field: "delete",
-        header: t("actions"),
-        body: (row: any) => (
-          <Button
-            className="trasparent-danger-button"
-            icon="pi pi-trash"
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteObject(e, row.id);
-            }}
-          />
-        ),
-      },
-    ],
-    [conti, categorie, t],
-  );
+  // Helper per trovare i nomi
+  const getCatName = (id: string) =>
+    categorie.find((c: Categoria) => String(c.id) === String(id))?.nome || "";
+  const getSubCatName = (id: string) =>
+    sottocategorie.find(
+      (c: SottoCategoria | undefined) => c && String(c.id) === String(id),
+    )?.nome || "";
+  const getTagName = (id: string) =>
+    tags.find((t: Tag) => String(t.id) === String(id))?.nome || "";
+  const getContoName = (id: string) =>
+    conti.find((c: Conto) => String(c.id) === String(id))?.nome || "";
 
   return (
     <>
       <div className="transaction-page-recurring">
+        {/* HEADER */}
         <header className="page-header">
           <h1>{t("recurring_history")}</h1>
           <div className="stats">
             <h3 className="stats-item">
-              {t("total_transactions")}: {recurrings.length}
+              {t("total_transactions")}: <span>{recurrings.length}</span>
             </h3>
           </div>
         </header>
 
-        <TableVisualization
-          value={recurrings}
-          columns={columns}
-          selectionRow={{
-            selectedRow: selectedRecurring,
-            onSelectionChange: (e) => onRowClick(e),
-          }}
-        />
+        {/* CONTAINER GRIGLIA */}
+        <div className="split-wrapper">
+          <section className="transaction-list">
+            <div className="scrollable-area">
+              <div className="transactions-grid">
+                {loading ? (
+                  <p className="no-data">Caricamento in corso...</p>
+                ) : recurrings.length > 0 ? (
+                  recurrings.map((r) => {
+                    const catName = getCatName(r.categoria_id);
+                    const subCatName = getSubCatName(r.sottocategoria_id);
+                    const tagName = getTagName(r.tag_id);
+                    const isInactive = !r.attiva;
+
+                    return (
+                      <div
+                        key={r.id}
+                        className={`transaction-card ${r.tipo.toLowerCase()} ${isInactive ? "inactive" : ""}`}
+                        onClick={() => onRowClick(r)}
+                      >
+                        <div className="icon-wrapper">
+                          <i
+                            className={`pi ${r.tipo === "USCITA" ? "pi-arrow-down-right" : r.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
+                          ></i>
+                        </div>
+
+                        <div className="card-content">
+                          {/* TOP: Nome, Stato e Cestino */}
+                          <div className="card-top">
+                            <div className="desc-container">
+                              <span className="desc">
+                                {r.nome || catName || "Ricorrente"}
+                              </span>
+                              {isInactive && (
+                                <span className="status-badge suspended">
+                                  SOSPESA
+                                </span>
+                              )}
+                            </div>
+                            <Button
+                              className="trasparent-danger-button delete-btn"
+                              icon="pi pi-trash"
+                              compact
+                              onClick={(e: any) => {
+                                e.stopPropagation();
+                                deleteObject(e, r.id);
+                              }}
+                            />
+                          </div>
+
+                          {/* MIDDLE: Frequenza, Categoria, Sottocategoria, Tag */}
+                          <div className="card-middle">
+                            <span className="info-badge frequency">
+                              <i
+                                className="pi pi-calendar-clock"
+                                style={{
+                                  fontSize: "0.6rem",
+                                  marginRight: "4px",
+                                }}
+                              ></i>
+                              {r.frequenza}
+                            </span>
+                            {catName && (
+                              <span className="info-badge cat">{catName}</span>
+                            )}
+                            {subCatName && (
+                              <span className="info-badge subcat">
+                                {subCatName}
+                              </span>
+                            )}
+                            {tagName && (
+                              <span className="info-badge tag">
+                                <i
+                                  className="pi pi-hashtag"
+                                  style={{
+                                    fontSize: "0.6rem",
+                                    marginRight: "2px",
+                                  }}
+                                ></i>
+                                {tagName}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* BOTTOM: Prossima Esecuzione/Conto e Importo */}
+                          <div className="card-bottom">
+                            <span className="date-cat">
+                              {r.prossima_esecuzione
+                                ? `Prox: ${new Date(r.prossima_esecuzione).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}`
+                                : ""}
+                              {getContoName(r.conto_id)
+                                ? ` • ${getContoName(r.conto_id)}`
+                                : ""}
+                            </span>
+                            <span className="amount">
+                              {r.tipo === "USCITA" ? "-" : "+"}
+                              {r.importo.toLocaleString("it-IT", {
+                                minimumFractionDigits: 2,
+                              })}{" "}
+                              €
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p className="no-data">{t("no_data")}</p>
+                )}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        {/* FAB BUTTON */}
         <Button
           className="add-transaction-button"
           icon={"pi pi-plus"}
           compact
           rounded
-          onClick={() => setIsTransactionDialogVisible(true)}
+          onClick={() => setIsDialogVisible(true)}
         />
       </div>
+
       <RecurrenceDialog
-        visible={isTransactionDialogVisible}
+        visible={isDialogVisible}
         recurring={selectedRecurring}
         onHide={() => handleCloseDialog()}
       />
