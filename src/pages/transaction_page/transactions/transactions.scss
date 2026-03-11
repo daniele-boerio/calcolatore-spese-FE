@@ -266,13 +266,5 @@
     bottom: 2rem;
     right: 2rem;
     z-index: 1000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
-}
-
-// Override stile Paginator PrimeReact se necessario
-.p-paginator {
-  background: transparent !important;
-  border: none !important;
-  margin-top: 1.5rem;
 }

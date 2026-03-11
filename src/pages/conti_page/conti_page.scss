@@ -24,13 +24,13 @@
       h1 {
         margin: 0;
         font-size: 1.5rem;
-        color: var(--text-color);
+        color: var(--text-main);
         font-weight: 800;
       }
 
       .subtitle {
         margin: 0;
-        color: var(--text-color-secondary);
+        color: var(--text-muted);
         font-size: 0.9rem;
       }
     }
@@ -63,7 +63,7 @@
       }
 
       .no-data {
-        color: var(--text-color-secondary);
+        color: var(--text-muted);
         font-style: italic;
       }
 
@@ -83,7 +83,6 @@
     bottom: 2rem;
     right: 2rem;
     z-index: 1000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
 }
 

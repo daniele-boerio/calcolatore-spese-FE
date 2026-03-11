@@ -8,11 +8,9 @@ import {
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import Dropdown from "../../../components/dropdown/dropdown";
-import TableVisualization, {
-  VisualizationColumnProps,
-} from "../../../components/table_visualization/table_visualization";
 import { useI18n } from "../../../i18n/use-i18n";
-import "./year_statistics.scss"; // Crea questo file per lo stile
+import CustomCard from "../../../components/custom_card/custom_card"; // Assicurati che il percorso sia corretto
+import "./year_statistics.scss";
 
 export default function YearStatistics() {
   const { t } = useI18n();
@@ -30,21 +28,21 @@ export default function YearStatistics() {
     null,
   );
 
-  // Opzioni Anno (es. da 5 anni fa all'anno prossimo)
+  // Opzioni Anno
   const yearOptions = useMemo(() => {
     const years = [];
     for (let y = currentYear - 5; y <= currentYear; y++) {
       years.push({ label: y.toString(), value: y });
     }
-    return years.reverse(); // Dal più recente
+    return years.reverse();
   }, [currentYear]);
 
-  // Caricamento Categorie all'avvio
+  // Caricamento inizialie
   useEffect(() => {
     dispatch(getCategorie());
   }, [dispatch]);
 
-  // Fetch dati statistici quando cambiano anno o categoria
+  // Fetch dati
   useEffect(() => {
     dispatch(
       getYearDetailsStatistics({
@@ -54,7 +52,7 @@ export default function YearStatistics() {
     );
   }, [dispatch, selectedYear, selectedCategoriaId]);
 
-  // 1. Uniformiamo i dati per mostrare sempre 12 righe (mesi)
+  // 1. Uniformiamo i dati per i mesi
   const tableData = useMemo(() => {
     const monthNames = [
       t("Jan"),
@@ -72,84 +70,69 @@ export default function YearStatistics() {
     ];
 
     return monthNames.map((monthName, index) => {
-      // 1. Troviamo i dati del mese
       const rawMonthData = data.find((d) => d.month === index + 1) || {};
-
-      // 2. Destrutturiamo togliendo la proprietà 'month' originale
-      // (la assegniamo a una variabile '_' che non useremo, il resto finisce in 'restData')
       const { month: _, ...restData } = rawMonthData as any;
 
       return {
-        month: monthName, // Adesso questa sarà l'unica proprietà "month"
+        month: monthName,
         monthId: index + 1,
-        ...restData, // Qui ci sono solo le categorie (Spesa, Stipendio, ecc.)
+        ...restData,
       };
     });
   }, [data, t]);
 
-  // 2. Generazione DINAMICA delle colonne
-  const columns: VisualizationColumnProps[] = useMemo(() => {
-    const dynamicKeys = new Set<string>();
+  // 2. "RIBALTIAMO" I DATI: Da Mesi->Categorie a Categorie->Mesi (Perfetto per le CustomCard)
+  const categoriesSummary = useMemo(() => {
+    // Usiamo una mappa per accumulare i totali e i mesi per ogni singola categoria
+    const categoryMap = new Map<
+      string,
+      {
+        total: number;
+        months: { monthName: string; value: number; monthId: number }[];
+      }
+    >();
 
     tableData.forEach((row) => {
       Object.keys(row).forEach((key) => {
         if (key !== "month" && key !== "monthId") {
-          dynamicKeys.add(key);
+          const val = row[key] as number;
+          // Ignoriamo i mesi a 0 per non sporcare la UI
+          if (val !== 0) {
+            if (!categoryMap.has(key)) {
+              categoryMap.set(key, { total: 0, months: [] });
+            }
+            const catData = categoryMap.get(key)!;
+            catData.total += val;
+            catData.months.push({
+              monthName: row.month as string,
+              value: val,
+              monthId: row.monthId as number,
+            });
+          }
         }
       });
     });
 
-    const cols: VisualizationColumnProps[] = [
-      {
-        field: "month",
-        header: t("month"),
-        body: (row: any) => <strong>{row.month}</strong>,
-      },
-    ];
+    // Convertiamo in array e ordiniamo per nome categoria
+    return Array.from(categoryMap.entries())
+      .map(([name, data]) => ({
+        categoria: name,
+        totale: data.total,
+        // Usiamo "sottocategoria" per ospitare in realtà il nome del Mese
+        sottocategorie: data.months
+          .sort((a, b) => a.monthId - b.monthId) // Ordine cronologico
+          .map((m) => ({
+            sottocategoria: m.monthName,
+            totale: m.value,
+          })),
+      }))
+      .sort((a, b) => a.categoria.localeCompare(b.categoria));
+  }, [tableData]);
 
-    // Aggiungiamo una colonna per ogni categoria/sottocategoria trovata nei dati
-    Array.from(dynamicKeys)
-      .sort()
-      .forEach((key) => {
-        // --- CALCOLO TOTALE E MEDIA ---
-        const totalValue = tableData.reduce(
-          (sum, row) => sum + (row[key] || 0),
-          0,
-        );
-
-        cols.push({
-          field: key,
-          header: (
-            <div className="column-header-with-total">
-              <span className="col-title">{key}</span>
-              <div>
-                <span
-                  className={`value-${totalValue > 0 ? "high" : ""}${totalValue < 0 ? "low" : ""}`}
-                >
-                  {totalValue !== 0
-                    ? ` ${totalValue > 0 ? "+" : ""}${totalValue.toLocaleString("it-IT", { minimumFractionDigits: 2 })} €`
-                    : " 0,00 €"}
-                </span>
-              </div>
-            </div>
-          ),
-          body: (row: any) => {
-            const value = row[key] || 0;
-            return (
-              <span
-                className={`value-${value > 0 ? "high" : ""}${value < 0 ? "low" : ""}`}
-              >
-                {value !== 0
-                  ? `${value > 0 ? "+" : ""}${value.toLocaleString("it-IT", { minimumFractionDigits: 2 })} €`
-                  : "-"}
-              </span>
-            );
-          },
-        });
-      });
-
-    return cols;
-  }, [tableData, t]);
+  // 3. Dividiamo le categorie generate in Entrate e Uscite basandoci sul totale annuale
+  const incomes = categoriesSummary.filter((c) => c.totale > 0);
+  const expenses = categoriesSummary.filter((c) => c.totale < 0);
+  const others = categoriesSummary.filter((c) => c.totale === 0);
 
   return (
     <div className="yearly-statistics-page">
@@ -172,17 +155,76 @@ export default function YearStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedCategoriaId(e.value)}
             placeholder={t("categories")}
-            showClear // Permette di svuotare la selezione per tornare alla vista principale
+            showClear
           />
         </div>
       </header>
 
-      <TableVisualization
-        className="statistics-table"
-        value={tableData}
-        columns={columns}
-        loading={loading}
-      />
+      {/* SOSTITUIAMO IL TABELLONE CON LE CARD RESPONSIVE */}
+      <div className="split-wrapper">
+        <section className="statistics-list">
+          <div className="scrollable-area">
+            {loading ? (
+              <p className="no-data">Caricamento in corso...</p>
+            ) : categoriesSummary.length === 0 ? (
+              <p className="no-data">{t("no_data")}</p>
+            ) : (
+              <>
+                {/* ENTRATE */}
+                {incomes.length > 0 && (
+                  <div className="category-section">
+                    <h3>{t("income")}</h3>
+                    <div className="categories-grid">
+                      {incomes.map((cat) => (
+                        <CustomCard
+                          key={cat.categoria}
+                          title={cat.categoria}
+                          totale={cat.totale}
+                          sottocategorie={cat.sottocategorie}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* USCITE */}
+                {expenses.length > 0 && (
+                  <div className="category-section">
+                    <h3>{t("expenses")}</h3>
+                    <div className="categories-grid">
+                      {expenses.map((cat) => (
+                        <CustomCard
+                          key={cat.categoria}
+                          title={cat.categoria}
+                          totale={cat.totale}
+                          sottocategorie={cat.sottocategorie}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* ALTRE (Saldo zero) */}
+                {others.length > 0 && (
+                  <div className="category-section">
+                    <h3>{t("others")}</h3>
+                    <div className="categories-grid">
+                      {others.map((cat) => (
+                        <CustomCard
+                          key={cat.categoria}
+                          title={cat.categoria}
+                          totale={cat.totale}
+                          sottocategorie={cat.sottocategorie}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

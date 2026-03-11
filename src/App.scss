@@ -109,3 +109,14 @@ body {
     color: v.$text-on-button;
   }
 }
+
+// Override stile Paginator PrimeReact se necessario
+.p-paginator {
+  background: transparent !important;
+  border: none !important;
+  margin-top: 1.5rem;
+
+  .p-paginator-element {
+    color: v.$text-main;
+  }
+}

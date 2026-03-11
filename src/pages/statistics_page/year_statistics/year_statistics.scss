@@ -6,24 +6,23 @@
   gap: 1.5rem;
   width: 100%;
   height: 100%;
-  animation: fadeIn 0.3s ease-in; // Animazione di ingresso morbida
+  animation: fadeIn 0.3s ease-in;
   padding: 1rem;
 
   .page-header {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: flex-end;
     flex-wrap: wrap;
     gap: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid v.$border-color; // Una linea sottile per separare l'header dalla tabella
+    border-bottom: 1px solid v.$border-color;
 
     .filters-row {
       display: flex;
       gap: 1.5rem;
       align-items: center;
 
-      // Forza una larghezza minima per i dropdown su desktop per non farli sembrare troppo piccoli
       .p-dropdown {
         min-width: 14rem;
       }
@@ -34,7 +33,6 @@
         align-items: stretch;
         gap: 1rem;
 
-        // Su mobile i dropdown occupano tutta la larghezza disponibile
         .p-dropdown {
           width: 100%;
         }
@@ -42,53 +40,55 @@
     }
   }
 
-  .value-high {
-    color: v.$green;
-  }
-  .value-low {
-    color: v.$red;
-  }
-
-  .statistics-table {
+  // Layout flessibile per la lista
+  .split-wrapper {
+    display: flex;
+    flex-direction: column;
     flex: 1;
-    width: 100%;
+    min-height: 0;
+  }
 
-    // Configurazione per gestire le colonne dinamiche
-    .p-datatable-wrapper {
-      overflow-x: auto; // Abilita lo scroll orizzontale
+  .statistics-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
 
-      // Personalizzazione interna della tabella PrimeReact
-      .p-datatable-table {
-        min-width: max-content; // Forza la tabella ad allargarsi se ci sono tante colonne
-      }
-    }
+    .scrollable-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      padding-bottom: 2rem;
 
-    .p-datatable {
-      .p-datatable-thead > tr > th {
-        white-space: nowrap; // Evita che i nomi lunghi delle categorie vadano a capo
-        text-align: right; // Allinea a destra per i numeri
+      display: flex;
+      flex-direction: column;
+      gap: 2rem; // Spazio tra Entrate, Uscite e Altro
 
-        &:first-child {
-          text-align: left; // Il "Mese" resta allineato a sinistra
-          position: sticky; // Blocca la colonna dei mesi a sinistra durante lo scroll orizzontale
-          left: 0;
-          z-index: 1;
-          background-color: v.$month-table-header !important; // Assicurati di avere questo colore in variables.scss (o usa #fff)
+      .category-section {
+        h3 {
+          margin-bottom: 1rem;
+          color: var(--text-main);
+          font-weight: 600;
+        }
+
+        .categories-grid {
+          display: flex;
+          flex-wrap: wrap; // Il segreto del layout responsive!
+          gap: 1rem;
         }
       }
 
-      .p-datatable-tbody > tr > td {
-        text-align: right;
-        white-space: nowrap;
-        font-family: v.$font-main;
+      .no-data {
+        color: var(--text-muted);
+        font-style: italic;
+      }
 
-        &:first-child {
-          text-align: left;
-          position: sticky; // Blocca i nomi dei mesi a sinistra
-          left: 0;
-          background-color: v.$bg-app;
-          font-weight: 600; // Rende il mese in grassetto
-        }
+      &::-webkit-scrollbar {
+        width: 0.313rem;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: v.$border-color;
+        border-radius: 10px;
       }
     }
   }

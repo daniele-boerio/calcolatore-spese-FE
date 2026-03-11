@@ -21,7 +21,7 @@
       display: flex;
       align-items: center;
       font-size: 1.5rem;
-      color: var(--text-color);
+      color: var(--text-main);
     }
   }
 
@@ -52,7 +52,7 @@
       .category-section {
         .section-title {
           margin-bottom: 1rem;
-          color: var(--text-color);
+          color: var(--text-main);
           font-weight: 600;
 
           // Impostazioni per il click
@@ -69,9 +69,7 @@
 
           i {
             font-size: 0.9rem;
-            color: var(
-              --text-color-secondary
-            ); // Freccia leggermente più chiara del testo
+            color: var(--text-main); // Freccia leggermente più chiara del testo
           }
         }
 
@@ -84,7 +82,7 @@
         }
 
         .no-data {
-          color: var(--text-color-secondary);
+          color: var(--text-main);
           font-style: italic;
           margin-left: 1.5rem; // Allinea il testo vuoto per compensare l'icona della freccia
         }
@@ -111,7 +109,6 @@
     bottom: 2rem;
     right: 2rem;
     z-index: 1000;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); // Ombra per farlo risaltare sulla griglia
   }
 }
 
