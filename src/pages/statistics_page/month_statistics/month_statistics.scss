@@ -1,0 +1,136 @@
+@use "../../../styles/variables" as v;
+
+.monthly-statistics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%;
+  animation: fadeIn 0.3s ease-in; // Animazione di ingresso morbida
+  padding: 1rem;
+
+  .page-header {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid v.$border-color; // Una linea sottile per separare l'header dalla tabella
+
+    .filters-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+
+      // Forza una larghezza minima per i dropdown su desktop per non farli sembrare troppo piccoli
+      .p-dropdown {
+        min-width: 14rem;
+      }
+
+      @media screen and (max-width: v.$mobile) {
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch;
+        gap: 1rem;
+
+        // Su mobile i dropdown occupano tutta la larghezza disponibile
+        .p-dropdown {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .value-high {
+    color: v.$green;
+  }
+  .value-low {
+    color: v.$red;
+  }
+
+  .statistics-container {
+    .incomes,
+    .expenses,
+    .others {
+      .categories-wrapper {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+        flex-wrap: wrap;
+        .category-card {
+          border: 1px solid v.$border-card;
+          background: v.$card-gradient;
+          border-radius: 24px;
+          padding: 1rem;
+          max-width: 25.394rem;
+          width: 25.394rem;
+          min-width: 20rem;
+          overflow: auto;
+          gap: 0.5rem;
+
+          display: flex;
+          flex-direction: column;
+
+          .category-header {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            .name {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              display: block;
+            }
+            .amount {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              display: block;
+            }
+          }
+
+          .subcategories-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-left: 1rem;
+            .subcategory-item {
+              display: flex;
+              flex-direction: row;
+              justify-content: space-between;
+              border: 1px solid v.$border-card;
+              background: v.$card-gradient;
+              border-radius: 30px;
+              padding: 0.5rem;
+              .name {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
+              }
+              .amount {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animazione
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

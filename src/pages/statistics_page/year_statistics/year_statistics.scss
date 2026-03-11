@@ -1,0 +1,107 @@
+@use "../../../styles/variables" as v;
+
+.yearly-statistics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%;
+  animation: fadeIn 0.3s ease-in; // Animazione di ingresso morbida
+  padding: 1rem;
+
+  .page-header {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid v.$border-color; // Una linea sottile per separare l'header dalla tabella
+
+    .filters-row {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+
+      // Forza una larghezza minima per i dropdown su desktop per non farli sembrare troppo piccoli
+      .p-dropdown {
+        min-width: 14rem;
+      }
+
+      @media screen and (max-width: v.$mobile) {
+        flex-direction: column;
+        width: 100%;
+        align-items: stretch;
+        gap: 1rem;
+
+        // Su mobile i dropdown occupano tutta la larghezza disponibile
+        .p-dropdown {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .value-high {
+    color: v.$green;
+  }
+  .value-low {
+    color: v.$red;
+  }
+
+  .statistics-table {
+    flex: 1;
+    width: 100%;
+
+    // Configurazione per gestire le colonne dinamiche
+    .p-datatable-wrapper {
+      overflow-x: auto; // Abilita lo scroll orizzontale
+
+      // Personalizzazione interna della tabella PrimeReact
+      .p-datatable-table {
+        min-width: max-content; // Forza la tabella ad allargarsi se ci sono tante colonne
+      }
+    }
+
+    .p-datatable {
+      .p-datatable-thead > tr > th {
+        white-space: nowrap; // Evita che i nomi lunghi delle categorie vadano a capo
+        text-align: right; // Allinea a destra per i numeri
+
+        &:first-child {
+          text-align: left; // Il "Mese" resta allineato a sinistra
+          position: sticky; // Blocca la colonna dei mesi a sinistra durante lo scroll orizzontale
+          left: 0;
+          z-index: 1;
+          background-color: v.$month-table-header !important; // Assicurati di avere questo colore in variables.scss (o usa #fff)
+        }
+      }
+
+      .p-datatable-tbody > tr > td {
+        text-align: right;
+        white-space: nowrap;
+        font-family: v.$font-main;
+
+        &:first-child {
+          text-align: left;
+          position: sticky; // Blocca i nomi dei mesi a sinistra
+          left: 0;
+          background-color: v.$bg-app;
+          font-weight: 600; // Rende il mese in grassetto
+        }
+      }
+    }
+  }
+}
+
+// Animazione
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

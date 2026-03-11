@@ -22,6 +22,7 @@ export type TableVisualizationProps = {
   deleteRow?: (id: string) => void;
   customRowClassName?: (rowData: DataTableValue) => string | undefined;
   scrollable?: boolean;
+  loading?: boolean;
 };
 
 export type SelectionRow = {
@@ -40,7 +41,7 @@ export type PaginatorProps = {
 
 export type VisualizationColumnProps = {
   field?: string;
-  header?: string;
+  header?: string | ReactNode | ((rowData: DataTableValue) => ReactNode);
   body?: ReactNode | ((rowData: DataTableValue) => ReactNode);
   width?: string;
   sortable?: boolean;
@@ -56,7 +57,7 @@ export default function TableVisualization(props: TableVisualizationProps) {
         id={props.id}
         value={props.value}
         dataKey={props.dataKey || "id"}
-        loading={props.paginator?.loading} // Loading overlay di PrimeReact
+        loading={props.paginator?.loading || props.loading} // Loading overlay di PrimeReact
         rowClassName={(rowData) =>
           props.disabledRows?.includes(rowData.id)
             ? "table-row-disabled"

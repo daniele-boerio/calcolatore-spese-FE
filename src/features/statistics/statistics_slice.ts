@@ -1,18 +1,29 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store/store";
-import { MonthlyStatRow } from "./interfaces";
-import { getMonthlyStatistics } from "./api_calls";
+import { MonthlyDetailCategory, YearDetailsStatRow } from "./interfaces";
+import {
+  getMonthlyDetailsStatistics,
+  getYearDetailsStatistics,
+} from "./api_calls";
 
 interface StatisticsState {
-  monthlyData: MonthlyStatRow[];
+  yearlyData: YearDetailsStatRow[];
+  monthlyData: MonthlyDetailCategory[];
   loading: boolean;
-  error: string | null;
 }
 
 const initialState: StatisticsState = {
+  yearlyData: [],
   monthlyData: [],
   loading: false,
-  error: null,
+};
+
+const handlePending = (state: StatisticsState) => {
+  state.loading = true;
+};
+
+const handleRejected = (state: StatisticsState) => {
+  state.loading = false;
 };
 
 const statisticsSlice = createSlice({
@@ -21,26 +32,43 @@ const statisticsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(getMonthlyStatistics.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(
-        getMonthlyStatistics.fulfilled,
-        (state, action: PayloadAction<MonthlyStatRow[]>) => {
+        getYearDetailsStatistics.fulfilled,
+        (state, action: PayloadAction<YearDetailsStatRow[]>) => {
+          state.loading = false;
+          state.yearlyData = action.payload;
+        },
+      )
+
+      .addCase(
+        getMonthlyDetailsStatistics.fulfilled,
+        (state, action: PayloadAction<MonthlyDetailCategory[]>) => {
           state.loading = false;
           state.monthlyData = action.payload;
         },
       )
-      .addCase(getMonthlyStatistics.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload as string;
-      });
+
+      // Matchers (rimangono invariati)
+      .addMatcher(
+        (action: Action) =>
+          action.type.endsWith("/pending") &&
+          action.type.startsWith("statistics/"),
+        handlePending,
+      )
+      .addMatcher(
+        (action: Action) =>
+          (action.type.endsWith("/rejected") ||
+            action.type.endsWith("/fulfilled")) &&
+          action.type.startsWith("statistics/"),
+        handleRejected,
+      );
   },
 });
 
 // Selectors
-export const selectStatisticsData = (state: RootState) =>
+export const selectYearlyStatisticsData = (state: RootState) =>
+  state.statistics.yearlyData;
+export const selectMonthlyStatisticsData = (state: RootState) =>
   state.statistics.monthlyData;
 export const selectStatisticsLoading = (state: RootState) =>
   state.statistics.loading;

@@ -27,6 +27,8 @@
   "Oct": "Ottobre",
   "Nov": "Novembre",
   "Dec": "Dicembre",
+  "avg": "Media",
+  "others": "Altre",
 
   "missing_fields": "Campi mancanti",
   "missing_fields_response": "Assicurati di aver compilato tutti i campi obbligatori",
@@ -156,5 +158,8 @@
   "transaction_details": "Dettagli Transazione",
   "basic_info": "Informazioni Base",
   "no_description": "Nessuna Descrizione",
-  "default": "Predefinito"
+  "default": "Predefinito",
+
+  "month_statistics": "Statistiche Mensili",
+  "year_statistics": "Statistiche Annuali"
 }

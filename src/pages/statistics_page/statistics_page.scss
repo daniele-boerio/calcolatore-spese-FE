@@ -1,100 +1,91 @@
 @use "../../styles/variables" as v;
 
-.statistics-page {
+.statistics-page-container {
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
-  width: 100%;
-  height: 100%;
-  animation: fadeIn 0.3s ease-in; // Animazione di ingresso morbida
-  padding: 2rem;
 
-  .page-header {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid v.$border-color; // Una linea sottile per separare l'header dalla tabella
-
-    .filters-row {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
-
-      // Forza una larghezza minima per i dropdown su desktop per non farli sembrare troppo piccoli
-      .p-dropdown {
-        min-width: 14rem;
-      }
-
-      @media screen and (max-width: v.$mobile) {
-        flex-direction: column;
-        width: 100%;
-        align-items: stretch;
-        gap: 1rem;
-
-        // Su mobile i dropdown occupano tutta la larghezza disponibile
-        .p-dropdown {
-          width: 100%;
-        }
-      }
-    }
+  .card-menu {
+    background: rgba(v.$text-main, 0.03); // Leggera tinta basata sul testo
+    border-radius: 12px;
+    padding: 0.5rem;
+    border: 1px solid rgba(v.$text-main, 0.08);
+    backdrop-filter: blur(10px);
   }
 
-  .statistics-table {
-    flex: 1;
-    width: 100%;
+  /* Personalizzazione TabMenu di PrimeReact */
+  .p-tabmenu {
+    .p-tabmenu-nav {
+      background: transparent !important;
+      border: none !important;
+      display: flex;
+      justify-content: center; // Centra i tab
+      gap: 0.5rem;
 
-    // Configurazione per gestire le colonne dinamiche
-    .p-datatable-wrapper {
-      overflow-x: auto; // Abilita lo scroll orizzontale
+      .p-tabmenuitem {
+        margin-right: 0;
 
-      // Personalizzazione interna della tabella PrimeReact
-      .p-datatable-table {
-        min-width: max-content; // Forza la tabella ad allargarsi se ci sono tante colonne
-      }
-    }
+        .p-menuitem-link {
+          background: transparent !important;
+          border: none !important;
+          color: v.$text-muted !important;
+          transition: all 0.3s ease;
+          border-radius: 8px;
+          padding: 0.75rem 1.25rem;
+          font-weight: 500;
 
-    .p-datatable {
-      .p-datatable-thead > tr > th {
-        white-space: nowrap; // Evita che i nomi lunghi delle categorie vadano a capo
-        text-align: right; // Allinea a destra per i numeri
+          .p-menuitem-icon {
+            margin-right: 0.5rem;
+            color: v.$text-muted;
+          }
 
-        &:first-child {
-          text-align: left; // Il "Mese" resta allineato a sinistra
-          position: sticky; // Blocca la colonna dei mesi a sinistra durante lo scroll orizzontale
-          left: 0;
-          z-index: 1;
-          background-color: v.$bg-app; // Assicurati di avere questo colore in variables.scss (o usa #fff)
+          &:focus {
+            box-shadow: none !important;
+          }
         }
-      }
 
-      .p-datatable-tbody > tr > td {
-        text-align: right;
-        white-space: nowrap;
-        font-family: v.$font-main;
+        /* Stato Attivo */
+        &.p-highlight {
+          .p-menuitem-link {
+            color: v.$text-main !important; // Usa il tuo colore primario (es. blu)
+            background: v.$bg-dark !important;
 
-        &:first-child {
-          text-align: left;
-          position: sticky; // Blocca i nomi dei mesi a sinistra
-          left: 0;
-          background-color: v.$bg-app;
-          font-weight: 600; // Rende il mese in grassetto
+            .p-menuitem-icon {
+              color: v.$text-main !important;
+            }
+          }
         }
       }
     }
   }
 }
 
-// Animazione
-@keyframes fadeIn {
+/* Animazione per il cambio tab */
+.tab-content-area {
+  animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@keyframes slideUp {
   from {
     opacity: 0;
-    transform: translateY(-5px);
+    transform: translateY(15px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: v.$mobile) {
+  .p-tabmenu .p-tabmenu-nav {
+    justify-content: flex-start;
+    overflow-x: auto; // Permette lo scroll orizzontale su mobile
+    padding-bottom: 0.5rem;
+
+    &::-webkit-scrollbar {
+      display: none; // Nasconde la barra scroll su mobile
+    }
   }
 }

@@ -25,6 +25,9 @@
   --btn-light: #95a5a6;
   --table-header: linear-gradient(90deg, #00c9ff 0%, #92fe9d 100%);
   --text-table-header: #333333;
+  --month-table-header: #00c9ff;
+  --card-gradient: linear-gradient(270deg, #f7e8f780 0%, #fcc9f191 100%), #fff;
+  --border-card: #0285ad33;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -52,6 +55,9 @@
     --btn-light: #b0b0b0;
     --table-header: linear-gradient(90deg, #3f2b96 0%, #3c73ff 100%);
     --text-table-header: #f0f0f0;
+    --month-table-header: #3f2b96;
+    --card-gradient: linear-gradient(to right, #36223d, #1b1b1b);
+    --border-card: #3a414966;
   }
 }
 
@@ -93,6 +99,9 @@ $bar-red: $red;
 $btn-light: var(--btn-light);
 $table-header: var(--table-header);
 $text-table-header: var(--text-table-header);
+$month-table-header: var(--month-table-header);
+$card-gradient: var(--card-gradient);
+$border-card: var(--border-card);
 
 // --- Breakpoints per il responsive ---
 $mobile: 480px;

@@ -52,6 +52,12 @@
   .p-dropdown-trigger {
     color: v.$text-main;
   }
+
+  .p-dropdown-clear-icon {
+    path {
+      fill: v.$text-main;
+    }
+  }
 }
 
 // Stili per il pannello (la lista che si apre)

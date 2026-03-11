@@ -27,6 +27,8 @@
   "Oct": "October",
   "Nov": "November",
   "Dec": "December",
+  "avg": "Average",
+  "others": "Others",
 
   "missing_fields": "Missing Fields",
   "missing_fields_response": "Make sure you have filled out all the required fields",
@@ -158,5 +160,8 @@
   "transaction_details": "Transaction Details",
   "basic_info": "Basic Information",
   "no_description": "No Description",
-  "default": "Default"
+  "default": "Default",
+
+  "month_statistics": "Month Statistics",
+  "year_statistics": "Year Statistics"
 }
