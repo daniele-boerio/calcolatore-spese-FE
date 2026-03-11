@@ -1,12 +1,14 @@
-@use "../../styles/variables.scss" as v;
-
 .doughnut-chart-wrapper {
   position: relative;
   width: 100%;
-  height: 18.75rem;
+  height: 350px; // Altezza base per Desktop
   display: flex;
   justify-content: center;
-  align-items: center;
+
+  // Su mobile riduciamo l'altezza totale per non occupare tutto lo schermo
+  @media screen and (max-width: 768px) {
+    height: 280px;
+  }
 
   .custom-chart-object {
     width: 100%;
@@ -15,26 +17,49 @@
 
   .doughnut-chart-overlay {
     position: absolute;
-    // Spostiamo leggermente in alto per compensare la legenda in basso
-    top: 42%;
+    top: 42%; // Centro ottico su Desktop
     left: 50%;
     transform: translate(-50%, -50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    pointer-events: none; // Evita di bloccare i tooltip del grafico
+    justify-content: center;
+    pointer-events: none;
+
+    // Limitiamo la larghezza del testo alla dimensione del buco
+    // così se il numero è enorme, va a capo invece di uscire
+    width: 60%;
+    text-align: center;
+
+    // Su mobile la legenda spinge la torta in su,
+    // quindi dobbiamo spostare il nostro "centro" un po' più in alto
+    @media screen and (max-width: 768px) {
+      top: 36%;
+    }
 
     .total-title {
       font-size: 0.85rem;
-      color: v.$text-muted;
+      font-weight: 500;
+      color: var(--text-color-secondary, #6c757d);
       text-transform: uppercase;
-      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+
+      @media screen and (max-width: 768px) {
+        font-size: 0.75rem; // Testo leggermente più piccolo
+      }
     }
 
     .total-amount {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: v.$text-main;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-color, #212529);
+      white-space: nowrap; // Evita che la valuta vada a capo da sola
+
+      // Riduciamo la dimensione dell'importo per farlo stare nel buco rimpicciolito
+      @media screen and (max-width: 768px) {
+        font-size: 1.25rem;
+      }
     }
   }
 }

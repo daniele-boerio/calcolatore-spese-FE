@@ -191,21 +191,23 @@ const contoSlice = createSlice({
             }
 
             // Aggiorna Expenses By Category
+            if (newTx.tipo === "USCITA") {
+              const categoryName =
+                (newTx as any).categoria?.nome || "Uncategorized";
 
-            const categoryName =
-              (newTx as any).categoria?.nome || "Uncategorized";
+              const catIndex = state.monthlyExpensesByCategory.findIndex(
+                (item) => item.label === categoryName,
+              );
 
-            const catIndex = state.monthlyExpensesByCategory.findIndex(
-              (item) => item.label === categoryName,
-            );
-
-            if (catIndex !== -1) {
-              state.monthlyExpensesByCategory[catIndex].value += txImporto;
-            } else {
-              state.monthlyExpensesByCategory.push({
-                label: categoryName,
-                value: txImporto,
-              });
+              if (catIndex !== -1) {
+                if (newTx.tipo === "USCITA")
+                  state.monthlyExpensesByCategory[catIndex].value += txImporto;
+              } else {
+                state.monthlyExpensesByCategory.push({
+                  label: categoryName,
+                  value: txImporto,
+                });
+              }
             }
 
             // Filtro pulizia categorie

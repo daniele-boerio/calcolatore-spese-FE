@@ -77,14 +77,14 @@ export default function CustomDoughnutChart({
         position: "bottom",
         labels: {
           usePointStyle: true,
-          padding: 20,
+          padding: 15, // <--- Abbassato da 20 a 15 (o anche 10 se hai tante voci)
           font: { size: 12 },
         },
       },
       tooltip: { enabled: total > 0 },
     },
     maintainAspectRatio: false,
-    spacing: 0,
+    spacing: 0, // Puoi impostare spacing: 2 se vuoi un piccolo spazio bianco tra le fette!
   };
 
   return (
