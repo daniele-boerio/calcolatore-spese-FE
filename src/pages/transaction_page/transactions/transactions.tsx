@@ -137,19 +137,35 @@ export default function Transactions() {
                       className={`transaction-card ${t.tipo.toLowerCase()}`}
                       onClick={() => onRowClick(t)}
                     >
-                      <div className="card-left">
-                        {/* Icona indicativa basata sul tipo */}
-                        <div className="icon-wrapper">
-                          <i
-                            className={`pi ${t.tipo === "USCITA" ? "pi-arrow-down-right" : t.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
-                          ></i>
-                        </div>
-                        <div className="info">
+                      {/* Icona sempre a sinistra */}
+                      <div className="icon-wrapper">
+                        <i
+                          className={`pi ${t.tipo === "USCITA" ? "pi-arrow-down-right" : t.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
+                        ></i>
+                      </div>
+
+                      {/* Contenitore principale a destra */}
+                      <div className="card-content">
+                        {/* Prima riga: Descrizione e Azioni */}
+                        <div className="card-top">
                           <span className="desc">
                             {t.descrizione ||
                               getCatName(t.categoria_id) ||
                               "Transazione"}
                           </span>
+                          <Button
+                            className="trasparent-danger-button delete-btn"
+                            icon="pi pi-trash"
+                            compact
+                            onClick={(e: any) => {
+                              e.stopPropagation();
+                              deleteObject(e, t.id);
+                            }}
+                          />
+                        </div>
+
+                        {/* Seconda riga: Data/Conto e Importo */}
+                        <div className="card-bottom">
                           <span className="date-cat">
                             {new Date(t.data).toLocaleDateString("it-IT", {
                               day: "2-digit",
@@ -159,27 +175,13 @@ export default function Transactions() {
                               ? ` • ${getContoName(t.conto_id)}`
                               : ""}
                           </span>
-                        </div>
-                      </div>
-
-                      <div className="card-right">
-                        <span className="amount">
-                          {t.tipo === "USCITA" ? "-" : "+"}
-                          {t.importo.toLocaleString("it-IT", {
-                            minimumFractionDigits: 2,
-                          })}{" "}
-                          €
-                        </span>
-                        <div className="actions">
-                          <Button
-                            className="trasparent-danger-button"
-                            icon="pi pi-trash"
-                            compact
-                            onClick={(e: any) => {
-                              e.stopPropagation(); // Evita di aprire il dialog quando si clicca sul cestino
-                              deleteObject(e, t.id);
-                            }}
-                          />
+                          <span className="amount">
+                            {t.tipo === "USCITA" ? "-" : "+"}
+                            {t.importo.toLocaleString("it-IT", {
+                              minimumFractionDigits: 2,
+                            })}{" "}
+                            €
+                          </span>
                         </div>
                       </div>
                     </div>

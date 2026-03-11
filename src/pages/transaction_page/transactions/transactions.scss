@@ -83,11 +83,11 @@
         align-content: flex-start;
 
         .transaction-card {
-          flex: 1 1 25rem; // Larghezza base 25rem, può crescere o stringersi
-          min-width: 20rem; // Non farla mai più piccola di così (su mobile andrà al 100%)
+          flex: 1 1 25rem;
+          min-width: 20rem;
           display: flex;
-          justify-content: space-between;
-          align-items: center;
+          align-items: center; // Centra l'icona verticalmente rispetto a tutto il testo
+          gap: 1rem;
           background: v.$card-gradient;
           border: 1px solid v.$border-card;
           border-radius: 16px;
@@ -102,70 +102,77 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
 
-          .card-left {
+          .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 1rem;
+            justify-content: center;
+            background: rgba(v.$text-muted, 0.1);
+            flex-shrink: 0; // Impedisce all'icona di ovalizzarsi!
+          }
+
+          .card-content {
+            display: flex;
+            flex-direction: column;
             flex: 1;
-            min-width: 0;
+            min-width: 0; // Fondamentale per far funzionare i tagli al testo (ellipsis)
+            gap: 0.25rem; // Spazio tra la prima riga (descrizione) e la seconda (importo)
 
-            .icon-wrapper {
-              width: 40px;
-              height: 40px;
-              border-radius: 50%;
+            .card-top {
               display: flex;
-              align-items: center;
-              justify-content: center;
-              background: rgba(v.$text-muted, 0.1);
-              flex-shrink: 0;
-            }
-
-            .info {
-              display: flex;
-              flex-direction: column;
-              flex: 1;
-              min-width: 0;
+              justify-content: space-between;
+              align-items: flex-start;
+              gap: 1rem;
 
               .desc {
                 font-weight: 600;
-                font-size: 1rem;
+                font-size: 1.05rem;
                 color: v.$text-main;
                 display: -webkit-box;
-                -webkit-line-clamp: 1;
+                -webkit-line-clamp: 2; // Permette alla descrizione di andare su 2 righe se lunghissima
                 -webkit-box-orient: vertical;
                 overflow: hidden;
-                word-break: break-all;
+                word-break: break-word;
+                line-height: 1.2;
+                margin-top: 0.15rem; // Allineamento ottico con il bottone
               }
+
+              .delete-btn {
+                flex-shrink: 0;
+                margin-top: -0.25rem; // Tira leggermente su il cestino per allinearlo al testo
+                margin-right: -0.5rem;
+              }
+            }
+
+            .card-bottom {
+              display: flex;
+              justify-content: space-between;
+              align-items: flex-end; // Allinea in basso la data e l'importo
+              gap: 1rem;
 
               .date-cat {
                 font-size: 0.8rem;
                 color: v.$text-muted;
                 white-space: nowrap;
                 overflow: hidden;
-                text-overflow: ellipsis; // Se la data+conto è troppo lunga, mette i puntini
+                text-overflow: ellipsis; // Mette i puntini se "10 mar • Intesa Sanpaolo" è troppo lungo
+                flex: 1;
+                min-width: 0;
+                padding-bottom: 0.15rem; // Allineamento ottico della baseline con l'importo grande
+              }
+
+              .amount {
+                font-weight: 800; // Molto più marcato
+                font-size: 1.25rem; // Più grande!
+                white-space: nowrap; // Impedisce all'Euro di andare a capo da solo
+                flex-shrink: 0;
               }
             }
           }
 
-          .card-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-shrink: 0;
-
-            .amount {
-              font-weight: bold;
-              font-size: 1.1rem;
-              white-space: nowrap;
-            }
-
-            .actions {
-              display: flex;
-              align-items: center;
-            }
-          }
-
-          // Colori dinamici in base al tipo
+          // Colori dinamici
           &.uscita {
             .icon-wrapper {
               color: v.$red;
