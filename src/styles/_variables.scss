@@ -26,7 +26,7 @@
   --table-header: linear-gradient(90deg, #00c9ff 0%, #92fe9d 100%);
   --text-table-header: #333333;
   --month-table-header: #00c9ff;
-  --card-gradient: linear-gradient(270deg, #f7e8f780 0%, #fcc9f191 100%), #fff;
+  --card-gradient: linear-gradient(to right, #f0d6fab6, #d4effa6b);
   --border-card: #0285ad33;
 }
 
@@ -56,9 +56,8 @@
     --table-header: linear-gradient(90deg, #3f2b96 0%, #3c73ff 100%);
     --text-table-header: #f0f0f0;
     --month-table-header: #3f2b96;
-    --card-gradient: linear-gradient(to right, #2b2c25, #47420d);
-
-    --border-card: #3a414966;
+    --card-gradient: linear-gradient(to right, #2e1212, #47420d);
+    --border-card: #fcd6d610;
   }
 }
 
