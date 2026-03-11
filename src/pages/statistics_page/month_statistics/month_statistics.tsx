@@ -11,6 +11,7 @@ import Dropdown from "../../../components/dropdown/dropdown";
 import { useI18n } from "../../../i18n/use-i18n";
 import "./month_statistics.scss";
 import { MonthlyDetailCategory } from "../../../features/statistics/interfaces";
+import CustomCard from "../../../components/custom_card/custom_card";
 
 // Se hai un'interfaccia nel tuo slice, usala. Altrimenti la definisco qui per chiarezza.
 
@@ -158,7 +159,14 @@ export default function MonthStatistics() {
           <h3>{t("income")}</h3>
           <div className="categories-wrapper">
             {incomes.length > 0 ? (
-              incomes.map(renderCategoryBlock)
+              incomes.map((cat) => (
+                <CustomCard
+                  key={cat.categoria}
+                  title={cat.categoria}
+                  totale={cat.totale}
+                  sottocategorie={cat.sottocategorie}
+                />
+              ))
             ) : (
               <p className="no-data">{t("no_data")}</p>
             )}
@@ -170,7 +178,14 @@ export default function MonthStatistics() {
           <h3>{t("expenses")}</h3>
           <div className="categories-wrapper">
             {expenses.length > 0 ? (
-              expenses.map(renderCategoryBlock)
+              expenses.map((cat) => (
+                <CustomCard
+                  key={cat.categoria}
+                  title={cat.categoria}
+                  totale={cat.totale}
+                  sottocategorie={cat.sottocategorie}
+                />
+              ))
             ) : (
               <p className="no-data">{t("no_data")}</p>
             )}
@@ -182,7 +197,14 @@ export default function MonthStatistics() {
           <h3>{t("others")}</h3>
           <div className="categories-wrapper">
             {others.length > 0 ? (
-              others.map(renderCategoryBlock)
+              others.map((cat) => (
+                <CustomCard
+                  key={cat.categoria}
+                  title={cat.categoria}
+                  totale={cat.totale}
+                  sottocategorie={cat.sottocategorie}
+                />
+              ))
             ) : (
               <p className="no-data">{t("no_data")}</p>
             )}

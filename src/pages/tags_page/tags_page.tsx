@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import "./tags_page.scss";
 import Button from "../../components/button/button";
@@ -8,6 +8,7 @@ import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../i18n/use-i18n";
 import TagDialog from "../../components/dialog/tag_dialog/tag_dialog";
 import { selectTagLoading, selectTagTags } from "../../features/tags/tag_slice";
+import CustomCard from "../../components/custom_card/custom_card";
 
 export default function TagsPage() {
   const { t } = useI18n();
@@ -32,7 +33,10 @@ export default function TagsPage() {
     setIsDialogTagVisible(true);
   };
 
-  const deleteObject = (event: any, id: string) => {
+  const deleteObject = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    id: string,
+  ) => {
     confirmPopup({
       target: event.currentTarget,
       message: t("delete_message"),
@@ -61,34 +65,41 @@ export default function TagsPage() {
         </div>
 
         <div className="split-wrapper">
-          {/* SEZIONE TAGS */}
           <section className="tag-list">
-            <div className="header-row sticky-header">
-              <span>{t("tags")}</span>
-              <span>{t("actions")}</span>
-            </div>
             <div className="scrollable-area">
-              {tags.map((tag: Tag) => (
-                <div key={tag.id} className="tag-row">
-                  <div className="info">
-                    <span className="cat-name">{tag.nome}</span>
-                  </div>
-                  <div className="actions">
-                    <Button
-                      className="trasparent-button"
-                      icon="pi pi-pencil"
-                      compact
-                      onClick={() => handleOpenTagEdit(tag)}
-                    />
-                    <Button
-                      className="trasparent-danger-button"
-                      icon="pi pi-trash"
-                      compact
-                      onClick={(e) => deleteObject(e, tag.id)}
-                    />
-                  </div>
+              <div className="tag-section">
+                <div className="tags-grid">
+                  {tags.length > 0 ? (
+                    tags.map((tag: Tag) => (
+                      <CustomCard
+                        key={tag.id}
+                        title={tag.nome}
+                        actions={
+                          <div
+                            className="buttons"
+                            style={{ display: "flex", gap: "0.25rem" }}
+                          >
+                            <Button
+                              className="trasparent-button"
+                              icon="pi pi-pencil"
+                              compact
+                              onClick={() => handleOpenTagEdit(tag)}
+                            />
+                            <Button
+                              className="trasparent-danger-button"
+                              icon="pi pi-trash"
+                              compact
+                              onClick={(e: any) => deleteObject(e, tag.id)}
+                            />
+                          </div>
+                        }
+                      />
+                    ))
+                  ) : (
+                    <p className="no-data">{t("no_data")}</p>
+                  )}
                 </div>
-              ))}
+              </div>
             </div>
           </section>
         </div>
@@ -100,6 +111,7 @@ export default function TagsPage() {
           rounded
           onClick={handleOpenCreate}
         />
+
         <TagDialog
           visible={isDialogTagVisible}
           tag={selectedTag!}

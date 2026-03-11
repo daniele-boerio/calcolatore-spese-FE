@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   getCategorie,
@@ -6,6 +6,7 @@ import {
 } from "../../features/categorie/api_calls";
 import "./category_page.scss";
 import Button from "../../components/button/button";
+import CustomCard from "../../components/custom_card/custom_card";
 import { Categoria } from "../../features/categorie/interfaces";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../i18n/use-i18n";
@@ -21,11 +22,25 @@ export default function CategoryPage() {
   const categorie = useAppSelector(selectCategoriaCategorie);
   const CatLoading = useAppSelector(selectCategoriaLoading);
 
-  const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [isDialogCatVisible, setIsDialogCatVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Categoria | null>(
     null,
   );
+
+  // --- NUOVO STATO PER LE SEZIONI COLLASSABILI ---
+  // Di default le teniamo tutte aperte (true)
+  const [expandedSections, setExpandedSections] = useState({
+    incomes: false,
+    expenses: false,
+    others: false,
+  });
+
+  const toggleSection = (section: keyof typeof expandedSections) => {
+    setExpandedSections((prev) => ({
+      ...prev,
+      [section]: !prev[section],
+    }));
+  };
 
   useEffect(() => {
     dispatch(getCategorie());
@@ -41,7 +56,10 @@ export default function CategoryPage() {
     setIsDialogCatVisible(true);
   };
 
-  const deleteObject = (event: any, id: string) => {
+  const deleteObject = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    id: string,
+  ) => {
     confirmPopup({
       target: event.currentTarget,
       message: t("delete_message"),
@@ -56,6 +74,50 @@ export default function CategoryPage() {
     });
   };
 
+  // --- LOGICA DI FILTRAGGIO DELLE CATEGORIE ---
+  const incomesCategories = categorie.filter(
+    (cat) => cat.solo_entrata && !cat.solo_uscita,
+  );
+
+  const expensesCategories = categorie.filter(
+    (cat) => cat.solo_uscita && !cat.solo_entrata,
+  );
+
+  const othersCategories = categorie.filter(
+    (cat) =>
+      (cat.solo_entrata && cat.solo_uscita) ||
+      (!cat.solo_entrata && !cat.solo_uscita),
+  );
+
+  // --- HELPER PER IL RENDER DELLA CARD ---
+  const renderCategoryCard = (cat: Categoria) => (
+    <CustomCard
+      key={cat.id}
+      title={cat.nome}
+      // Trasformiamo le sottocategorie del Redux store nel formato richiesto dalla card
+      sottocategorie={cat.sottocategorie?.map((sub) => ({
+        sottocategoria: sub.nome,
+      }))}
+      // Passiamo i bottoni come ReactNode
+      actions={
+        <div className="buttons" style={{ display: "flex", gap: "0.25rem" }}>
+          <Button
+            className="trasparent-button"
+            icon="pi pi-pencil"
+            compact
+            onClick={() => handleOpenCatEdit(cat)}
+          />
+          <Button
+            className="trasparent-danger-button"
+            icon="pi pi-trash"
+            compact
+            onClick={(e: any) => deleteObject(e, cat.id)}
+          />
+        </div>
+      }
+    />
+  );
+
   return (
     <>
       <div className="categorie-page">
@@ -69,65 +131,76 @@ export default function CategoryPage() {
           </h1>
         </div>
 
+        {/* --- CONTENITORE PRINCIPALE --- */}
         <div className="split-wrapper">
-          {/* SEZIONE CATEGORIE */}
           <section className="category-list">
-            <div className="header-row sticky-header">
-              <span>{t("categories")}</span>
-              <span>{t("actions")}</span>
-            </div>
             <div className="scrollable-area">
-              {categorie.map((cat: Categoria) => (
-                <div key={cat.id} className="category-item-container">
-                  <div
-                    className={`category-row ${expandedRow === cat.id ? "active" : ""}`}
-                  >
-                    <div
-                      className="info"
-                      onClick={() =>
-                        setExpandedRow(expandedRow === cat.id ? null : cat.id)
-                      }
-                    >
-                      <i
-                        className={`pi ${expandedRow === cat.id ? "pi-chevron-down" : "pi-chevron-right"} arrow-icon`}
-                      ></i>
-                      <span className="cat-name">{cat.nome}</span>
-                    </div>
-                    <div className="actions">
-                      <Button
-                        className="trasparent-button"
-                        icon="pi pi-pencil"
-                        compact
-                        onClick={() => handleOpenCatEdit(cat)}
-                      />
-                      <Button
-                        className="trasparent-danger-button"
-                        icon="pi pi-trash"
-                        compact
-                        onClick={(e) => deleteObject(e, cat.id)}
-                      />
-                    </div>
+              {/* --- SEZIONE ENTRATE --- */}
+              <div className="category-section">
+                <h3
+                  onClick={() => toggleSection("incomes")}
+                  className="section-title"
+                >
+                  <i
+                    className={`pi ${expandedSections.incomes ? "pi-chevron-down" : "pi-chevron-right"}`}
+                  ></i>
+                  {t("income")}
+                </h3>
+                {/* Mostra la griglia solo se la sezione è espansa */}
+                {expandedSections.incomes && (
+                  <div className="categories-grid">
+                    {incomesCategories.length > 0 ? (
+                      incomesCategories.map(renderCategoryCard)
+                    ) : (
+                      <p className="no-data">{t("no_data")}</p>
+                    )}
                   </div>
-                  {expandedRow === cat.id && (
-                    <div className="subcategory-list">
-                      {cat.sottocategorie?.map((sub) => (
-                        <div key={sub.id} className="subcategory-row">
-                          <div className="sub-info">
-                            <i
-                              className="pi pi-minus"
-                              style={{
-                                fontSize: "0.7rem",
-                                marginRight: "0.625rem",
-                              }}
-                            ></i>
-                            <span>{sub.nome}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              ))}
+                )}
+              </div>
+
+              {/* --- SEZIONE USCITE --- */}
+              <div className="category-section">
+                <h3
+                  onClick={() => toggleSection("expenses")}
+                  className="section-title"
+                >
+                  <i
+                    className={`pi ${expandedSections.expenses ? "pi-chevron-down" : "pi-chevron-right"}`}
+                  ></i>
+                  {t("expenses")}
+                </h3>
+                {expandedSections.expenses && (
+                  <div className="categories-grid">
+                    {expensesCategories.length > 0 ? (
+                      expensesCategories.map(renderCategoryCard)
+                    ) : (
+                      <p className="no-data">{t("no_data")}</p>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* --- SEZIONE MISTE (ALTRO) --- */}
+              <div className="category-section">
+                <h3
+                  onClick={() => toggleSection("others")}
+                  className="section-title"
+                >
+                  <i
+                    className={`pi ${expandedSections.others ? "pi-chevron-down" : "pi-chevron-right"}`}
+                  ></i>
+                  {t("others")}
+                </h3>
+                {expandedSections.others && (
+                  <div className="categories-grid">
+                    {othersCategories.length > 0 ? (
+                      othersCategories.map(renderCategoryCard)
+                    ) : (
+                      <p className="no-data">{t("no_data")}</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </section>
         </div>

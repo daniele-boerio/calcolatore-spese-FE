@@ -46,6 +46,7 @@ export type VisualizationColumnProps = {
   width?: string;
   sortable?: boolean;
   filter?: boolean;
+  className?: string;
 };
 
 export default function TableVisualization(props: TableVisualizationProps) {
@@ -86,6 +87,7 @@ export default function TableVisualization(props: TableVisualizationProps) {
       >
         {props.columns.map((col, i) => (
           <Column
+            className={col.className}
             key={col.field || `col-${i}`}
             field={col.field}
             header={col.header}

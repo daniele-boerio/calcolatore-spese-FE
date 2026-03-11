@@ -1,49 +1,100 @@
 @use "../../styles/variables.scss" as v;
 
 .conti-page {
-  padding: 2rem;
-  max-width: 75rem;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%; // Occupa l'altezza completa (fino al bordo dello schermo)
+  animation: fadeIn 0.3s ease-in;
+  padding: 1rem;
 
-  &__header {
+  .page-header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2.5rem;
+    justify-content: flex-start;
+    align-items: flex-end;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid v.$border-color;
 
-    h1 {
-      font-size: 2rem;
-      font-weight: 800;
-      color: v.$text-main;
-      margin: 0;
-    }
+    .header-content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
 
-    .subtitle {
-      color: v.$text-muted;
-      margin-top: 0.5rem;
+      h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--text-color);
+        font-weight: 800;
+      }
+
+      .subtitle {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 0.9rem;
+      }
     }
   }
+
+  .split-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0; // Fondamentale per far funzionare lo scroll interno all'area dedicata
+  }
+
+  .conti-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+
+    .scrollable-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem; // Spazio per non far attaccare le card alla scrollbar
+      padding-bottom: 6rem; // Spazio in fondo per evitare che il "+" copra l'ultima riga
+
+      .conti-grid {
+        display: flex;
+        flex-wrap: wrap; // IL SEGRETO: manda a capo le credit card quando lo schermo si stringe!
+        gap: 1.5rem;
+        align-content: flex-start;
+      }
+
+      .no-data {
+        color: var(--text-color-secondary);
+        font-style: italic;
+      }
+
+      // Stile scrollbar
+      &::-webkit-scrollbar {
+        width: 0.313rem;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: v.$border-color;
+        border-radius: 10px;
+      }
+    }
+  }
+
   .add-account-button {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
     z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
 }
 
-// Responsive mobile
-@media (max-width: v.$mobile) {
-  .conti-page {
-    padding: 1rem;
-
-    &__header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 1.5rem;
-    }
-
-    &__grid {
-      grid-template-columns: 1fr;
-    }
+// Animazione d'ingresso
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

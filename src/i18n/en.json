@@ -169,5 +169,6 @@
   "add_new_subcategory": "New SubCategory",
   "new_subcategory_name": "New SubCategory Name",
   "add_new_tag": "New Tag",
-  "new_tag_name": "New Tag Name"
+  "new_tag_name": "New Tag Name",
+  "no_data": "No Data Available"
 }

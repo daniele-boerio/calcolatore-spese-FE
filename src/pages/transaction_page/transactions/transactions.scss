@@ -1,63 +1,229 @@
 @use "../../../styles/variables" as v;
 
 .transaction-page {
-  padding: 2rem;
-  max-width: 75rem;
-  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  height: 100%; // Occupa tutta l'altezza
+  padding: 1rem;
+  animation: fadeIn 0.3s ease-in;
 
   @media screen and (max-width: v.$mobile) {
-    padding: 2rem 0.5rem !important; // Riduce il padding orizzontale a soli 8px (0.5rem)
+    padding: 1rem 0.5rem;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid v.$border-color;
+    flex-wrap: wrap; // Utile su mobile per non far sbordare le statistiche
+    gap: 1rem;
+
+    h1 {
+      color: v.$text-main;
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.9rem;
+
+      .stats-item {
+        margin: 0;
+        font-weight: normal;
+        color: v.$text-muted;
+
+        span {
+          font-weight: bold;
+          margin-left: 0.25rem;
+        }
+
+        &.income span {
+          color: v.$green;
+        }
+        &.expenses span {
+          color: v.$red;
+        }
+        &.compensation span {
+          color: #3498db;
+        }
+      }
+    }
+  }
+
+  .split-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .transaction-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+
+    .scrollable-area {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 0.5rem;
+      padding-bottom: 6rem; // Spazio per FAB button
+
+      .transactions-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-content: flex-start;
+
+        .transaction-card {
+          flex: 1 1 25rem; // Larghezza base 25rem, può crescere o stringersi
+          min-width: 20rem; // Non farla mai più piccola di così (su mobile andrà al 100%)
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          background: v.$card-gradient;
+          border: 1px solid v.$border-card;
+          border-radius: 16px;
+          padding: 1rem;
+          cursor: pointer;
+          transition:
+            transform 0.2s,
+            box-shadow 0.2s;
+
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          }
+
+          .card-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+            min-width: 0;
+
+            .icon-wrapper {
+              width: 40px;
+              height: 40px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              background: rgba(v.$text-muted, 0.1);
+              flex-shrink: 0;
+            }
+
+            .info {
+              display: flex;
+              flex-direction: column;
+              flex: 1;
+              min-width: 0;
+
+              .desc {
+                font-weight: 600;
+                font-size: 1rem;
+                color: v.$text-main;
+                display: -webkit-box;
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                word-break: break-all;
+              }
+
+              .date-cat {
+                font-size: 0.8rem;
+                color: v.$text-muted;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis; // Se la data+conto è troppo lunga, mette i puntini
+              }
+            }
+          }
+
+          .card-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-shrink: 0;
+
+            .amount {
+              font-weight: bold;
+              font-size: 1.1rem;
+              white-space: nowrap;
+            }
+
+            .actions {
+              display: flex;
+              align-items: center;
+            }
+          }
+
+          // Colori dinamici in base al tipo
+          &.uscita {
+            .icon-wrapper {
+              color: v.$red;
+              background: rgba(v.$red, 0.1);
+            }
+            .amount {
+              color: v.$red;
+            }
+          }
+          &.entrata {
+            .icon-wrapper {
+              color: v.$green;
+              background: rgba(v.$green, 0.1);
+            }
+            .amount {
+              color: v.$green;
+            }
+          }
+          &.rimborso {
+            .icon-wrapper {
+              color: #3498db;
+              background: rgba(52, 152, 219, 0.1);
+            }
+            .amount {
+              color: #3498db;
+            }
+          }
+        }
+
+        .no-data {
+          color: v.$text-muted;
+          font-style: italic;
+        }
+      }
+
+      // Scrollbar
+      &::-webkit-scrollbar {
+        width: 0.313rem;
+      }
+      &::-webkit-scrollbar-thumb {
+        background: v.$border-color;
+        border-radius: 10px;
+      }
+    }
   }
 
   .add-transaction-button {
     position: fixed;
     bottom: 2rem;
     right: 2rem;
-    z-index: 1000; // Assicura che il pulsante sia sopra altri elementi
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
+}
 
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    h1 {
-      color: v.$text-main;
-      font-size: 1.5rem;
-    }
-    .stats {
-      display: flex;
-      gap: 1rem;
-      color: v.$text-main;
-      font-size: 1rem;
-
-      .stats-item {
-        &.income {
-          span {
-            color: white;
-          }
-        }
-        &.compensation {
-          span {
-            color: white;
-          }
-        }
-        &.expenses {
-          span {
-            color: white;
-          }
-        }
-      }
-    }
-  }
-
-  .transaction-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: v.$bg-card;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  }
+// Override stile Paginator PrimeReact se necessario
+.p-paginator {
+  background: transparent !important;
+  border: none !important;
+  margin-top: 1.5rem;
 }

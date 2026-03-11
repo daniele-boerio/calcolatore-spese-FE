@@ -53,71 +53,14 @@
     .incomes,
     .expenses,
     .others {
+      h3 {
+        margin-bottom: 1rem;
+      }
       .categories-wrapper {
         display: flex;
         flex-direction: row;
         gap: 1rem;
         flex-wrap: wrap;
-        .category-card {
-          border: 1px solid v.$border-card;
-          background: v.$card-gradient;
-          border-radius: 24px;
-          padding: 1rem;
-          max-width: 25.394rem;
-          width: 25.394rem;
-          min-width: 20rem;
-          overflow: auto;
-          gap: 0.5rem;
-
-          display: flex;
-          flex-direction: column;
-
-          .category-header {
-            display: flex;
-            flex-direction: row;
-            justify-content: space-between;
-            .name {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              display: block;
-            }
-            .amount {
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              display: block;
-            }
-          }
-
-          .subcategories-list {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-left: 1rem;
-            .subcategory-item {
-              display: flex;
-              flex-direction: row;
-              justify-content: space-between;
-              border: 1px solid v.$border-card;
-              background: v.$card-gradient;
-              border-radius: 30px;
-              padding: 0.5rem;
-              .name {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: block;
-              }
-              .amount {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                display: block;
-              }
-            }
-          }
-        }
       }
     }
   }

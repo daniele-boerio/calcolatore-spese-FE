@@ -5,9 +5,6 @@ import {
   getTransactionsPaginated,
 } from "../../../features/transactions/api_calls";
 import { getConti } from "../../../features/conti/api_calls";
-import TableVisualization, {
-  VisualizationColumnProps,
-} from "../../../components/table_visualization/table_visualization";
 import "./transactions.scss";
 import { Conto } from "../../../features/conti/interfaces";
 import Button from "../../../components/button/button";
@@ -15,6 +12,7 @@ import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../../i18n/use-i18n";
 import TransactionDialog from "../../../components/dialog/transaction_dialog/transaction_dialog";
 import { selectContiConti } from "../../../features/conti/conto_slice";
+import { Paginator } from "primereact/paginator"; // Importiamo il Paginator nudo e crudo
 import {
   selectTransactionLoading,
   selectTransactionPagination,
@@ -37,7 +35,6 @@ export default function Transactions() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
-  // Utilizziamo lo stato tipizzato 'transactions'
   const transactions = useAppSelector(selectTransactionTransactions);
   const loading = useAppSelector(selectTransactionLoading);
   const pagination = useAppSelector(selectTransactionPagination);
@@ -51,7 +48,6 @@ export default function Transactions() {
   const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
     null,
   );
-
   const [isTransactionDialogVisible, setIsTransactionDialogVisible] =
     useState<boolean>(false);
 
@@ -85,7 +81,10 @@ export default function Transactions() {
     );
   }, [dispatch, currentPage, pageSize]);
 
-  const deleteObject = (event: any, id: string) => {
+  const deleteObject = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    id: string,
+  ) => {
     confirmPopup({
       target: event.currentTarget,
       message: t("delete_message"),
@@ -100,104 +99,11 @@ export default function Transactions() {
     });
   };
 
-  const columns: VisualizationColumnProps[] = useMemo(
-    () => [
-      {
-        field: "data",
-        header: "Data",
-        body: (row: any) =>
-          new Date(row.data).toLocaleDateString("it-IT", {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-          }),
-      },
-      {
-        field: "importo",
-        header: "Importo",
-        body: (row: any) => (
-          <span
-            style={{
-              fontWeight: "bold",
-              color:
-                row.tipo.toUpperCase() === "USCITA"
-                  ? "var(--red-500)"
-                  : "var(--green-500)",
-            }}
-          >
-            {row.tipo.toUpperCase() === "USCITA" ? "-" : "+"} €
-            {row.importo.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
-          </span>
-        ),
-      },
-      { field: "descrizione", header: "Descrizione" },
-      {
-        field: "conto_id",
-        header: "Conto",
-        body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'conti' si popola
-          const conto = conti.find(
-            (c: Conto) => String(c.id) === String(row.conto_id),
-          );
-          return conto ? conto.nome : ``;
-        },
-      },
-      {
-        field: "categoria_id",
-        header: "Categoria",
-        body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'categoria' si popola
-          const categoria = categorie.find(
-            (c: Categoria) => String(c.id) === String(row.categoria_id),
-          );
-          return categoria ? categoria.nome : ``;
-        },
-      },
-      {
-        field: "sottocategoria_id",
-        header: "Sottocategoria",
-        body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'sottocategorie' si popola
-          const sottocategoria = sottocategorie.find(
-            (c: SottoCategoria | undefined) =>
-              c && String(c.id) === String(row.sottocategoria_id),
-          );
-          return sottocategoria ? sottocategoria.nome : ``;
-        },
-      },
-      {
-        field: "tag_id",
-        header: "Tag",
-        body: (row: any) => {
-          // Ora questa logica viene ricalcolata non appena 'tags' si popola
-          const tag = tags.find(
-            (tag: Tag) => String(tag.id) === String(row.tag_id),
-          );
-          return tag ? tag.nome : ``;
-        },
-      },
-      {
-        field: "delete",
-        header: t("actions"),
-        body: (row: any) => (
-          <Button
-            className="trasparent-danger-button"
-            icon="pi pi-trash"
-            compact
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteObject(e, row.id);
-            }}
-          />
-        ),
-      },
-    ],
-    [conti, categorie, sottocategorie, tags, t],
-  );
-
-  const dataReadyKey = useMemo(() => {
-    return `table-${conti.length > 0}-${categorie.length > 0}-${tags.length > 0}`;
-  }, [conti.length, categorie.length, tags.length]);
+  // Helper per trovare i nomi (così non appesantiamo il JSX)
+  const getCatName = (id: string) =>
+    categorie.find((c: Categoria) => String(c.id) === String(id))?.nome || "";
+  const getContoName = (id: string) =>
+    conti.find((c: Conto) => String(c.id) === String(id))?.nome || "";
 
   return (
     <>
@@ -218,28 +124,87 @@ export default function Transactions() {
           </div>
         </header>
 
-        <TableVisualization
-          className="transaction-table"
-          key={dataReadyKey}
-          value={transactions}
-          columns={columns}
-          scrollable={true}
-          selectionRow={{
-            selectedRow: selectedTransaction,
-            onSelectionChange: (e) => onRowClick(e),
-          }}
-          paginator={{
-            row: pageSize,
-            totalRecords: pagination?.total || 0,
-            first: currentPage * pageSize,
-            loading: loading,
-            lazy: true,
-            onPage: (e: { page: number; rows: number }) => {
-              setCurrentPage(e.page);
-              setPageSize(e.rows);
-            },
-          }}
-        />
+        <div className="split-wrapper">
+          <section className="transaction-list">
+            <div className="scrollable-area">
+              <div className="transactions-grid">
+                {loading ? (
+                  <p className="no-data">Caricamento in corso...</p>
+                ) : transactions.length > 0 ? (
+                  transactions.map((t) => (
+                    <div
+                      key={t.id}
+                      className={`transaction-card ${t.tipo.toLowerCase()}`}
+                      onClick={() => onRowClick(t)}
+                    >
+                      <div className="card-left">
+                        {/* Icona indicativa basata sul tipo */}
+                        <div className="icon-wrapper">
+                          <i
+                            className={`pi ${t.tipo === "USCITA" ? "pi-arrow-down-right" : t.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
+                          ></i>
+                        </div>
+                        <div className="info">
+                          <span className="desc">
+                            {t.descrizione ||
+                              getCatName(t.categoria_id) ||
+                              "Transazione"}
+                          </span>
+                          <span className="date-cat">
+                            {new Date(t.data).toLocaleDateString("it-IT", {
+                              day: "2-digit",
+                              month: "short",
+                            })}
+                            {getContoName(t.conto_id)
+                              ? ` • ${getContoName(t.conto_id)}`
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="card-right">
+                        <span className="amount">
+                          {t.tipo === "USCITA" ? "-" : "+"}
+                          {t.importo.toLocaleString("it-IT", {
+                            minimumFractionDigits: 2,
+                          })}{" "}
+                          €
+                        </span>
+                        <div className="actions">
+                          <Button
+                            className="trasparent-danger-button"
+                            icon="pi pi-trash"
+                            compact
+                            onClick={(e: any) => {
+                              e.stopPropagation(); // Evita di aprire il dialog quando si clicca sul cestino
+                              deleteObject(e, t.id);
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="no-data">{t("no_data")}</p>
+                )}
+              </div>
+
+              {/* Paginazione a fondo lista */}
+              {pagination && (pagination.total || 0) > pageSize && (
+                <Paginator
+                  first={currentPage * pageSize}
+                  rows={pageSize}
+                  totalRecords={pagination?.total || 0}
+                  onPageChange={(e: any) => {
+                    setCurrentPage(e.page);
+                    setPageSize(e.rows);
+                  }}
+                />
+              )}
+            </div>
+          </section>
+        </div>
+
         <Button
           className="add-transaction-button"
           icon={"pi pi-plus"}
@@ -248,6 +213,7 @@ export default function Transactions() {
           onClick={() => setIsTransactionDialogVisible(true)}
         />
       </div>
+
       <TransactionDialog
         visible={isTransactionDialogVisible}
         transaction={selectedTransaction}
