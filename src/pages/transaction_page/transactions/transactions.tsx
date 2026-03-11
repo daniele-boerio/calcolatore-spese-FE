@@ -44,7 +44,7 @@ export default function Transactions() {
   const tags = useAppSelector(selectTagTags);
 
   const [currentPage, setCurrentPage] = useState<number>(0);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [pageSize, setPageSize] = useState<number>(12);
   const [selectedTransaction, setSelectedTransaction] = useState<any | null>(
     null,
   );
@@ -102,6 +102,12 @@ export default function Transactions() {
   // Helper per trovare i nomi (così non appesantiamo il JSX)
   const getCatName = (id: string) =>
     categorie.find((c: Categoria) => String(c.id) === String(id))?.nome || "";
+  const getSubCatName = (id: string) =>
+    sottocategorie.find(
+      (c: SottoCategoria | undefined) => c && String(c.id) === String(id),
+    )?.nome || "";
+  const getTagName = (id: string) =>
+    tags.find((t: Tag) => String(t.id) === String(id))?.nome || "";
   const getContoName = (id: string) =>
     conti.find((c: Conto) => String(c.id) === String(id))?.nome || "";
 
@@ -131,61 +137,91 @@ export default function Transactions() {
                 {loading ? (
                   <p className="no-data">Caricamento in corso...</p>
                 ) : transactions.length > 0 ? (
-                  transactions.map((t) => (
-                    <div
-                      key={t.id}
-                      className={`transaction-card ${t.tipo.toLowerCase()}`}
-                      onClick={() => onRowClick(t)}
-                    >
-                      {/* Icona sempre a sinistra */}
-                      <div className="icon-wrapper">
-                        <i
-                          className={`pi ${t.tipo === "USCITA" ? "pi-arrow-down-right" : t.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
-                        ></i>
-                      </div>
+                  transactions.map((t) => {
+                    const catName = getCatName(t.categoria_id);
+                    const subCatName = getSubCatName(t.sottocategoria_id);
+                    const tagName = getTagName(t.tag_id);
 
-                      {/* Contenitore principale a destra */}
-                      <div className="card-content">
-                        {/* Prima riga: Descrizione e Azioni */}
-                        <div className="card-top">
-                          <span className="desc">
-                            {t.descrizione ||
-                              getCatName(t.categoria_id) ||
-                              "Transazione"}
-                          </span>
-                          <Button
-                            className="trasparent-danger-button delete-btn"
-                            icon="pi pi-trash"
-                            compact
-                            onClick={(e: any) => {
-                              e.stopPropagation();
-                              deleteObject(e, t.id);
-                            }}
-                          />
+                    return (
+                      <div
+                        key={t.id}
+                        className={`transaction-card ${t.tipo.toLowerCase()}`}
+                        onClick={() => onRowClick(t)}
+                      >
+                        <div className="icon-wrapper">
+                          <i
+                            className={`pi ${t.tipo === "USCITA" ? "pi-arrow-down-right" : t.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
+                          ></i>
                         </div>
 
-                        {/* Seconda riga: Data/Conto e Importo */}
-                        <div className="card-bottom">
-                          <span className="date-cat">
-                            {new Date(t.data).toLocaleDateString("it-IT", {
-                              day: "2-digit",
-                              month: "short",
-                            })}
-                            {getContoName(t.conto_id)
-                              ? ` • ${getContoName(t.conto_id)}`
-                              : ""}
-                          </span>
-                          <span className="amount">
-                            {t.tipo === "USCITA" ? "-" : "+"}
-                            {t.importo.toLocaleString("it-IT", {
-                              minimumFractionDigits: 2,
-                            })}{" "}
-                            €
-                          </span>
+                        <div className="card-content">
+                          {/* TOP: Descrizione e Cestino */}
+                          <div className="card-top">
+                            <span className="desc">
+                              {t.descrizione || catName || "Transazione"}
+                            </span>
+                            <Button
+                              className="trasparent-danger-button delete-btn"
+                              icon="pi pi-trash"
+                              compact
+                              onClick={(e: any) => {
+                                e.stopPropagation();
+                                deleteObject(e, t.id);
+                              }}
+                            />
+                          </div>
+
+                          {/* MIDDLE: Categoria, Sottocategoria, Tag */}
+                          {(catName || subCatName || tagName) && (
+                            <div className="card-middle">
+                              {catName && (
+                                <span className="info-badge cat">
+                                  {catName}
+                                </span>
+                              )}
+                              {subCatName && (
+                                <span className="info-badge subcat">
+                                  {subCatName}
+                                </span>
+                              )}
+                              {tagName && (
+                                <span className="info-badge tag">
+                                  <i
+                                    className="pi pi-hashtag"
+                                    style={{
+                                      fontSize: "0.6rem",
+                                      marginRight: "2px",
+                                    }}
+                                  ></i>
+                                  {tagName}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {/* BOTTOM: Data/Conto e Importo */}
+                          <div className="card-bottom">
+                            <span className="date-cat">
+                              {new Date(t.data).toLocaleDateString("it-IT", {
+                                day: "2-digit",
+                                month: "short",
+                              })}
+                              {getContoName(t.conto_id)
+                                ? ` • ${getContoName(t.conto_id)}`
+                                : ""}
+                            </span>
+                            <span className="amount">
+                              {t.tipo === "USCITA" ? "-" : "+"}
+                              {t.importo.toLocaleString("it-IT", {
+                                minimumFractionDigits: 2,
+                              })}{" "}
+                              €
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="no-data">{t("no_data")}</p>
                 )}

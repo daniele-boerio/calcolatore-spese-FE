@@ -117,8 +117,8 @@
             display: flex;
             flex-direction: column;
             flex: 1;
-            min-width: 0; // Fondamentale per far funzionare i tagli al testo (ellipsis)
-            gap: 0.25rem; // Spazio tra la prima riga (descrizione) e la seconda (importo)
+            min-width: 0;
+            gap: 0.4rem; // Aumentato un filo per far spazio alla terza riga
 
             .card-top {
               display: flex;
@@ -131,25 +131,67 @@
                 font-size: 1.05rem;
                 color: v.$text-main;
                 display: -webkit-box;
-                -webkit-line-clamp: 2; // Permette alla descrizione di andare su 2 righe se lunghissima
+                -webkit-line-clamp: 1; // Riportato a 1 riga per non occupare troppo spazio verticale
                 -webkit-box-orient: vertical;
+                line-clamp: 1;
                 overflow: hidden;
                 word-break: break-word;
                 line-height: 1.2;
-                margin-top: 0.15rem; // Allineamento ottico con il bottone
+                margin-top: 0.15rem;
               }
 
               .delete-btn {
                 flex-shrink: 0;
-                margin-top: -0.25rem; // Tira leggermente su il cestino per allinearlo al testo
+                margin-top: -0.25rem;
                 margin-right: -0.5rem;
+              }
+            }
+
+            // --- NUOVA RIGA CENTRALE (BADGES) ---
+            .card-middle {
+              display: flex;
+              align-items: center;
+              gap: 0.4rem;
+              width: 100%;
+
+              .info-badge {
+                display: inline-flex;
+                align-items: center;
+                font-size: 0.7rem;
+                font-weight: 500;
+                padding: 0.15rem 0.4rem;
+                border-radius: 4px;
+                white-space: nowrap; // Impedisce al testo del badge di andare a capo
+                overflow: hidden; // Taglia il testo fuori misura
+                text-overflow: ellipsis; // Aggiunge i "..."
+
+                // Il segreto per troncare su mobile:
+                // Permette ai badge di stringersi, ma senza collassare del tutto se c'è spazio
+                flex: 0 1 auto;
+                min-width: 0;
+
+                &.cat {
+                  background: rgba(v.$text-muted, 0.1);
+                  color: v.$text-main;
+                }
+
+                &.subcat {
+                  background: transparent;
+                  color: v.$text-muted;
+                  border: 1px solid rgba(v.$text-muted, 0.3);
+                }
+
+                &.tag {
+                  background: rgba(41, 128, 185, 0.1); // Blu chiaro
+                  color: #2980b9; // Usa una tua variabile se preferisci
+                }
               }
             }
 
             .card-bottom {
               display: flex;
               justify-content: space-between;
-              align-items: flex-end; // Allinea in basso la data e l'importo
+              align-items: flex-end;
               gap: 1rem;
 
               .date-cat {
@@ -157,16 +199,16 @@
                 color: v.$text-muted;
                 white-space: nowrap;
                 overflow: hidden;
-                text-overflow: ellipsis; // Mette i puntini se "10 mar • Intesa Sanpaolo" è troppo lungo
+                text-overflow: ellipsis;
                 flex: 1;
                 min-width: 0;
-                padding-bottom: 0.15rem; // Allineamento ottico della baseline con l'importo grande
+                padding-bottom: 0.15rem;
               }
 
               .amount {
-                font-weight: 800; // Molto più marcato
-                font-size: 1.25rem; // Più grande!
-                white-space: nowrap; // Impedisce all'Euro di andare a capo da solo
+                font-weight: 800;
+                font-size: 1.25rem;
+                white-space: nowrap;
                 flex-shrink: 0;
               }
             }
