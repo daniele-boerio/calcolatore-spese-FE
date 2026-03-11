@@ -40,7 +40,7 @@
     .total-title {
       font-size: 0.85rem;
       font-weight: 500;
-      color: var(--text-color-secondary, #6c757d);
+      color: var(--text-main);
       text-transform: uppercase;
       letter-spacing: 0.5px;
       margin-bottom: 0.25rem;
@@ -53,7 +53,7 @@
     .total-amount {
       font-size: 1.75rem;
       font-weight: 700;
-      color: var(--text-color, #212529);
+      color: var(--text-main);
       white-space: nowrap; // Evita che la valuta vada a capo da sola
 
       // Riduciamo la dimensione dell'importo per farlo stare nel buco rimpicciolito

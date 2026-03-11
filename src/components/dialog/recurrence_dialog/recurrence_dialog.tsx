@@ -334,6 +334,7 @@ export default function RecurrenceDialog({
               showIcon
               dateFormat="dd/mm/yy"
               minDate={new Date()}
+              showButtonBar
             />
           </div>
         </div>

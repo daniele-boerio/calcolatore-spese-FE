@@ -378,6 +378,7 @@ export default function TransactionDialog({
                   dateFormat="dd/mm/yy"
                   showTime={false}
                   hourFormat="24"
+                  showButtonBar
                 />
               </div>
             </div>

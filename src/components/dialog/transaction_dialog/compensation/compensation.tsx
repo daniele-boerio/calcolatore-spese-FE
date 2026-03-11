@@ -190,6 +190,7 @@ export default function Compensation({
                       dateFormat="dd/mm/yy"
                       showTime={false}
                       hourFormat="24"
+                      showButtonBar
                     />
                   </div>
                   <div className="field">
@@ -201,6 +202,7 @@ export default function Compensation({
                       dateFormat="dd/mm/yy"
                       showTime={false}
                       hourFormat="24"
+                      showButtonBar
                     />
                   </div>
                 </div>
@@ -275,6 +277,7 @@ export default function Compensation({
                       dateFormat="dd/mm/yy"
                       showTime={false}
                       hourFormat="24"
+                      showButtonBar
                     />
                   </div>
                 </div>

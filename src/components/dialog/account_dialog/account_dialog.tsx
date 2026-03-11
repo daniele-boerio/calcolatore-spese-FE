@@ -282,6 +282,7 @@ export default function AccountDialog({
                       showIcon
                       minDate={new Date()}
                       inputClassName="p-inputtext" // Applica lo stile a linea inferiore
+                      showButtonBar
                     />
                   </div>
                 </div>
