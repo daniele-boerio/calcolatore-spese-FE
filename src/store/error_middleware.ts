@@ -1,13 +1,16 @@
 import { Middleware } from "@reduxjs/toolkit";
 import { showError } from "../features/error/error_slice";
+import { setLogout } from "../features/profile/profile_slice";
 
 export const errorMiddleware: Middleware =
   (store) => (next) => (action: any) => {
     if (action.type?.endsWith("/rejected")) {
-      if (
-        action.payload?.status === 401 ||
-        action.error?.message?.includes("401")
-      ) {
+      const status =
+        action.payload?.status ||
+        (action.error?.message?.includes("401") ? 401 : null);
+
+      if (status === 401) {
+        store.dispatch(setLogout());
         return next(action);
       }
 
@@ -24,9 +27,7 @@ export const errorMiddleware: Middleware =
       // 3. Dispatch della Dialog di errore
       store.dispatch(
         showError({
-          title: action.payload?.status
-            ? `Errore ${action.payload.status}`
-            : "Attenzione",
+          title: status ? `Errore ${status}` : "Attenzione",
           message: formattedMessage,
         }),
       );
