@@ -2,7 +2,12 @@ import { useSelector } from "react-redux";
 import AuthPage from "./pages/auth_page/auth_page";
 import HomePage from "./pages/home_page/home_page";
 import Navbar from "./components/navbar/navbar";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import "./App.scss";
 import TransactionPage from "./pages/transaction_page/transaction_page";
 import { useAppDispatch } from "./store/store";
@@ -48,7 +53,7 @@ function App() {
                 <Route path="/tags" element={<TagsPage />} />
                 <Route path="/accounts" element={<ContiPage />} />
                 <Route path="/statistics" element={<StatisticsPage />} />
-                <Route path="*" element={<HomePage />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>
           </>
