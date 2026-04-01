@@ -48,6 +48,7 @@ function App() {
                 <Route path="/tags" element={<TagsPage />} />
                 <Route path="/accounts" element={<ContiPage />} />
                 <Route path="/statistics" element={<StatisticsPage />} />
+                <Route path="*" element={<HomePage />} />
               </Routes>
             </div>
           </>
