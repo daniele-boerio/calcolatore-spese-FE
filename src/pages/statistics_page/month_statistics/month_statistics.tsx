@@ -153,6 +153,7 @@ export default function MonthStatistics() {
       </header>
 
       {/* Se sta caricando, potresti mostrare uno spinner qui. Per ora mostriamo i dati. */}
+      {loading && <p className="no-data">{t("loading_data")}</p>}
       <div className="statistics-container">
         {/* COLONNA ENTRATE */}
         <div className="incomes">

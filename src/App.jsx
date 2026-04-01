@@ -14,6 +14,7 @@ import ContiPage from "./pages/conti_page/conti_page";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import TagsPage from "./pages/tags_page/tags_page";
 import StatisticsPage from "./pages/statistics_page/statistics_page";
+import ResetPasswordPage from "./pages/reset_password_page/reset_password_page";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -31,7 +32,10 @@ function App() {
     <Router>
       <div className="App">
         {!isAuthenticated ? (
-          <AuthPage />
+          <Routes>
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="*" element={<AuthPage />} />
+          </Routes>
         ) : (
           <>
             <Navbar /> {/* Resta sempre qui in alto */}

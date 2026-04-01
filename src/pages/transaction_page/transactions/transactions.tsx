@@ -135,7 +135,7 @@ export default function Transactions() {
             <div className="scrollable-area">
               <div className="transactions-grid">
                 {loading ? (
-                  <p className="no-data">Caricamento in corso...</p>
+                  <p className="no-data">{t("loading_data")}</p>
                 ) : transactions.length > 0 ? (
                   transactions.map((t) => {
                     const catName = getCatName(t.categoria_id);
@@ -158,7 +158,7 @@ export default function Transactions() {
                           {/* TOP: Descrizione e Cestino */}
                           <div className="card-top">
                             <span className="desc">
-                              {t.descrizione || catName || "Transazione"}
+                              {t.descrizione || catName || t("transaction")}
                             </span>
                             <Button
                               className="trasparent-danger-button delete-btn"

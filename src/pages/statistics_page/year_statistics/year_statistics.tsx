@@ -165,7 +165,7 @@ export default function YearStatistics() {
         <section className="statistics-list">
           <div className="scrollable-area">
             {loading ? (
-              <p className="no-data">Caricamento in corso...</p>
+              <p className="no-data">{t("loading_data")}</p>
             ) : categoriesSummary.length === 0 ? (
               <p className="no-data">{t("no_data")}</p>
             ) : (

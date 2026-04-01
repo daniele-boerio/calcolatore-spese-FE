@@ -414,7 +414,7 @@ export default function TransactionDialog({
                     label={t("new_tag_name")}
                     value={newTagName}
                     onChange={(e) => setNewTagName(e.target.value)}
-                    placeholder="Es. Corsica 2026"
+                    placeholder={t("ex_corsica")}
                   />
                 </div>
               </div>
@@ -452,7 +452,7 @@ export default function TransactionDialog({
                     label={t("new_category_name")}
                     value={newCategoryName}
                     onChange={(e) => setNewCategoryName(e.target.value)}
-                    placeholder="Es. Abbonamenti"
+                    placeholder={t("ex_subscriptions")}
                   />
                 </div>
               </div>
@@ -465,7 +465,7 @@ export default function TransactionDialog({
                     label={t("new_subcategory_name")}
                     value={newSubCategoryName}
                     onChange={(e) => setNewSubCategoryName(e.target.value)}
-                    placeholder="Es. Netflix"
+                    placeholder={t("ex_netflix")}
                   />
                 </div>
               </div>

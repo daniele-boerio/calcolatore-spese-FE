@@ -114,7 +114,7 @@ export default function Recurrings() {
             <div className="scrollable-area">
               <div className="transactions-grid">
                 {loading ? (
-                  <p className="no-data">Caricamento in corso...</p>
+                  <p className="no-data">{t("loading_data")}</p>
                 ) : recurrings.length > 0 ? (
                   recurrings.map((r) => {
                     const catName = getCatName(r.categoria_id);
@@ -139,11 +139,11 @@ export default function Recurrings() {
                           <div className="card-top">
                             <div className="desc-container">
                               <span className="desc">
-                                {r.nome || catName || "Ricorrente"}
+                                {r.nome || catName || t("recurring_item")}
                               </span>
                               {isInactive && (
                                 <span className="status-badge suspended">
-                                  SOSPESA
+                                  {t("status_suspended")}
                                 </span>
                               )}
                             </div>
@@ -196,7 +196,7 @@ export default function Recurrings() {
                           <div className="card-bottom">
                             <span className="date-cat">
                               {r.prossima_esecuzione
-                                ? `Prox: ${new Date(r.prossima_esecuzione).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}`
+                                ? `${t("prox_execution")} ${new Date(r.prossima_esecuzione).toLocaleDateString("it-IT", { day: "2-digit", month: "short", year: "numeric" })}`
                                 : ""}
                               {getContoName(r.conto_id)
                                 ? ` • ${getContoName(r.conto_id)}`

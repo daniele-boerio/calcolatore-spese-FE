@@ -312,7 +312,7 @@ export default function Compensation({
                         label={t("new_tag_name")}
                         value={newTagName}
                         onChange={(e) => setNewTagName(e.target.value)}
-                        placeholder="Es. Corsica 2026"
+                        placeholder={t("ex_corsica")}
                       />
                     </div>
                   </div>

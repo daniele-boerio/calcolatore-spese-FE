@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import Password from "../../components/password/password";
 import { useI18n } from "../../i18n/use-i18n";
 import { selectProfileLoading } from "../../features/profile/profile_slice";
+import ForgotPasswordDialog from "../../components/dialog/forgot_password_dialog/forgot_password_dialog";
 
 export default function AuthPage() {
   const { t } = useI18n();
@@ -14,6 +15,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [forgotDialogVisible, setForgotDialogVisible] = useState(false);
 
   const loading = useAppSelector(selectProfileLoading);
   const dispatch = useAppDispatch();
@@ -81,12 +83,22 @@ export default function AuthPage() {
         />
 
         <p className="auth-toggle-text">
-          {isLogin ? "Non hai un account?" : "Hai già un account?"}
+          {isLogin ? t("no_account") : t("account")}
           <span onClick={() => setIsLogin(!isLogin)}>
             {isLogin ? t("sign_in_space") : t("login_space")}
           </span>
         </p>
+        <p className="auth-toggle-text">
+          {t("forgot_password_question")}{" "}
+          <span onClick={() => setForgotDialogVisible(true)}>
+            {t("forgot_password")}
+          </span>
+        </p>
       </div>
+      <ForgotPasswordDialog
+        visible={forgotDialogVisible}
+        onHide={() => setForgotDialogVisible(false)}
+      />
     </div>
   );
 }
