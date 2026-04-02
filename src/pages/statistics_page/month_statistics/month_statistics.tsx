@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { getMonthlyDetailsStatistics } from "../../../features/statistics/api_calls";
 import {
   selectMonthlyStatisticsData,
+  selectMonthlyTotals,
   selectStatisticsLoading,
 } from "../../../features/statistics/statistics_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
@@ -13,14 +14,13 @@ import "./month_statistics.scss";
 import { MonthlyDetailCategory } from "../../../features/statistics/interfaces";
 import CustomCard from "../../../components/custom_card/custom_card";
 
-// Se hai un'interfaccia nel tuo slice, usala. Altrimenti la definisco qui per chiarezza.
-
 export default function MonthStatistics() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Selettori Redux
   const data = useAppSelector(selectMonthlyStatisticsData);
+  const totals = useAppSelector(selectMonthlyTotals);
   const loading = useAppSelector(selectStatisticsLoading);
   const categorie = useAppSelector(selectCategoriaCategorie);
 
@@ -77,6 +77,10 @@ export default function MonthStatistics() {
   const incomes = data.filter((cat) => cat.tipo === "ENTRATA");
   const expenses = data.filter((cat) => cat.tipo === "USCITA");
   const others = data.filter((cat) => cat.tipo === "OTHER");
+
+  // Calcolo totali (usiamo quelli del BE)
+  const totalIncomes = totals.incomes;
+  const totalExpenses = totals.expenses;
 
   // Funzione helper per renderizzare una singola categoria con le sue sottocategorie
   const renderCategoryBlock = (cat: MonthlyDetailCategory) => (
@@ -152,8 +156,31 @@ export default function MonthStatistics() {
         </div>
       </header>
 
-      {/* Se sta caricando, potresti mostrare uno spinner qui. Per ora mostriamo i dati. */}
+      <div className="summary-stats-row">
+        <div className="stats">
+          <h3 className="stats-item income">
+            {t("income")}:{" "}
+            <span>
+              {totalIncomes.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
+            </span>
+          </h3>
+          <h3 className="stats-item expenses">
+            {t("expenses")}:{" "}
+            <span>
+              {totalExpenses.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
+            </span>
+          </h3>
+        </div>
+      </div>
+
       {loading && <p className="no-data">{t("loading_data")}</p>}
+
       <div className="statistics-container">
         {/* COLONNA ENTRATE */}
         <div className="incomes">
@@ -180,25 +207,6 @@ export default function MonthStatistics() {
           <div className="categories-wrapper">
             {expenses.length > 0 ? (
               expenses.map((cat) => (
-                <CustomCard
-                  key={cat.categoria}
-                  title={cat.categoria}
-                  totale={cat.totale}
-                  sottocategorie={cat.sottocategorie}
-                />
-              ))
-            ) : (
-              <p className="no-data">{t("no_data")}</p>
-            )}
-          </div>
-        </div>
-
-        {/* COLONNA MISTE (OTHER) */}
-        <div className="others">
-          <h3>{t("others")}</h3>
-          <div className="categories-wrapper">
-            {others.length > 0 ? (
-              others.map((cat) => (
                 <CustomCard
                   key={cat.categoria}
                   title={cat.categoria}

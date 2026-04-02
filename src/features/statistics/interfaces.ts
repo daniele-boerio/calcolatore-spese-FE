@@ -8,6 +8,12 @@ export interface FetchYearStatisticsParams {
   categoria_id?: string | null;
 }
 
+export interface MonthlyDetailResponse {
+  data: MonthlyDetailCategory[];
+  totale_entrata: number;
+  totale_uscita: number;
+}
+
 export interface MonthlyDetailCategory {
   categoria: string;
   totale: number;

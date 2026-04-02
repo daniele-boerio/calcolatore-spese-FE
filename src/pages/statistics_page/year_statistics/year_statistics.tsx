@@ -134,6 +134,10 @@ export default function YearStatistics() {
   const expenses = categoriesSummary.filter((c) => c.totale < 0);
   const others = categoriesSummary.filter((c) => c.totale === 0);
 
+  // Calcolo totali annuali
+  const totalIncomes = incomes.reduce((acc, cat) => acc + cat.totale, 0);
+  const totalExpenses = expenses.reduce((acc, cat) => acc + cat.totale, 0);
+
   return (
     <div className="yearly-statistics-page">
       <header className="page-header">
@@ -160,7 +164,29 @@ export default function YearStatistics() {
         </div>
       </header>
 
-      {/* SOSTITUIAMO IL TABELLONE CON LE CARD RESPONSIVE */}
+      <div className="summary-stats-row">
+        <div className="stats">
+          <h3 className="stats-item income">
+            {t("income")}:{" "}
+            <span>
+              {totalIncomes.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
+            </span>
+          </h3>
+          <h3 className="stats-item expenses">
+            {t("expenses")}:{" "}
+            <span>
+              {totalExpenses.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
+            </span>
+          </h3>
+        </div>
+      </div>
+
       <div className="split-wrapper">
         <section className="statistics-list">
           <div className="scrollable-area">
@@ -193,23 +219,6 @@ export default function YearStatistics() {
                     <h3>{t("expenses")}</h3>
                     <div className="categories-grid">
                       {expenses.map((cat) => (
-                        <CustomCard
-                          key={cat.categoria}
-                          title={cat.categoria}
-                          totale={cat.totale}
-                          sottocategorie={cat.sottocategorie}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* ALTRE (Saldo zero) */}
-                {others.length > 0 && (
-                  <div className="category-section">
-                    <h3>{t("others")}</h3>
-                    <div className="categories-grid">
-                      {others.map((cat) => (
                         <CustomCard
                           key={cat.categoria}
                           title={cat.categoria}

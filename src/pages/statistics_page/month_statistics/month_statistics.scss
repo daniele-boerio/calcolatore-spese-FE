@@ -16,7 +16,7 @@
     flex-wrap: wrap;
     gap: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid v.$border-color; // Una linea sottile per separare l'header dalla tabella
+    border-bottom: 1px solid v.$border-color;
 
     .filters-row {
       display: flex;
@@ -42,6 +42,53 @@
     }
   }
 
+  .summary-stats-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 0.5rem;
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 2rem;
+      font-size: 1rem;
+      background: rgba(v.$text-main, 0.03);
+      padding: 0.8rem 2rem;
+      border-radius: 50px;
+      border: 1px solid rgba(v.$text-main, 0.05);
+
+      .stats-item {
+        margin: 0;
+        font-weight: 500;
+        color: v.$text-muted;
+
+        span {
+          font-weight: 700;
+          margin-left: 0.35rem;
+        }
+
+        &.income span {
+          color: v.$green;
+        }
+        &.expenses span {
+          color: v.$red;
+        }
+        &.others span {
+          color: #3498db;
+        }
+      }
+
+      @media screen and (max-width: v.$mobile) {
+        gap: 1rem;
+        padding: 0.8rem 1.2rem;
+        border-radius: 16px;
+        font-size: 0.85rem;
+      }
+    }
+  }
+
   .value-high {
     color: v.$green;
   }
@@ -55,7 +102,10 @@
     .others {
       h3 {
         margin-bottom: 1rem;
+        color: v.$text-main;
+        font-weight: 600;
       }
+
       .categories-wrapper {
         display: flex;
         flex-direction: row;

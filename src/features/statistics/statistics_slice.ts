@@ -9,12 +9,20 @@ import {
 interface StatisticsState {
   yearlyData: YearDetailsStatRow[];
   monthlyData: MonthlyDetailCategory[];
+  totals: {
+    incomes: number;
+    expenses: number;
+  };
   loading: boolean;
 }
 
 const initialState: StatisticsState = {
   yearlyData: [],
   monthlyData: [],
+  totals: {
+    incomes: 0,
+    expenses: 0,
+  },
   loading: false,
 };
 
@@ -42,9 +50,11 @@ const statisticsSlice = createSlice({
 
       .addCase(
         getMonthlyDetailsStatistics.fulfilled,
-        (state, action: PayloadAction<MonthlyDetailCategory[]>) => {
+        (state, action: PayloadAction<MonthlyDetailResponse>) => {
           state.loading = false;
-          state.monthlyData = action.payload;
+          state.monthlyData = action.payload.data;
+          state.totals.incomes = action.payload.totale_entrata;
+          state.totals.expenses = action.payload.totale_uscita;
         },
       )
 
@@ -70,6 +80,8 @@ export const selectYearlyStatisticsData = (state: RootState) =>
   state.statistics.yearlyData;
 export const selectMonthlyStatisticsData = (state: RootState) =>
   state.statistics.monthlyData;
+export const selectMonthlyTotals = (state: RootState) =>
+  state.statistics.totals;
 export const selectStatisticsLoading = (state: RootState) =>
   state.statistics.loading;
 

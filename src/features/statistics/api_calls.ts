@@ -34,11 +34,11 @@ export const getYearDetailsStatistics = createAsyncThunk<
 });
 
 export const getMonthlyDetailsStatistics = createAsyncThunk<
-  MonthlyDetailCategory[],
+  MonthlyDetailResponse,
   FetchMonthStatisticsParams
 >("statistics/monthDetails", async (params, { rejectWithValue }) => {
   try {
-    const response = await api.get<MonthlyDetailCategory[]>(
+    const response = await api.get<MonthlyDetailResponse>(
       "/statistics/monthDetails",
       {
         params: {
