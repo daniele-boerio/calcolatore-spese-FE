@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from "../../../store/store";
 import "./recurrence_dialog.scss";
 import { tipoTransaction } from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
-import { Calendar } from "primereact/calendar";
+import Calendar from "../../calendar/calendar";
 import {
   createCategoria,
   createSottoCategorie,
@@ -327,12 +327,11 @@ export default function RecurrenceDialog({
             />
           </div>
           <div className="field">
-            <label className="field-label">{t("next_execution")}</label>
             <Calendar
+              label={t("next_execution")}
               value={prossimaEsecuzione}
               onChange={(e) => setProssimaEsecuzione(e.value as Date)}
               showIcon
-              dateFormat="dd/mm/yy"
               minDate={new Date()}
               showButtonBar
             />

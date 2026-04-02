@@ -11,7 +11,7 @@ import {
 } from "../../../../features/transactions/api_calls";
 import { Transaction } from "../../../../features/transactions/interfaces";
 import { useI18n } from "../../../../i18n/use-i18n";
-import { Calendar } from "primereact/calendar";
+import Calendar from "../../../calendar/calendar";
 import { selectContiConti } from "../../../../features/conti/conto_slice";
 import { selectCategoriaCategorie } from "../../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../../features/tags/tag_slice";
@@ -182,24 +182,22 @@ export default function Compensation({
                 </div>
                 <div className="form-row">
                   <div className="field">
-                    <label className="field-label">{t("from_date")}</label>
                     <Calendar
+                      label={t("from_date")}
                       value={from_data}
                       onChange={(e) => setFromData(e.value as Date)}
                       showIcon
-                      dateFormat="dd/mm/yy"
                       showTime={false}
                       hourFormat="24"
                       showButtonBar
                     />
                   </div>
                   <div className="field">
-                    <label className="field-label">{t("to_date")}</label>
                     <Calendar
+                      label={t("to_date")}
                       value={to_data}
                       onChange={(e) => setToData(e.value as Date)}
                       showIcon
-                      dateFormat="dd/mm/yy"
                       showTime={false}
                       hourFormat="24"
                       showButtonBar
@@ -269,12 +267,11 @@ export default function Compensation({
                     />
                   </div>
                   <div className="field">
-                    <label className="field-label">{t("date")}</label>
                     <Calendar
+                      label={t("date")}
                       value={data}
                       onChange={(e) => setData(e.value as Date)}
                       showIcon
-                      dateFormat="dd/mm/yy"
                       showTime={false}
                       hourFormat="24"
                       showButtonBar

@@ -1,0 +1,16 @@
+.div-calendar {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .field-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    margin-bottom: 0.5rem;
+  }
+
+  .p-calendar {
+    width: 100%;
+  }
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar"; // Tornato al componente standard
+import Calendar from "../../calendar/calendar";
 import Dropdown from "../../dropdown/dropdown";
 import InputText from "../../input_text/input_text";
 import Button from "../../button/button";
@@ -273,12 +273,11 @@ export default function AccountDialog({
 
               <div className="form-row">
                 <div className="field">
-                  <div className="calendar-field">
-                    <label className="field-label">{t("next_check")}</label>
+                  <div className="field">
                     <Calendar
+                      label={t("next_check")}
                       value={prossimoControllo}
                       onChange={(e) => setProssimoControllo(e.value as Date)}
-                      dateFormat="dd/mm/yy"
                       showIcon
                       minDate={new Date()}
                       inputClassName="p-inputtext" // Applica lo stile a linea inferiore

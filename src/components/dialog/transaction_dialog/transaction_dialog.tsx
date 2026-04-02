@@ -15,7 +15,7 @@ import {
   Transaction,
 } from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
-import { Calendar } from "primereact/calendar";
+import Calendar from "../../calendar/calendar";
 import Compensation from "./compensation/compensation";
 import { selectContiConti } from "../../../features/conti/conto_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
@@ -370,12 +370,11 @@ export default function TransactionDialog({
                 />
               </div>
               <div className="field">
-                <label className="field-label">{t("date")}</label>
                 <Calendar
+                  label={t("date")}
                   value={data}
                   onChange={(e) => setData(e.value as Date)}
                   showIcon
-                  dateFormat="dd/mm/yy"
                   showTime={false}
                   hourFormat="24"
                   showButtonBar
