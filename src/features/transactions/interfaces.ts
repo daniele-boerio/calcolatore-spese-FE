@@ -91,8 +91,8 @@ export interface TransactionsFilters {
   data_inizio?: string;
   data_fine?: string;
   descrizione?: string;
-  conto_id?: string[];
-  categoria_id?: string[];
-  sottocategoria_id?: string[];
-  tag_id?: string[];
+  conto_id?: string;
+  categoria_id?: string;
+  sottocategoria_id?: string;
+  tag_id?: string;
 }

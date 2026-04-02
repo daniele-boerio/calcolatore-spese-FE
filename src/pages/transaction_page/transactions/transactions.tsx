@@ -30,6 +30,14 @@ import {
 import { selectTagTags } from "../../../features/tags/tag_slice";
 import { getTags } from "../../../features/tags/api_calls";
 import { Tag } from "../../../features/tags/interfaces";
+import { Sidebar } from "primereact/sidebar";
+import Dropdown from "../../../components/dropdown/dropdown";
+import Calendar from "../../../components/calendar/calendar";
+import {
+  selectTransactionFilters,
+  updateFilters,
+  resetFilters,
+} from "../../../features/transactions/transaction_slice";
 
 export default function Transactions() {
   const { t } = useI18n();
@@ -42,6 +50,7 @@ export default function Transactions() {
   const categorie = useAppSelector(selectCategoriaCategorie);
   const sottocategorie = useAppSelector(selectCategoriaSottocategorie);
   const tags = useAppSelector(selectTagTags);
+  const filters = useAppSelector(selectTransactionFilters);
 
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [pageSize, setPageSize] = useState<number>(12);
@@ -50,6 +59,22 @@ export default function Transactions() {
   );
   const [isTransactionDialogVisible, setIsTransactionDialogVisible] =
     useState<boolean>(false);
+  const [isSidebarVisible, setIsSidebarVisible] = useState<boolean>(false);
+
+  const toLocalDateStr = (date: Date | null) => {
+    if (!date) return undefined;
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, "0");
+    const d = String(date.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+  };
+
+  const parseDate = (dateStr?: string) => {
+    if (!dateStr) return null;
+    const parts = dateStr.split("-");
+    if (parts.length !== 3) return null;
+    return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+  };
 
   const onRowClick = (transaction: any) => {
     setSelectedTransaction(transaction);
@@ -79,7 +104,7 @@ export default function Transactions() {
         size: pageSize,
       }),
     );
-  }, [dispatch, currentPage, pageSize]);
+  }, [dispatch, currentPage, pageSize, filters]);
 
   const deleteObject = (
     event: React.MouseEvent<HTMLButtonElement>,
@@ -114,19 +139,43 @@ export default function Transactions() {
   return (
     <>
       <div className="transaction-page">
-        <header className="page-header">
-          <h1>{t("transaction_history")}</h1>
-          <div className="stats">
-            <h3 className="stats-item income">
-              {t("income")}: <span>{pagination?.total_incomes || 0} €</span>
-            </h3>
-            <h3 className="stats-item compensation">
-              {t("compensations")}:{" "}
-              <span>{pagination?.total_compensation || 0} €</span>
-            </h3>
-            <h3 className="stats-item expenses">
-              {t("expenses")}: <span>{pagination?.total_expenses || 0} €</span>
-            </h3>
+        <header
+          className="page-header"
+          style={{ justifyContent: "space-between", alignItems: "center" }}
+        >
+          <div>
+            <h1>{t("transaction_history")}</h1>
+            <div className="stats">
+              <h3 className="stats-item income">
+                {t("income")}: <span>{pagination?.total_incomes || 0} €</span>
+              </h3>
+              <h3 className="stats-item compensation">
+                {t("compensations")}:{" "}
+                <span>{pagination?.total_compensation || 0} €</span>
+              </h3>
+              <h3 className="stats-item expenses">
+                {t("expenses")}:{" "}
+                <span>{pagination?.total_expenses || 0} €</span>
+              </h3>
+            </div>
+          </div>
+          <div className="header-actions">
+            <Button
+              icon="pi pi-filter"
+              className="trasparent-button"
+              onClick={() => setIsSidebarVisible(true)}
+              compact
+              rounded
+            />
+            <Button
+              label={t("reset_filters")}
+              className="trasparent-button"
+              onClick={() => {
+                dispatch(resetFilters());
+                setCurrentPage(0);
+              }}
+              icon="pi pi-filter-slash"
+            />
           </div>
         </header>
 
@@ -137,20 +186,22 @@ export default function Transactions() {
                 {loading ? (
                   <p className="no-data">{t("loading_data")}</p>
                 ) : transactions.length > 0 ? (
-                  transactions.map((t) => {
-                    const catName = getCatName(t.categoria_id);
-                    const subCatName = getSubCatName(t.sottocategoria_id);
-                    const tagName = getTagName(t.tag_id);
+                  transactions.map((transaction) => {
+                    const catName = getCatName(transaction.categoria_id);
+                    const subCatName = getSubCatName(
+                      transaction.sottocategoria_id,
+                    );
+                    const tagName = getTagName(transaction.tag_id);
 
                     return (
                       <div
-                        key={t.id}
-                        className={`transaction-card ${t.tipo.toLowerCase()}`}
-                        onClick={() => onRowClick(t)}
+                        key={transaction.id}
+                        className={`transaction-card ${transaction.tipo.toLowerCase()}`}
+                        onClick={() => onRowClick(transaction)}
                       >
                         <div className="icon-wrapper">
                           <i
-                            className={`pi ${t.tipo === "USCITA" ? "pi-arrow-down-right" : t.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
+                            className={`pi ${transaction.tipo === "USCITA" ? "pi-arrow-down-right" : transaction.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
                           ></i>
                         </div>
 
@@ -158,7 +209,9 @@ export default function Transactions() {
                           {/* TOP: Descrizione e Cestino */}
                           <div className="card-top">
                             <span className="desc">
-                              {t.descrizione || catName || t("transaction")}
+                              {transaction.descrizione ||
+                                catName ||
+                                t("transaction")}
                             </span>
                             <Button
                               className="trasparent-danger-button delete-btn"
@@ -166,7 +219,7 @@ export default function Transactions() {
                               compact
                               onClick={(e: any) => {
                                 e.stopPropagation();
-                                deleteObject(e, t.id);
+                                deleteObject(e, transaction.id);
                               }}
                             />
                           </div>
@@ -202,17 +255,20 @@ export default function Transactions() {
                           {/* BOTTOM: Data/Conto e Importo */}
                           <div className="card-bottom">
                             <span className="date-cat">
-                              {new Date(t.data).toLocaleDateString("it-IT", {
-                                day: "2-digit",
-                                month: "short",
-                              })}
-                              {getContoName(t.conto_id)
-                                ? ` • ${getContoName(t.conto_id)}`
+                              {new Date(transaction.data).toLocaleDateString(
+                                "it-IT",
+                                {
+                                  day: "2-digit",
+                                  month: "short",
+                                },
+                              )}
+                              {getContoName(transaction.conto_id)
+                                ? ` • ${getContoName(transaction.conto_id)}`
                                 : ""}
                             </span>
                             <span className="amount">
-                              {t.tipo === "USCITA" ? "-" : "+"}
-                              {t.importo.toLocaleString("it-IT", {
+                              {transaction.tipo === "USCITA" ? "-" : "+"}
+                              {transaction.importo.toLocaleString("it-IT", {
                                 minimumFractionDigits: 2,
                               })}{" "}
                               €
@@ -257,6 +313,138 @@ export default function Transactions() {
         transaction={selectedTransaction}
         onHide={() => handleCloseDialog()}
       />
+
+      <Sidebar
+        visible={isSidebarVisible}
+        position="right"
+        onHide={() => setIsSidebarVisible(false)}
+        className="filter-sidebar"
+      >
+        <h2>{t("filters")}</h2>
+
+        <div className="filter-form">
+          <div className="field">
+            <Dropdown
+              label={t("select_type") || "Seleziona Tipo"}
+              value={filters.tipo || null}
+              options={[
+                { label: t("income"), value: "ENTRATA" },
+                { label: t("expenses"), value: "USCITA" },
+                { label: t("compensation"), value: "RIMBORSO" },
+              ]}
+              onChange={(e) => {
+                dispatch(updateFilters({ tipo: e.value ?? undefined }));
+                setCurrentPage(0);
+              }}
+              placeholder={t("select_type")}
+              showClear
+            />
+          </div>
+
+          <div className="field">
+            <Dropdown
+              label={t("bank_account")}
+              value={filters.conto_id || null}
+              options={conti}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => {
+                dispatch(updateFilters({ conto_id: e.value ?? undefined }));
+                setCurrentPage(0);
+              }}
+              placeholder={t("bank_account")}
+              showClear
+            />
+          </div>
+
+          <div className="field">
+            <Dropdown
+              label={t("category")}
+              value={filters.categoria_id || null}
+              options={categorie}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => {
+                dispatch(
+                  updateFilters({
+                    categoria_id: e.value ?? undefined,
+                    sottocategoria_id: undefined, // Reset subcategory when category changes
+                  }),
+                );
+                setCurrentPage(0);
+              }}
+              placeholder={t("category")}
+              showClear
+            />
+          </div>
+
+          <div className="field">
+            <Dropdown
+              label={t("sub_category")}
+              value={filters.sottocategoria_id || null}
+              options={
+                categorie.find((c) => c.id === filters.categoria_id)
+                  ?.sottocategorie || []
+              }
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => {
+                dispatch(
+                  updateFilters({ sottocategoria_id: e.value ?? undefined }),
+                );
+                setCurrentPage(0);
+              }}
+              placeholder={t("sub_category")}
+              disabled={!filters.categoria_id}
+              showClear
+            />
+          </div>
+
+          <div className="field">
+            <Dropdown
+              label={t("tag")}
+              value={filters.tag_id || null}
+              options={tags}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => {
+                dispatch(updateFilters({ tag_id: e.value ?? undefined }));
+                setCurrentPage(0);
+              }}
+              placeholder={t("tag")}
+              showClear
+            />
+          </div>
+
+          <div className="field">
+            <Calendar
+              label={t("from_date") || "Da Data"}
+              value={parseDate(filters.data_inizio)}
+              onChange={(e) => {
+                const dateStr = toLocalDateStr(e.value as Date | null);
+                dispatch(updateFilters({ data_inizio: dateStr }));
+                setCurrentPage(0);
+              }}
+              showIcon
+              showButtonBar
+            />
+          </div>
+
+          <div className="field">
+            <Calendar
+              label={t("to_date") || "A Data"}
+              value={parseDate(filters.data_fine)}
+              onChange={(e) => {
+                const dateStr = toLocalDateStr(e.value as Date | null);
+                dispatch(updateFilters({ data_fine: dateStr }));
+                setCurrentPage(0);
+              }}
+              showIcon
+              showButtonBar
+            />
+          </div>
+        </div>
+      </Sidebar>
     </>
   );
 }

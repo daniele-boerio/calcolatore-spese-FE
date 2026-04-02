@@ -55,6 +55,11 @@
         }
       }
     }
+
+    .header-actions {
+      display: flex;
+      flex-direction: row;
+    }
   }
 
   .split-wrapper {
@@ -266,5 +271,27 @@
     bottom: 2rem;
     right: 2rem;
     z-index: 1000;
+  }
+}
+
+.filter-sidebar {
+  padding: 1.5rem;
+  background-color: var(--bg-card) !important;
+
+  .p-sidebar-header {
+    display: none;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: 2rem;
+  }
+
+  .filter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
   }
 }

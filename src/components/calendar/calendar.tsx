@@ -1,11 +1,11 @@
-import {
-  Calendar as CalendarPrime,
-  CalendarChangeEvent,
-} from "primereact/calendar";
+import { Calendar as CalendarPrime } from "primereact/calendar";
+import { FormEvent } from "primereact/ts-helpers";
 import { locale, addLocale } from "primereact/api";
 import React, { useEffect } from "react";
 import "./calendar.scss";
 import { useI18n } from "../../i18n/use-i18n";
+
+export type CalendarChangeEvent = FormEvent<Date>;
 
 export type CalendarProps = {
   id?: string;
@@ -15,7 +15,7 @@ export type CalendarProps = {
   showIcon?: boolean;
   dateFormat?: string;
   showTime?: boolean;
-  hourFormat?: string;
+  hourFormat?: "12" | "24";
   showButtonBar?: boolean;
   minDate?: Date;
   inputClassName?: string;

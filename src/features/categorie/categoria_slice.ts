@@ -161,7 +161,7 @@ export const selectCategoriaSelectedCategoria = (state: RootState) =>
 export const selectCategoriaSelectedSottoCategoria = (state: RootState) =>
   state.categoria.selectedSottoCategoria;
 export const selectCategoriaSottocategorie = (state: RootState) =>
-  state.categoria.categorie.flatMap((cat) => cat.sottocategorie);
+  state.categoria.categorie.flatMap((cat) => cat.sottocategorie || []);
 export const selectCategoriaFilters = (state: RootState) =>
   state.categoria.filters;
 

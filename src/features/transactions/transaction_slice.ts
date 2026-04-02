@@ -47,7 +47,17 @@ const handleRejected = (state: TransactionsState) => {
 const transactionsSlice = createSlice({
   name: "transactions",
   initialState,
-  reducers: {},
+  reducers: {
+    updateFilters: (
+      state,
+      action: PayloadAction<Partial<TransactionsState["filters"]>>,
+    ) => {
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    resetFilters: (state) => {
+      state.filters = { sort_by: ["data:desc", "lastUpdate:desc"] };
+    },
+  },
   extraReducers: (builder) => {
     builder
       // GET LastTransactions
@@ -159,5 +169,7 @@ export const selectTransactionPagination = (state: RootState) =>
 
 export const selectTransactionFilters = (state: RootState) =>
   state.transaction.filters;
+
+export const { updateFilters, resetFilters } = transactionsSlice.actions;
 
 export default transactionsSlice.reducer;

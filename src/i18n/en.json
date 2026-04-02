@@ -206,5 +206,8 @@
   "source_category": "Source Category",
   "source_subcategory": "Source Subcategory",
   "destination_category": "Destination Category",
-  "destination_subcategory": "Destination Subcategory"
+  "destination_subcategory": "Destination Subcategory",
+  "filters": "Filters",
+  "reset_filters": "Reset Filters",
+  "select_type": "Select Type"
 }

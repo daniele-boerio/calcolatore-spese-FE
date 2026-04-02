@@ -204,5 +204,8 @@
   "source_category": "Categoria di Origine",
   "source_subcategory": "Sottocategoria di Origine",
   "destination_category": "Categoria di Destinazione",
-  "destination_subcategory": "Sottocategoria di Destinazione"
+  "destination_subcategory": "Sottocategoria di Destinazione",
+  "filters": "Filtri",
+  "reset_filters": "Resetta Filtri",
+  "select_type": "Seleziona Tipo"
 }
