@@ -20,6 +20,7 @@ import { ConfirmPopup } from "primereact/confirmpopup";
 import TagsPage from "./pages/tags_page/tags_page";
 import StatisticsPage from "./pages/statistics_page/statistics_page";
 import ResetPasswordPage from "./pages/reset_password_page/reset_password_page";
+import ChartsPage from "./pages/charts_page/charts_page";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/tags" element={<TagsPage />} />
                 <Route path="/accounts" element={<ContiPage />} />
                 <Route path="/statistics" element={<StatisticsPage />} />
+                <Route path="/charts" element={<ChartsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>

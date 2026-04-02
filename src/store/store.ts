@@ -8,6 +8,7 @@ import errorReducer from "../features/error/error_slice";
 import recurringReducer from "../features/recurrings/recurring_slice";
 import investimentoReducer from "../features/investimenti/investimento_slice";
 import statisticsReducer from "../features/statistics/statistics_slice";
+import chartsReducer from "../features/charts/charts_slice";
 import { useDispatch, useSelector } from "react-redux";
 import { errorMiddleware } from "./error_middleware";
 
@@ -22,6 +23,7 @@ export const store = configureStore({
     recurring: recurringReducer,
     investimento: investimentoReducer,
     statistics: statisticsReducer,
+    charts: chartsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(errorMiddleware),

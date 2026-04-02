@@ -65,6 +65,11 @@ export default function Navbar() {
               {t("nav_statistics")}
             </NavLink>
           </li>
+          <li>
+            <NavLink to="/charts" onClick={closeMenu}>
+              {t("nav_charts")}
+            </NavLink>
+          </li>
         </ul>
       </div>
 
