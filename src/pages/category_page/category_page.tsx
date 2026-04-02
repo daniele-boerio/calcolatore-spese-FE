@@ -11,6 +11,7 @@ import { Categoria } from "../../features/categorie/interfaces";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../i18n/use-i18n";
 import CategoryDialog from "../../components/dialog/category_dialog/category_dialog";
+import MigrateTransactionsDialog from "../../components/dialog/migrate_transactions_dialog/migrate_transactions_dialog";
 import {
   selectCategoriaCategorie,
   selectCategoriaLoading,
@@ -23,6 +24,7 @@ export default function CategoryPage() {
   const CatLoading = useAppSelector(selectCategoriaLoading);
 
   const [isDialogCatVisible, setIsDialogCatVisible] = useState(false);
+  const [isMigrateDialogVisible, setIsMigrateDialogVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Categoria | null>(
     null,
   );
@@ -121,7 +123,10 @@ export default function CategoryPage() {
   return (
     <>
       <div className="categorie-page">
-        <div className="page-header">
+        <div
+          className="page-header"
+          style={{ justifyContent: "space-between", alignItems: "center" }}
+        >
           <h1>
             <i
               className="pi pi-tags"
@@ -129,6 +134,13 @@ export default function CategoryPage() {
             ></i>
             {t("category_title")}
           </h1>
+          <Button
+            className="action-button"
+            label={t("migrate_transactions")}
+            icon="pi pi-arrow-right-arrow-left"
+            onClick={() => setIsMigrateDialogVisible(true)}
+            compact
+          />
         </div>
 
         {/* --- CONTENITORE PRINCIPALE --- */}
@@ -218,6 +230,11 @@ export default function CategoryPage() {
           category={selectedCategory!}
           onHide={() => setIsDialogCatVisible(false)}
           loading={CatLoading}
+        />
+
+        <MigrateTransactionsDialog
+          visible={isMigrateDialogVisible}
+          onHide={() => setIsMigrateDialogVisible(false)}
         />
       </div>
     </>

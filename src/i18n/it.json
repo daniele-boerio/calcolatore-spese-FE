@@ -198,5 +198,11 @@
   "confirm_password": "Conferma Password",
   "rewrite_password": "Riscrivi la password",
   "save_new_password": "Salva Nuova Password",
-  "min_8_chars": "Minimo 8 caratteri"
+  "min_8_chars": "Minimo 8 caratteri",
+  "migrate_transactions": "Migra Transazioni",
+  "migrate_transactions_title": "Migra le transazioni",
+  "source_category": "Categoria di Origine",
+  "source_subcategory": "Sottocategoria di Origine",
+  "destination_category": "Categoria di Destinazione",
+  "destination_subcategory": "Sottocategoria di Destinazione"
 }

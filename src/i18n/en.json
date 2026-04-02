@@ -200,5 +200,11 @@
   "confirm_password": "Confirm Password",
   "rewrite_password": "Rewrite the password",
   "save_new_password": "Save New Password",
-  "min_8_chars": "Minimum 8 characters"
+  "min_8_chars": "Minimum 8 characters",
+  "migrate_transactions": "Migrate Transactions",
+  "migrate_transactions_title": "Migrate transactions",
+  "source_category": "Source Category",
+  "source_subcategory": "Source Subcategory",
+  "destination_category": "Destination Category",
+  "destination_subcategory": "Destination Subcategory"
 }
