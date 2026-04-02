@@ -1,6 +1,10 @@
 import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store/store";
-import { MonthlyDetailCategory, YearDetailsStatRow } from "./interfaces";
+import {
+  MonthlyDetailCategory,
+  MonthlyDetailResponse,
+  YearDetailsStatRow,
+} from "./interfaces";
 import {
   getMonthlyDetailsStatistics,
   getYearDetailsStatistics,

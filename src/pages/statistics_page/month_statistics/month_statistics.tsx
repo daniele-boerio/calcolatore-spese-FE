@@ -11,6 +11,8 @@ import {
   selectCategoriaSottocategorie,
 } from "../../../features/categorie/categoria_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
+import { selectTagTags } from "../../../features/tags/tag_slice"; // <-- Aggiunto
+import { getTags } from "../../../features/tags/api_calls"; // <-- Aggiunto
 import Dropdown from "../../../components/dropdown/dropdown";
 import { useI18n } from "../../../i18n/use-i18n";
 import "./month_statistics.scss";
@@ -28,6 +30,7 @@ export default function MonthStatistics() {
   const loading = useAppSelector(selectStatisticsLoading);
   const categorie = useAppSelector(selectCategoriaCategorie);
   const sottocategorie = useAppSelector(selectCategoriaSottocategorie);
+  const tags = useAppSelector(selectTagTags); // <-- Aggiunto
 
   // Stati locali per i filtri
   const currentYear = new Date().getFullYear();
@@ -37,6 +40,7 @@ export default function MonthStatistics() {
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<string | null>(
     null,
   );
+  const [selectedTagId, setSelectedTagId] = useState<string | null>(null); // <-- Aggiunto
 
   // Dialog State
   const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -44,6 +48,7 @@ export default function MonthStatistics() {
   const [dialogFilters, setDialogFilters] = useState<{
     categoria_id?: string;
     sottocategoria_id?: string;
+    tag_id?: string; // <-- Aggiunto
     data_inizio?: string;
     data_fine?: string;
   }>({});
@@ -65,6 +70,7 @@ export default function MonthStatistics() {
 
     setDialogFilters({
       categoria_id: catId,
+      tag_id: selectedTagId || undefined, // <-- Passiamo il tag se selezionato
       data_inizio: toDateStr(start),
       data_fine: toDateStr(end),
     });
@@ -85,7 +91,8 @@ export default function MonthStatistics() {
 
     setDialogFilters({
       categoria_id: cat.id,
-      sottocategoria_id: subCat?.id, // undefined is handled well by the dialog
+      sottocategoria_id: subCat?.id,
+      tag_id: selectedTagId || undefined, // <-- Passiamo il tag se selezionato
       data_inizio: toDateStr(start),
       data_fine: toDateStr(end),
     });
@@ -102,9 +109,10 @@ export default function MonthStatistics() {
     return years.reverse();
   }, [currentYear]);
 
-  // Caricamento Categorie all'avvio
+  // Caricamento Dati all'avvio
   useEffect(() => {
     dispatch(getCategorie());
+    dispatch(getTags()); // <-- Carichiamo i tag
   }, [dispatch]);
 
   // Fetch dati statistici
@@ -114,9 +122,16 @@ export default function MonthStatistics() {
         month: selectedMonth,
         year: selectedYear,
         categoria_id: selectedCategoriaId,
+        tag_id: selectedTagId, // <-- Passiamo il tag all'API
       }),
     );
-  }, [dispatch, selectedYear, selectedMonth, selectedCategoriaId]);
+  }, [
+    dispatch,
+    selectedYear,
+    selectedMonth,
+    selectedCategoriaId,
+    selectedTagId,
+  ]);
 
   const monthNames = [
     { value: 1, label: t("Jan") },
@@ -136,50 +151,10 @@ export default function MonthStatistics() {
   // Filtriamo i dati per colonna
   const incomes = data.filter((cat) => cat.tipo === "ENTRATA");
   const expenses = data.filter((cat) => cat.tipo === "USCITA");
-  const others = data.filter((cat) => cat.tipo === "OTHER");
 
-  // Calcolo totali (usiamo quelli del BE)
+  // Calcolo totali
   const totalIncomes = totals.incomes;
   const totalExpenses = totals.expenses;
-
-  // Funzione helper per renderizzare una singola categoria con le sue sottocategorie
-  const renderCategoryBlock = (cat: MonthlyDetailCategory) => (
-    <div key={cat.categoria} className="category-card">
-      <div className="category-header">
-        <span className="name">{cat.categoria}</span>
-        <span
-          className="amount"
-          style={{
-            color:
-              cat.totale < 0
-                ? "var(--red-500)"
-                : cat.totale > 0
-                  ? "var(--green-500)"
-                  : "inherit",
-          }}
-        >
-          {cat.totale > 0 ? "+" : ""}
-          {cat.totale.toLocaleString("it-IT", { minimumFractionDigits: 2 })} €
-        </span>
-      </div>
-
-      {cat.sottocategorie.length > 0 && (
-        <div className="subcategories-list">
-          {cat.sottocategorie.map((sub) => (
-            <div key={sub.sottocategoria} className="subcategory-item">
-              <span className="name">{sub.sottocategoria}</span>
-              <span className="amount">
-                {sub.totale.toLocaleString("it-IT", {
-                  minimumFractionDigits: 2,
-                })}{" "}
-                €
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
 
   return (
     <div className="monthly-statistics-page">
@@ -211,6 +186,17 @@ export default function MonthStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedCategoriaId(e.value)}
             placeholder={t("categories")}
+            showClear
+          />
+          {/* NUOVO DROPDOWN PER I TAG */}
+          <Dropdown
+            label={t("tag")}
+            value={selectedTagId}
+            options={tags}
+            optionLabel="nome"
+            optionValue="id"
+            onChange={(e) => setSelectedTagId(e.value)}
+            placeholder={t("tag") || "Tag"}
             showClear
           />
         </div>

@@ -7,9 +7,11 @@ import {
 } from "../../../features/statistics/statistics_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
+import { selectTagTags } from "../../../features/tags/tag_slice"; // <-- Aggiunto
+import { getTags } from "../../../features/tags/api_calls"; // <-- Aggiunto
 import Dropdown from "../../../components/dropdown/dropdown";
 import { useI18n } from "../../../i18n/use-i18n";
-import CustomCard from "../../../components/custom_card/custom_card"; // Assicurati che il percorso sia corretto
+import CustomCard from "../../../components/custom_card/custom_card";
 import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
 import "./year_statistics.scss";
 
@@ -21,6 +23,7 @@ export default function YearStatistics() {
   const data = useAppSelector(selectYearlyStatisticsData);
   const loading = useAppSelector(selectStatisticsLoading);
   const categorie = useAppSelector(selectCategoriaCategorie);
+  const tags = useAppSelector(selectTagTags); // <-- Aggiunto
 
   // Stati locali per i filtri
   const currentYear = new Date().getFullYear();
@@ -28,6 +31,7 @@ export default function YearStatistics() {
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<string | null>(
     null,
   );
+  const [selectedTagId, setSelectedTagId] = useState<string | null>(null); // <-- Aggiunto
 
   // Dialog State
   const [isDialogVisible, setIsDialogVisible] = useState(false);
@@ -35,6 +39,7 @@ export default function YearStatistics() {
   const [dialogFilters, setDialogFilters] = useState<{
     categoria_id?: string;
     sottocategoria_id?: string;
+    tag_id?: string; // <-- Aggiunto
     data_inizio?: string;
     data_fine?: string;
   }>({});
@@ -48,7 +53,6 @@ export default function YearStatistics() {
   };
 
   const handleCategoryClick = (categoryName: string) => {
-    // Se selectedCategoriaId è impostato, categoryName è in realtà il nome della sottocategoria
     if (selectedCategoriaId) {
       const selectedCat = categorie.find((c) => c.id === selectedCategoriaId);
       if (!selectedCat) return;
@@ -64,13 +68,13 @@ export default function YearStatistics() {
       setDialogFilters({
         categoria_id: selectedCat.id,
         sottocategoria_id: subCat.id,
+        tag_id: selectedTagId || undefined, // <-- Passiamo il tag
         data_inizio: toDateStr(start),
         data_fine: toDateStr(end),
       });
       setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
       setIsDialogVisible(true);
     } else {
-      // Comportamento originale quando non è selezionata una categoria
       const catId = categorie.find((c) => c.nome === categoryName)?.id;
       if (!catId) return;
 
@@ -79,6 +83,7 @@ export default function YearStatistics() {
 
       setDialogFilters({
         categoria_id: catId,
+        tag_id: selectedTagId || undefined, // <-- Passiamo il tag
         data_inizio: toDateStr(start),
         data_fine: toDateStr(end),
       });
@@ -88,7 +93,27 @@ export default function YearStatistics() {
   };
 
   const handleSubcategoryClick = (monthName: string, categoryName: string) => {
-    // Se selectedCategoriaId è impostato, categoryName è in realtà il nome della sottocategoria
+    const monthNamesLocal = [
+      t("Jan"),
+      t("Feb"),
+      t("Mar"),
+      t("Apr"),
+      t("May"),
+      t("Jun"),
+      t("Jul"),
+      t("Aug"),
+      t("Sept"),
+      t("Oct"),
+      t("Nov"),
+      t("Dec"),
+    ];
+
+    const monthIndex = monthNamesLocal.indexOf(monthName);
+    if (monthIndex === -1) return;
+
+    const start = new Date(selectedYear, monthIndex, 1);
+    const end = new Date(selectedYear, monthIndex + 1, 0);
+
     if (selectedCategoriaId) {
       const selectedCat = categorie.find((c) => c.id === selectedCategoriaId);
       if (!selectedCat) return;
@@ -98,30 +123,10 @@ export default function YearStatistics() {
       );
       if (!subCat) return;
 
-      const monthNamesLocal = [
-        t("Jan"),
-        t("Feb"),
-        t("Mar"),
-        t("Apr"),
-        t("May"),
-        t("Jun"),
-        t("Jul"),
-        t("Aug"),
-        t("Sept"),
-        t("Oct"),
-        t("Nov"),
-        t("Dec"),
-      ];
-
-      const monthIndex = monthNamesLocal.indexOf(monthName);
-      if (monthIndex === -1) return;
-
-      const start = new Date(selectedYear, monthIndex, 1);
-      const end = new Date(selectedYear, monthIndex + 1, 0);
-
       setDialogFilters({
         categoria_id: selectedCat.id,
         sottocategoria_id: subCat.id,
+        tag_id: selectedTagId || undefined, // <-- Passiamo il tag
         data_inizio: toDateStr(start),
         data_fine: toDateStr(end),
       });
@@ -130,33 +135,12 @@ export default function YearStatistics() {
       );
       setIsDialogVisible(true);
     } else {
-      // Comportamento originale quando non è selezionata una categoria
       const catId = categorie.find((c) => c.nome === categoryName)?.id;
       if (!catId) return;
 
-      const monthNamesLocal = [
-        t("Jan"),
-        t("Feb"),
-        t("Mar"),
-        t("Apr"),
-        t("May"),
-        t("Jun"),
-        t("Jul"),
-        t("Aug"),
-        t("Sept"),
-        t("Oct"),
-        t("Nov"),
-        t("Dec"),
-      ];
-
-      const monthIndex = monthNamesLocal.indexOf(monthName);
-      if (monthIndex === -1) return;
-
-      const start = new Date(selectedYear, monthIndex, 1);
-      const end = new Date(selectedYear, monthIndex + 1, 0);
-
       setDialogFilters({
         categoria_id: catId,
+        tag_id: selectedTagId || undefined, // <-- Passiamo il tag
         data_inizio: toDateStr(start),
         data_fine: toDateStr(end),
       });
@@ -176,36 +160,23 @@ export default function YearStatistics() {
     return years.reverse();
   }, [currentYear]);
 
-  // Caricamento inizialie
+  // Caricamento iniziale
   useEffect(() => {
     dispatch(getCategorie());
+    dispatch(getTags()); // <-- Carichiamo i tag
   }, [dispatch]);
 
-  // Mapping dei nomi delle sottocategorie agli ID quando selectedCategoriaId è impostato
-  const subcategoryNameToIdMap = useMemo(() => {
-    if (!selectedCategoriaId) return new Map<string, string>();
-
-    const selectedCat = categorie.find((c) => c.id === selectedCategoriaId);
-    if (!selectedCat || !selectedCat.sottocategorie) return new Map();
-
-    const map = new Map<string, string>();
-    selectedCat.sottocategorie.forEach((sc) => {
-      map.set(sc.nome, sc.id);
-    });
-    return map;
-  }, [selectedCategoriaId, categorie]);
-
-  // Fetch dati
+  // Fetch dati statistici
   useEffect(() => {
     dispatch(
       getYearDetailsStatistics({
         year: selectedYear,
         categoria_id: selectedCategoriaId,
+        tag_id: selectedTagId, // <-- Passiamo il tag all'API
       }),
     );
-  }, [dispatch, selectedYear, selectedCategoriaId]);
+  }, [dispatch, selectedYear, selectedCategoriaId, selectedTagId]);
 
-  // 1. Uniformiamo i dati per i mesi
   const tableData = useMemo(() => {
     const monthNames = [
       t("Jan"),
@@ -236,9 +207,7 @@ export default function YearStatistics() {
     });
   }, [data, t]);
 
-  // 2. "RIBALTIAMO" I DATI: Da Mesi->Categorie a Categorie->Mesi (Perfetto per le CustomCard)
   const categoriesSummary = useMemo(() => {
-    // Usiamo una mappa per accumulare i totali e i mesi per ogni singola categoria
     const categoryMap = new Map<
       string,
       {
@@ -251,7 +220,6 @@ export default function YearStatistics() {
       Object.keys(row).forEach((key) => {
         if (key !== "month" && key !== "monthId") {
           const val = row[key] as number;
-          // Ignoriamo i mesi a 0 per non sporcare la UI
           if (val !== 0) {
             if (!categoryMap.has(key)) {
               categoryMap.set(key, { total: 0, months: [] });
@@ -268,14 +236,12 @@ export default function YearStatistics() {
       });
     });
 
-    // Convertiamo in array e ordiniamo per nome categoria
     return Array.from(categoryMap.entries())
       .map(([name, data]) => ({
         categoria: name,
         totale: data.total,
-        // Usiamo "sottocategoria" per ospitare in realtà il nome del Mese
         sottocategorie: data.months
-          .sort((a, b) => a.monthId - b.monthId) // Ordine cronologico
+          .sort((a, b) => a.monthId - b.monthId)
           .map((m) => ({
             sottocategoria: m.monthName,
             totale: m.value,
@@ -284,12 +250,9 @@ export default function YearStatistics() {
       .sort((a, b) => a.categoria.localeCompare(b.categoria));
   }, [tableData]);
 
-  // 3. Dividiamo le categorie generate in Entrate e Uscite basandoci sul totale annuale
   const incomes = categoriesSummary.filter((c) => c.totale > 0);
   const expenses = categoriesSummary.filter((c) => c.totale < 0);
-  const others = categoriesSummary.filter((c) => c.totale === 0);
 
-  // Calcolo totali annuali
   const totalIncomes = incomes.reduce((acc, cat) => acc + cat.totale, 0);
   const totalExpenses = expenses.reduce((acc, cat) => acc + cat.totale, 0);
 
@@ -314,6 +277,17 @@ export default function YearStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedCategoriaId(e.value)}
             placeholder={t("categories")}
+            showClear
+          />
+          {/* NUOVO DROPDOWN PER I TAG */}
+          <Dropdown
+            label={t("tag")}
+            value={selectedTagId}
+            options={tags}
+            optionLabel="nome"
+            optionValue="id"
+            onChange={(e) => setSelectedTagId(e.value)}
+            placeholder={t("tag") || "Tag"}
             showClear
           />
         </div>

@@ -5,7 +5,7 @@ import {
   FetchYearStatisticsParams,
   FetchMonthStatisticsParams,
   YearDetailsStatRow,
-  MonthlyDetailCategory,
+  MonthlyDetailResponse,
 } from "./interfaces";
 
 // --- API CALLS ---
@@ -21,6 +21,7 @@ export const getYearDetailsStatistics = createAsyncThunk<
         params: {
           year: params.year,
           categoria_id: params.categoria_id || undefined,
+          tag_id: params.tag_id || undefined,
         },
       },
     );
@@ -45,6 +46,7 @@ export const getMonthlyDetailsStatistics = createAsyncThunk<
           month: params.month,
           year: params.year,
           categoria_id: params.categoria_id || undefined,
+          tag_id: params.tag_id || undefined,
         },
       },
     );

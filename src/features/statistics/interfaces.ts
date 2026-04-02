@@ -6,6 +6,7 @@ export interface YearDetailsStatRow {
 export interface FetchYearStatisticsParams {
   year: number;
   categoria_id?: string | null;
+  tag_id?: string | null;
 }
 
 export interface MonthlyDetailResponse {
@@ -30,4 +31,5 @@ export interface FetchMonthStatisticsParams {
   year: number;
   month: number;
   categoria_id?: string | null;
+  tag_id?: string | null;
 }
