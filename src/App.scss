@@ -25,6 +25,10 @@ body {
     background-color: v.$bg-dialog;
     color: v.$text-main;
   }
+
+  .p-dialog-header-icon {
+    color: v.$text-main;
+  }
 }
 
 .p-button:focus {

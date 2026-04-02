@@ -15,7 +15,7 @@ export const getYearDetailsStatistics = createAsyncThunk<
   FetchYearStatisticsParams
 >("statistics/yearDetails", async (params, { rejectWithValue }) => {
   try {
-    const response = await api.get<YearDetailsStatRow[]>(
+    const response = await api.get<{ data: YearDetailsStatRow[] }>(
       "/statistics/yearDetails",
       {
         params: {
@@ -24,7 +24,7 @@ export const getYearDetailsStatistics = createAsyncThunk<
         },
       },
     );
-    return response.data;
+    return response.data.data;
   } catch (error) {
     const err = error as AxiosError;
     return rejectWithValue(

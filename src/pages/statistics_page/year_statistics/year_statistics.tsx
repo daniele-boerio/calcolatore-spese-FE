@@ -34,6 +34,7 @@ export default function YearStatistics() {
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogFilters, setDialogFilters] = useState<{
     categoria_id?: string;
+    sottocategoria_id?: string;
     data_inizio?: string;
     data_fine?: string;
   }>({});
@@ -47,53 +48,123 @@ export default function YearStatistics() {
   };
 
   const handleCategoryClick = (categoryName: string) => {
-    const catId = categorie.find((c) => c.nome === categoryName)?.id;
-    if (!catId) return;
+    // Se selectedCategoriaId è impostato, categoryName è in realtà il nome della sottocategoria
+    if (selectedCategoriaId) {
+      const selectedCat = categorie.find((c) => c.id === selectedCategoriaId);
+      if (!selectedCat) return;
 
-    const start = new Date(selectedYear, 0, 1);
-    const end = new Date(selectedYear, 11, 31);
+      const subCat = selectedCat.sottocategorie?.find(
+        (s) => s.nome === categoryName,
+      );
+      if (!subCat) return;
 
-    setDialogFilters({
-      categoria_id: catId,
-      data_inizio: toDateStr(start),
-      data_fine: toDateStr(end),
-    });
-    setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
-    setIsDialogVisible(true);
+      const start = new Date(selectedYear, 0, 1);
+      const end = new Date(selectedYear, 11, 31);
+
+      setDialogFilters({
+        categoria_id: selectedCat.id,
+        sottocategoria_id: subCat.id,
+        data_inizio: toDateStr(start),
+        data_fine: toDateStr(end),
+      });
+      setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
+      setIsDialogVisible(true);
+    } else {
+      // Comportamento originale quando non è selezionata una categoria
+      const catId = categorie.find((c) => c.nome === categoryName)?.id;
+      if (!catId) return;
+
+      const start = new Date(selectedYear, 0, 1);
+      const end = new Date(selectedYear, 11, 31);
+
+      setDialogFilters({
+        categoria_id: catId,
+        data_inizio: toDateStr(start),
+        data_fine: toDateStr(end),
+      });
+      setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
+      setIsDialogVisible(true);
+    }
   };
 
   const handleSubcategoryClick = (monthName: string, categoryName: string) => {
-    const catId = categorie.find((c) => c.nome === categoryName)?.id;
-    if (!catId) return;
+    // Se selectedCategoriaId è impostato, categoryName è in realtà il nome della sottocategoria
+    if (selectedCategoriaId) {
+      const selectedCat = categorie.find((c) => c.id === selectedCategoriaId);
+      if (!selectedCat) return;
 
-    const monthNamesLocal = [
-      t("Jan"),
-      t("Feb"),
-      t("Mar"),
-      t("Apr"),
-      t("May"),
-      t("Jun"),
-      t("Jul"),
-      t("Aug"),
-      t("Sept"),
-      t("Oct"),
-      t("Nov"),
-      t("Dec"),
-    ];
+      const subCat = selectedCat.sottocategorie?.find(
+        (s) => s.nome === categoryName,
+      );
+      if (!subCat) return;
 
-    const monthIndex = monthNamesLocal.indexOf(monthName);
-    if (monthIndex === -1) return;
+      const monthNamesLocal = [
+        t("Jan"),
+        t("Feb"),
+        t("Mar"),
+        t("Apr"),
+        t("May"),
+        t("Jun"),
+        t("Jul"),
+        t("Aug"),
+        t("Sept"),
+        t("Oct"),
+        t("Nov"),
+        t("Dec"),
+      ];
 
-    const start = new Date(selectedYear, monthIndex, 1);
-    const end = new Date(selectedYear, monthIndex + 1, 0); // Ultimo giorno del mese
+      const monthIndex = monthNamesLocal.indexOf(monthName);
+      if (monthIndex === -1) return;
 
-    setDialogFilters({
-      categoria_id: catId,
-      data_inizio: toDateStr(start),
-      data_fine: toDateStr(end),
-    });
-    setDialogTitle(`${t("nav_transactions")} - ${categoryName} (${monthName})`);
-    setIsDialogVisible(true);
+      const start = new Date(selectedYear, monthIndex, 1);
+      const end = new Date(selectedYear, monthIndex + 1, 0);
+
+      setDialogFilters({
+        categoria_id: selectedCat.id,
+        sottocategoria_id: subCat.id,
+        data_inizio: toDateStr(start),
+        data_fine: toDateStr(end),
+      });
+      setDialogTitle(
+        `${t("nav_transactions")} - ${categoryName} (${monthName})`,
+      );
+      setIsDialogVisible(true);
+    } else {
+      // Comportamento originale quando non è selezionata una categoria
+      const catId = categorie.find((c) => c.nome === categoryName)?.id;
+      if (!catId) return;
+
+      const monthNamesLocal = [
+        t("Jan"),
+        t("Feb"),
+        t("Mar"),
+        t("Apr"),
+        t("May"),
+        t("Jun"),
+        t("Jul"),
+        t("Aug"),
+        t("Sept"),
+        t("Oct"),
+        t("Nov"),
+        t("Dec"),
+      ];
+
+      const monthIndex = monthNamesLocal.indexOf(monthName);
+      if (monthIndex === -1) return;
+
+      const start = new Date(selectedYear, monthIndex, 1);
+      const end = new Date(selectedYear, monthIndex + 1, 0);
+
+      setDialogFilters({
+        categoria_id: catId,
+        data_inizio: toDateStr(start),
+        data_fine: toDateStr(end),
+      });
+      setDialogTitle(
+        `${t("nav_transactions")} - ${categoryName} (${monthName})`,
+      );
+      setIsDialogVisible(true);
+    }
   };
 
   // Opzioni Anno
@@ -109,6 +180,20 @@ export default function YearStatistics() {
   useEffect(() => {
     dispatch(getCategorie());
   }, [dispatch]);
+
+  // Mapping dei nomi delle sottocategorie agli ID quando selectedCategoriaId è impostato
+  const subcategoryNameToIdMap = useMemo(() => {
+    if (!selectedCategoriaId) return new Map<string, string>();
+
+    const selectedCat = categorie.find((c) => c.id === selectedCategoriaId);
+    if (!selectedCat || !selectedCat.sottocategorie) return new Map();
+
+    const map = new Map<string, string>();
+    selectedCat.sottocategorie.forEach((sc) => {
+      map.set(sc.nome, sc.id);
+    });
+    return map;
+  }, [selectedCategoriaId, categorie]);
 
   // Fetch dati
   useEffect(() => {
@@ -138,8 +223,10 @@ export default function YearStatistics() {
     ];
 
     return monthNames.map((monthName, index) => {
-      const rawMonthData = data.find((d) => d.month === index + 1) || {};
-      const { month: _, ...restData } = rawMonthData as any;
+      const rawMonthData = Array.isArray(data)
+        ? data.find((d) => d.month === index + 1)
+        : undefined;
+      const { month: _, ...restData } = (rawMonthData || {}) as any;
 
       return {
         month: monthName,
@@ -275,6 +362,8 @@ export default function YearStatistics() {
                           title={cat.categoria}
                           totale={cat.totale}
                           sottocategorie={cat.sottocategorie}
+                          onClick={handleCategoryClick}
+                          onSubcategoryClick={handleSubcategoryClick}
                         />
                       ))}
                     </div>
@@ -292,6 +381,8 @@ export default function YearStatistics() {
                           title={cat.categoria}
                           totale={cat.totale}
                           sottocategorie={cat.sottocategorie}
+                          onClick={handleCategoryClick}
+                          onSubcategoryClick={handleSubcategoryClick}
                         />
                       ))}
                     </div>
@@ -302,6 +393,13 @@ export default function YearStatistics() {
           </div>
         </section>
       </div>
+
+      <TransactionsListDialog
+        visible={isDialogVisible}
+        onHide={() => setIsDialogVisible(false)}
+        title={dialogTitle}
+        filters={dialogFilters}
+      />
     </div>
   );
 }
