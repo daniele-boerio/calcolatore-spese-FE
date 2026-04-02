@@ -78,7 +78,7 @@ export default function CustomDoughnutChart({
   showTotalText = true, // Di default mostra sempre il totale
   fontSize = 25,
   textColor = "var(--text-main)",
-  aspectRatio = 1.2,
+  aspectRatio = 0.5,
 }: DoughnutChartProps) {
   const resolvedTextColor = useMemo(() => {
     if (textColor.includes("var(")) {

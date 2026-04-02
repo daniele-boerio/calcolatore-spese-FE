@@ -106,6 +106,14 @@ export default function Transactions() {
     );
   }, [dispatch, currentPage, pageSize, filters]);
 
+  // RESET FILTRI ALL'USCITA DALLA PAGINA
+  useEffect(() => {
+    return () => {
+      // Questa funzione di cleanup parte solo quando il componente viene smontato (uscita dalla pagina)
+      dispatch(resetFilters());
+    };
+  }, [dispatch]);
+
   const deleteObject = (
     event: React.MouseEvent<HTMLButtonElement>,
     id: string,
