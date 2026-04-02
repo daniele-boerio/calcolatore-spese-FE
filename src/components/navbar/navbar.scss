@@ -79,6 +79,11 @@
     transform: translateX(280px); // Entra in scena
   }
 
+  // Flexbox container to push logout to the bottom
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
   .nav-links {
     list-style: none;
     display: flex;
@@ -94,6 +99,25 @@
       &.active {
         color: v.$green;
         font-weight: 700;
+      }
+    }
+  }
+
+  .nav-footer {
+    padding-top: 1.5rem;
+    width: 100%;
+
+    .logout-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.5rem 0;
+
+      .p-button {
+        width: 100%;
       }
     }
   }

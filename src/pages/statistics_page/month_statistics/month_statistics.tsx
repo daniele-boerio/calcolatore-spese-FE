@@ -6,13 +6,17 @@ import {
   selectMonthlyTotals,
   selectStatisticsLoading,
 } from "../../../features/statistics/statistics_slice";
-import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
+import {
+  selectCategoriaCategorie,
+  selectCategoriaSottocategorie,
+} from "../../../features/categorie/categoria_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import Dropdown from "../../../components/dropdown/dropdown";
 import { useI18n } from "../../../i18n/use-i18n";
 import "./month_statistics.scss";
 import { MonthlyDetailCategory } from "../../../features/statistics/interfaces";
 import CustomCard from "../../../components/custom_card/custom_card";
+import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
 
 export default function MonthStatistics() {
   const { t } = useI18n();
@@ -23,6 +27,7 @@ export default function MonthStatistics() {
   const totals = useAppSelector(selectMonthlyTotals);
   const loading = useAppSelector(selectStatisticsLoading);
   const categorie = useAppSelector(selectCategoriaCategorie);
+  const sottocategorie = useAppSelector(selectCategoriaSottocategorie);
 
   // Stati locali per i filtri
   const currentYear = new Date().getFullYear();
@@ -32,6 +37,61 @@ export default function MonthStatistics() {
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<string | null>(
     null,
   );
+
+  // Dialog State
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogFilters, setDialogFilters] = useState<{
+    categoria_id?: string;
+    sottocategoria_id?: string;
+    data_inizio?: string;
+    data_fine?: string;
+  }>({});
+
+  // Helpers
+  const toDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    const catId = categorie.find((c) => c.nome === categoryName)?.id;
+    if (!catId) return;
+
+    const start = new Date(selectedYear, selectedMonth - 1, 1);
+    const end = new Date(selectedYear, selectedMonth, 0);
+
+    setDialogFilters({
+      categoria_id: catId,
+      data_inizio: toDateStr(start),
+      data_fine: toDateStr(end),
+    });
+    setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
+    setIsDialogVisible(true);
+  };
+
+  const handleSubcategoryClick = (
+    subcategoryName: string,
+    categoryName: string,
+  ) => {
+    const cat = categorie.find((c) => c.nome === categoryName);
+    if (!cat) return;
+    const subCat = cat.sottocategorie?.find((s) => s.nome === subcategoryName);
+
+    const start = new Date(selectedYear, selectedMonth - 1, 1);
+    const end = new Date(selectedYear, selectedMonth, 0);
+
+    setDialogFilters({
+      categoria_id: cat.id,
+      sottocategoria_id: subCat?.id, // undefined is handled well by the dialog
+      data_inizio: toDateStr(start),
+      data_fine: toDateStr(end),
+    });
+    setDialogTitle(`${t("nav_transactions")} - ${subcategoryName}`);
+    setIsDialogVisible(true);
+  };
 
   // Opzioni Anno
   const yearOptions = useMemo(() => {
@@ -193,6 +253,8 @@ export default function MonthStatistics() {
                   title={cat.categoria}
                   totale={cat.totale}
                   sottocategorie={cat.sottocategorie}
+                  onClick={handleCategoryClick}
+                  onSubcategoryClick={handleSubcategoryClick}
                 />
               ))
             ) : (
@@ -212,6 +274,8 @@ export default function MonthStatistics() {
                   title={cat.categoria}
                   totale={cat.totale}
                   sottocategorie={cat.sottocategorie}
+                  onClick={handleCategoryClick}
+                  onSubcategoryClick={handleSubcategoryClick}
                 />
               ))
             ) : (
@@ -220,6 +284,13 @@ export default function MonthStatistics() {
           </div>
         </div>
       </div>
+
+      <TransactionsListDialog
+        visible={isDialogVisible}
+        onHide={() => setIsDialogVisible(false)}
+        title={dialogTitle}
+        filters={dialogFilters}
+      />
     </div>
   );
 }

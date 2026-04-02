@@ -12,6 +12,11 @@ export interface CustomCardProps {
   totale?: number;
   sottocategorie?: SubCategory[];
   actions?: React.ReactNode; // Permette di passare bottoni custom (es. Edit/Delete)
+  onClick?: (title: string) => void;
+  onSubcategoryClick?: (
+    subcategoryTitle: string,
+    categoryTitle: string,
+  ) => void;
 }
 
 export default function CustomCard({
@@ -19,6 +24,8 @@ export default function CustomCard({
   totale,
   sottocategorie = [],
   actions,
+  onClick,
+  onSubcategoryClick,
 }: CustomCardProps) {
   // Funzione per determinare il colore in base all'importo (se presente)
   const getAmountColor = (val?: number) => {
@@ -29,8 +36,12 @@ export default function CustomCard({
   };
 
   return (
-    <div className="custom-category-card">
-      <div className="category-header">
+    <div className={`custom-category-card ${onClick ? "clickable" : ""}`}>
+      <div
+        className="category-header"
+        onClick={() => onClick && onClick(title)}
+        style={{ cursor: onClick ? "pointer" : "default" }}
+      >
         <span className="name">{title}</span>
 
         {/* Contenitore di destra per importo e/o bottoni */}
@@ -56,6 +67,13 @@ export default function CustomCard({
             <div
               key={`${sub.sottocategoria}-${idx}`}
               className="subcategory-item"
+              onClick={(e) => {
+                if (onSubcategoryClick) {
+                  e.stopPropagation();
+                  onSubcategoryClick(sub.sottocategoria, title);
+                }
+              }}
+              style={{ cursor: onSubcategoryClick ? "pointer" : "default" }}
             >
               <span className="name">{sub.sottocategoria}</span>
               {sub.totale !== undefined && (

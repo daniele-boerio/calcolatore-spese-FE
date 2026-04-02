@@ -10,6 +10,7 @@ import { getCategorie } from "../../../features/categorie/api_calls";
 import Dropdown from "../../../components/dropdown/dropdown";
 import { useI18n } from "../../../i18n/use-i18n";
 import CustomCard from "../../../components/custom_card/custom_card"; // Assicurati che il percorso sia corretto
+import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
 import "./year_statistics.scss";
 
 export default function YearStatistics() {
@@ -27,6 +28,73 @@ export default function YearStatistics() {
   const [selectedCategoriaId, setSelectedCategoriaId] = useState<string | null>(
     null,
   );
+
+  // Dialog State
+  const [isDialogVisible, setIsDialogVisible] = useState(false);
+  const [dialogTitle, setDialogTitle] = useState("");
+  const [dialogFilters, setDialogFilters] = useState<{
+    categoria_id?: string;
+    data_inizio?: string;
+    data_fine?: string;
+  }>({});
+
+  // Helpers
+  const toDateStr = (d: Date) => {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+  };
+
+  const handleCategoryClick = (categoryName: string) => {
+    const catId = categorie.find((c) => c.nome === categoryName)?.id;
+    if (!catId) return;
+
+    const start = new Date(selectedYear, 0, 1);
+    const end = new Date(selectedYear, 11, 31);
+
+    setDialogFilters({
+      categoria_id: catId,
+      data_inizio: toDateStr(start),
+      data_fine: toDateStr(end),
+    });
+    setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
+    setIsDialogVisible(true);
+  };
+
+  const handleSubcategoryClick = (monthName: string, categoryName: string) => {
+    const catId = categorie.find((c) => c.nome === categoryName)?.id;
+    if (!catId) return;
+
+    const monthNamesLocal = [
+      t("Jan"),
+      t("Feb"),
+      t("Mar"),
+      t("Apr"),
+      t("May"),
+      t("Jun"),
+      t("Jul"),
+      t("Aug"),
+      t("Sept"),
+      t("Oct"),
+      t("Nov"),
+      t("Dec"),
+    ];
+
+    const monthIndex = monthNamesLocal.indexOf(monthName);
+    if (monthIndex === -1) return;
+
+    const start = new Date(selectedYear, monthIndex, 1);
+    const end = new Date(selectedYear, monthIndex + 1, 0); // Ultimo giorno del mese
+
+    setDialogFilters({
+      categoria_id: catId,
+      data_inizio: toDateStr(start),
+      data_fine: toDateStr(end),
+    });
+    setDialogTitle(`${t("nav_transactions")} - ${categoryName} (${monthName})`);
+    setIsDialogVisible(true);
+  };
 
   // Opzioni Anno
   const yearOptions = useMemo(() => {

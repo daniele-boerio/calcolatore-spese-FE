@@ -1,14 +1,23 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n"; // Verifica che il path sia corretto
+import { useAppDispatch } from "../../store/store";
+import { setLogout } from "../../features/profile/profile_slice";
+import Button from "../button/button";
 import "./navbar.scss";
 
 export default function Navbar() {
   const { t } = useI18n();
+  const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => setIsOpen(!isOpen);
   const closeMenu = () => setIsOpen(false);
+
+  const handleLogout = () => {
+    closeMenu();
+    dispatch(setLogout());
+  };
 
   return (
     <nav className="navbar">
@@ -71,6 +80,16 @@ export default function Navbar() {
             </NavLink>
           </li>
         </ul>
+
+        <div className="nav-footer">
+          <Button
+            className="trasparent-danger-button logout-btn"
+            onClick={handleLogout}
+            icon="pi pi-sign-out"
+            label={t("logout") || "Logout"}
+            iconPos="left"
+          />
+        </div>
       </div>
 
       {isOpen && <div className="overlay" onClick={closeMenu}></div>}
