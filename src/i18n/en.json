@@ -219,5 +219,7 @@
   "destination_subcategory": "Destination Subcategory",
   "filters": "Filters",
   "reset_filters": "Reset Filters",
-  "select_type": "Select Type"
+  "select_type": "Select Type",
+  "include_future_recurring": "Include future recurring transactions",
+  "other": "Other"
 }

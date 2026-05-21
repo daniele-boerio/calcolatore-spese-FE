@@ -25,6 +25,7 @@ export interface MonthlyBudget {
   total_budget: number | null;
   expenses: number | null;
   percentage: number | null;
+  remaining?: number | null;
 }
 
 export interface BudgetUpdateData {
@@ -35,9 +36,11 @@ export interface BudgetUpdateData {
 export interface MonthlyBudgetResponse {
   monthly_budget: {
     total_budget: number | null;
-    expenses: number | null;
+    expenses?: number | null;
     percentage: number | null;
+    remaining?: number | null;
   };
+  remaining?: number | null;
 }
 
 export interface ContoState {
@@ -47,11 +50,16 @@ export interface ContoState {
   monthlyBudget: MonthlyBudget;
   monthlyExpensesByCategory: ExpenseByCategory[];
   filters: ContoFilters;
+  include_future_recurring: boolean;
 }
 
 // Interfaccia per il payload di aggiornamento budget
 export interface UpdateBudgetParams {
   total_budget: number | null;
+}
+
+export interface GetMonthExpensesParams {
+  include_future_recurring?: boolean;
 }
 
 export interface CreateContoParams {

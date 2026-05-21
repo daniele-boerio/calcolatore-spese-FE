@@ -1,15 +1,21 @@
 import React, { useState } from "react";
 import Button from "../button/button";
+import Checkbox from "../checkbox/checkbox";
 import "./budget_card.scss";
 import BudgetSettingsDialog from "../dialog/budget_settings_dialog/budget_settings_dialog";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { updateBudget } from "../../features/conti/api_calls";
+import {
+  updateBudget,
+  getCurrentMonthExpenses,
+} from "../../features/conti/api_calls";
 import { BudgetUpdateData } from "../../features/conti/interfaces";
 import { useI18n } from "../../i18n/use-i18n";
 import { ProgressBar } from "primereact/progressbar";
 import {
   selectContiLoading,
   selectContiMonthlyBudget,
+  selectIncludeFutureRecurring,
+  setIncludeFutureRecurring,
 } from "../../features/conti/conto_slice";
 
 export default function BudgetCard() {
@@ -19,8 +25,12 @@ export default function BudgetCard() {
   // Selettori ora tipizzati correttamente dallo store globale
   const monthlyBudget = useAppSelector(selectContiMonthlyBudget);
   const loading = useAppSelector(selectContiLoading);
+  const includeFutureRecurring = useAppSelector(selectIncludeFutureRecurring);
 
-  const { total_budget, expenses, percentage } = monthlyBudget;
+  const { total_budget, expenses, percentage, remaining } = monthlyBudget;
+
+  const displayAmount =
+    expenses !== null ? expenses : remaining !== undefined ? remaining : null;
 
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
 
@@ -40,6 +50,11 @@ export default function BudgetCard() {
     }
   };
 
+  const handleToggleRecurring = (checked: boolean) => {
+    dispatch(setIncludeFutureRecurring(checked));
+    dispatch(getCurrentMonthExpenses({ include_future_recurring: checked }));
+  };
+
   const formatEuro = (value: number | null | undefined): string => {
     if (value === null || value === undefined) return "€0";
     return new Intl.NumberFormat("it-IT", {
@@ -51,8 +66,8 @@ export default function BudgetCard() {
 
   // Logica dinamica per le classi di stato
   const getStatusClass = (): string => {
-    if (!hasTotalBudget || expenses === null) return "is-neutral";
-    return total_budget > expenses ? "is-danger" : "is-success";
+    if (!hasTotalBudget || displayAmount === null) return "is-neutral";
+    return total_budget > displayAmount ? "is-danger" : "is-success";
   };
 
   return (
@@ -70,8 +85,17 @@ export default function BudgetCard() {
         />
       </div>
 
+      <div className="budget-card__checkbox-row">
+        <Checkbox
+          id="include-recurring"
+          checked={includeFutureRecurring}
+          onChange={(e) => handleToggleRecurring(e.checked ?? false)}
+          label={t("include_future_recurring") || "Include future recurring"}
+        />
+      </div>
+
       <div className="budget-card__amount-container">
-        <h2 className="budget-card__amount">{formatEuro(expenses)}</h2>
+        <h2 className="budget-card__amount">{formatEuro(displayAmount)}</h2>
 
         {hasTotalBudget && (
           <span className="budget-card__summary">

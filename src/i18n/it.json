@@ -217,5 +217,7 @@
   "destination_subcategory": "Sottocategoria di Destinazione",
   "filters": "Filtri",
   "reset_filters": "Resetta Filtri",
-  "select_type": "Seleziona Tipo"
+  "select_type": "Seleziona Tipo",
+  "include_future_recurring": "Includi transazioni ricorrenti future",
+  "other": "Altro"
 }

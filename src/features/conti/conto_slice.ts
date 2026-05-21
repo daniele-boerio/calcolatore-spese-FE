@@ -31,6 +31,7 @@ const initialState: ContoState = {
   filters: {
     sort_by: ["saldo:desc"],
   },
+  include_future_recurring: false,
 };
 
 // --- HELPERS ---
@@ -46,7 +47,11 @@ const handleRejected = (state: ContoState) => {
 const contoSlice = createSlice({
   name: "conto",
   initialState,
-  reducers: {},
+  reducers: {
+    setIncludeFutureRecurring: (state, action: PayloadAction<boolean>) => {
+      state.include_future_recurring = action.payload;
+    },
+  },
   extraReducers: (builder) => {
     builder
       // currentMonthExpenses & updateBudget
@@ -58,7 +63,17 @@ const contoSlice = createSlice({
           state.monthlyBudget.total_budget = Number(
             monthly_budget.total_budget,
           );
-          state.monthlyBudget.expenses = Number(monthly_budget.expenses);
+          state.monthlyBudget.expenses =
+            monthly_budget.expenses !== null &&
+            monthly_budget.expenses !== undefined
+              ? Number(monthly_budget.expenses)
+              : null;
+          const remainingValue =
+            monthly_budget.remaining ?? action.payload.remaining;
+          state.monthlyBudget.remaining =
+            remainingValue !== null && remainingValue !== undefined
+              ? Number(remainingValue)
+              : null;
           state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
         },
       )
@@ -69,7 +84,17 @@ const contoSlice = createSlice({
           state.monthlyBudget.total_budget = Number(
             monthly_budget.total_budget,
           );
-          state.monthlyBudget.expenses = Number(monthly_budget.expenses);
+          state.monthlyBudget.expenses =
+            monthly_budget.expenses !== null &&
+            monthly_budget.expenses !== undefined
+              ? Number(monthly_budget.expenses)
+              : null;
+          const remainingValue =
+            monthly_budget.remaining ?? action.payload.remaining;
+          state.monthlyBudget.remaining =
+            remainingValue !== null && remainingValue !== undefined
+              ? Number(remainingValue)
+              : null;
           state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
         },
       )
@@ -242,5 +267,8 @@ export const selectContiMonthlyBudget = (state: RootState) =>
 export const selectContiMonthlyExpensesByCategory = (state: RootState) =>
   state.conto.monthlyExpensesByCategory;
 export const selectContiFilters = (state: RootState) => state.conto.filters;
+export const selectIncludeFutureRecurring = (state: RootState) =>
+  state.conto.include_future_recurring;
 
 export default contoSlice.reducer;
+export const { setIncludeFutureRecurring } = contoSlice.actions;

@@ -13,6 +13,7 @@ export interface MonthlyDetailResponse {
   data: MonthlyDetailCategory[];
   totale_entrata: number;
   totale_uscita: number;
+  totale: number;
 }
 
 export interface MonthlyDetailCategory {

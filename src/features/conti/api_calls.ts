@@ -10,16 +10,25 @@ import {
   UpdateContoParams,
   DeleteContoParams,
   ContoFilters,
+  GetMonthExpensesParams,
 } from "./interfaces";
 import { RootState } from "../../store/store";
 
 export const getCurrentMonthExpenses = createAsyncThunk<
   MonthlyBudgetResponse,
-  void
->("conti/getCurrentMonthExpenses", async (_, { rejectWithValue }) => {
+  GetMonthExpensesParams | undefined
+>("conti/getCurrentMonthExpenses", async (params = {}, { rejectWithValue }) => {
   try {
+    const queryParams = new URLSearchParams();
+    if (params?.include_future_recurring !== undefined) {
+      queryParams.append(
+        "include_future_recurring",
+        params.include_future_recurring.toString(),
+      );
+    }
+
     const response = await api.get<MonthlyBudgetResponse>(
-      `/conti/currentMonthExpenses`,
+      `/conti/currentMonthExpenses${queryParams.toString() ? "?" + queryParams.toString() : ""}`,
     );
     return response.data;
   } catch (error) {

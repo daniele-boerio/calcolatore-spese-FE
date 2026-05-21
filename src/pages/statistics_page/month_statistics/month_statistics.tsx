@@ -156,7 +156,7 @@ export default function MonthStatistics() {
   // Calcolo totali
   const totalIncomes = totals.incomes;
   const totalExpenses = totals.expenses;
-  const totalOthers = others.reduce((sum, cat) => sum + cat.totale, 0);
+  const totalNet = totals.total;
 
   return (
     <div className="monthly-statistics-page">
@@ -224,10 +224,10 @@ export default function MonthStatistics() {
               €
             </span>
           </h3>
-          <h3 className="stats-item others">
-            {t("other") || "Other"}:{" "}
+          <h3 className="stats-item total">
+            {t("total")}:{" "}
             <span>
-              {totalOthers.toLocaleString("it-IT", {
+              {totalNet.toLocaleString("it-IT", {
                 minimumFractionDigits: 2,
               })}{" "}
               €
@@ -271,6 +271,7 @@ export default function MonthStatistics() {
                   title={cat.categoria}
                   totale={cat.totale}
                   sottocategorie={cat.sottocategorie}
+                  forceNegative
                   onClick={handleCategoryClick}
                   onSubcategoryClick={handleSubcategoryClick}
                 />

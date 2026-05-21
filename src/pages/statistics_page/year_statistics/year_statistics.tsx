@@ -255,6 +255,7 @@ export default function YearStatistics() {
 
   const totalIncomes = incomes.reduce((acc, cat) => acc + cat.totale, 0);
   const totalExpenses = expenses.reduce((acc, cat) => acc + cat.totale, 0);
+  const totalNet = totalIncomes + totalExpenses;
 
   return (
     <div className="yearly-statistics-page">
@@ -313,6 +314,15 @@ export default function YearStatistics() {
               €
             </span>
           </h3>
+          <h3 className="stats-item total">
+            {t("total")}:{" "}
+            <span>
+              {totalNet.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
+            </span>
+          </h3>
         </div>
       </div>
 
@@ -355,6 +365,7 @@ export default function YearStatistics() {
                           title={cat.categoria}
                           totale={cat.totale}
                           sottocategorie={cat.sottocategorie}
+                          forceNegative
                           onClick={handleCategoryClick}
                           onSubcategoryClick={handleSubcategoryClick}
                         />

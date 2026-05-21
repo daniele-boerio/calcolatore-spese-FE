@@ -17,6 +17,7 @@ export interface CustomCardProps {
     subcategoryTitle: string,
     categoryTitle: string,
   ) => void;
+  forceNegative?: boolean;
 }
 
 export default function CustomCard({
@@ -26,7 +27,11 @@ export default function CustomCard({
   actions,
   onClick,
   onSubcategoryClick,
+  forceNegative = false,
 }: CustomCardProps) {
+  const normalizedAmount =
+    totale !== undefined && forceNegative ? -Math.abs(totale) : totale;
+
   // Funzione per determinare il colore in base all'importo (se presente)
   const getAmountColor = (val?: number) => {
     if (val === undefined) return "inherit";
@@ -49,10 +54,16 @@ export default function CustomCard({
           className="header-right"
           style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}
         >
-          {totale !== undefined && (
-            <span className="amount" style={{ color: getAmountColor(totale) }}>
-              {totale > 0 ? "+" : ""}
-              {totale.toLocaleString("it-IT", { minimumFractionDigits: 2 })} €
+          {normalizedAmount !== undefined && (
+            <span
+              className="amount"
+              style={{ color: getAmountColor(normalizedAmount) }}
+            >
+              {normalizedAmount > 0 ? "+" : ""}
+              {normalizedAmount.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
             </span>
           )}
 
@@ -63,29 +74,35 @@ export default function CustomCard({
 
       {sottocategorie.length > 0 && (
         <div className="subcategories-list">
-          {sottocategorie.map((sub, idx) => (
-            <div
-              key={`${sub.sottocategoria}-${idx}`}
-              className="subcategory-item"
-              onClick={(e) => {
-                if (onSubcategoryClick) {
-                  e.stopPropagation();
-                  onSubcategoryClick(sub.sottocategoria, title);
-                }
-              }}
-              style={{ cursor: onSubcategoryClick ? "pointer" : "default" }}
-            >
-              <span className="name">{sub.sottocategoria}</span>
-              {sub.totale !== undefined && (
-                <span className="amount">
-                  {sub.totale.toLocaleString("it-IT", {
-                    minimumFractionDigits: 2,
-                  })}{" "}
-                  €
-                </span>
-              )}
-            </div>
-          ))}
+          {sottocategorie.map((sub, idx) => {
+            const normalizedSubTotal =
+              sub.totale !== undefined && forceNegative
+                ? -Math.abs(sub.totale)
+                : sub.totale;
+            return (
+              <div
+                key={`${sub.sottocategoria}-${idx}`}
+                className="subcategory-item"
+                onClick={(e) => {
+                  if (onSubcategoryClick) {
+                    e.stopPropagation();
+                    onSubcategoryClick(sub.sottocategoria, title);
+                  }
+                }}
+                style={{ cursor: onSubcategoryClick ? "pointer" : "default" }}
+              >
+                <span className="name">{sub.sottocategoria}</span>
+                {normalizedSubTotal !== undefined && (
+                  <span className="amount">
+                    {normalizedSubTotal.toLocaleString("it-IT", {
+                      minimumFractionDigits: 2,
+                    })}{" "}
+                    €
+                  </span>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

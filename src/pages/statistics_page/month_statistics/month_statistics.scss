@@ -78,6 +78,9 @@
         &.others span {
           color: #3498db;
         }
+        &.total span {
+          color: v.$text-main;
+        }
       }
 
       @media screen and (max-width: v.$mobile) {
