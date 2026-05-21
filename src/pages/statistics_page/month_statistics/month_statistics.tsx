@@ -151,10 +151,12 @@ export default function MonthStatistics() {
   // Filtriamo i dati per colonna
   const incomes = data.filter((cat) => cat.tipo === "ENTRATA");
   const expenses = data.filter((cat) => cat.tipo === "USCITA");
+  const others = data.filter((cat) => cat.tipo === "OTHER");
 
   // Calcolo totali
   const totalIncomes = totals.incomes;
   const totalExpenses = totals.expenses;
+  const totalOthers = others.reduce((sum, cat) => sum + cat.totale, 0);
 
   return (
     <div className="monthly-statistics-page">
@@ -222,6 +224,15 @@ export default function MonthStatistics() {
               €
             </span>
           </h3>
+          <h3 className="stats-item others">
+            {t("other") || "Other"}:{" "}
+            <span>
+              {totalOthers.toLocaleString("it-IT", {
+                minimumFractionDigits: 2,
+              })}{" "}
+              €
+            </span>
+          </h3>
         </div>
       </div>
 
@@ -255,6 +266,27 @@ export default function MonthStatistics() {
           <div className="categories-wrapper">
             {expenses.length > 0 ? (
               expenses.map((cat) => (
+                <CustomCard
+                  key={cat.categoria}
+                  title={cat.categoria}
+                  totale={cat.totale}
+                  sottocategorie={cat.sottocategorie}
+                  onClick={handleCategoryClick}
+                  onSubcategoryClick={handleSubcategoryClick}
+                />
+              ))
+            ) : (
+              <p className="no-data">{t("no_data")}</p>
+            )}
+          </div>
+        </div>
+
+        {/* COLONNA OTHER */}
+        <div className="others">
+          <h3>{t("other") || "Other"}</h3>
+          <div className="categories-wrapper">
+            {others.length > 0 ? (
+              others.map((cat) => (
                 <CustomCard
                   key={cat.categoria}
                   title={cat.categoria}
