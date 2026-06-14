@@ -1,9 +1,31 @@
 @use "../../styles/variables.scss" as v;
+// Stato interattivo di base condiviso da tutti i bottoni
+.div-button .p-button {
+  font-weight: 600;
+  transition:
+    background-color v.$transition-fast,
+    border-color v.$transition-fast,
+    box-shadow v.$transition-fast,
+    transform v.$transition-fast,
+    filter v.$transition-fast;
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
 .action-button {
   .p-button {
     color: v.$text-on-button;
     border-color: v.$bc-button-primary;
     background-color: v.$bg-button-primary;
+    box-shadow: v.$shadow-sm;
+
+    &:hover {
+      filter: brightness(1.07);
+      box-shadow: v.$shadow-md;
+      transform: translateY(-1px);
+    }
   }
 }
 
@@ -12,6 +34,10 @@
     color: v.$text-on-button;
     border-color: v.$bc-button-secondary;
     background-color: v.$bg-button-secondary;
+
+    &:hover {
+      filter: brightness(1.07);
+    }
   }
 }
 
@@ -20,6 +46,22 @@
     color: v.$text-main;
     border-color: transparent;
     background-color: transparent;
+  }
+}
+
+.split-button {
+  .p-button {
+    color: v.$text-on-button;
+    border-color: v.$accent-split;
+    background-color: v.$accent-split;
+    transition:
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      border-color: v.$accent-split-hover;
+      background-color: v.$accent-split-hover;
+    }
   }
 }
 
@@ -51,7 +93,7 @@
 
 .div-button {
   display: flex;
-  border-radius: 20px;
+  border-radius: v.$radius-md;
 
   &.invisible {
     display: none;
@@ -133,17 +175,27 @@
 .add-account-button,
 .add-tag-button,
 .add-transaction-button {
+  border-radius: v.$radius-pill;
+
   .p-button {
     justify-content: center !important;
     max-width: 4rem !important;
     max-height: 4rem !important;
     width: 4rem;
     height: 4rem;
-    color: v.$text-on-dark;
+    border-radius: v.$radius-pill;
+    color: v.$text-on-button;
     border: none;
-    background-color: v.$btn-light;
+    background-color: v.$bg-button-primary;
+    box-shadow: v.$shadow-md;
     .icon-button {
       font-size: 1.5rem;
+    }
+
+    &:hover {
+      filter: brightness(1.07);
+      transform: translateY(-2px);
+      box-shadow: v.$shadow-lg;
     }
   }
 }

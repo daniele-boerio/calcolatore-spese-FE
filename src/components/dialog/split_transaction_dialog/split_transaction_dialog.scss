@@ -1,22 +1,125 @@
-.split-dialog .split-part-row {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
+@use "../../../styles/variables.scss" as v;
 
-.split-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 1rem;
-}
+.split-dialog {
+  .split-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
 
-.split-total {
-  font-weight: 600;
-}
+  .split-subtitle {
+    margin: 0;
+    color: v.$text-muted;
+    font-size: 0.9rem;
+  }
 
-.error-message {
-  color: var(--danger-main, #d9534f);
-  margin-top: 0.5rem;
+  // --- Riepilogo importi ---
+  .split-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid v.$border-color;
+    border-radius: 12px;
+    background: v.$bg-gradient-table;
+
+    &__item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      flex: 1;
+      min-width: 7rem;
+
+      .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        color: v.$text-muted;
+      }
+
+      .value {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: v.$text-main;
+
+        &.is-ok {
+          color: v.$green;
+        }
+
+        &.is-warning {
+          color: v.$red;
+        }
+      }
+    }
+  }
+
+  // --- Lista parti ---
+  .split-parts {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .split-part {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem;
+    border: 1px solid v.$border-color;
+    border-left: 3px solid v.$accent-split;
+    border-radius: 12px;
+    background: v.$bg-card;
+
+    &__header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    &__title {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: v.$accent-split;
+    }
+
+    .form-row {
+      display: flex;
+      gap: 1rem;
+
+      .field {
+        flex: 1;
+        min-width: 0;
+      }
+    }
+  }
+
+  .split-add-button {
+    .p-button {
+      border-color: v.$accent-split;
+      color: v.$accent-split;
+    }
+  }
+
+  .split-error {
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    background: rgba(231, 76, 60, 0.1);
+    color: v.$red;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .buttons-footer-dialog {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 0.5rem;
+  }
+
+  @media (max-width: v.$tablet) {
+    .split-part .form-row {
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+  }
 }

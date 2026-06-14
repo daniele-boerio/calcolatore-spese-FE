@@ -19,15 +19,74 @@ body {
     color 0.3s ease;
 }
 
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+// --- Scrollbar moderna ---
+* {
+  scrollbar-width: thin;
+  scrollbar-color: v.$border-color transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: v.$border-color;
+  border-radius: v.$radius-pill;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: v.$text-muted;
+  background-clip: padding-box;
+}
+
+// --- Focus accessibile e moderno ---
+:focus-visible {
+  outline: 2px solid v.$light-blue;
+  outline-offset: 2px;
+}
+
 .dialog-custom {
   border: 1px solid v.$border-dialog;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-lg;
+  overflow: hidden;
+
   > div {
     background-color: v.$bg-dialog;
     color: v.$text-main;
   }
 
+  .p-dialog-header {
+    padding: 1.4rem 1.5rem 0.75rem;
+
+    .p-dialog-title {
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+  }
+
+  .p-dialog-content {
+    padding: 0.5rem 1.5rem 1rem;
+  }
+
+  .p-dialog-footer {
+    padding: 1rem 1.5rem 1.4rem;
+  }
+
   .p-dialog-header-icon {
     color: v.$text-main;
+    border-radius: v.$radius-pill;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$surface-hover;
+    }
   }
 }
 

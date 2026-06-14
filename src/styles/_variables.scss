@@ -28,6 +28,25 @@
   --month-table-header: #00c9ff;
   --card-gradient: linear-gradient(to right, #f0d6fab6, #d4effa6b);
   --border-card: #0285ad33;
+  --accent-split: #6c5ce7;
+  --accent-split-hover: #5a4bd4;
+
+  // --- Modern design tokens (light) ---
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.09), 0 1px 2px rgba(16, 24, 40, 0.05);
+  --shadow-md: 0 6px 16px rgba(16, 24, 40, 0.1), 0 2px 6px rgba(16, 24, 40, 0.05);
+  --shadow-lg: 0 16px 36px rgba(16, 24, 40, 0.14), 0 6px 12px rgba(16, 24, 40, 0.07);
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --surface-hover: #f1f5f9;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -58,13 +77,33 @@
     --month-table-header: #3f2b96;
     --card-gradient: linear-gradient(to left, #162058a6, #111944a6);
     --border-card: #fcd6d610;
+  --accent-split: #8b7bf0;
+  --accent-split-hover: #9d8ff5;
+
+  // --- Modern design tokens (dark) ---
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-pill: 999px;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.55);
+  --shadow-lg: 0 18px 38px rgba(0, 0, 0, 0.65);
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  --surface-hover: #2a2a2a;
   }
 }
 
-$light-blue: #3498db;
-$light-gray: #7f8c8d;
-$red: #e74c3c;
-$green: #2ecc71;
+// Palette accent (rifinita verso toni più moderni)
+$light-blue: #3b82f6;
+$light-gray: #7b8794;
+$red: #ef4444;
+$green: #22c55e;
 
 // Mappatura variabili SCSS
 $bg-app: var(--bg-app);
@@ -102,6 +141,22 @@ $text-table-header: var(--text-table-header);
 $month-table-header: var(--month-table-header);
 $card-gradient: var(--card-gradient);
 $border-card: var(--border-card);
+$accent-split: var(--accent-split);
+$accent-split-hover: var(--accent-split-hover);
+
+// --- Modern design tokens (mapping) ---
+$radius-sm: var(--radius-sm);
+$radius-md: var(--radius-md);
+$radius-lg: var(--radius-lg);
+$radius-xl: var(--radius-xl);
+$radius-pill: var(--radius-pill);
+$shadow-xs: var(--shadow-xs);
+$shadow-sm: var(--shadow-sm);
+$shadow-md: var(--shadow-md);
+$shadow-lg: var(--shadow-lg);
+$transition-fast: var(--transition-fast);
+$transition-base: var(--transition-base);
+$surface-hover: var(--surface-hover);
 
 // --- Breakpoints per il responsive ---
 $mobile: 480px;

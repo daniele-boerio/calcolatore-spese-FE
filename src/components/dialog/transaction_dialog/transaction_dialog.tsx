@@ -309,7 +309,9 @@ export default function TransactionDialog({
           />
           {transaction && (
             <Button
-              className="trasparent-button"
+              className="split-button"
+              icon="pi pi-sitemap"
+              iconPos="left"
               label={t("split_transaction") || "Split"}
               onClick={() => setIsSplitDialogVisible(true)}
             />

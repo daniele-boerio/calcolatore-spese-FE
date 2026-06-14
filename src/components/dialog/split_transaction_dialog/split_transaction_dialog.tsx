@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Dialog } from "primereact/dialog";
+import clsx from "clsx";
 import Button from "../../button/button";
 import InputText from "../../input_text/input_text";
 import Dropdown from "../../dropdown/dropdown";
@@ -26,6 +27,13 @@ interface Props {
   transaction?: Transaction | null;
 }
 
+const formatEuro = (value: number) =>
+  value.toLocaleString("it-IT", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+  });
+
 export default function SplitTransactionDialog({
   visible,
   onHide,
@@ -41,7 +49,7 @@ export default function SplitTransactionDialog({
 
   useEffect(() => {
     if (visible && transaction) {
-      // initialize with one part equal to full amount
+      // Si parte da una sola parte uguale all'intero importo
       setParts([
         {
           importo: Number(transaction.importo) || 0,
@@ -56,15 +64,13 @@ export default function SplitTransactionDialog({
     }
   }, [visible, transaction]);
 
-  const categoriesOptions = useMemo(() => {
-    return categorie || [];
-  }, [categorie]);
+  const categoriesOptions = useMemo(() => categorie || [], [categorie]);
+  const tagOptions = useMemo(() => tags || [], [tags]);
 
-  const tagOptions = useMemo(() => {
-    return tags || [];
-  }, [tags]);
-
+  const original = Number(transaction?.importo || 0);
   const total = parts.reduce((s, p) => s + Number(p.importo || 0), 0);
+  const remaining = original - total;
+  const balanced = Math.abs(remaining) < 0.01;
 
   const updatePart = (index: number, field: keyof SplitPart, value: any) => {
     const copy = [...parts];
@@ -72,10 +78,25 @@ export default function SplitTransactionDialog({
     setParts(copy);
   };
 
+  const handleImporto = (index: number, raw: string) => {
+    const cleaned = raw.replace(",", ".");
+    if (cleaned === "" || /^\d*\.?\d{0,2}$/.test(cleaned)) {
+      updatePart(index, "importo", cleaned === "" ? 0 : parseFloat(cleaned));
+    }
+  };
+
   const addPart = () => {
+    // La nuova parte riceve di default l'importo ancora da assegnare
+    const leftover = remaining > 0 ? Number(remaining.toFixed(2)) : 0;
     setParts([
       ...parts,
-      { importo: 0, categoria_id: null, sottocategoria_id: null, tag_id: null },
+      {
+        importo: leftover,
+        categoria_id: null,
+        sottocategoria_id: null,
+        tag_id: null,
+        descrizione: null,
+      },
     ]);
   };
 
@@ -86,9 +107,8 @@ export default function SplitTransactionDialog({
   const handleSplit = async () => {
     if (!transaction) return;
 
-    const original = Number(transaction.importo || 0);
-    if (Math.abs(total - original) > 0.009) {
-      setError("La somma delle parti deve essere uguale all'importo originale");
+    if (!balanced) {
+      setError(t("split_mismatch"));
       return;
     }
 
@@ -109,95 +129,151 @@ export default function SplitTransactionDialog({
 
       onHide();
     } catch (e: any) {
-      setError(e?.message || String(e));
+      setError(e?.detail || e?.message || String(e));
     }
   };
 
   return (
     <Dialog
-      header={
-        transaction ? t("split_transaction") || "Split" : t("split") || "Split"
-      }
+      header={t("split_transaction")}
       visible={visible}
       onHide={onHide}
       className="dialog-custom split-dialog"
-      style={{ width: "95vw", maxWidth: "45rem" }}
+      style={{ width: "95vw", maxWidth: "46rem" }}
+      blockScroll={true}
+      draggable={false}
+      resizable={false}
       footer={
-        <div className="dialog-footer">
+        <div className="buttons-footer-dialog">
           <Button
-            label={t("cancel") || "Annulla"}
+            label={t("cancel")}
             className="reset-button"
             onClick={onHide}
           />
           <Button
-            className="action-button"
-            label={t("split_transaction") || "Dividi"}
+            className="split-button"
+            icon="pi pi-sitemap"
+            iconPos="left"
+            label={t("split_transaction")}
             onClick={handleSplit}
+            disabled={!balanced || parts.length === 0}
           />
         </div>
       }
     >
       {transaction ? (
-        <div>
-          <p>
-            Importo originale: €{" "}
-            {Number(transaction.importo).toLocaleString("it-IT", {
-              minimumFractionDigits: 2,
-            })}
-          </p>
+        <div className="split-content">
+          <p className="split-subtitle">{t("split_subtitle")}</p>
 
-          {parts.map((p, idx) => (
-            <div className="split-part-row" key={idx}>
-              <InputText
-                value={String(p.importo)}
-                onChange={(e: any) =>
-                  updatePart(idx, "importo", parseFloat(e.target.value || 0))
-                }
-                placeholder="Importo"
-              />
-
-              <Dropdown
-                options={categoriesOptions}
-                optionLabel="nome"
-                optionValue="id"
-                value={p.categoria_id || null}
-                onChange={(e: any) => updatePart(idx, "categoria_id", e.value)}
-                placeholder="Categoria"
-                showClear
-              />
-
-              <Dropdown
-                options={tagOptions}
-                optionLabel="nome"
-                optionValue="id"
-                value={p.tag_id || null}
-                onChange={(e: any) => updatePart(idx, "tag_id", e.value)}
-                placeholder="Tag"
-                showClear
-              />
-
-              <Button
-                className="trasparent-danger-button"
-                icon="pi pi-trash"
-                compact
-                onClick={() => removePart(idx)}
-              />
+          {/* RIEPILOGO */}
+          <div className="split-summary">
+            <div className="split-summary__item">
+              <span className="label">{t("original_amount")}</span>
+              <span className="value">{formatEuro(original)}</span>
             </div>
-          ))}
-
-          <div className="split-actions">
-            <Button
-              label="Aggiungi parte"
-              className="trasparent-button"
-              onClick={addPart}
-            />
-            <div className="split-total">
-              Totale: €{" "}
-              {total.toLocaleString("it-IT", { minimumFractionDigits: 2 })}
+            <div className="split-summary__item">
+              <span className="label">{t("split_assigned")}</span>
+              <span className="value">{formatEuro(total)}</span>
+            </div>
+            <div className="split-summary__item">
+              <span className="label">{t("split_remaining")}</span>
+              <span
+                className={clsx(
+                  "value",
+                  balanced ? "is-ok" : "is-warning",
+                )}
+              >
+                {formatEuro(remaining)}
+              </span>
             </div>
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {/* PARTI */}
+          <div className="split-parts">
+            {parts.map((p, idx) => (
+              <div className="split-part" key={idx}>
+                <div className="split-part__header">
+                  <span className="split-part__title">
+                    {t("split_part")} {idx + 1}
+                  </span>
+                  <Button
+                    className="trasparent-danger-button"
+                    icon="pi pi-trash"
+                    compact
+                    disabled={parts.length <= 1}
+                    onClick={() => removePart(idx)}
+                  />
+                </div>
+
+                <div className="form-row">
+                  <div className="field">
+                    <InputText
+                      label={t("amount")}
+                      value={p.importo === 0 ? "" : String(p.importo)}
+                      onChange={(e) => handleImporto(idx, e.target.value)}
+                      icon="pi pi-euro"
+                      iconPos="right"
+                      keyfilter={/^\d*[.,]?\d{0,2}$/}
+                      inputMode="decimal"
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="field">
+                    <Dropdown
+                      label={t("category")}
+                      options={categoriesOptions}
+                      optionLabel="nome"
+                      optionValue="id"
+                      value={p.categoria_id || null}
+                      onChange={(e: any) =>
+                        updatePart(idx, "categoria_id", e.value)
+                      }
+                      placeholder={t("select_category")}
+                      showClear
+                    />
+                  </div>
+                  <div className="field">
+                    <Dropdown
+                      label={t("tag")}
+                      options={tagOptions}
+                      optionLabel="nome"
+                      optionValue="id"
+                      value={p.tag_id || null}
+                      onChange={(e: any) => updatePart(idx, "tag_id", e.value)}
+                      placeholder={t("select_tag")}
+                      showClear
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
+                  <div className="field">
+                    <InputText
+                      label={t("description")}
+                      value={p.descrizione || ""}
+                      onChange={(e) =>
+                        updatePart(idx, "descrizione", e.target.value)
+                      }
+                      placeholder={t("description")}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <Button
+            label={t("add_part")}
+            icon="pi pi-plus"
+            iconPos="left"
+            className="table-add-button split-add-button"
+            onClick={addPart}
+          />
+
+          {error && <div className="split-error">{error}</div>}
         </div>
       ) : null}
     </Dialog>
