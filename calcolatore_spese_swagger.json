@@ -7233,6 +7233,11 @@
               }
             ],
             "title": "Total Budget"
+          },
+          "is_open_banking_admin": {
+            "type": "boolean",
+            "title": "Is Open Banking Admin",
+            "default": false
           }
         },
         "type": "object",

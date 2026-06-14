@@ -12,12 +12,14 @@ import {
   selectContiConti,
   selectContiLoading,
 } from "../../features/conti/conto_slice";
+import { selectIsOpenBankingAdmin } from "../../features/profile/profile_slice";
 
 export default function ContiPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
   const conti = useAppSelector(selectContiConti);
   const accountLoading = useAppSelector(selectContiLoading);
+  const isOpenBankingAdmin = useAppSelector(selectIsOpenBankingAdmin);
 
   const [isCreateDialogVisible, setIsCreateDialogVisible] = useState(false);
   // Stato per l'edit
@@ -72,7 +74,11 @@ export default function ContiPage() {
                       index={index}
                       color={conto.color ? conto.color : "4b6cb7"}
                       onEdit={() => handleOpenEdit(conto)}
-                      onLinkBank={() => handleOpenLinkBank(conto)}
+                      onLinkBank={
+                        isOpenBankingAdmin
+                          ? () => handleOpenLinkBank(conto)
+                          : undefined
+                      }
                     />
                   ))
                 ) : (

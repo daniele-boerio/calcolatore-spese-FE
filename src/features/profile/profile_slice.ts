@@ -14,6 +14,7 @@ const initialState: ProfileState = {
   username: savedUsername ? ({ username: savedUsername } as any) : null,
   email: null,
   isAuthenticated: !!savedToken,
+  isOpenBankingAdmin: false,
 };
 
 // --- HELPERS ---
@@ -34,6 +35,7 @@ const profileSlice = createSlice({
       state.token = null;
       state.username = null;
       state.isAuthenticated = false;
+      state.isOpenBankingAdmin = false;
       localStorage.removeItem("token");
       localStorage.removeItem("username");
     },
@@ -71,11 +73,14 @@ const profileSlice = createSlice({
 
           state.username = action.payload.username;
           state.email = action.payload.email;
+          state.isOpenBankingAdmin =
+            action.payload.is_open_banking_admin ?? false;
         },
       )
 
       .addCase(getProfile.rejected, (state) => {
         state.isAuthenticated = false;
+        state.isOpenBankingAdmin = false;
 
         localStorage.removeItem("token");
         localStorage.removeItem("username");
@@ -111,5 +116,8 @@ export const selectProfileEmail = (state: RootState) => state.profile.email;
 
 export const selectProfileIsAuthenticated = (state: RootState) =>
   state.profile.isAuthenticated;
+
+export const selectIsOpenBankingAdmin = (state: RootState) =>
+  state.profile.isOpenBankingAdmin;
 
 export default profileSlice.reducer;

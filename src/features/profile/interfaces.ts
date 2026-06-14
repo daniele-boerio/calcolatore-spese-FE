@@ -20,9 +20,11 @@ export interface ProfileState {
   username: string | null;
   email: string | null;
   isAuthenticated: boolean;
+  isOpenBankingAdmin: boolean;
 }
 
 export interface ProfileResponse {
   username: string;
   email: string;
+  is_open_banking_admin?: boolean;
 }
