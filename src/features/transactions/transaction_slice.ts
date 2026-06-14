@@ -5,6 +5,7 @@ import {
   getLastTransactions,
   getTransactionsPaginated,
   updateTransaction,
+  splitTransaction,
 } from "./api_calls";
 import {
   PaginatedResponse,
@@ -122,6 +123,41 @@ const transactionsSlice = createSlice({
             updatedList.length > pageSize
               ? updatedList.slice(0, pageSize)
               : updatedList;
+        },
+      )
+
+      .addCase(
+        splitTransaction.fulfilled,
+        (
+          state,
+          action: PayloadAction<{ sourceId: string; parts: Transaction[] }>,
+        ) => {
+          const { sourceId, parts } = action.payload;
+
+          // Remove original transaction if present
+          state.transactions = state.transactions.filter(
+            (t) => String(t.id) !== String(sourceId),
+          );
+
+          // Map and insert new parts
+          const mapped = parts.map(mapTransaction);
+          const updatedList = [...state.transactions, ...mapped];
+          updatedList.sort(sortTransactions);
+
+          const pageSize = state.pagination.size || 10;
+          state.transactions =
+            updatedList.length > pageSize
+              ? updatedList.slice(0, pageSize)
+              : updatedList;
+
+          // Adjust total (remove original, add parts)
+          if (
+            state.pagination.total !== null &&
+            state.pagination.total !== undefined
+          ) {
+            state.pagination.total =
+              state.pagination.total - 1 + (parts ? parts.length : 0);
+          }
         },
       )
 

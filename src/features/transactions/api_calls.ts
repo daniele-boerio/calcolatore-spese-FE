@@ -14,6 +14,7 @@ import { RootState } from "../../store/store";
 import {
   getCurrentMonthExpenses,
   getCurrentMonthExpensesByCategory,
+  getConti,
 } from "../conti/api_calls";
 
 // Parametri per la paginazione
@@ -217,6 +218,42 @@ export const deleteTransaction = createAsyncThunk<
       return rejectWithValue(
         err.response?.data || "Errore eliminazione transazione",
       );
+    }
+  },
+);
+
+export const splitTransaction = createAsyncThunk<
+  { sourceId: string; parts: Transaction[] },
+  {
+    id: string;
+    parts: Array<{
+      importo: number | string;
+      categoria_id?: string | null;
+      sottocategoria_id?: string | null;
+      tag_id?: string | null;
+      descrizione?: string | null;
+      debito_id?: number | null;
+    }>;
+  },
+  { state: RootState }
+>(
+  "transazioni/splitTransazione",
+  async ({ id, parts }, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await api.post<Transaction[]>(
+        `/transazioni/${id}/split`,
+        { parts },
+      );
+
+      // Refresh key data
+      await dispatch(getConti());
+      await dispatch(getCurrentMonthExpenses());
+      await dispatch(getCurrentMonthExpensesByCategory());
+
+      return { sourceId: id, parts: response.data };
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(err.response?.data || "Errore split transazione");
     }
   },
 );

@@ -1,0 +1,22 @@
+.split-dialog .split-part-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.split-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.split-total {
+  font-weight: 600;
+}
+
+.error-message {
+  color: var(--danger-main, #d9534f);
+  margin-top: 0.5rem;
+}

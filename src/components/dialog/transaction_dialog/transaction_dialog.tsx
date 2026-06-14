@@ -25,6 +25,7 @@ import {
   createCategoria,
   createSottoCategorie,
 } from "../../../features/categorie/api_calls";
+import SplitTransactionDialog from "../split_transaction_dialog/split_transaction_dialog";
 
 interface TransactionDialogProps {
   visible: boolean;
@@ -60,6 +61,8 @@ export default function TransactionDialog({
   const [from_data, setFromData] = useState<Date | null>(null);
   const [to_data, setToData] = useState<Date | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
+  const [isSplitDialogVisible, setIsSplitDialogVisible] =
+    useState<boolean>(false);
 
   // Effetto per il popolamento (Edit) o reset (Create)
   useEffect(() => {
@@ -304,6 +307,13 @@ export default function TransactionDialog({
             className="reset-button"
             onClick={onHide}
           />
+          {transaction && (
+            <Button
+              className="trasparent-button"
+              label={t("split_transaction") || "Split"}
+              onClick={() => setIsSplitDialogVisible(true)}
+            />
+          )}
           <Button
             className="action-button"
             label={transaction ? t("save_changes") : t("save")}
@@ -319,6 +329,11 @@ export default function TransactionDialog({
       draggable={false}
       resizable={false}
     >
+      <SplitTransactionDialog
+        visible={isSplitDialogVisible}
+        onHide={() => setIsSplitDialogVisible(false)}
+        transaction={transaction || null}
+      />
       <div className="transaction-form">
         <div className="form-row">
           <SelectButton
