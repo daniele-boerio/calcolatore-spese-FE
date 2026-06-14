@@ -9,6 +9,7 @@ import { Transaction } from "../../../features/transactions/interfaces";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../features/tags/tag_slice";
 import "./split_transaction_dialog.scss";
+import { useI18n } from "../../../i18n/use-i18n";
 
 interface SplitPart {
   importo: number;
@@ -30,6 +31,7 @@ export default function SplitTransactionDialog({
   onHide,
   transaction,
 }: Props) {
+  const { t } = useI18n();
   const dispatch = useAppDispatch();
   const categorie = useAppSelector(selectCategoriaCategorie);
   const tags = useAppSelector(selectTagTags);
@@ -113,17 +115,23 @@ export default function SplitTransactionDialog({
 
   return (
     <Dialog
-      header={transaction ? "Split Transaction" : "Split"}
+      header={
+        transaction ? t("split_transaction") || "Split" : t("split") || "Split"
+      }
       visible={visible}
       onHide={onHide}
-      className="split-dialog"
-      style={{ width: "95vw", maxWidth: "50rem" }}
+      className="dialog-custom split-dialog"
+      style={{ width: "95vw", maxWidth: "45rem" }}
       footer={
         <div className="dialog-footer">
-          <Button label="Annulla" className="reset-button" onClick={onHide} />
+          <Button
+            label={t("cancel") || "Annulla"}
+            className="reset-button"
+            onClick={onHide}
+          />
           <Button
             className="action-button"
-            label="Dividi"
+            label={t("split_transaction") || "Dividi"}
             onClick={handleSplit}
           />
         </div>

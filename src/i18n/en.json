@@ -94,6 +94,8 @@
 
   "edit_category": "Edit Category",
   "save_changes": "Save Changes",
+  "split": "Split",
+  "split_transaction": "Split Transaction",
   "category_name": "Category Name",
   "subcategories_title": "Subcategories (Tags)",
   "no_subcategories": "No subcategories added yet.",

@@ -94,6 +94,8 @@
 
   "edit_category": "Modifica Categoria",
   "save_changes": "Salva Modifiche",
+  "split": "Dividi",
+  "split_transaction": "Dividi Transazione",
   "category_name": "Nome Categoria",
   "subcategories_title": "Sottocategorie (Tag)",
   "no_subcategories": "Nessuna sottocategoria aggiunta.",
