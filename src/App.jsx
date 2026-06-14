@@ -16,6 +16,7 @@ import CategoryPage from "./pages/category_page/category_page";
 import { getProfile } from "./features/profile/api_calls";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import ContiPage from "./pages/conti_page/conti_page";
+import DebitiPage from "./pages/debiti_page/debiti_page";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import TagsPage from "./pages/tags_page/tags_page";
 import StatisticsPage from "./pages/statistics_page/statistics_page";
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/categories" element={<CategoryPage />} />
                 <Route path="/tags" element={<TagsPage />} />
                 <Route path="/accounts" element={<ContiPage />} />
+                <Route path="/debts" element={<DebitiPage />} />
                 <Route path="/statistics" element={<StatisticsPage />} />
                 <Route path="/charts" element={<ChartsPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />

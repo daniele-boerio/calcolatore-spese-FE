@@ -65,6 +65,11 @@ export default function Navbar() {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/debts" onClick={closeMenu}>
+              {t("nav_debts")}
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/transactions" onClick={closeMenu}>
               {t("nav_transactions")}
             </NavLink>

@@ -7,6 +7,7 @@ import tagReducer from "../features/tags/tag_slice";
 import errorReducer from "../features/error/error_slice";
 import recurringReducer from "../features/recurrings/recurring_slice";
 import investimentoReducer from "../features/investimenti/investimento_slice";
+import debitiReducer from "../features/debiti/debito_slice";
 import statisticsReducer from "../features/statistics/statistics_slice";
 import chartsReducer from "../features/charts/charts_slice";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,6 +23,7 @@ export const store = configureStore({
     error: errorReducer,
     recurring: recurringReducer,
     investimento: investimentoReducer,
+    debiti: debitiReducer,
     statistics: statisticsReducer,
     charts: chartsReducer,
   },
