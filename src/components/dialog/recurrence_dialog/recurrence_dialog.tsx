@@ -363,54 +363,51 @@ export default function RecurrenceDialog({
 
         <div className="form-row">
           <div className="field">
-            <Dropdown
-              label={t("category")}
-              value={categoriaId}
-              options={categorieOptions}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setCategoriaId(e.value)}
-              placeholder={t("category_placeholder")}
-            />
+            <div className="field-inline">
+              <Dropdown
+                label={t("category")}
+                value={categoriaId}
+                options={categorieOptions}
+                optionLabel="nome"
+                optionValue="id"
+                onChange={(e) => setCategoriaId(e.value)}
+                placeholder={t("category_placeholder")}
+              />
+              {categoriaId === "NEW_CATEGORY" && (
+                <InputText
+                  label={t("new_category_name")}
+                  value={newCategoryName}
+                  onChange={(e) => setNewCategoryName(e.target.value)}
+                  placeholder={t("ex_subscriptions")}
+                  autoFocus
+                />
+              )}
+            </div>
           </div>
           <div className="field">
-            <Dropdown
-              label={t("sub_category")}
-              value={sottoCategoriaId}
-              options={sottocategorieOptions}
-              optionLabel="nome"
-              optionValue="id"
-              onChange={(e) => setSottoCategoriaId(e.value)}
-              placeholder={t("sub_category_placeholder")}
-              disabled={!categoriaId}
-            />
+            <div className="field-inline">
+              <Dropdown
+                label={t("sub_category")}
+                value={sottoCategoriaId}
+                options={sottocategorieOptions}
+                optionLabel="nome"
+                optionValue="id"
+                onChange={(e) => setSottoCategoriaId(e.value)}
+                placeholder={t("sub_category_placeholder")}
+                disabled={!categoriaId}
+              />
+              {sottoCategoriaId === "NEW_SUBCATEGORY" && (
+                <InputText
+                  label={t("new_subcategory_name")}
+                  value={newSubCategoryName}
+                  onChange={(e) => setNewSubCategoryName(e.target.value)}
+                  placeholder={t("ex_netflix")}
+                  autoFocus
+                />
+              )}
+            </div>
           </div>
         </div>
-        {categoriaId === "NEW_CATEGORY" && (
-          <div className="form-row">
-            <div className="field" style={{ width: "100%" }}>
-              <InputText
-                label={t("new_category_name")}
-                value={newCategoryName}
-                onChange={(e) => setNewCategoryName(e.target.value)}
-                placeholder={t("ex_subscriptions")}
-              />
-            </div>
-          </div>
-        )}
-
-        {sottoCategoriaId === "NEW_SUBCATEGORY" && (
-          <div className="form-row">
-            <div className="field" style={{ width: "100%" }}>
-              <InputText
-                label={t("new_subcategory_name")}
-                value={newSubCategoryName}
-                onChange={(e) => setNewSubCategoryName(e.target.value)}
-                placeholder={t("ex_netflix")}
-              />
-            </div>
-          </div>
-        )}
 
         <div className="form-row">
           <div className="field">

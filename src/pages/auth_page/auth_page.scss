@@ -5,18 +5,27 @@
   justify-content: center;
   align-items: center;
   padding: 1rem;
-  background-color: v.$bg-app; // Aggiunto per coprire l'intera pagina
+  min-height: 100dvh;
+  // Sfondo con un alone morbido per dare profondità alla schermata d'accesso
+  background:
+    radial-gradient(
+      circle at 50% 0%,
+      rgba(59, 130, 246, 0.14),
+      transparent 55%
+    ),
+    v.$bg-app;
 }
 
 .auth-container {
   background: v.$bg-card; // Convertito var
-  padding: 2.5rem;
+  padding: 2.75rem 2.5rem;
   width: 100%;
   max-width: 28.125rem;
-  border-radius: 12px;
+  border: 1px solid v.$border-color;
+  border-radius: v.$radius-xl;
 
   // Ombra dinamica coerente con il sistema
-  box-shadow: v.$shadow-color;
+  box-shadow: v.$shadow-lg;
 
   display: flex;
   flex-direction: column;

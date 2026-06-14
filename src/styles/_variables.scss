@@ -22,6 +22,9 @@
   --bar-gray: #e0e0e0;
   --bar-green: #2ecc71;
   --bar-red: #e74c3c;
+  // Semantic amount colors (usati anche inline nei componenti)
+  --green-500: #16a34a;
+  --red-500: #dc2626;
   --btn-light: #95a5a6;
   --table-header: linear-gradient(90deg, #00c9ff 0%, #92fe9d 100%);
   --text-table-header: #333333;
@@ -71,6 +74,8 @@
     --bar-gray: #333333;
     --bar-green: #2ecc71;
     --bar-red: #e74c3c;
+    --green-500: #4ade80;
+    --red-500: #f87171;
     --btn-light: #b0b0b0;
     --table-header: linear-gradient(90deg, #3f2b96 0%, #3c73ff 100%);
     --text-table-header: #f0f0f0;

@@ -4,28 +4,38 @@
   .transaction-list-title {
     margin-bottom: 1rem;
     color: v.$text-main;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 
   .transaction-list-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem; // Spazio verticale tra le righe
+    gap: 0.25rem; // Spazio verticale tra le righe
   }
 
   .transaction-card {
     display: flex;
     flex-direction: row; // Forza gli elementi sulla stessa riga
     align-items: center;
-    gap: 0.5rem; // Spazio orizzontale tra data, importo e descrizione
+    gap: 0.75rem; // Spazio orizzontale tra data, importo e descrizione
+    padding: 0.6rem 0.75rem;
+    border-radius: v.$radius-md;
+    transition: background-color v.$transition-fast;
+
+    &:hover {
+      background-color: v.$surface-hover;
+    }
 
     .transaction-date {
-      color: v.$text-main;
+      color: v.$text-muted;
+      font-size: 0.85rem;
       white-space: nowrap; // Evita che la data vada a capo
     }
 
     .transaction-amount {
-      font-weight: bold;
+      font-weight: 700;
       min-width: 4.375rem; // Mantiene gli importi leggermente incolonnati se vuoi
 
       &.entrata {

@@ -82,6 +82,26 @@
       }
     }
   }
+
+  // Dropdown + input "nuova categoria/sottocategoria" affiancati,
+  // impilati su mobile. Senza input, resta solo il dropdown a tutta larghezza.
+  .field-inline {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    gap: 0.75rem;
+
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
+
+    @media screen and (max-width: v.$mobile) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+    }
+  }
 }
 
 // Semplice animazione per la sottocategoria che appare

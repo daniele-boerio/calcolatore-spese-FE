@@ -3,8 +3,8 @@
 /* Contenitore principale */
 .div-inputtext {
   // Sostituito tertiary con il tuo border-color standard
-  border-bottom: 1px solid v.$border-color;
-  transition: border-color 0.2s ease;
+  border-bottom: 1.5px solid v.$border-color;
+  transition: border-color v.$transition-base;
   width: 100%;
 
   // Effetto linea colorata quando l'input è attivo

@@ -20,7 +20,9 @@
       margin: 0;
       display: flex;
       align-items: center;
-      font-size: 1.5rem;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
       color: var(--text-main);
     }
   }
@@ -41,6 +43,7 @@
     .scrollable-area {
       flex: 1;
       overflow-y: auto;
+      padding-top: 0.5rem; // Respiro per il sollevamento in hover delle card
       padding-right: 0.5rem;
       padding-bottom: 6rem; // Spazio extra in fondo per non coprire le card con il FAB button "+"
 

@@ -4,11 +4,19 @@
   font-family: v.$font-main;
   background-color: v.$bg-card;
   padding: 1.5rem;
-  border-radius: 12px;
-  box-shadow: v.$shadow-color;
+  border: 1px solid v.$border-color;
+  border-radius: v.$radius-lg;
+  box-shadow: v.$shadow-sm;
   display: flex;
   flex-direction: column;
-  transition: all 0.3s ease;
+  transition:
+    transform v.$transition-base,
+    box-shadow v.$transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: v.$shadow-md;
+  }
 
   &__header-row {
     display: flex;
@@ -70,8 +78,8 @@
     .p-progressbar {
       flex: 1; // Fondamentale per la larghezza in un contesto flex
       background-color: v.$bar-gray;
-      height: 0.375rem !important;
-      border-radius: 10px;
+      height: 0.5rem !important;
+      border-radius: v.$radius-pill;
       border: none;
       overflow: hidden;
 

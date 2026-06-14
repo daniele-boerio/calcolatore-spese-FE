@@ -4,12 +4,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 1.5rem;
+  padding: 0 1rem;
   height: 3.75rem;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  background-color: v.$bg-card;
+  border-bottom: 1px solid v.$border-color;
+  box-shadow: v.$shadow-sm;
 
   .navbar-left,
   .navbar-right {
@@ -28,36 +30,64 @@
     justify-content: center;
 
     .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.5px;
+      font-size: 1.35rem;
+      letter-spacing: -0.03em;
       color: v.$text-main;
+
+      // Pallino brand con gradiente
+      &::before {
+        content: "";
+        width: 0.65rem;
+        height: 0.65rem;
+        border-radius: 50%;
+        background: linear-gradient(
+          135deg,
+          v.$bg-button-primary,
+          v.$accent-split
+        );
+        box-shadow: 0 0 0 3px rgba(v.$bg-button-primary, 0.18);
+      }
     }
   }
 
   .hamburger {
     display: flex; // SEMPRE visibile (Desktop e Mobile)
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    gap: 0.313rem;
+    gap: 0.3rem;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: v.$radius-md;
+    transition: background-color v.$transition-fast;
     z-index: 1100;
 
+    &:hover {
+      background-color: v.$surface-hover;
+    }
+
     .bar {
-      width: 1.375rem;
-      height: 0.125rem;
+      width: 1.35rem;
+      height: 2px;
+      border-radius: v.$radius-pill;
       background-color: v.$text-main;
-      transition: 0.3s;
+      transition: transform 0.3s ease, opacity 0.2s ease;
     }
 
     &.open {
       .bar:nth-child(1) {
-        transform: translateY(7px) rotate(45deg);
+        transform: translateY(8px) rotate(45deg);
       }
       .bar:nth-child(2) {
         opacity: 0;
       }
       .bar:nth-child(3) {
-        transform: translateY(-7px) rotate(-45deg);
+        transform: translateY(-8px) rotate(-45deg);
       }
     }
   }
@@ -71,9 +101,11 @@
   width: 17.5rem;
   height: 100%;
   background-color: v.$bg-card;
+  border-radius: 0 v.$radius-xl v.$radius-xl 0;
+  box-shadow: v.$shadow-lg;
   z-index: 1050;
   transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  padding: 5rem 1.5rem;
+  padding: 5rem 1.25rem;
 
   &.active {
     transform: translateX(280px); // Entra in scena
@@ -88,17 +120,29 @@
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.35rem;
+    padding: 0;
 
     a {
       text-decoration: none;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       color: v.$text-main;
       font-weight: 500;
+      display: block;
+      padding: 0.7rem 1rem;
+      border-radius: v.$radius-md;
+      transition:
+        background-color v.$transition-fast,
+        color v.$transition-fast;
+
+      &:hover {
+        background-color: v.$surface-hover;
+      }
 
       &.active {
-        color: v.$green;
+        color: v.$bg-button-primary;
         font-weight: 700;
+        background-color: rgba(v.$bg-button-primary, 0.12);
       }
     }
   }

@@ -23,7 +23,8 @@
 
       h1 {
         margin: 0;
-        font-size: 1.5rem;
+        font-size: 1.75rem;
+        letter-spacing: -0.02em;
         color: var(--text-main);
         font-weight: 800;
       }
@@ -52,6 +53,7 @@
     .scrollable-area {
       flex: 1;
       overflow-y: auto;
+      padding-top: 0.5rem; // Respiro per il sollevamento in hover delle card
       padding-right: 0.5rem; // Spazio per non far attaccare le card alla scrollbar
       padding-bottom: 6rem; // Spazio in fondo per evitare che il "+" copra l'ultima riga
 

@@ -24,7 +24,9 @@
 
     h1 {
       color: v.$text-main;
-      font-size: 1.5rem;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
       margin: 0;
     }
 
@@ -64,6 +66,7 @@
     .scrollable-area {
       flex: 1;
       overflow-y: auto;
+      padding-top: 0.5rem; // Respiro per il sollevamento in hover delle card
       padding-right: 0.5rem;
       padding-bottom: 6rem; // Spazio per FAB button
 
@@ -81,17 +84,18 @@
           gap: 1rem;
           background: v.$card-gradient;
           border: 1px solid v.$border-card;
-          border-radius: 16px;
-          padding: 1rem;
+          border-radius: v.$radius-lg;
+          padding: 1rem 1.15rem;
           cursor: pointer;
+          box-shadow: v.$shadow-xs;
           transition:
-            transform 0.2s,
-            box-shadow 0.2s,
-            opacity 0.2s;
+            transform v.$transition-base,
+            box-shadow v.$transition-base,
+            opacity v.$transition-base;
 
           &:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-3px);
+            box-shadow: v.$shadow-md;
           }
 
           // Se la ricorrenza è disattivata, la rendiamo più trasparente
@@ -174,9 +178,9 @@
                 display: inline-flex;
                 align-items: center;
                 font-size: 0.7rem;
-                font-weight: 500;
-                padding: 0.15rem 0.4rem;
-                border-radius: 4px;
+                font-weight: 600;
+                padding: 0.2rem 0.5rem;
+                border-radius: v.$radius-pill;
                 white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;

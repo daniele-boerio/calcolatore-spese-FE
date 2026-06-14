@@ -8,8 +8,8 @@
 
   .card-menu {
     background: rgba(v.$text-main, 0.03); // Leggera tinta basata sul testo
-    border-radius: 12px;
-    padding: 0.5rem;
+    border-radius: v.$radius-lg;
+    padding: 0.4rem;
     border: 1px solid rgba(v.$text-main, 0.08);
     backdrop-filter: blur(10px);
   }
@@ -30,10 +30,13 @@
           background: transparent !important;
           border: none !important;
           color: v.$text-muted !important;
-          transition: all 0.3s ease;
-          border-radius: 8px;
-          padding: 0.75rem 1.25rem;
-          font-weight: 500;
+          transition:
+            background-color v.$transition-fast,
+            color v.$transition-fast,
+            box-shadow v.$transition-fast;
+          border-radius: v.$radius-md;
+          padding: 0.7rem 1.25rem;
+          font-weight: 600;
 
           .p-menuitem-icon {
             margin-right: 0.5rem;
@@ -48,11 +51,12 @@
         /* Stato Attivo */
         &.p-highlight {
           .p-menuitem-link {
-            color: v.$text-main !important; // Usa il tuo colore primario (es. blu)
-            background: v.$bg-dark !important;
+            color: v.$bg-button-primary !important;
+            background: v.$bg-card !important;
+            box-shadow: v.$shadow-sm;
 
             .p-menuitem-icon {
-              color: v.$text-main !important;
+              color: v.$bg-button-primary !important;
             }
           }
         }
