@@ -22,6 +22,7 @@ import TagsPage from "./pages/tags_page/tags_page";
 import StatisticsPage from "./pages/statistics_page/statistics_page";
 import ResetPasswordPage from "./pages/reset_password_page/reset_password_page";
 import ChartsPage from "./pages/charts_page/charts_page";
+import BankCallbackPage from "./pages/bank_callback_page/bank_callback_page";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -41,6 +42,7 @@ function App() {
         {!isAuthenticated ? (
           <Routes>
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/bank-callback" element={<BankCallbackPage />} />
             <Route path="*" element={<AuthPage />} />
           </Routes>
         ) : (
@@ -57,6 +59,7 @@ function App() {
                 <Route path="/debts" element={<DebitiPage />} />
                 <Route path="/statistics" element={<StatisticsPage />} />
                 <Route path="/charts" element={<ChartsPage />} />
+                <Route path="/bank-callback" element={<BankCallbackPage />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </div>

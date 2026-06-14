@@ -12,6 +12,7 @@ interface CreditCardProps {
   logo?: string;
   index: number;
   onEdit: () => void;
+  onLinkBank?: () => void;
   color: string;
 }
 
@@ -22,6 +23,7 @@ export default function CreditCard({
   logo,
   index,
   onEdit,
+  onLinkBank,
   color,
 }: CreditCardProps) {
   const { t } = useI18n();
@@ -77,6 +79,18 @@ export default function CreditCard({
   return (
     <div className={`credit-card`} style={cardStyle}>
       <div className="credit-card__actions">
+        {onLinkBank && (
+          <Button
+            icon="pi pi-building"
+            className="trasparent-button-account"
+            labelNoTraduction={t("link_bank")}
+            compact
+            onClick={(e) => {
+              onLinkBank();
+              e.stopPropagation();
+            }}
+          />
+        )}
         <Button
           icon="pi pi-pencil"
           className="trasparent-button-account"

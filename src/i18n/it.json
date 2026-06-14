@@ -148,6 +148,18 @@
   "add_account": "Aggiungi Conto",
   "no_accounts_found": "Nessun conto trovato. Aggiungi il primo per iniziare il tracciamento!",
 
+  "link_bank": "Collega banca",
+  "link_bank_title": "Collega il conto a una banca",
+  "link_bank_subtitle": "Seleziona la tua banca per collegarla in modo sicuro tramite Open Banking",
+  "search_bank": "Cerca banca",
+  "no_banks_found": "Nessuna banca trovata",
+  "redirecting_to_bank": "Reindirizzamento alla banca…",
+  "bank_callback_connecting": "Collegamento del conto in corso…",
+  "bank_callback_success": "Conto collegato con successo!",
+  "bank_callback_error": "Impossibile completare il collegamento bancario",
+  "bank_callback_missing_ref": "Riferimento mancante: collegamento non valido",
+  "back_to_accounts": "Torna ai conti",
+
   "edit_account": "Modifica Conto",
   "account_name": "Nome Conto",
   "current_balance": "Saldo Attuale",

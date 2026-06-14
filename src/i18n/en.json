@@ -148,6 +148,18 @@
   "add_account": "Add Account",
   "no_accounts_found": "No accounts found. Add your first one to start tracking!",
 
+  "link_bank": "Link bank",
+  "link_bank_title": "Link this account to a bank",
+  "link_bank_subtitle": "Select your bank to connect it securely via Open Banking",
+  "search_bank": "Search bank",
+  "no_banks_found": "No banks found",
+  "redirecting_to_bank": "Redirecting to your bank…",
+  "bank_callback_connecting": "Linking your account…",
+  "bank_callback_success": "Account linked successfully!",
+  "bank_callback_error": "Could not complete the bank connection",
+  "bank_callback_missing_ref": "Missing reference: invalid connection",
+  "back_to_accounts": "Back to accounts",
+
   "edit_account": "Edit Account",
   "account_name": "Account Name",
   "current_balance": "Current Balance",

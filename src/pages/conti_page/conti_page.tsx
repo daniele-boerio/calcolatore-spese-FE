@@ -5,6 +5,7 @@ import Button from "../../components/button/button";
 import "./conti_page.scss";
 import { getConti } from "../../features/conti/api_calls";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
+import BankConnectDialog from "../../components/dialog/bank_connect_dialog/bank_connect_dialog";
 import CreditCard from "../../components/credit_card/credit_card"; // Assicurati che il percorso sia giusto
 import { Conto } from "../../features/conti/interfaces";
 import {
@@ -22,6 +23,10 @@ export default function ContiPage() {
   // Stato per l'edit
   const [selectedAccount, setSelectedAccount] = useState<Conto | null>(null);
 
+  // Stato per il collegamento bancario (Open Banking)
+  const [isBankDialogVisible, setIsBankDialogVisible] = useState(false);
+  const [bankAccount, setBankAccount] = useState<Conto | null>(null);
+
   useEffect(() => {
     dispatch(getConti());
   }, [dispatch]);
@@ -34,6 +39,11 @@ export default function ContiPage() {
   const handleOpenEdit = (account: Conto) => {
     setSelectedAccount(account);
     setIsCreateDialogVisible(true);
+  };
+
+  const handleOpenLinkBank = (account: Conto) => {
+    setBankAccount(account);
+    setIsBankDialogVisible(true);
   };
 
   return (
@@ -62,6 +72,7 @@ export default function ContiPage() {
                       index={index}
                       color={conto.color ? conto.color : "4b6cb7"}
                       onEdit={() => handleOpenEdit(conto)}
+                      onLinkBank={() => handleOpenLinkBank(conto)}
                     />
                   ))
                 ) : (
@@ -91,6 +102,16 @@ export default function ContiPage() {
           setSelectedAccount(null);
         }}
         loading={accountLoading}
+      />
+
+      {/* DIALOG COLLEGAMENTO BANCARIO */}
+      <BankConnectDialog
+        visible={isBankDialogVisible}
+        conto={bankAccount}
+        onHide={() => {
+          setIsBankDialogVisible(false);
+          setBankAccount(null);
+        }}
       />
     </>
   );

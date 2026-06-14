@@ -98,3 +98,33 @@ export interface ContoFilters {
   saldo_max?: number;
   ricarica_automatica?: boolean;
 }
+
+// --- Open Banking (collegamento conto a banca via Enable Banking) ---
+
+// Una banca (ASPSP): identificata da nome + paese, non da un singolo id.
+export interface Institution {
+  name: string;
+  country: string;
+  logo?: string;
+}
+
+export interface StartBankAuthParams {
+  conto_id: string;
+  aspsp_name: string;
+  aspsp_country: string;
+}
+
+export interface BankAuthLink {
+  url: string;
+}
+
+export interface ConfirmBankSessionParams {
+  state: string;
+  code: string;
+}
+
+export interface BankSessionResult {
+  conto_id: number;
+  account_id: string;
+  status: string;
+}

@@ -11,6 +11,11 @@ import {
   DeleteContoParams,
   ContoFilters,
   GetMonthExpensesParams,
+  Institution,
+  StartBankAuthParams,
+  BankAuthLink,
+  ConfirmBankSessionParams,
+  BankSessionResult,
 } from "./interfaces";
 import { RootState } from "../../store/store";
 
@@ -128,6 +133,65 @@ export const updateConto = createAsyncThunk<Conto, UpdateContoParams>(
     }
   },
 );
+
+// --- Open Banking: collegamento del conto a una banca tramite Enable Banking ---
+
+// Step 1: elenco delle banche (ASPSP) selezionabili (per mostrare loghi/nomi).
+export const getInstitutions = createAsyncThunk<Institution[], string | undefined>(
+  "openBanking/getInstitutions",
+  async (country = "IT", { rejectWithValue }) => {
+    try {
+      const response = await api.get<Institution[]>(
+        `/open-banking/institutions?country=${country}`,
+      );
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore ricezione lista banche",
+      );
+    }
+  },
+);
+
+// Step 2: avvia l'autorizzazione e restituisce l'URL verso la banca.
+export const startBankAuth = createAsyncThunk<BankAuthLink, StartBankAuthParams>(
+  "openBanking/startAuth",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await api.post<BankAuthLink>(`/open-banking/auth`, {
+        conto_id: Number(params.conto_id),
+        aspsp_name: params.aspsp_name,
+        aspsp_country: params.aspsp_country,
+      });
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore avvio collegamento bancario",
+      );
+    }
+  },
+);
+
+// Step 5/6: la stretta di mano finale (scambia code + state per una sessione).
+export const confirmBankSession = createAsyncThunk<
+  BankSessionResult,
+  ConfirmBankSessionParams
+>("openBanking/confirmSession", async (params, { rejectWithValue }) => {
+  try {
+    const response = await api.post<BankSessionResult>(
+      `/open-banking/sessions`,
+      { state: params.state, code: params.code },
+    );
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(
+      err.response?.data || "Errore conferma collegamento bancario",
+    );
+  }
+});
 
 export const deleteConto = createAsyncThunk<string, DeleteContoParams>(
   "conti/deleteConto",
