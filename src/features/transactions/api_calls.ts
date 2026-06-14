@@ -11,6 +11,10 @@ import {
   LastTransactionsParams,
 } from "./interfaces";
 import { RootState } from "../../store/store";
+import {
+  getCurrentMonthExpenses,
+  getCurrentMonthExpensesByCategory,
+} from "../conti/api_calls";
 
 // Parametri per la paginazione
 
@@ -135,7 +139,7 @@ export const createTransaction = createAsyncThunk<
   { state: RootState } // Dichiariamo che vogliamo accedere al RootState
 >(
   "transazioni/createTransazione",
-  async (params, { getState, rejectWithValue }) => {
+  async (params, { getState, dispatch, rejectWithValue }) => {
     try {
       // 1. Facciamo la chiamata API standard
       const response = await api.post<Transaction>(`/transazioni`, params);
@@ -150,14 +154,19 @@ export const createTransaction = createAsyncThunk<
         (c) => String(c.id) === String(newTx.categoria_id),
       );
 
-      // 4. Arricchiamo l'oggetto di ritorno iniettando l'oggetto 'categoria'
-      return {
+      const enrichedTx = {
         ...newTx,
         categoria: {
           id: newTx.categoria_id,
           nome: categoriaTrovata ? categoriaTrovata.nome : "Uncategorized",
         },
-      } as Transaction; // Forziamo il tipo Transaction per TypeScript
+      } as Transaction;
+
+      // Aggiorniamo i dati del budget e del grafico dopo la creazione
+      await dispatch(getCurrentMonthExpenses());
+      await dispatch(getCurrentMonthExpensesByCategory());
+
+      return enrichedTx;
     } catch (error) {
       const err = error as AxiosError;
       return rejectWithValue(
@@ -170,30 +179,44 @@ export const createTransaction = createAsyncThunk<
 export const updateTransaction = createAsyncThunk<
   Transaction,
   UpdateTransactionParams
->("transazioni/updateTransazione", async (params, { rejectWithValue }) => {
-  try {
-    // Estraiamo l'id e raccogliamo tutto il resto in 'body'
-    const { id, ...body } = params;
+>(
+  "transazioni/updateTransazione",
+  async (params, { dispatch, rejectWithValue }) => {
+    try {
+      // Estraiamo l'id e raccogliamo tutto il resto in 'body'
+      const { id, ...body } = params;
 
-    const response = await api.put<Transaction>(`/transazioni/${id}`, body);
-    return response.data;
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(err.response?.data || "Errore update transazione");
-  }
-});
+      const response = await api.put<Transaction>(`/transazioni/${id}`, body);
+
+      await dispatch(getCurrentMonthExpenses());
+      await dispatch(getCurrentMonthExpensesByCategory());
+
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(err.response?.data || "Errore update transazione");
+    }
+  },
+);
 
 export const deleteTransaction = createAsyncThunk<
   string,
   DeleteTransactionParams
->("transazioni/deleteTransaction", async (params, { rejectWithValue }) => {
-  try {
-    await api.delete<void>(`/transazioni/${params.id}`);
-    return params.id;
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(
-      err.response?.data || "Errore eliminazione transazione",
-    );
-  }
-});
+>(
+  "transazioni/deleteTransaction",
+  async (params, { dispatch, rejectWithValue }) => {
+    try {
+      await api.delete<void>(`/transazioni/${params.id}`);
+
+      await dispatch(getCurrentMonthExpenses());
+      await dispatch(getCurrentMonthExpensesByCategory());
+
+      return params.id;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore eliminazione transazione",
+      );
+    }
+  },
+);

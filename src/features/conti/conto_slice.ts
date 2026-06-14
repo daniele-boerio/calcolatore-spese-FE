@@ -193,16 +193,14 @@ const contoSlice = createSlice({
 
           // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget
           if (isThisMonth) {
-            const txMod = newTx.tipo === "USCITA" ? -1 : 1;
-            const importoNetto = txImporto * txMod;
+            const isExpense = newTx.tipo === "USCITA";
 
-            // Aggiorna Monthly Budget
-            if (state.monthlyBudget.expenses !== null) {
-              state.monthlyBudget.expenses += importoNetto;
+            // Aggiorna Monthly Budget solo per le spese
+            if (isExpense && state.monthlyBudget.expenses !== null) {
+              state.monthlyBudget.expenses += txImporto;
 
-              // Ricalcola la percentuale
               if (
-                state.monthlyBudget.total_budget &&
+                state.monthlyBudget.total_budget !== null &&
                 state.monthlyBudget.total_budget > 0
               ) {
                 state.monthlyBudget.percentage = Number(
@@ -213,10 +211,16 @@ const contoSlice = createSlice({
                   ).toFixed(1),
                 );
               }
+
+              if (state.monthlyBudget.total_budget !== null) {
+                state.monthlyBudget.remaining =
+                  state.monthlyBudget.total_budget -
+                  state.monthlyBudget.expenses;
+              }
             }
 
             // Aggiorna Expenses By Category
-            if (newTx.tipo === "USCITA") {
+            if (isExpense) {
               const categoryName =
                 (newTx as any).categoria?.nome || "Uncategorized";
 
@@ -225,8 +229,7 @@ const contoSlice = createSlice({
               );
 
               if (catIndex !== -1) {
-                if (newTx.tipo === "USCITA")
-                  state.monthlyExpensesByCategory[catIndex].value += txImporto;
+                state.monthlyExpensesByCategory[catIndex].value += txImporto;
               } else {
                 state.monthlyExpensesByCategory.push({
                   label: categoryName,

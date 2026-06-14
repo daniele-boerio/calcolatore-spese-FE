@@ -36,6 +36,22 @@ const mapTransaction = (tx: Transaction): Transaction => ({
   importo_netto: tx.importo_netto !== null ? Number(tx.importo_netto) : null,
 });
 
+const sortTransactions = (a: Transaction, b: Transaction) => {
+  const dateA = new Date(a.data).getTime();
+  const dateB = new Date(b.data).getTime();
+  if (dateA !== dateB) return dateB - dateA;
+
+  const lastUpdateA = new Date(a.lastUpdate).getTime();
+  const lastUpdateB = new Date(b.lastUpdate).getTime();
+  if (lastUpdateA !== lastUpdateB) return lastUpdateB - lastUpdateA;
+
+  const creationA = new Date(a.creationDate).getTime();
+  const creationB = new Date(b.creationDate).getTime();
+  if (creationA !== creationB) return creationB - creationA;
+
+  return String(b.id).localeCompare(String(a.id));
+};
+
 const handlePending = (state: TransactionsState) => {
   state.loading = true;
 };
@@ -72,7 +88,9 @@ const transactionsSlice = createSlice({
       .addCase(
         getTransactionsPaginated.fulfilled,
         (state, action: PayloadAction<PaginatedResponse>) => {
-          state.transactions = action.payload.data.map(mapTransaction);
+          state.transactions = action.payload.data
+            .map(mapTransaction)
+            .sort(sortTransactions);
           state.pagination.total = action.payload.total;
           state.pagination.page = action.payload.page;
           state.pagination.size = action.payload.size;
@@ -97,9 +115,7 @@ const transactionsSlice = createSlice({
           state.pagination.total = (state.pagination.total || 0) + 1;
 
           const updatedList = [...state.transactions, newTx];
-          updatedList.sort(
-            (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
-          );
+          updatedList.sort(sortTransactions);
 
           const pageSize = state.pagination.size || 10;
           state.transactions =
@@ -119,9 +135,7 @@ const transactionsSlice = createSlice({
 
           if (index !== -1) {
             state.transactions[index] = updatedTx;
-            state.transactions.sort(
-              (a, b) => new Date(b.data).getTime() - new Date(a.data).getTime(),
-            );
+            state.transactions.sort(sortTransactions);
           }
         },
       )
