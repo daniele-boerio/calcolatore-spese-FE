@@ -125,9 +125,16 @@ export default function AccountDialog({
     onHide();
   };
 
-  const handleNumberChange = (val: string, fun: any) => {
+  const handleNumberChange = (
+    val: string,
+    fun: (value: string) => void,
+    allowNegative = false,
+  ) => {
     let cleanedValue = val.replace(",", ".");
-    if (cleanedValue === "" || /^\d*\.?\d{0,2}$/.test(cleanedValue)) {
+    const pattern = allowNegative
+      ? /^-?\d*\.?\d{0,2}$/
+      : /^\d*\.?\d{0,2}$/;
+    if (cleanedValue === "" || pattern.test(cleanedValue)) {
       fun(cleanedValue);
     }
   };
@@ -176,11 +183,13 @@ export default function AccountDialog({
           <div className="field">
             <InputText
               value={saldo}
-              onChange={(e) => handleNumberChange(e.target.value, setSaldo)}
+              onChange={(e) =>
+                handleNumberChange(e.target.value, setSaldo, true)
+              }
               label={t("current_balance")}
               icon="pi pi-euro"
               iconPos="right"
-              keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
+              keyfilter={/^-?\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact (saldo può essere negativo)
               inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
               placeholder="0.00"
             />
