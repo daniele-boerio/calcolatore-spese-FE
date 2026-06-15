@@ -52,6 +52,9 @@ export default function TransactionDialog({
   const [data, setData] = useState<Date | null>(new Date());
   const [descrizione, setDescrizione] = useState("");
   const [contoId, setContoId] = useState<string | null>(null);
+  const [contoDestinazioneId, setContoDestinazioneId] = useState<string | null>(
+    null,
+  );
   const [categoriaId, setCategoriaId] = useState<string | null>(null);
   const [newCategoryName, setNewCategoryName] = useState<string>("");
   const [sottoCategoriaId, setSottoCategoriaId] = useState<string | null>(null);
@@ -74,6 +77,7 @@ export default function TransactionDialog({
         setData(new Date(transaction.data));
         setDescrizione(transaction.descrizione || "");
         setContoId(transaction.conto_id);
+        setContoDestinazioneId(transaction.conto_destinazione_id ?? null);
         setCategoriaId(transaction.categoria_id);
         setSottoCategoriaId(transaction.sottocategoria_id);
         setTagId(transaction.tag_id);
@@ -87,6 +91,7 @@ export default function TransactionDialog({
         setCategoriaId(null);
         setSottoCategoriaId(null);
         setTagId(null);
+        setContoDestinazioneId(null);
         setFromData(null);
         setToData(null);
         setTransactionId(null);
@@ -193,6 +198,8 @@ export default function TransactionDialog({
       }
     }
 
+    const isRicarica = tipo === "RICARICA";
+
     // --- 4. PREPARAZIONE DEL PAYLOAD FINALE ---
     const payload: any = {
       importo: isNaN(numericImporto) ? 0 : numericImporto,
@@ -200,10 +207,12 @@ export default function TransactionDialog({
       data: formattedDate,
       descrizione: descrizione,
       conto_id: contoId,
-      categoria_id: finalCategoriaId,
-      sottocategoria_id: finalSottoCategoriaId,
-      tag_id: finalTagId,
-      parent_transaction_id: transactionId,
+      // Per i giroconti: conto destinazione valorizzato, niente categoria/tag
+      conto_destinazione_id: isRicarica ? contoDestinazioneId : null,
+      categoria_id: isRicarica ? null : finalCategoriaId,
+      sottocategoria_id: isRicarica ? null : finalSottoCategoriaId,
+      tag_id: isRicarica ? null : finalTagId,
+      parent_transaction_id: isRicarica ? null : transactionId,
     };
 
     // --- 5. SALVATAGGIO TRANSAZIONE ---
@@ -220,7 +229,14 @@ export default function TransactionDialog({
     { label: t("income"), value: "ENTRATA" },
     { label: t("expenses"), value: "USCITA" },
     { label: t("compensation"), value: "RIMBORSO" },
+    { label: t("transfer"), value: "RICARICA" },
   ];
+
+  // Conti selezionabili come destinazione: tutti tranne la sorgente
+  const contiDestinazione = useMemo(
+    () => conti.filter((c) => String(c.id) !== String(contoId)),
+    [conti, contoId],
+  );
 
   const handleImportoChange = (val: string) => {
     let cleanedValue = val.replace(",", ".");
@@ -323,7 +339,15 @@ export default function TransactionDialog({
             disabled={
               tipo === "RIMBORSO"
                 ? !(importo && contoId && data && transactionId)
-                : !(importo && contoId && data)
+                : tipo === "RICARICA"
+                  ? !(
+                      importo &&
+                      contoId &&
+                      contoDestinazioneId &&
+                      String(contoId) !== String(contoDestinazioneId) &&
+                      data
+                    )
+                  : !(importo && contoId && data)
             }
           />
         </div>
@@ -402,7 +426,9 @@ export default function TransactionDialog({
             <div className="form-row">
               <div className="field">
                 <Dropdown
-                  label={t("bank_account")}
+                  label={
+                    tipo === "RICARICA" ? t("source_account") : t("bank_account")
+                  }
                   value={contoId}
                   options={conti}
                   optionLabel="nome"
@@ -412,15 +438,27 @@ export default function TransactionDialog({
                 />
               </div>
               <div className="field">
-                <Dropdown
-                  label={t("tag")}
-                  value={tagId}
-                  options={tagOptions}
-                  optionLabel="nome"
-                  optionValue="id"
-                  onChange={(e) => setTagId(e.value)}
-                  placeholder={t("tag_placeholder")}
-                />
+                {tipo === "RICARICA" ? (
+                  <Dropdown
+                    label={t("destination_account")}
+                    value={contoDestinazioneId}
+                    options={contiDestinazione}
+                    optionLabel="nome"
+                    optionValue="id"
+                    onChange={(e) => setContoDestinazioneId(e.value)}
+                    placeholder={t("destination_account_placeholder")}
+                  />
+                ) : (
+                  <Dropdown
+                    label={t("tag")}
+                    value={tagId}
+                    options={tagOptions}
+                    optionLabel="nome"
+                    optionValue="id"
+                    onChange={(e) => setTagId(e.value)}
+                    placeholder={t("tag_placeholder")}
+                  />
+                )}
               </div>
             </div>
             {tagId === "NEW_TAG" && (
@@ -436,11 +474,12 @@ export default function TransactionDialog({
               </div>
             )}
 
-            <div className="form-row">
-              <div className="field">
-                <div className="field-inline">
-                  <Dropdown
-                    label={t("category")}
+            {tipo !== "RICARICA" && (
+              <div className="form-row">
+                <div className="field">
+                  <div className="field-inline">
+                    <Dropdown
+                      label={t("category")}
                     value={categoriaId}
                     options={categorieOptions}
                     optionLabel="nome"
@@ -482,7 +521,8 @@ export default function TransactionDialog({
                   )}
                 </div>
               </div>
-            </div>
+              </div>
+            )}
 
             <div className="form-row">
               <div className="field">

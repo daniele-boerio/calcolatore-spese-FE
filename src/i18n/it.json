@@ -68,6 +68,9 @@
 
   "compensation": "Rimborso",
   "compensations": "Rimborsi",
+  "transfer": "Ricarica",
+  "destination_account": "Conto Destinazione",
+  "destination_account_placeholder": "Scegli il conto destinazione",
   "income": "Entrate",
   "expenses": "Uscite",
   "new_transaction": "Nuova Transazione",

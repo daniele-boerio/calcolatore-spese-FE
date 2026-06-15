@@ -182,13 +182,29 @@ const contoSlice = createSlice({
             new Date(newTx.data).getFullYear() === new Date().getFullYear();
 
           // 1. Aggiorna il saldo del conto coinvolto
-          const contoIndex = state.conti.findIndex(
-            (c) => String(c.id) === String(newTx.conto_id),
-          );
-          if (contoIndex !== -1) {
-            const mod = newTx.tipo === "USCITA" ? -1 : 1;
-            // Calcolo sicuro tra numeri
-            state.conti[contoIndex].saldo += txImporto * mod;
+          if (newTx.tipo === "RICARICA") {
+            // Giroconto: esce dalla sorgente, entra nella destinazione
+            const srcIndex = state.conti.findIndex(
+              (c) => String(c.id) === String(newTx.conto_id),
+            );
+            if (srcIndex !== -1) {
+              state.conti[srcIndex].saldo -= txImporto;
+            }
+            const dstIndex = state.conti.findIndex(
+              (c) => String(c.id) === String(newTx.conto_destinazione_id),
+            );
+            if (dstIndex !== -1) {
+              state.conti[dstIndex].saldo += txImporto;
+            }
+          } else {
+            const contoIndex = state.conti.findIndex(
+              (c) => String(c.id) === String(newTx.conto_id),
+            );
+            if (contoIndex !== -1) {
+              const mod = newTx.tipo === "USCITA" ? -1 : 1;
+              // Calcolo sicuro tra numeri
+              state.conti[contoIndex].saldo += txImporto * mod;
+            }
           }
 
           // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget

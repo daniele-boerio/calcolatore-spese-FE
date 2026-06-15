@@ -7,7 +7,7 @@ export interface LastTransactionsParams {
   n: number;
 }
 
-export type tipoTransaction = "ENTRATA" | "USCITA" | "RIMBORSO";
+export type tipoTransaction = "ENTRATA" | "USCITA" | "RIMBORSO" | "RICARICA";
 
 export interface Transaction {
   id: string; // ID come stringa
@@ -17,6 +17,7 @@ export interface Transaction {
   importo_netto: number | null;
   tipo: tipoTransaction;
   conto_id: string;
+  conto_destinazione_id?: string | null;
   categoria_id: string;
   sottocategoria_id: string;
   tag_id: string;
@@ -56,6 +57,7 @@ export interface CreateTransactionParams {
   data: string;
   descrizione: string | null;
   conto_id: string;
+  conto_destinazione_id?: string | null;
   categoria_id: string | null;
   sottocategoria_id: string | null;
   tag_id: string | null;
@@ -69,6 +71,7 @@ export interface UpdateTransactionParams {
   data: string | null;
   descrizione: string | null;
   conto_id: string | null;
+  conto_destinazione_id?: string | null;
   categoria_id: string | null;
   sottocategoria_id: string | null;
   tag_id: string | null;

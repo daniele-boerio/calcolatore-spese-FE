@@ -68,6 +68,9 @@
 
   "compensation": "Compensation",
   "compensations": "Compensations",
+  "transfer": "Transfer",
+  "destination_account": "Destination Account",
+  "destination_account_placeholder": "Choose the destination account",
   "income": "Income",
   "expenses": "Expenses",
   "new_transaction": "New Transaction",

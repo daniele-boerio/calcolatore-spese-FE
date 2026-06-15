@@ -251,6 +251,15 @@
               color: #3498db;
             }
           }
+          &.ricarica {
+            .icon-wrapper {
+              color: v.$accent-split;
+              background: rgba(108, 92, 231, 0.12);
+            }
+            .amount {
+              color: v.$accent-split;
+            }
+          }
         }
 
         .no-data {

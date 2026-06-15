@@ -270,12 +270,20 @@ export default function Transactions() {
                                   month: "short",
                                 },
                               )}
-                              {getContoName(transaction.conto_id)
-                                ? ` • ${getContoName(transaction.conto_id)}`
-                                : ""}
+                              {transaction.tipo === "RICARICA"
+                                ? getContoName(transaction.conto_id)
+                                  ? ` • ${getContoName(transaction.conto_id)} → ${getContoName(transaction.conto_destinazione_id || "")}`
+                                  : ""
+                                : getContoName(transaction.conto_id)
+                                  ? ` • ${getContoName(transaction.conto_id)}`
+                                  : ""}
                             </span>
                             <span className="amount">
-                              {transaction.tipo === "USCITA" ? "-" : "+"}
+                              {transaction.tipo === "USCITA"
+                                ? "-"
+                                : transaction.tipo === "RICARICA"
+                                  ? ""
+                                  : "+"}
                               {transaction.importo.toLocaleString("it-IT", {
                                 minimumFractionDigits: 2,
                               })}{" "}
@@ -339,6 +347,7 @@ export default function Transactions() {
                 { label: t("income"), value: "ENTRATA" },
                 { label: t("expenses"), value: "USCITA" },
                 { label: t("compensation"), value: "RIMBORSO" },
+                { label: t("transfer"), value: "RICARICA" },
               ]}
               onChange={(e) => {
                 dispatch(updateFilters({ tipo: e.value ?? undefined }));

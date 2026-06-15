@@ -6665,7 +6665,8 @@
         "enum": [
           "ENTRATA",
           "USCITA",
-          "RIMBORSO"
+          "RIMBORSO",
+          "RICARICA"
         ],
         "title": "TipoTransazione"
       },
@@ -6708,7 +6709,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-06-14"
+            "default": "2026-06-15"
           },
           "descrizione": {
             "anyOf": [
@@ -6724,6 +6725,17 @@
           "conto_id": {
             "type": "integer",
             "title": "Conto Id"
+          },
+          "conto_destinazione_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conto Destinazione Id"
           },
           "categoria_id": {
             "anyOf": [
@@ -6803,7 +6815,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-06-14"
+            "default": "2026-06-15"
           },
           "descrizione": {
             "anyOf": [
@@ -6819,6 +6831,17 @@
           "conto_id": {
             "type": "integer",
             "title": "Conto Id"
+          },
+          "conto_destinazione_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conto Destinazione Id"
           },
           "categoria_id": {
             "anyOf": [
@@ -7086,7 +7109,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-06-14"
+            "default": "2026-06-15"
           },
           "descrizione": {
             "anyOf": [
@@ -7102,6 +7125,17 @@
           "conto_id": {
             "type": "integer",
             "title": "Conto Id"
+          },
+          "conto_destinazione_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conto Destinazione Id"
           },
           "categoria_id": {
             "anyOf": [
