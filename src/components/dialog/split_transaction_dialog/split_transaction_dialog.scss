@@ -14,7 +14,12 @@
   }
 
   // --- Riepilogo importi ---
+  // Resta agganciato in cima all'area scrollabile del dialog mentre si
+  // scorrono le parti, così originale/assegnato/rimanente sono sempre visibili.
   .split-summary {
+    position: sticky;
+    top: 0;
+    z-index: 2;
     display: flex;
     flex-wrap: wrap;
     gap: 0.75rem;
