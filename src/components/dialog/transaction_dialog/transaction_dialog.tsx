@@ -199,6 +199,9 @@ export default function TransactionDialog({
     }
 
     const isRicarica = tipo === "RICARICA";
+    const isAccantonamento = tipo === "ACCANTONAMENTO";
+    // Sia giroconto che accantonamento possono avere un conto destinazione
+    const hasDestination = isRicarica || isAccantonamento;
 
     // --- 4. PREPARAZIONE DEL PAYLOAD FINALE ---
     const payload: any = {
@@ -207,8 +210,9 @@ export default function TransactionDialog({
       data: formattedDate,
       descrizione: descrizione,
       conto_id: contoId,
-      // Per i giroconti: conto destinazione valorizzato, niente categoria/tag
-      conto_destinazione_id: isRicarica ? contoDestinazioneId : null,
+      // Giroconto: destinazione obbligatoria. Accantonamento: destinazione
+      // opzionale (salvadanaio) ma con categoria/tag come una normale transazione.
+      conto_destinazione_id: hasDestination ? contoDestinazioneId : null,
       categoria_id: isRicarica ? null : finalCategoriaId,
       sottocategoria_id: isRicarica ? null : finalSottoCategoriaId,
       tag_id: isRicarica ? null : finalTagId,
@@ -230,6 +234,7 @@ export default function TransactionDialog({
     { label: t("expenses"), value: "USCITA" },
     { label: t("compensation"), value: "RIMBORSO" },
     { label: t("transfer"), value: "RICARICA" },
+    { label: t("set_aside"), value: "ACCANTONAMENTO" },
   ];
 
   // Conti selezionabili come destinazione: tutti tranne la sorgente
@@ -469,6 +474,23 @@ export default function TransactionDialog({
                     value={newTagName}
                     onChange={(e) => setNewTagName(e.target.value)}
                     placeholder={t("ex_corsica")}
+                  />
+                </div>
+              </div>
+            )}
+
+            {tipo === "ACCANTONAMENTO" && (
+              <div className="form-row">
+                <div className="field">
+                  <Dropdown
+                    label={t("set_aside_destination")}
+                    value={contoDestinazioneId}
+                    options={contiDestinazione}
+                    optionLabel="nome"
+                    optionValue="id"
+                    onChange={(e) => setContoDestinazioneId(e.value)}
+                    placeholder={t("set_aside_destination_placeholder")}
+                    showClear
                   />
                 </div>
               </div>

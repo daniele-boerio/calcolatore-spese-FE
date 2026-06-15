@@ -7,7 +7,12 @@ export interface LastTransactionsParams {
   n: number;
 }
 
-export type tipoTransaction = "ENTRATA" | "USCITA" | "RIMBORSO" | "RICARICA";
+export type tipoTransaction =
+  | "ENTRATA"
+  | "USCITA"
+  | "RIMBORSO"
+  | "RICARICA"
+  | "ACCANTONAMENTO";
 
 export interface Transaction {
   id: string; // ID come stringa

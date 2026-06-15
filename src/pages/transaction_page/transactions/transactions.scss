@@ -260,6 +260,15 @@
               color: v.$accent-split;
             }
           }
+          &.accantonamento {
+            .icon-wrapper {
+              color: #f59e0b;
+              background: rgba(245, 158, 11, 0.12);
+            }
+            .amount {
+              color: #f59e0b;
+            }
+          }
         }
 
         .no-data {

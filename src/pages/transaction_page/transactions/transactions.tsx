@@ -209,7 +209,15 @@ export default function Transactions() {
                       >
                         <div className="icon-wrapper">
                           <i
-                            className={`pi ${transaction.tipo === "USCITA" ? "pi-arrow-down-right" : transaction.tipo === "ENTRATA" ? "pi-arrow-up-right" : "pi-sync"}`}
+                            className={`pi ${
+                              transaction.tipo === "USCITA"
+                                ? "pi-arrow-down-right"
+                                : transaction.tipo === "ENTRATA"
+                                  ? "pi-arrow-up-right"
+                                  : transaction.tipo === "ACCANTONAMENTO"
+                                    ? "pi-wallet"
+                                    : "pi-sync"
+                            }`}
                           ></i>
                         </div>
 
@@ -270,16 +278,15 @@ export default function Transactions() {
                                   month: "short",
                                 },
                               )}
-                              {transaction.tipo === "RICARICA"
-                                ? getContoName(transaction.conto_id)
-                                  ? ` • ${getContoName(transaction.conto_id)} → ${getContoName(transaction.conto_destinazione_id || "")}`
-                                  : ""
-                                : getContoName(transaction.conto_id)
-                                  ? ` • ${getContoName(transaction.conto_id)}`
-                                  : ""}
+                              {getContoName(transaction.conto_id)
+                                ? transaction.conto_destinazione_id
+                                  ? ` • ${getContoName(transaction.conto_id)} → ${getContoName(transaction.conto_destinazione_id)}`
+                                  : ` • ${getContoName(transaction.conto_id)}`
+                                : ""}
                             </span>
                             <span className="amount">
-                              {transaction.tipo === "USCITA"
+                              {transaction.tipo === "USCITA" ||
+                              transaction.tipo === "ACCANTONAMENTO"
                                 ? "-"
                                 : transaction.tipo === "RICARICA"
                                   ? ""
@@ -348,6 +355,7 @@ export default function Transactions() {
                 { label: t("expenses"), value: "USCITA" },
                 { label: t("compensation"), value: "RIMBORSO" },
                 { label: t("transfer"), value: "RICARICA" },
+                { label: t("set_aside"), value: "ACCANTONAMENTO" },
               ]}
               onChange={(e) => {
                 dispatch(updateFilters({ tipo: e.value ?? undefined }));

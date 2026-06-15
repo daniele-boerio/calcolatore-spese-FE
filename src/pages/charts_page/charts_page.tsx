@@ -148,12 +148,20 @@ export default function ChartsPage() {
     const labels = incomeExpense.map((item) => formatLabel(item.label));
     const entrate = incomeExpense.map((item) => item.entrate);
     const uscite = incomeExpense.map((item) => Math.abs(item.uscite));
+    const accantonamenti = incomeExpense.map((item) =>
+      Math.abs(item.accantonamento || 0),
+    );
 
     return {
       labels,
       datasets: [
         { label: t("income"), data: entrate, backgroundColor: "#4caf50" },
         { label: t("expenses"), data: uscite, backgroundColor: "#f44336" },
+        {
+          label: t("set_aside"),
+          data: accantonamenti,
+          backgroundColor: "#f59e0b",
+        },
       ],
     };
   }, [incomeExpense, monthNamesShort, t]);

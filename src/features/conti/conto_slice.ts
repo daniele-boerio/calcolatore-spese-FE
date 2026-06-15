@@ -182,8 +182,9 @@ const contoSlice = createSlice({
             new Date(newTx.data).getFullYear() === new Date().getFullYear();
 
           // 1. Aggiorna il saldo del conto coinvolto
-          if (newTx.tipo === "RICARICA") {
-            // Giroconto: esce dalla sorgente, entra nella destinazione
+          if (newTx.tipo === "RICARICA" || newTx.tipo === "ACCANTONAMENTO") {
+            // Giroconto/accantonamento: esce dalla sorgente; per l'accantonamento
+            // la destinazione (salvadanaio) è opzionale.
             const srcIndex = state.conti.findIndex(
               (c) => String(c.id) === String(newTx.conto_id),
             );
@@ -210,6 +211,26 @@ const contoSlice = createSlice({
           // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget
           if (isThisMonth) {
             const isExpense = newTx.tipo === "USCITA";
+
+            // Gli accantonamenti non sono spese ma riducono il risparmio del mese
+            if (
+              newTx.tipo === "ACCANTONAMENTO" &&
+              state.monthlyBudget.remaining !== null
+            ) {
+              state.monthlyBudget.remaining -= txImporto;
+              if (
+                state.monthlyBudget.total_budget !== null &&
+                state.monthlyBudget.total_budget > 0
+              ) {
+                state.monthlyBudget.percentage = Number(
+                  (
+                    (state.monthlyBudget.remaining /
+                      state.monthlyBudget.total_budget) *
+                    100
+                  ).toFixed(1),
+                );
+              }
+            }
 
             // Aggiorna Monthly Budget solo per le spese
             if (isExpense && state.monthlyBudget.expenses !== null) {

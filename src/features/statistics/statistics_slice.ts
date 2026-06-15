@@ -16,6 +16,7 @@ interface StatisticsState {
   totals: {
     incomes: number;
     expenses: number;
+    accantonamento: number;
     total: number;
   };
   loading: boolean;
@@ -27,6 +28,7 @@ const initialState: StatisticsState = {
   totals: {
     incomes: 0,
     expenses: 0,
+    accantonamento: 0,
     total: 0,
   },
   loading: false,
@@ -61,6 +63,8 @@ const statisticsSlice = createSlice({
           state.monthlyData = action.payload.data;
           state.totals.incomes = action.payload.totale_entrata;
           state.totals.expenses = action.payload.totale_uscita;
+          state.totals.accantonamento =
+            action.payload.totale_accantonamento ?? 0;
           state.totals.total = action.payload.totale;
         },
       )

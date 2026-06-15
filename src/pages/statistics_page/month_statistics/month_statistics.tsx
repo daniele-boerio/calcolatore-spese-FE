@@ -156,6 +156,7 @@ export default function MonthStatistics() {
   // Calcolo totali
   const totalIncomes = totals.incomes;
   const totalExpenses = totals.expenses;
+  const totalAccantonamento = totals.accantonamento;
   const totalNet = totals.total;
 
   return (
@@ -224,6 +225,17 @@ export default function MonthStatistics() {
               €
             </span>
           </h3>
+          {totalAccantonamento !== 0 && (
+            <h3 className="stats-item set-aside">
+              {t("set_aside")}:{" "}
+              <span>
+                {totalAccantonamento.toLocaleString("it-IT", {
+                  minimumFractionDigits: 2,
+                })}{" "}
+                €
+              </span>
+            </h3>
+          )}
           <h3 className="stats-item total">
             {t("total")}:{" "}
             <span>

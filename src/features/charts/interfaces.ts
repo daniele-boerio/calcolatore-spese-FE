@@ -2,6 +2,7 @@ export interface MonthlyIncomeExpenseOut {
   label: string;
   entrate: number;
   uscite: number;
+  accantonamento: number;
 }
 
 export interface MonthlySavingsOut {

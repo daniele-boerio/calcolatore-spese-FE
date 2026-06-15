@@ -6042,6 +6042,11 @@
           "uscite": {
             "type": "number",
             "title": "Uscite"
+          },
+          "accantonamento": {
+            "type": "number",
+            "title": "Accantonamento",
+            "default": 0.0
           }
         },
         "type": "object",
@@ -6689,7 +6694,8 @@
           "ENTRATA",
           "USCITA",
           "RIMBORSO",
-          "RICARICA"
+          "RICARICA",
+          "ACCANTONAMENTO"
         ],
         "title": "TipoTransazione"
       },
