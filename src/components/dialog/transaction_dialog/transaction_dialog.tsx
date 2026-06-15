@@ -66,6 +66,9 @@ export default function TransactionDialog({
   const [transactionId, setTransactionId] = useState<string | null>(null);
   const [isSplitDialogVisible, setIsSplitDialogVisible] =
     useState<boolean>(false);
+  // Transazione su cui agisce lo split: quella esistente (modifica) o quella
+  // appena creata (creazione + dividi).
+  const [splitTarget, setSplitTarget] = useState<Transaction | null>(null);
 
   // Effetto per il popolamento (Edit) o reset (Create)
   useEffect(() => {
@@ -105,7 +108,9 @@ export default function TransactionDialog({
     }
   }, [visible, transaction, conti]);
 
-  const handleSave = async () => {
+  // Costruisce il payload risolvendo (e creando se serve) tag/categoria/sottocategoria.
+  // Estratto da handleSave per poterlo riusare anche nel flusso "crea e dividi".
+  const preparePayload = async () => {
     const formattedDate = data
       ? `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-${String(data.getDate()).padStart(2, "0")}`
       : "";
@@ -219,7 +224,13 @@ export default function TransactionDialog({
       parent_transaction_id: isRicarica ? null : transactionId,
     };
 
-    // --- 5. SALVATAGGIO TRANSAZIONE ---
+    return payload;
+  };
+
+  const handleSave = async () => {
+    const payload = await preparePayload();
+
+    // --- SALVATAGGIO TRANSAZIONE ---
     if (transaction?.id) {
       await dispatch(updateTransaction({ id: transaction.id, ...payload }));
     } else {
@@ -227,6 +238,27 @@ export default function TransactionDialog({
     }
 
     onHide();
+  };
+
+  // Apre lo split. In modifica divide la transazione esistente; in creazione la
+  // crea prima (per ottenerne l'id) e poi apre subito lo split sulla nuova.
+  const handleOpenSplit = async () => {
+    if (transaction?.id) {
+      setSplitTarget(transaction);
+      setIsSplitDialogVisible(true);
+      return;
+    }
+
+    if (!(importo && contoId && data)) return;
+
+    try {
+      const payload = await preparePayload();
+      const created = await dispatch(createTransaction(payload)).unwrap();
+      setSplitTarget(created);
+      setIsSplitDialogVisible(true);
+    } catch {
+      // Gli errori sono gestiti dal middleware
+    }
   };
 
   const tipoOptions = [
@@ -328,13 +360,14 @@ export default function TransactionDialog({
             className="reset-button"
             onClick={onHide}
           />
-          {transaction && (
+          {(transaction || tipo === "ENTRATA" || tipo === "USCITA") && (
             <Button
               className="split-button"
               icon="pi pi-sitemap"
               iconPos="left"
               label={t("split_transaction") || "Split"}
-              onClick={() => setIsSplitDialogVisible(true)}
+              onClick={handleOpenSplit}
+              disabled={!transaction && !(importo && contoId && data)}
             />
           )}
           <Button
@@ -362,8 +395,16 @@ export default function TransactionDialog({
     >
       <SplitTransactionDialog
         visible={isSplitDialogVisible}
-        onHide={() => setIsSplitDialogVisible(false)}
-        transaction={transaction || null}
+        onHide={() => {
+          setIsSplitDialogVisible(false);
+          // In creazione (crea + dividi) la transazione è già stata salvata:
+          // chiudiamo anche il dialog principale al termine dello split.
+          if (!transaction) {
+            setSplitTarget(null);
+            onHide();
+          }
+        }}
+        transaction={splitTarget}
       />
       <div className="transaction-form">
         <div className="form-row">

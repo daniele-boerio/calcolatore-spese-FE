@@ -13,7 +13,9 @@ import "./split_transaction_dialog.scss";
 import { useI18n } from "../../../i18n/use-i18n";
 
 interface SplitPart {
-  importo: number;
+  // Importo tenuto come stringa "grezza" mentre si digita (come negli altri
+  // dialog), così virgola/punto e decimali intermedi non vengono persi.
+  importo: string;
   categoria_id?: string | null;
   sottocategoria_id?: string | null;
   tag_id?: string | null;
@@ -52,7 +54,7 @@ export default function SplitTransactionDialog({
       // Si parte da una sola parte uguale all'intero importo
       setParts([
         {
-          importo: Number(transaction.importo) || 0,
+          importo: transaction.importo ? String(transaction.importo) : "",
           categoria_id: transaction.categoria_id || null,
           sottocategoria_id: transaction.sottocategoria_id || null,
           tag_id: transaction.tag_id || null,
@@ -68,7 +70,7 @@ export default function SplitTransactionDialog({
   const tagOptions = useMemo(() => tags || [], [tags]);
 
   const original = Number(transaction?.importo || 0);
-  const total = parts.reduce((s, p) => s + Number(p.importo || 0), 0);
+  const total = parts.reduce((s, p) => s + (parseFloat(p.importo) || 0), 0);
   const remaining = original - total;
   const balanced = Math.abs(remaining) < 0.01;
 
@@ -81,13 +83,13 @@ export default function SplitTransactionDialog({
   const handleImporto = (index: number, raw: string) => {
     const cleaned = raw.replace(",", ".");
     if (cleaned === "" || /^\d*\.?\d{0,2}$/.test(cleaned)) {
-      updatePart(index, "importo", cleaned === "" ? 0 : parseFloat(cleaned));
+      updatePart(index, "importo", cleaned);
     }
   };
 
   const addPart = () => {
     // La nuova parte riceve di default l'importo ancora da assegnare
-    const leftover = remaining > 0 ? Number(remaining.toFixed(2)) : 0;
+    const leftover = remaining > 0 ? remaining.toFixed(2) : "";
     setParts([
       ...parts,
       {
@@ -117,7 +119,7 @@ export default function SplitTransactionDialog({
         splitTransaction({
           id: String(transaction.id),
           parts: parts.map((p) => ({
-            importo: p.importo,
+            importo: parseFloat(p.importo) || 0,
             categoria_id: p.categoria_id ?? null,
             sottocategoria_id: p.sottocategoria_id ?? null,
             tag_id: p.tag_id ?? null,
@@ -209,7 +211,7 @@ export default function SplitTransactionDialog({
                   <div className="field">
                     <InputText
                       label={t("amount")}
-                      value={p.importo === 0 ? "" : String(p.importo)}
+                      value={p.importo}
                       onChange={(e) => handleImporto(idx, e.target.value)}
                       icon="pi pi-euro"
                       iconPos="right"
