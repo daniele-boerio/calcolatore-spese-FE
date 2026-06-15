@@ -12,11 +12,32 @@
 
     .div-button {
       flex: 1;
+      min-width: 0;
 
       button {
         width: 100%;
 
         max-width: 100%;
+      }
+
+      // La label non deve forzare l'allargamento del pulsante oltre la dialog
+      .span-button {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    // Su mobile 3 pulsanti in fila (incluso "Dividi transazione" con label
+    // lunga) sforano la larghezza della dialog: li impiliamo in verticale.
+    @media screen and (max-width: v.$mobile) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+
+      .div-button {
+        flex: 1 1 auto;
+        width: 100%;
       }
     }
   }
@@ -44,6 +65,22 @@
         text-overflow: ellipsis;
         white-space: nowrap;
         padding: 0 0.5rem;
+      }
+    }
+
+    // Su telefono 4 pulsanti in fila sono troppo stretti e le label vanno
+    // in ellipsis: li disponiamo 2x2 (ogni pulsante diventa una pillola).
+    @media screen and (max-width: v.$mobile) {
+      flex-wrap: wrap;
+      gap: 0.4rem;
+
+      .p-button {
+        flex: 1 1 calc(50% - 0.2rem);
+        border-radius: v.$radius-md !important;
+
+        .p-button-label {
+          padding: 0 0.25rem;
+        }
       }
     }
   }

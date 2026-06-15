@@ -278,6 +278,8 @@ export default function ChartsPage() {
             <CustomLineChart
               labels={savingsData.labels}
               datasets={savingsData.datasets}
+              showTrendline
+              trendlineLabel={t("trendline")}
             />
           </div>
         </div>
@@ -362,6 +364,8 @@ export default function ChartsPage() {
             <CustomLineChart
               labels={categoryTrendData.labels}
               datasets={categoryTrendData.datasets}
+              showTrendline
+              trendlineLabel={t("trendline")}
             />
           </div>
         </div>

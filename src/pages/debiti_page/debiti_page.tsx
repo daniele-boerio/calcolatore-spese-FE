@@ -77,12 +77,6 @@ export default function DebitiPage() {
             <h1>{t("debts_title")}</h1>
             <p className="subtitle">{t("debts_subtitle")}</p>
           </div>
-          <Button
-            icon="pi pi-plus"
-            label={t("new_debt")}
-            className="action-button"
-            onClick={openCreateDialog}
-          />
         </header>
 
         <div className="debts-grid">
@@ -169,6 +163,14 @@ export default function DebitiPage() {
             <p className="no-data">{t("no_data")}</p>
           )}
         </div>
+
+        <Button
+          icon="pi pi-plus"
+          className="add-debt-button"
+          compact
+          rounded
+          onClick={openCreateDialog}
+        />
       </div>
 
       <DebitoDialog

@@ -37,6 +37,13 @@
     flex-direction: column;
     gap: 0.25rem;
   }
+
+  .add-debt-button {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    z-index: 1000;
+  }
 }
 
 .debts-grid {
