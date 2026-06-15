@@ -167,5 +167,16 @@ const investimentoSlice = createSlice({
   },
 });
 
-// Selectors ... (Invariati)
+// --- SELECTORS ---
+export const selectInvestimenti = (state: RootState) =>
+  state.investimento.investimenti;
+
+export const selectInvestimentiLoading = (state: RootState) =>
+  state.investimento.loading;
+
+export const selectInvestimentoById = (id: string) => (state: RootState) =>
+  state.investimento.investimenti.find(
+    (inv) => String(inv.id) === String(id),
+  ) || null;
+
 export default investimentoSlice.reducer;

@@ -22,6 +22,7 @@ import TagsPage from "./pages/tags_page/tags_page";
 import StatisticsPage from "./pages/statistics_page/statistics_page";
 import ResetPasswordPage from "./pages/reset_password_page/reset_password_page";
 import ChartsPage from "./pages/charts_page/charts_page";
+import InvestimentiPage from "./pages/investimenti_page/investimenti_page";
 import BankCallbackPage from "./pages/bank_callback_page/bank_callback_page";
 
 function App() {
@@ -57,6 +58,7 @@ function App() {
                 <Route path="/tags" element={<TagsPage />} />
                 <Route path="/accounts" element={<ContiPage />} />
                 <Route path="/debts" element={<DebitiPage />} />
+                <Route path="/investments" element={<InvestimentiPage />} />
                 <Route path="/statistics" element={<StatisticsPage />} />
                 <Route path="/charts" element={<ChartsPage />} />
                 <Route path="/bank-callback" element={<BankCallbackPage />} />

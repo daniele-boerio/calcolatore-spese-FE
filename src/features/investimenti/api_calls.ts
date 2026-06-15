@@ -101,7 +101,7 @@ export const createOperazione = createAsyncThunk<
   try {
     const { investimento_id, ...body } = params;
     const response = await api.post<Operazione>(
-      `/investimenti/${investimento_id}operazione/`,
+      `/investimenti/${investimento_id}/operazione`,
       body,
     );
     return response.data;
@@ -118,7 +118,7 @@ export const updateOperazione = createAsyncThunk<
   try {
     const { investimento_id, id, ...body } = params;
     const response = await api.put<Operazione>(
-      `/investimenti/${investimento_id}operazione/${id}`,
+      `/investimenti/${investimento_id}/operazione/${id}`,
       body,
     );
     return response.data;
@@ -136,7 +136,7 @@ export const deleteOperazione = createAsyncThunk<
 >("investimenti/deleteOperazione", async (params, { rejectWithValue }) => {
   try {
     const { investimento_id, id } = params;
-    await api.delete<void>(`/investimenti/${investimento_id}operazione/${id}`);
+    await api.delete<void>(`/investimenti/${investimento_id}/operazione/${id}`);
     return { inv_id: String(investimento_id), op_id: id };
   } catch (error) {
     const err = error as AxiosError;

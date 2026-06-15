@@ -43,6 +43,8 @@ export interface UpdateInvestimentoParams {
   isin?: string;
   ticker?: string;
   nome_titolo?: string;
+  prezzo_attuale?: number;
+  data_ultimo_aggiornamento?: string;
 }
 
 export interface DeleteInvestimentoParams {

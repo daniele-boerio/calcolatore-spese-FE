@@ -6001,6 +6001,29 @@
               }
             ],
             "title": "Nome Titolo"
+          },
+          "prezzo_attuale": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prezzo Attuale"
+          },
+          "data_ultimo_aggiornamento": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Ultimo Aggiornamento"
           }
         },
         "type": "object",
