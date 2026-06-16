@@ -84,9 +84,16 @@
     gap: 0.75rem;
     margin-top: 0.5rem;
 
+    // Su telefono restano affiancati, dividendo la larghezza
     @media screen and (max-width: v.$mobile) {
-      flex-direction: column-reverse;
-      align-items: stretch;
+      .div-button {
+        flex: 1;
+        min-width: 0;
+
+        button {
+          width: 100%;
+        }
+      }
     }
   }
 }

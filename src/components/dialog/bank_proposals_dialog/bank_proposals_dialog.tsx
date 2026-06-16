@@ -44,17 +44,26 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
   const [tagId, setTagId] = useState<string | null>(null);
   const [descrizione, setDescrizione] = useState("");
 
-  // Reset del form ad ogni nuova proposta: conto preimpostato a quello da cui
-  // arriva la proposta; la descrizione la inserisce l'utente (parte vuota).
+  // Reset del form ad ogni nuova proposta (la descrizione la inserisce l'utente).
   useEffect(() => {
     if (current) {
-      setContoId(current.conto_id);
       setCategoriaId(null);
       setSottoCategoriaId(null);
       setTagId(null);
       setDescrizione("");
     }
   }, [current?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Preseleziona il conto da cui arriva la proposta. Usa l'id reale del conto
+  // trovato così il tipo combacia col Dropdown (le proposte hanno conto_id come
+  // stringa, i conti come numero) e ricalcola quando la lista conti si carica.
+  useEffect(() => {
+    if (!current) return;
+    const match = conti.find(
+      (c) => String(c.id) === String(current.conto_id),
+    );
+    setContoId(match ? (match.id as string) : current.conto_id);
+  }, [current?.id, conti]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const categorieFiltrate = useMemo(() => {
     if (!current) return categorie;
