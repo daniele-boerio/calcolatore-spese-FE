@@ -43,29 +43,12 @@
     display: flex;
     gap: 0.25rem;
     z-index: 2; // Sopra la decorazione
-
-    // Conto collegato alla banca: accentiamo in verde l'icona di conferma
-    .bank-linked {
-      .icon-button,
-      .span-button {
-        color: #4ade80 !important;
-      }
-    }
   }
 
   &__header,
   &__footer {
     position: relative;
     z-index: 1;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    // Lascia spazio ai pulsanti in alto a destra
-    padding-right: 5.5rem;
   }
 
   &__name {
@@ -75,23 +58,6 @@
     filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.6));
   }
 
-  // Pillola "Collegato" quando il conto è agganciato alla banca
-  &__bank-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    padding: 0.15rem 0.55rem;
-    border-radius: v.$radius-pill;
-    font-size: 0.7rem;
-    font-weight: 700;
-    background: rgba(255, 255, 255, 0.22);
-    color: #fff;
-    backdrop-filter: blur(2px);
-
-    i {
-      font-size: 0.7rem;
-    }
-  }
 
   &__balance-label {
     display: block;

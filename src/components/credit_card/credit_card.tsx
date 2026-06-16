@@ -83,12 +83,8 @@ export default function CreditCard({
       <div className="credit-card__actions">
         {onLinkBank && (
           <Button
-            icon={bankLinked ? "pi pi-check-circle" : "pi pi-building"}
-            className={
-              bankLinked
-                ? "trasparent-button-account bank-linked"
-                : "trasparent-button-account"
-            }
+            icon={bankLinked ? "pi pi-verified" : "pi pi-building"}
+            className="trasparent-button-account"
             labelNoTraduction={bankLinked ? t("bank_connected") : t("link_bank")}
             compact
             onClick={(e) => {
@@ -119,12 +115,6 @@ export default function CreditCard({
 
       <div className="credit-card__header">
         <span className="credit-card__name">{name}</span>
-        {bankLinked && (
-          <span className="credit-card__bank-badge" title={t("bank_connected")}>
-            <i className="pi pi-link" />
-            {t("bank_connected")}
-          </span>
-        )}
         {logo && <img src={logo} alt={name} className="credit-card__logo" />}
       </div>
 
