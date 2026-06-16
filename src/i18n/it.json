@@ -189,6 +189,10 @@
   "add_account": "Aggiungi Conto",
   "no_accounts_found": "Nessun conto trovato. Aggiungi il primo per iniziare il tracciamento!",
 
+  "approve": "Approva",
+  "reject": "Rifiuta",
+  "bank_proposals_title": "Nuove transazioni bancarie",
+  "bank_proposals_subtitle": "Rivedi le transazioni importate dalla tua banca",
   "link_bank": "Collega banca",
   "bank_connected": "Collegato",
   "connected_to": "Collegato a",

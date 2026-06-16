@@ -24,6 +24,7 @@ import ResetPasswordPage from "./pages/reset_password_page/reset_password_page";
 import ChartsPage from "./pages/charts_page/charts_page";
 import InvestimentiPage from "./pages/investimenti_page/investimenti_page";
 import BankCallbackPage from "./pages/bank_callback_page/bank_callback_page";
+import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_gate";
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
@@ -49,6 +50,7 @@ function App() {
         ) : (
           <>
             <Navbar /> {/* Resta sempre qui in alto */}
+            <BankProposalsGate /> {/* Controllo automatico proposte bancarie */}
             <div className="page-content">
               <Routes>
                 {/* Quando l'URL cambia, React Router decide cosa mostrare qui sotto */}

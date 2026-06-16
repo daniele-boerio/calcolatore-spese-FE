@@ -189,6 +189,10 @@
   "add_account": "Add Account",
   "no_accounts_found": "No accounts found. Add your first one to start tracking!",
 
+  "approve": "Approve",
+  "reject": "Reject",
+  "bank_proposals_title": "New bank transactions",
+  "bank_proposals_subtitle": "Review the transactions imported from your bank",
   "link_bank": "Link bank",
   "bank_connected": "Connected",
   "connected_to": "Connected to",

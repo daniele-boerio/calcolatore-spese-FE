@@ -3653,6 +3653,37 @@
         }
       }
     },
+    "/bank-proposals": {
+      "get": {
+        "tags": [
+          "BankConnector"
+        ],
+        "summary": "Get All Pending Proposals",
+        "description": "Tutte le proposte PENDING dell'utente, su qualsiasi conto.",
+        "operationId": "get_all_pending_proposals_bank_proposals_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BankTransactionProposalOut"
+                  },
+                  "title": "Response Get All Pending Proposals Bank Proposals Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/conti/{conto_id}/bank-connector/proposals": {
       "get": {
         "tags": [
@@ -4604,6 +4635,17 @@
       },
       "BankTransactionProposalImport": {
         "properties": {
+          "conto_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conto Id"
+          },
           "categoria_id": {
             "anyOf": [
               {
@@ -4657,6 +4699,10 @@
           "id": {
             "type": "integer",
             "title": "Id"
+          },
+          "conto_id": {
+            "type": "integer",
+            "title": "Conto Id"
           },
           "provider": {
             "type": "string",
@@ -4726,6 +4772,7 @@
         "type": "object",
         "required": [
           "id",
+          "conto_id",
           "provider",
           "tipo",
           "data",
