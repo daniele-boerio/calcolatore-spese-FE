@@ -44,14 +44,15 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
   const [tagId, setTagId] = useState<string | null>(null);
   const [descrizione, setDescrizione] = useState("");
 
-  // Reset del form ad ogni nuova proposta (conto default = quello della proposta)
+  // Reset del form ad ogni nuova proposta: conto preimpostato a quello da cui
+  // arriva la proposta; la descrizione la inserisce l'utente (parte vuota).
   useEffect(() => {
     if (current) {
       setContoId(current.conto_id);
       setCategoriaId(null);
       setSottoCategoriaId(null);
       setTagId(null);
-      setDescrizione(current.descrizione || "");
+      setDescrizione("");
     }
   }, [current?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
