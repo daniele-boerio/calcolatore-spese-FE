@@ -1,7 +1,9 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import {
+  confirmBankSession,
   createConto,
   deleteConto,
+  disconnectBank,
   getConti,
   getCurrentMonthExpenses,
   getCurrentMonthExpensesByCategory,
@@ -9,6 +11,7 @@ import {
   updateConto,
 } from "./api_calls";
 import {
+  BankSessionResult,
   Conto,
   ContoState,
   ExpenseByCategory,
@@ -168,6 +171,37 @@ const contoSlice = createSlice({
           state.conti = state.conti.filter(
             (conto) => String(conto.id) !== String(action.payload),
           );
+        },
+      )
+
+      // disconnectBank: il conto torna senza connettore bancario
+      .addCase(
+        disconnectBank.fulfilled,
+        (state, action: PayloadAction<Conto>) => {
+          const index = state.conti.findIndex(
+            (c) => String(c.id) === String(action.payload.id),
+          );
+          if (index !== -1) {
+            state.conti[index] = {
+              ...action.payload,
+              saldo: Number(action.payload.saldo),
+            };
+          }
+        },
+      )
+
+      // confirmBankSession: feedback immediato del collegamento riuscito
+      .addCase(
+        confirmBankSession.fulfilled,
+        (state, action: PayloadAction<BankSessionResult>) => {
+          const { conto_id, account_id } = action.payload;
+          const conto = state.conti.find(
+            (c) => String(c.id) === String(conto_id),
+          );
+          if (conto) {
+            conto.bank_connector_account_id = account_id;
+            conto.bank_connector_last_error = null;
+          }
         },
       )
 

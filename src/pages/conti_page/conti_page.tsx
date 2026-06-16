@@ -74,6 +74,7 @@ export default function ContiPage() {
                       index={index}
                       color={conto.color ? conto.color : "4b6cb7"}
                       onEdit={() => handleOpenEdit(conto)}
+                      bankLinked={!!conto.bank_connector_account_id}
                       onLinkBank={
                         isOpenBankingAdmin
                           ? () => handleOpenLinkBank(conto)

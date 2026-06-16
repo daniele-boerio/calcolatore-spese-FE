@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Chart } from "primereact/chart";
+import { useResolvedThemeColor } from "./use_theme_color";
 
 interface BarChartProps {
   labels: string[];
@@ -22,17 +23,10 @@ export default function CustomBarChart({
     datasets,
   };
 
-  // Leggiamo i colori dinamicamente dalle variabili CSS del root
-  const { textColor, gridColor } = useMemo(() => {
-    const computedStyle = getComputedStyle(document.documentElement);
-    return {
-      textColor: computedStyle.getPropertyValue("--text-main").trim() || "#333",
-      // Usa una tua variabile per i bordi, oppure un fallback semitrasparente che si adatti
-      gridColor:
-        computedStyle.getPropertyValue("--border-color").trim() ||
-        "rgba(128, 128, 128, 0.2)",
-    };
-  }, []);
+  // Colori dalle CSS variable, risolti in modo reattivo al tema (vedi hook):
+  // evita label scure illeggibili in dark mode su mobile.
+  const textColor = useResolvedThemeColor("var(--text-main)");
+  const gridColor = useResolvedThemeColor("var(--border-color)");
 
   // Avvolgiamo le opzioni in useMemo per ottimizzare le performance di React
   const chartOptions = useMemo(

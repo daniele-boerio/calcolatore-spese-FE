@@ -13,6 +13,7 @@ interface CreditCardProps {
   index: number;
   onEdit: () => void;
   onLinkBank?: () => void;
+  bankLinked?: boolean;
   color: string;
 }
 
@@ -24,6 +25,7 @@ export default function CreditCard({
   index,
   onEdit,
   onLinkBank,
+  bankLinked,
   color,
 }: CreditCardProps) {
   const { t } = useI18n();
@@ -81,9 +83,13 @@ export default function CreditCard({
       <div className="credit-card__actions">
         {onLinkBank && (
           <Button
-            icon="pi pi-building"
-            className="trasparent-button-account"
-            labelNoTraduction={t("link_bank")}
+            icon={bankLinked ? "pi pi-check-circle" : "pi pi-building"}
+            className={
+              bankLinked
+                ? "trasparent-button-account bank-linked"
+                : "trasparent-button-account"
+            }
+            labelNoTraduction={bankLinked ? t("bank_connected") : t("link_bank")}
             compact
             onClick={(e) => {
               onLinkBank();
@@ -113,6 +119,12 @@ export default function CreditCard({
 
       <div className="credit-card__header">
         <span className="credit-card__name">{name}</span>
+        {bankLinked && (
+          <span className="credit-card__bank-badge" title={t("bank_connected")}>
+            <i className="pi pi-link" />
+            {t("bank_connected")}
+          </span>
+        )}
         {logo && <img src={logo} alt={name} className="credit-card__logo" />}
       </div>
 

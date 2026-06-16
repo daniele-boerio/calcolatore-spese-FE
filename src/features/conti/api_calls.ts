@@ -16,6 +16,7 @@ import {
   BankAuthLink,
   ConfirmBankSessionParams,
   BankSessionResult,
+  DisconnectBankParams,
 } from "./interfaces";
 import { RootState } from "../../store/store";
 
@@ -192,6 +193,24 @@ export const confirmBankSession = createAsyncThunk<
     );
   }
 });
+
+// Scollega il conto dalla banca; ritorna il conto aggiornato (senza connettore).
+export const disconnectBank = createAsyncThunk<Conto, DisconnectBankParams>(
+  "openBanking/disconnect",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await api.delete<Conto>(
+        `/open-banking/link/${params.conto_id}`,
+      );
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore scollegamento bancario",
+      );
+    }
+  },
+);
 
 export const deleteConto = createAsyncThunk<string, DeleteContoParams>(
   "conti/deleteConto",

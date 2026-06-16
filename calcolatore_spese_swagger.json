@@ -3971,6 +3971,54 @@
         ]
       }
     },
+    "/open-banking/link/{conto_id}": {
+      "delete": {
+        "tags": [
+          "OpenBanking"
+        ],
+        "summary": "Disconnect Bank",
+        "description": "Scollega il conto dalla banca: azzera tutti i riferimenti al connettore.",
+        "operationId": "disconnect_bank_open_banking_link__conto_id__delete",
+        "parameters": [
+          {
+            "name": "conto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Conto Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/debiti": {
       "get": {
         "tags": [

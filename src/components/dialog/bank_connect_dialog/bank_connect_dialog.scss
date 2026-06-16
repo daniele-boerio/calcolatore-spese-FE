@@ -19,6 +19,55 @@
     color: var(--text-muted);
   }
 
+  // --- Vista conto già collegato ---
+  .bank-connected {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0 0.25rem;
+
+    &__icon {
+      font-size: 2.75rem;
+      color: #22c55e;
+    }
+
+    &__title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    &__row {
+      display: flex;
+      gap: 0.4rem;
+      align-items: baseline;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+
+      strong {
+        color: var(--text-main);
+      }
+    }
+
+    &__error {
+      width: 100%;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      background: rgba(231, 76, 60, 0.1);
+      color: #e74c3c;
+      font-size: 0.85rem;
+    }
+
+    &__actions {
+      display: flex;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+
   .bank-list {
     list-style: none;
     margin: 0;

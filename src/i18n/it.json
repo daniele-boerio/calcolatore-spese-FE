@@ -190,6 +190,12 @@
   "no_accounts_found": "Nessun conto trovato. Aggiungi il primo per iniziare il tracciamento!",
 
   "link_bank": "Collega banca",
+  "bank_connected": "Collegato",
+  "connected_to": "Collegato a",
+  "last_sync": "Ultima sincronizzazione",
+  "change_bank": "Cambia banca",
+  "disconnect_bank": "Scollega",
+  "disconnect_bank_confirm": "Scollegare questo conto dalla banca?",
   "link_bank_title": "Collega il conto a una banca",
   "link_bank_subtitle": "Seleziona la tua banca per collegarla in modo sicuro tramite Open Banking",
   "search_bank": "Cerca banca",

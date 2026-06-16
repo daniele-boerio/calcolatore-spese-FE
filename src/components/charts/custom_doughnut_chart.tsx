@@ -1,5 +1,6 @@
 import React, { useMemo } from "react";
 import { Doughnut } from "react-chartjs-2";
+import { useResolvedThemeColor } from "./use_theme_color";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -80,16 +81,7 @@ export default function CustomDoughnutChart({
   textColor = "var(--text-main)",
   aspectRatio = 0.5,
 }: DoughnutChartProps) {
-  const resolvedTextColor = useMemo(() => {
-    if (textColor.includes("var(")) {
-      const computedStyle = getComputedStyle(document.documentElement);
-      const cssVarName = textColor.match(/var\((.*?)\)/)?.[1];
-      if (cssVarName) {
-        return computedStyle.getPropertyValue(cssVarName).trim();
-      }
-    }
-    return textColor;
-  }, [textColor]);
+  const resolvedTextColor = useResolvedThemeColor(textColor);
 
   // CALCOLO AUTOMATICO DEL TOTALE INTERNO
   const totalText = useMemo(() => {

@@ -190,6 +190,12 @@
   "no_accounts_found": "No accounts found. Add your first one to start tracking!",
 
   "link_bank": "Link bank",
+  "bank_connected": "Connected",
+  "connected_to": "Connected to",
+  "last_sync": "Last sync",
+  "change_bank": "Change bank",
+  "disconnect_bank": "Disconnect",
+  "disconnect_bank_confirm": "Disconnect this account from the bank?",
   "link_bank_title": "Link this account to a bank",
   "link_bank_subtitle": "Select your bank to connect it securely via Open Banking",
   "search_bank": "Search bank",
