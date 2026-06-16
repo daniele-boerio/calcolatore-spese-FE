@@ -65,7 +65,13 @@ export default function RecurrenceDialog({
         setImporto(recurring.importo.toString());
         setTipo(recurring.tipo);
         setFrequenza(recurring.frequenza);
-        setProssimaEsecuzione(new Date(recurring.prossima_esecuzione));
+        // Parse come data LOCALE (YYYY-MM-DD) per evitare lo shift di fuso
+        {
+          const [y, m, d] = recurring.prossima_esecuzione
+            .split("-")
+            .map(Number);
+          setProssimaEsecuzione(new Date(y, m - 1, d));
+        }
         setAttiva(recurring.attiva);
         setContoId(recurring.conto_id);
         setCategoriaId(recurring.categoria_id);
@@ -145,7 +151,11 @@ export default function RecurrenceDialog({
   }, [tags, t]);
 
   const handleSave = async () => {
-    const formattedDate = prossimaEsecuzione.toISOString().split("T")[0];
+    // Usiamo i componenti LOCALI della data: toISOString() converte in UTC e
+    // per i fusi orari positivi (Italia) anticiperebbe la data di un giorno.
+    const formattedDate = `${prossimaEsecuzione.getFullYear()}-${String(
+      prossimaEsecuzione.getMonth() + 1,
+    ).padStart(2, "0")}-${String(prossimaEsecuzione.getDate()).padStart(2, "0")}`;
     const numericImporto = parseFloat(importo);
 
     let finalTagId = tagId === "NEW_TAG" ? newTagName : tagId;
