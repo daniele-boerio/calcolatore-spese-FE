@@ -80,6 +80,27 @@ export default function SplitTransactionDialog({
     setParts(copy);
   };
 
+  // Cambiando categoria azzeriamo la sottocategoria: una sottocategoria di
+  // un'altra categoria non ha senso (e il BE la slegherebbe comunque).
+  const handleCategoriaChange = (index: number, value: any) => {
+    const copy = [...parts];
+    copy[index] = {
+      ...copy[index],
+      categoria_id: value ?? null,
+      sottocategoria_id: null,
+    };
+    setParts(copy);
+  };
+
+  // Sottocategorie disponibili per la categoria scelta in questa parte.
+  const getSottocategorieOptions = (categoriaId?: string | null) => {
+    if (!categoriaId) return [];
+    const cat = categoriesOptions.find(
+      (c: any) => String(c.id) === String(categoriaId),
+    );
+    return (cat as any)?.sottocategorie || [];
+  };
+
   const handleImporto = (index: number, raw: string) => {
     const cleaned = raw.replace(",", ".");
     if (cleaned === "" || /^\d*\.?\d{0,2}$/.test(cleaned)) {
@@ -231,12 +252,30 @@ export default function SplitTransactionDialog({
                       optionValue="id"
                       value={p.categoria_id || null}
                       onChange={(e: any) =>
-                        updatePart(idx, "categoria_id", e.value)
+                        handleCategoriaChange(idx, e.value)
                       }
                       placeholder={t("select_category")}
                       showClear
                     />
                   </div>
+                  <div className="field">
+                    <Dropdown
+                      label={t("sub_category")}
+                      options={getSottocategorieOptions(p.categoria_id)}
+                      optionLabel="nome"
+                      optionValue="id"
+                      value={p.sottocategoria_id || null}
+                      onChange={(e: any) =>
+                        updatePart(idx, "sottocategoria_id", e.value)
+                      }
+                      placeholder={t("sub_category_placeholder")}
+                      disabled={!p.categoria_id}
+                      showClear
+                    />
+                  </div>
+                </div>
+
+                <div className="form-row">
                   <div className="field">
                     <Dropdown
                       label={t("tag")}
