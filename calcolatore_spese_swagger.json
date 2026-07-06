@@ -3701,6 +3701,105 @@
         }
       }
     },
+    "/conti/{conto_id}/bank-connector/import-statement": {
+      "post": {
+        "tags": [
+          "BankConnector"
+        ],
+        "summary": "Import Bank Statement",
+        "description": "Importa un estratto conto (PDF, Excel .xlsx o CSV): estrae i movimenti (opzionalmente nel range data_da..data_a) e crea proposte PENDING da rivedere nel dialog delle proposte.",
+        "operationId": "import_bank_statement_conti__conto_id__bank_connector_import_statement_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Conto Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "title": "File"
+                  },
+                  "data_da": {
+                    "anyOf": [
+                      { "type": "string", "format": "date" },
+                      { "type": "null" }
+                    ],
+                    "title": "Data Da"
+                  },
+                  "data_a": {
+                    "anyOf": [
+                      { "type": "string", "format": "date" },
+                      { "type": "null" }
+                    ],
+                    "title": "Data A"
+                  },
+                  "balance_column": {
+                    "type": "boolean",
+                    "default": false,
+                    "title": "Balance Column"
+                  }
+                },
+                "required": [
+                  "file"
+                ],
+                "title": "Body_import_bank_statement"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "parsed": { "type": "integer", "title": "Parsed" },
+                    "new_proposals": { "type": "integer", "title": "New Proposals" },
+                    "skipped": { "type": "integer", "title": "Skipped" }
+                  },
+                  "required": [
+                    "parsed",
+                    "new_proposals",
+                    "skipped"
+                  ],
+                  "title": "BankStatementImportResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/bank-proposals": {
       "get": {
         "tags": [

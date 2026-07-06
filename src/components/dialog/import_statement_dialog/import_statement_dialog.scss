@@ -1,0 +1,63 @@
+.import-statement-dialog {
+  .import-statement-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .import-statement-subtitle {
+    margin: 0 0 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  .field-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 0.35rem;
+    display: block;
+  }
+
+  .import-statement-file {
+    width: 100%;
+    padding: 0.6rem;
+    border: 1px dashed var(--surface-border, #c9c9c9);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-main);
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .import-statement-hint {
+    display: block;
+    margin-top: 0.35rem;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+
+  .import-statement-checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
+    label {
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: var(--text-main);
+    }
+  }
+
+  .import-statement-message {
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: rgba(0, 128, 0, 0.08);
+    color: var(--text-main);
+
+    &.is-error {
+      background: rgba(200, 0, 0, 0.08);
+    }
+  }
+}

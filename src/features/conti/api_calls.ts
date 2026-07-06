@@ -9,6 +9,8 @@ import {
   CreateContoParams,
   UpdateContoParams,
   DeleteContoParams,
+  ImportStatementParams,
+  ImportStatementResponse,
   ContoFilters,
   GetMonthExpensesParams,
   Institution,
@@ -224,3 +226,29 @@ export const deleteConto = createAsyncThunk<string, DeleteContoParams>(
     }
   },
 );
+
+// Importa un estratto conto (PDF, Excel o CSV): il BE ne estrae i movimenti e
+// crea proposte PENDING, come una sincronizzazione bancaria. Ritorna gli esiti.
+export const importStatement = createAsyncThunk<
+  ImportStatementResponse,
+  ImportStatementParams
+>("conti/importStatement", async (params, { rejectWithValue }) => {
+  try {
+    const formData = new FormData();
+    formData.append("file", params.file);
+    if (params.data_da) formData.append("data_da", params.data_da);
+    if (params.data_a) formData.append("data_a", params.data_a);
+    if (params.balance_column) formData.append("balance_column", "true");
+
+    const response = await api.post<ImportStatementResponse>(
+      `/conti/${params.conto_id}/bank-connector/import-statement`,
+      formData,
+    );
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(
+      err.response?.data || "Errore import estratto conto",
+    );
+  }
+});

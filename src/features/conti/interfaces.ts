@@ -97,6 +97,22 @@ export interface DeleteContoParams {
   id: string;
 }
 
+// --- Import estratto conto (PDF, Excel .xlsx o CSV) ---
+
+export interface ImportStatementParams {
+  conto_id: string;
+  file: File;
+  data_da?: string | null; // formato YYYY-MM-DD
+  data_a?: string | null; // formato YYYY-MM-DD
+  balance_column?: boolean; // rilevante solo per il PDF
+}
+
+export interface ImportStatementResponse {
+  parsed: number; // movimenti riconosciuti (dopo il filtro date)
+  new_proposals: number; // proposte PENDING create
+  skipped: number; // scartati perché duplicati
+}
+
 export interface ContoFilters {
   sort_by?: string[];
   nome?: string;

@@ -6,6 +6,7 @@ import "./conti_page.scss";
 import { getConti } from "../../features/conti/api_calls";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
 import BankConnectDialog from "../../components/dialog/bank_connect_dialog/bank_connect_dialog";
+import ImportStatementDialog from "../../components/dialog/import_statement_dialog/import_statement_dialog";
 import CreditCard from "../../components/credit_card/credit_card"; // Assicurati che il percorso sia giusto
 import { Conto } from "../../features/conti/interfaces";
 import {
@@ -28,6 +29,9 @@ export default function ContiPage() {
   // Stato per il collegamento bancario (Open Banking)
   const [isBankDialogVisible, setIsBankDialogVisible] = useState(false);
   const [bankAccount, setBankAccount] = useState<Conto | null>(null);
+
+  // Stato per l'import di un estratto conto PDF
+  const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
 
   useEffect(() => {
     dispatch(getConti());
@@ -56,6 +60,15 @@ export default function ContiPage() {
           <div className="header-content">
             <h1>{t("nav_accounts")}</h1>
             <p className="subtitle">{t("manage_accounts_subtitle")}</p>
+          </div>
+          <div className="header-actions">
+            <Button
+              icon="pi pi-file-import"
+              iconPos="left"
+              label={t("import_statement_title")}
+              className="action-button"
+              onClick={() => setIsImportDialogVisible(true)}
+            />
           </div>
         </header>
 
@@ -119,6 +132,12 @@ export default function ContiPage() {
           setIsBankDialogVisible(false);
           setBankAccount(null);
         }}
+      />
+
+      {/* DIALOG IMPORT ESTRATTO CONTO PDF */}
+      <ImportStatementDialog
+        visible={isImportDialogVisible}
+        onHide={() => setIsImportDialogVisible(false)}
       />
     </>
   );
