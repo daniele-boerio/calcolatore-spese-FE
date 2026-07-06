@@ -432,6 +432,54 @@
         }
       }
     },
+    "/conti/{conto_id}/restore": {
+      "post": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Restore Conto",
+        "description": "Ripristina un conto in soft-delete (e le transazioni nascoste insieme a esso). Rete di sicurezza per le cancellazioni accidentali: nessuna UI dedicata, si invoca direttamente.",
+        "operationId": "restore_conto_conti__conto_id__restore_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Conto Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/conti/currentMonthExpenses": {
       "get": {
         "tags": [

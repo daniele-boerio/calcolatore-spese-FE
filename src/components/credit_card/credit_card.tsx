@@ -4,6 +4,7 @@ import Button from "../button/button";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useAppDispatch } from "../../store/store";
 import { deleteConto } from "../../features/conti/api_calls";
+import api from "../../services/api";
 
 interface CreditCardProps {
   id: string;
@@ -37,10 +38,33 @@ export default function CreditCard({
     maximumFractionDigits: 2,
   }).format(balance);
 
-  const handleDeleteAccount = (event: any) => {
+  const handleDeleteAccount = async (event: any) => {
+    // Catturiamo il target PRIMA dell'await: dopo il tick async React può
+    // azzerare currentTarget e il popup non avrebbe più un ancoraggio.
+    const target = event.currentTarget;
+
+    // Mostriamo quante transazioni verranno nascoste: chi cancella un conto
+    // per sbaglio deve capire cosa sta per succedere. La cancellazione è
+    // reversibile lato BE (soft-delete), ma qui vogliamo comunque un freno.
+    let message: string;
+    try {
+      const response = await api.get<{ total: number }>(
+        `/transazioni/paginated?conto_id=${id}&size=1`,
+      );
+      const count = response.data?.total ?? 0;
+      message =
+        count > 0
+          ? t("delete_conto_message").replace("{count}", String(count))
+          : t("delete_conto_message_zero");
+    } catch {
+      // Il conteggio è solo informativo: se fallisce non blocchiamo la delete,
+      // chiediamo comunque conferma con un messaggio prudente.
+      message = t("delete_conto_error_count");
+    }
+
     confirmPopup({
-      target: event.currentTarget,
-      message: t("delete_message"),
+      target,
+      message,
       icon: "pi pi-exclamation-triangle",
       acceptClassName: "p-button-danger",
       acceptLabel: t("yes"),
