@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
+import { confirmPopup } from "primereact/confirmpopup";
 import InputText from "../../input_text/input_text";
 import Switch from "../../switch/switch";
 import Button from "../../button/button";
@@ -122,12 +123,35 @@ export default function CategoryDialog({
     });
   };
 
-  const handleRemoveSub = (index: number) => {
+  const handleRemoveSub = (
+    event: React.MouseEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
     const subToRemove = subs[index];
+
+    const removeSub = () => {
+      if (subToRemove.id) {
+        setSubsToDelete((prev) => [...prev, subToRemove.id!]);
+      }
+      setSubs((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    // Chiedi conferma solo per le sottocategorie già salvate; per una riga
+    // appena aggiunta (senza id) rimuoviamo direttamente.
     if (subToRemove.id) {
-      setSubsToDelete((prev) => [...prev, subToRemove.id!]);
+      confirmPopup({
+        target: event.currentTarget,
+        message: t("delete_message"),
+        icon: "pi pi-exclamation-triangle",
+        acceptClassName: "p-button-danger",
+        acceptLabel: t("yes"),
+        rejectLabel: t("no"),
+        accept: removeSub,
+        reject: () => {},
+      });
+    } else {
+      removeSub();
     }
-    setSubs(subs.filter((_, i) => i !== index));
   };
 
   const handleConfirm = async () => {
@@ -308,7 +332,12 @@ export default function CategoryDialog({
                 <Button
                   icon="pi pi-trash"
                   className="trasparent-danger-button"
-                  onClick={() => handleRemoveSub(index)}
+                  onClick={(e) =>
+                    handleRemoveSub(
+                      e as React.MouseEvent<HTMLButtonElement>,
+                      index,
+                    )
+                  }
                   compact
                   rounded
                 />

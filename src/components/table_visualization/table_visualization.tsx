@@ -4,8 +4,10 @@ import {
   type DataTableValue,
   type DataTableValueArray,
 } from "primereact/datatable";
+import { confirmPopup } from "primereact/confirmpopup";
 import { type ReactNode } from "react";
 import Button from "../button/button";
+import { useI18n } from "../../i18n/use-i18n";
 import "./table_visualization.scss";
 
 export type TableVisualizationProps = {
@@ -50,6 +52,8 @@ export type VisualizationColumnProps = {
 };
 
 export default function TableVisualization(props: TableVisualizationProps) {
+  const { t } = useI18n();
+
   return (
     <div
       className={`div-table-visualization ${props.className ?? ""} ${props.invisible ? "invisible" : ""}`}
@@ -106,7 +110,19 @@ export default function TableVisualization(props: TableVisualizationProps) {
                 icon="pi pi-trash"
                 className="trasparent-danger-button"
                 compact
-                onClick={() => props.deleteRow!(rowData[props.dataKey || "id"])}
+                onClick={(event) =>
+                  confirmPopup({
+                    target: event.currentTarget as HTMLElement,
+                    message: t("delete_message"),
+                    icon: "pi pi-exclamation-triangle",
+                    acceptClassName: "p-button-danger",
+                    acceptLabel: t("yes"),
+                    rejectLabel: t("no"),
+                    accept: () =>
+                      props.deleteRow!(rowData[props.dataKey || "id"]),
+                    reject: () => {},
+                  })
+                }
               />
             )}
           />

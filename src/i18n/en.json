@@ -48,7 +48,7 @@
 
   "delete_message": "Are you sure you want to delete this item?",
   "delete_conto_message_zero": "Delete this account? It has no linked transactions.",
-  "delete_conto_message": "Deleting this account will also hide its {count} transactions. Do you want to continue?",
+  "delete_conto_message": "Deleting this account will also delete its {count} transactions. Do you want to continue?",
   "delete_conto_error_count": "Could not check this account's transactions. Delete it anyway?",
   "import": "Import",
   "import_statement_title": "Import bank statement",

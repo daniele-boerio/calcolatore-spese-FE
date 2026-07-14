@@ -4,8 +4,10 @@ import {
   type DataTableValue,
   type DataTableValueArray,
 } from "primereact/datatable";
+import { confirmPopup } from "primereact/confirmpopup";
 import { type ReactNode } from "react";
 import Button from "../button/button";
+import { useI18n } from "../../i18n/use-i18n";
 import "./table_edit.scss";
 
 export type TableEditProps = {
@@ -45,6 +47,8 @@ export type EditColumnProps = {
 };
 
 export default function TableEdit(props: TableEditProps) {
+  const { t } = useI18n();
+
   return (
     <div
       className={`div-table-edit ${props.className ?? ""} ${
@@ -92,7 +96,18 @@ export default function TableEdit(props: TableEditProps) {
                   icon="pi pi-trash"
                   className="trasparent-danger-button"
                   compact
-                  onClick={() => props.deleteRow!(rowId)}
+                  onClick={(event) =>
+                    confirmPopup({
+                      target: event.currentTarget as HTMLElement,
+                      message: t("delete_message"),
+                      icon: "pi pi-exclamation-triangle",
+                      acceptClassName: "p-button-danger",
+                      acceptLabel: t("yes"),
+                      rejectLabel: t("no"),
+                      accept: () => props.deleteRow!(rowId),
+                      reject: () => {},
+                    })
+                  }
                   disabled={props.disabled}
                 />
               );

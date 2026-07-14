@@ -48,7 +48,7 @@
 
   "delete_message": "Sei sicuro di voler eliminare questo elemento?",
   "delete_conto_message_zero": "Vuoi eliminare questo conto? Non ha transazioni collegate.",
-  "delete_conto_message": "Eliminando questo conto verranno nascoste anche le sue {count} transazioni. Vuoi continuare?",
+  "delete_conto_message": "Eliminando questo conto verranno eliminate anche le sue {count} transazioni. Vuoi continuare?",
   "delete_conto_error_count": "Impossibile verificare le transazioni del conto. Vuoi comunque eliminarlo?",
   "import": "Importa",
   "import_statement_title": "Importa estratto conto",
