@@ -438,7 +438,7 @@
           "Conti"
         ],
         "summary": "Restore Conto",
-        "description": "Ripristina un conto in soft-delete (e le transazioni nascoste insieme a esso). Rete di sicurezza per le cancellazioni accidentali: nessuna UI dedicata, si invoca direttamente.",
+        "description": "Ripristina un conto in soft-delete (e le transazioni nascoste insieme a esso).\n\nRete di sicurezza per le cancellazioni accidentali: non c'è una UI dedicata,\nsi invoca direttamente (es. dalla pagina /docs o via curl).",
         "operationId": "restore_conto_conti__conto_id__restore_post",
         "security": [
           {
@@ -3707,7 +3707,7 @@
           "BankConnector"
         ],
         "summary": "Import Bank Statement",
-        "description": "Importa un estratto conto (PDF, Excel .xlsx o CSV): estrae i movimenti (opzionalmente nel range data_da..data_a) e crea proposte PENDING da rivedere nel dialog delle proposte.",
+        "description": "Importa un estratto conto (PDF, Excel .xlsx o CSV): ne estrae i movimenti\n(opzionalmente nel range data_da..data_a) e crea proposte PENDING, come una\nsincronizzazione bancaria. L'utente le rivede poi dal dialog delle proposte,\nassegnando categoria/sottocategoria/conto/tag prima di confermarle.\n\nExcel/CSV usano un parser a colonne (affidabile); il PDF un parser euristico\n(`balance_column` è rilevante solo per il PDF).",
         "operationId": "import_bank_statement_conti__conto_id__bank_connector_import_statement_post",
         "security": [
           {
@@ -3730,37 +3730,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "file": {
-                    "type": "string",
-                    "format": "binary",
-                    "title": "File"
-                  },
-                  "data_da": {
-                    "anyOf": [
-                      { "type": "string", "format": "date" },
-                      { "type": "null" }
-                    ],
-                    "title": "Data Da"
-                  },
-                  "data_a": {
-                    "anyOf": [
-                      { "type": "string", "format": "date" },
-                      { "type": "null" }
-                    ],
-                    "title": "Data A"
-                  },
-                  "balance_column": {
-                    "type": "boolean",
-                    "default": false,
-                    "title": "Balance Column"
-                  }
-                },
-                "required": [
-                  "file"
-                ],
-                "title": "Body_import_bank_statement"
+                "$ref": "#/components/schemas/Body_import_bank_statement_conti__conto_id__bank_connector_import_statement_post"
               }
             }
           }
@@ -3771,18 +3741,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "parsed": { "type": "integer", "title": "Parsed" },
-                    "new_proposals": { "type": "integer", "title": "New Proposals" },
-                    "skipped": { "type": "integer", "title": "Skipped" }
-                  },
-                  "required": [
-                    "parsed",
-                    "new_proposals",
-                    "skipped"
-                  ],
-                  "title": "BankStatementImportResponse"
+                  "$ref": "#/components/schemas/BankStatementImportResponse"
                 }
               }
             }
@@ -3793,37 +3752,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/bank-proposals": {
-      "get": {
-        "tags": [
-          "BankConnector"
-        ],
-        "summary": "Get All Pending Proposals",
-        "description": "Tutte le proposte PENDING dell'utente, su qualsiasi conto.",
-        "operationId": "get_all_pending_proposals_bank_proposals_get",
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/BankTransactionProposalOut"
-                  },
-                  "title": "Response Get All Pending Proposals Bank Proposals Get"
                 }
               }
             }
@@ -4002,6 +3930,36 @@
         }
       }
     },
+    "/bank-proposals": {
+      "get": {
+        "tags": [
+          "BankConnector"
+        ],
+        "summary": "Get All Pending Proposals",
+        "operationId": "get_all_pending_proposals_bank_proposals_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BankTransactionProposalOut"
+                  },
+                  "type": "array",
+                  "title": "Response Get All Pending Proposals Bank Proposals Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/open-banking/institutions": {
       "get": {
         "tags": [
@@ -4155,8 +4113,13 @@
           "OpenBanking"
         ],
         "summary": "Disconnect Bank",
-        "description": "Scollega il conto dalla banca: azzera tutti i riferimenti al connettore.",
+        "description": "Scollega il conto dalla banca: azzera tutti i riferimenti al connettore\ncosì il conto torna 'non collegato' (e si può eventualmente ricollegare).",
         "operationId": "disconnect_bank_open_banking_link__conto_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "conto_id",
@@ -4189,12 +4152,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/debiti": {
@@ -4516,6 +4474,73 @@
         }
       }
     },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Refresh Access Token",
+        "description": "Rinnova l'access token a partire dal cookie httpOnly.\n\nIl refresh token viene ruotato a ogni uso: quello vecchio è bruciato e ne\nviene emesso uno nuovo nella stessa famiglia. È quello che tiene l'utente\nloggato sul dispositivo senza mai riesporre le credenziali.",
+        "operationId": "refresh_access_token_auth_refresh_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout",
+        "description": "Chiude la sessione di QUESTO dispositivo (revoca la famiglia del cookie).",
+        "operationId": "logout_auth_logout_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/logout-all": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Logout All Devices",
+        "description": "Disconnette l'utente da tutti i dispositivi.",
+        "operationId": "logout_all_devices_auth_logout_all_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/": {
       "get": {
         "summary": "Root",
@@ -4780,6 +4805,29 @@
         ],
         "title": "BankSessionConfirmResponse"
       },
+      "BankStatementImportResponse": {
+        "properties": {
+          "parsed": {
+            "type": "integer",
+            "title": "Parsed"
+          },
+          "new_proposals": {
+            "type": "integer",
+            "title": "New Proposals"
+          },
+          "skipped": {
+            "type": "integer",
+            "title": "Skipped"
+          }
+        },
+        "type": "object",
+        "required": [
+          "parsed",
+          "new_proposals",
+          "skipped"
+        ],
+        "title": "BankStatementImportResponse"
+      },
       "BankTransactionProposalImport": {
         "properties": {
           "conto_id": {
@@ -4938,6 +4986,49 @@
           "DISCARDED"
         ],
         "title": "BankTransactionProposalStatus"
+      },
+      "Body_import_bank_statement_conti__conto_id__bank_connector_import_statement_post": {
+        "properties": {
+          "file": {
+            "type": "string",
+            "format": "binary",
+            "title": "File"
+          },
+          "data_da": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Da"
+          },
+          "data_a": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data A"
+          },
+          "balance_column": {
+            "type": "boolean",
+            "title": "Balance Column",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "file"
+        ],
+        "title": "Body_import_bank_statement_conti__conto_id__bank_connector_import_statement_post"
       },
       "Body_login_login_post": {
         "properties": {
@@ -6247,7 +6338,11 @@
           "prezzo_attuale": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
               },
               {
                 "type": "null"
@@ -6980,7 +7075,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-06-15"
+            "default": "2026-07-14"
           },
           "descrizione": {
             "anyOf": [
@@ -7086,7 +7181,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-06-15"
+            "default": "2026-07-14"
           },
           "descrizione": {
             "anyOf": [
@@ -7380,7 +7475,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-06-15"
+            "default": "2026-07-14"
           },
           "descrizione": {
             "anyOf": [

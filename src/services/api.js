@@ -2,6 +2,9 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
+  // Indispensabile: il refresh token vive in un cookie httpOnly, e senza questo
+  // flag axios non lo allega alle richieste cross-origin verso il BE.
+  withCredentials: true,
 });
 
 api.interceptors.request.use(
@@ -15,14 +18,72 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
+// L'access token dura poco (30 min): quando scade lo rinnoviamo in automatico usando
+// il cookie httpOnly e rigiochiamo la richiesta fallita, così l'utente non se ne
+// accorge e resta loggato sul dispositivo.
+//
+// Se scadono più chiamate insieme, un refresh per ciascuna significherebbe token
+// ruotati in parallelo: il server invaliderebbe i doppioni e scatterebbe la reuse
+// detection, buttando fuori l'utente. Quindi il refresh è UNO solo, condiviso: le
+// altre richieste aspettano la stessa promise.
+let refreshPromise = null;
+
+const clearSession = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("username");
+};
+
+const refreshAccessToken = () => {
+  if (!refreshPromise) {
+    refreshPromise = api
+      .post("/auth/refresh", null, { _skipAuthRefresh: true })
+      .then((response) => {
+        const { access_token, username } = response.data;
+        localStorage.setItem("token", access_token);
+        if (username) {
+          localStorage.setItem("username", username);
+        }
+        return access_token;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+  }
+  return refreshPromise;
+};
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("username");
+  async (error) => {
+    const originalRequest = error.config;
+    const isAuthError = error.response?.status === 401;
+
+    // Un 401 sul refresh stesso vuol dire sessione finita davvero: non si riprova,
+    // altrimenti si entra in un ciclo infinito.
+    const canRetry =
+      isAuthError &&
+      originalRequest &&
+      !originalRequest._retry &&
+      !originalRequest._skipAuthRefresh;
+
+    if (!canRetry) {
+      if (isAuthError && originalRequest?._skipAuthRefresh) {
+        clearSession();
+      }
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    originalRequest._retry = true;
+
+    try {
+      const newToken = await refreshAccessToken();
+      originalRequest.headers.Authorization = `Bearer ${newToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      // Refresh fallito: cookie scaduto o revocato. La sessione è chiusa.
+      clearSession();
+      return Promise.reject(refreshError);
+    }
   },
 );
 

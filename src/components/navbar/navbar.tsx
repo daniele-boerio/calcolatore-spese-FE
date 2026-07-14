@@ -2,7 +2,7 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n"; // Verifica che il path sia corretto
 import { useAppDispatch } from "../../store/store";
-import { setLogout } from "../../features/profile/profile_slice";
+import { logout } from "../../features/profile/api_calls";
 import Button from "../button/button";
 import "./navbar.scss";
 
@@ -16,7 +16,9 @@ export default function Navbar() {
 
   const handleLogout = () => {
     closeMenu();
-    dispatch(setLogout());
+    // Passa dal server: revoca il refresh token, altrimenti il cookie resterebbe
+    // valido e la sessione rinnovabile su questo dispositivo.
+    dispatch(logout());
   };
 
   return (

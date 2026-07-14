@@ -1,5 +1,11 @@
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
-import { getProfile, login, register } from "./api_calls";
+import {
+  getProfile,
+  login,
+  logout,
+  register,
+  restoreSession,
+} from "./api_calls";
 import { AuthResponse, ProfileResponse, ProfileState } from "./interfaces";
 import { RootState } from "../../store/store";
 
@@ -79,6 +85,32 @@ const profileSlice = createSlice({
       )
 
       .addCase(getProfile.rejected, (state) => {
+        state.isAuthenticated = false;
+        state.isOpenBankingAdmin = false;
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("username");
+      })
+
+      // Sessione recuperata dal solo cookie httpOnly (payload null = nessuna sessione,
+      // resta la pagina di login).
+      .addCase(
+        restoreSession.fulfilled,
+        (state, action: PayloadAction<AuthResponse | null>) => {
+          if (!action.payload) return;
+
+          state.token = action.payload.access_token;
+          state.username = action.payload.username;
+          state.isAuthenticated = true;
+        },
+      )
+
+      // La thunk non fallisce mai (l'errore è già assorbito): la sessione locale
+      // viene sempre azzerata, anche se il server non era raggiungibile.
+      .addCase(logout.fulfilled, (state) => {
+        state.token = null;
+        state.username = null;
+        state.email = null;
         state.isAuthenticated = false;
         state.isOpenBankingAdmin = false;
 

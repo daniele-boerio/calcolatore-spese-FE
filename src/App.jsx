@@ -10,7 +10,7 @@ import {
 import "./App.scss";
 import { useAppDispatch } from "./store/store";
 import { lazy, Suspense, useEffect } from "react";
-import { getProfile } from "./features/profile/api_calls";
+import { getProfile, restoreSession } from "./features/profile/api_calls";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import { ConfirmPopup } from "primereact/confirmpopup";
@@ -56,9 +56,21 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+
     if (token) {
+      // L'access token può essere scaduto: ci pensa l'interceptor a rinnovarlo
+      // col cookie e a rigiocare questa chiamata.
       dispatch(getProfile());
+      return;
     }
+
+    // Nessun access token, ma il cookie httpOnly potrebbe reggere ancora la
+    // sessione (es. localStorage svuotato da Safari/ITP): proviamo a recuperarla.
+    dispatch(restoreSession()).then((action) => {
+      if (action.payload) {
+        dispatch(getProfile());
+      }
+    });
   }, [dispatch]);
 
   return (

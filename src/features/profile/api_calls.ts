@@ -51,3 +51,45 @@ export const getProfile = createAsyncThunk<ProfileResponse, void>(
     }
   },
 );
+
+// Il logout deve passare dal server: svuotare solo il localStorage lascerebbe il
+// cookie di refresh valido, e la sessione resterebbe rinnovabile su quel dispositivo.
+// Se la chiamata fallisce (offline, cookie già scaduto) usciamo comunque lato client:
+// un logout non deve mai lasciare l'utente "dentro".
+export const logout = createAsyncThunk<void, void>(
+  "profile/logout",
+  async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch {
+      // ignorato di proposito: la pulizia locale avviene comunque nel reducer
+    }
+  },
+);
+
+// Ripristino della sessione all'avvio quando in localStorage non c'è più un access
+// token ma il cookie httpOnly è ancora buono. Serve davvero: Safari (ITP) può
+// svuotare il localStorage dopo giorni di inattività, mentre il cookie impostato dal
+// server sopravvive — senza questo l'utente si ritroverebbe sloggato pur avendo una
+// sessione valida, cioè esattamente ciò che il refresh token deve evitare.
+//
+// Non fallisce mai (restituisce null): un avvio senza sessione è la normalità per un
+// visitatore anonimo e non deve far comparire una dialog d'errore.
+export const restoreSession = createAsyncThunk<AuthResponse | null, void>(
+  "profile/restoreSession",
+  async () => {
+    try {
+      const response = await api.post<AuthResponse>("/auth/refresh", null, {
+        // Un 401 qui significa "nessuna sessione": non ha senso che l'interceptor
+        // tenti a sua volta un refresh.
+        _skipAuthRefresh: true,
+      });
+
+      localStorage.setItem("token", response.data.access_token);
+      localStorage.setItem("username", response.data.username);
+      return response.data;
+    } catch {
+      return null;
+    }
+  },
+);
