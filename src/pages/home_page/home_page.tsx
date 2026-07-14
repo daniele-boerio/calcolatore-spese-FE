@@ -10,7 +10,6 @@ import {
   getCurrentMonthExpensesByCategory,
 } from "../../features/conti/api_calls";
 import Button from "../../components/button/button";
-import { useI18n } from "../../i18n/use-i18n";
 import CustomDoughnutChart from "../../components/charts/custom_doughnut_chart";
 import TransactionDialog from "../../components/dialog/transaction_dialog/transaction_dialog";
 import {
@@ -21,7 +20,6 @@ import { getCategorie } from "../../features/categorie/api_calls";
 import { getTags } from "../../features/tags/api_calls";
 
 export default function HomePage() {
-  const { t } = useI18n();
   const dispatch = useAppDispatch();
 
   // Selettori tipizzati dallo store

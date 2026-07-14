@@ -23,7 +23,7 @@ export type CalendarProps = {
 };
 
 export default function Calendar(props: CalendarProps) {
-  const { t, locale: currentLocale } = useI18n();
+  const { locale: currentLocale } = useI18n();
 
   useEffect(() => {
     // Configura i giorni per far iniziare la settimana di lunedì (firstDayOfWeek = 1)

@@ -276,7 +276,7 @@ export default function TransactionDialog({
   );
 
   const handleImportoChange = (val: string) => {
-    let cleanedValue = val.replace(",", ".");
+    const cleanedValue = val.replace(",", ".");
     if (cleanedValue === "" || /^\d*\.?\d{0,2}$/.test(cleanedValue)) {
       setImporto(cleanedValue);
     }

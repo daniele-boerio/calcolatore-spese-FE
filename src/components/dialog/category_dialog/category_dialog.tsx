@@ -124,7 +124,7 @@ export default function CategoryDialog({
   };
 
   const handleRemoveSub = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<unknown>,
     index: number,
   ) => {
     const subToRemove = subs[index];
@@ -140,7 +140,7 @@ export default function CategoryDialog({
     // appena aggiunta (senza id) rimuoviamo direttamente.
     if (subToRemove.id) {
       confirmPopup({
-        target: event.currentTarget,
+        target: event.currentTarget as HTMLElement,
         message: t("delete_message"),
         icon: "pi pi-exclamation-triangle",
         acceptClassName: "p-button-danger",
@@ -332,12 +332,7 @@ export default function CategoryDialog({
                 <Button
                   icon="pi pi-trash"
                   className="trasparent-danger-button"
-                  onClick={(e) =>
-                    handleRemoveSub(
-                      e as React.MouseEvent<HTMLButtonElement>,
-                      index,
-                    )
-                  }
+                  onClick={(e) => handleRemoveSub(e, index)}
                   compact
                   rounded
                 />

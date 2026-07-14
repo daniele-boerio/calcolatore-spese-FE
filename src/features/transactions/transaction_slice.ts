@@ -31,7 +31,7 @@ const initialState: TransactionsState = {
 // --- HELPERS ---
 
 // Converte i campi Decimal (stringhe) in Number per il frontend
-const mapTransaction = (tx: Transaction): Transaction => ({
+export const mapTransaction = (tx: Transaction): Transaction => ({
   ...tx,
   importo: Number(tx.importo),
   importo_netto: tx.importo_netto !== null ? Number(tx.importo_netto) : null,

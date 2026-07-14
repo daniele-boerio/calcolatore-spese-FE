@@ -23,7 +23,6 @@ export default function CreditCard({
   name,
   balance,
   logo,
-  index,
   onEdit,
   onLinkBank,
   bankLinked,

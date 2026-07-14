@@ -1,14 +1,11 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useMemo, useRef } from "react";
 import Stepper from "../../../stepper/stepper";
 import InputText from "../../../input_text/input_text";
 import Button from "../../../button/button";
 import Dropdown from "../../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import "./compensation.scss";
-import {
-  createTransaction,
-  getTransactionsByCategory,
-} from "../../../../features/transactions/api_calls";
+import { getTransactionsByCategory } from "../../../../features/transactions/api_calls";
 import { Transaction } from "../../../../features/transactions/interfaces";
 import { useI18n } from "../../../../i18n/use-i18n";
 import Calendar from "../../../calendar/calendar";
@@ -132,7 +129,7 @@ export default function Compensation({
         }),
       ).unwrap();
       setTransactions(res || []);
-    } catch (e) {
+    } catch {
       setTransactions([]);
     } finally {
       stepperRef.current?.nextCallback();
@@ -140,7 +137,7 @@ export default function Compensation({
   };
 
   const handleImportoChange = (val: string) => {
-    let cleanedValue = val.replace(",", ".");
+    const cleanedValue = val.replace(",", ".");
     if (cleanedValue === "" || /^\d*\.?\d{0,2}$/.test(cleanedValue)) {
       setImporto(cleanedValue);
     }

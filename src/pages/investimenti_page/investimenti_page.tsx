@@ -61,11 +61,11 @@ export default function InvestimentiPage() {
   };
 
   const handleDelete = (
-    event: React.MouseEvent<HTMLButtonElement>,
+    event: React.MouseEvent<unknown>,
     id: string,
   ) => {
     confirmPopup({
-      target: event.currentTarget,
+      target: event.currentTarget as HTMLElement,
       message: t("delete_message"),
       icon: "pi pi-exclamation-triangle",
       acceptClassName: "p-button-danger",

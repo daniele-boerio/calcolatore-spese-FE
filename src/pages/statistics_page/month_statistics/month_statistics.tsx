@@ -8,7 +8,6 @@ import {
 } from "../../../features/statistics/statistics_slice";
 import {
   selectCategoriaCategorie,
-  selectCategoriaSottocategorie,
 } from "../../../features/categorie/categoria_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import { selectTagTags } from "../../../features/tags/tag_slice"; // <-- Aggiunto
@@ -29,7 +28,6 @@ export default function MonthStatistics() {
   const totals = useAppSelector(selectMonthlyTotals);
   const loading = useAppSelector(selectStatisticsLoading);
   const categorie = useAppSelector(selectCategoriaCategorie);
-  const sottocategorie = useAppSelector(selectCategoriaSottocategorie);
   const tags = useAppSelector(selectTagTags); // <-- Aggiunto
 
   // Stati locali per i filtri

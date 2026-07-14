@@ -249,7 +249,7 @@ const contoSlice = createSlice({
             // Gli accantonamenti non sono spese ma riducono il risparmio del mese
             if (
               newTx.tipo === "ACCANTONAMENTO" &&
-              state.monthlyBudget.remaining !== null
+              state.monthlyBudget.remaining != null
             ) {
               state.monthlyBudget.remaining -= txImporto;
               if (

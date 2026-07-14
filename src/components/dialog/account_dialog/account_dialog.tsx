@@ -130,7 +130,7 @@ export default function AccountDialog({
     fun: (value: string) => void,
     allowNegative = false,
   ) => {
-    let cleanedValue = val.replace(",", ".");
+    const cleanedValue = val.replace(",", ".");
     const pattern = allowNegative
       ? /^-?\d*\.?\d{0,2}$/
       : /^\d*\.?\d{0,2}$/;

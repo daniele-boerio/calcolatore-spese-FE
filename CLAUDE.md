@@ -45,7 +45,10 @@ component.
 ## Don't
 
 - Don't put business logic in presentational components — it belongs in the thunk/slice.
-- Don't add a state library, data-fetching lib, or test runner without being asked;
-  none is configured (`npm run lint` is the only quality gate today).
+- Don't add a state library or data-fetching lib without being asked. Quality gates
+  that now exist: `npm run typecheck` (tsc, strict), `npm run lint` (ESLint over JS+TS)
+  and `npm run test` (Vitest) — run them after changes. ESLint keeps a batch of
+  pre-existing react-hooks/`no-explicit-any` findings as **warnings** (tech-debt);
+  don't let the count grow. A formatter (prettier) is still intentionally not set up.
 - Don't edit `vite.config.js` / `package.json` unless the task genuinely requires it.
 - `App.jsx`, `main.jsx`, and `services/api.js` are intentionally JS — leave them JS.
