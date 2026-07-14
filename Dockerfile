@@ -2,7 +2,10 @@
 FROM node:20-slim AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+# `npm ci` invece di `npm install`: installazione deterministica dal
+# package-lock.json committato (più veloce, riproducibile, niente
+# ri-risoluzione dei peer in fase di build).
+RUN npm ci
 COPY . .
 # Vite genera la cartella /dist
 RUN npm run build
