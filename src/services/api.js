@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toApiError } from "./api_error";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
@@ -55,6 +56,16 @@ const refreshAccessToken = () => {
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Tutti i thunk rigettano con `error.response?.data`: normalizzandolo QUI, una
+    // volta sola, ogni chiamata (anche quelle scritte in futuro) consegna alla UI
+    // uno `status` e un `detail` leggibile invece del corpo grezzo del BE.
+    // Se `error.response` manca, il server non ha risposto affatto: lo lasciamo
+    // così com'è, ed è proprio quel "payload non normalizzato" che l'errorMiddleware
+    // riconosce come problema di rete.
+    if (error.response) {
+      error.response.data = toApiError(error.response.status, error.response.data);
+    }
+
     const originalRequest = error.config;
     const isAuthError = error.response?.status === 401;
 
