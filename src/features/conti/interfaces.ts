@@ -27,11 +27,12 @@ export interface ExpenseByCategory {
   value: number;
 }
 
+// `remaining` è il RISPARMIO del mese (entrate - uscite - accantonamenti), non
+// il residuo del budget: è il BE a calcolarlo, il FE non lo ricalcola mai.
 export interface MonthlyBudget {
   total_budget: number | null;
-  expenses: number | null;
   percentage: number | null;
-  remaining?: number | null;
+  remaining: number | null;
 }
 
 export interface BudgetUpdateData {
@@ -39,14 +40,14 @@ export interface BudgetUpdateData {
 }
 
 // Struttura specifica della risposta API per il budget
+// (GET /conti/currentMonthExpenses e PUT /monthlyBudget)
 export interface MonthlyBudgetResponse {
   monthly_budget: {
     total_budget: number | null;
-    expenses?: number | null;
     percentage: number | null;
-    remaining?: number | null;
+    remaining: number | null;
+    period?: { start: string; end: string };
   };
-  remaining?: number | null;
 }
 
 export interface ContoState {

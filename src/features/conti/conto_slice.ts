@@ -27,7 +27,7 @@ const initialState: ContoState = {
   selectedConto: null,
   monthlyBudget: {
     total_budget: null,
-    expenses: null,
+    remaining: null,
     percentage: null,
   },
   monthlyExpensesByCategory: [],
@@ -47,6 +47,25 @@ const handleRejected = (state: ContoState) => {
   state.loading = false;
 };
 
+// GET /conti/currentMonthExpenses e PUT /monthlyBudget rispondono con la stessa
+// struttura: un solo posto dove convertire i Decimal (che arrivano come stringhe).
+const applyMonthlyBudget = (
+  state: ContoState,
+  payload: MonthlyBudgetResponse,
+) => {
+  const { monthly_budget } = payload;
+  state.monthlyBudget.total_budget =
+    monthly_budget.total_budget !== null &&
+    monthly_budget.total_budget !== undefined
+      ? Number(monthly_budget.total_budget)
+      : null;
+  state.monthlyBudget.remaining =
+    monthly_budget.remaining !== null && monthly_budget.remaining !== undefined
+      ? Number(monthly_budget.remaining)
+      : null;
+  state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
+};
+
 const contoSlice = createSlice({
   name: "conto",
   initialState,
@@ -61,44 +80,13 @@ const contoSlice = createSlice({
       .addCase(
         getCurrentMonthExpenses.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
-          const { monthly_budget } = action.payload;
-          // Cast a Number perché arrivano come stringhe dal backend
-          state.monthlyBudget.total_budget = Number(
-            monthly_budget.total_budget,
-          );
-          state.monthlyBudget.expenses =
-            monthly_budget.expenses !== null &&
-            monthly_budget.expenses !== undefined
-              ? Number(monthly_budget.expenses)
-              : null;
-          const remainingValue =
-            monthly_budget.remaining ?? action.payload.remaining;
-          state.monthlyBudget.remaining =
-            remainingValue !== null && remainingValue !== undefined
-              ? Number(remainingValue)
-              : null;
-          state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
+          applyMonthlyBudget(state, action.payload);
         },
       )
       .addCase(
         updateBudget.fulfilled,
         (state, action: PayloadAction<MonthlyBudgetResponse>) => {
-          const { monthly_budget } = action.payload;
-          state.monthlyBudget.total_budget = Number(
-            monthly_budget.total_budget,
-          );
-          state.monthlyBudget.expenses =
-            monthly_budget.expenses !== null &&
-            monthly_budget.expenses !== undefined
-              ? Number(monthly_budget.expenses)
-              : null;
-          const remainingValue =
-            monthly_budget.remaining ?? action.payload.remaining;
-          state.monthlyBudget.remaining =
-            remainingValue !== null && remainingValue !== undefined
-              ? Number(remainingValue)
-              : null;
-          state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
+          applyMonthlyBudget(state, action.payload);
         },
       )
 
@@ -211,11 +199,15 @@ const contoSlice = createSlice({
           const newTx = action.payload;
           const txImporto = Number(newTx.importo); // Fondamentale: cast dell'importo stringa
 
-          const isThisMonth =
-            new Date(newTx.data).getMonth() === new Date().getMonth() &&
-            new Date(newTx.data).getFullYear() === new Date().getFullYear();
+          // Qui aggiorniamo SOLO i saldi dei conti: il thunk createTransaction
+          // rifà già il fetch di currentMonthExpenses e expensesByCategory (e le
+          // loro `fulfilled` arrivano PRIMA di questa), quindi budget e grafico
+          // sono già i valori del server. Riapplicare qui il delta li contava due
+          // volte — la torta raddoppiava la spesa e il risparmio sottraeva
+          // l'accantonamento due volte. `getConti` invece non viene rifetchato,
+          // quindi il saldo va aggiornato a mano.
 
-          // 1. Aggiorna il saldo del conto coinvolto
+          // Aggiorna il saldo del conto coinvolto
           if (newTx.tipo === "RICARICA" || newTx.tipo === "ACCANTONAMENTO") {
             // Giroconto/accantonamento: esce dalla sorgente; per l'accantonamento
             // la destinazione (salvadanaio) è opzionale.
@@ -240,78 +232,6 @@ const contoSlice = createSlice({
               // Calcolo sicuro tra numeri
               state.conti[contoIndex].saldo += txImporto * mod;
             }
-          }
-
-          // 2. Se la transazione appartiene al mese corrente, aggiorna statistiche budget
-          if (isThisMonth) {
-            const isExpense = newTx.tipo === "USCITA";
-
-            // Gli accantonamenti non sono spese ma riducono il risparmio del mese
-            if (
-              newTx.tipo === "ACCANTONAMENTO" &&
-              state.monthlyBudget.remaining != null
-            ) {
-              state.monthlyBudget.remaining -= txImporto;
-              if (
-                state.monthlyBudget.total_budget !== null &&
-                state.monthlyBudget.total_budget > 0
-              ) {
-                state.monthlyBudget.percentage = Number(
-                  (
-                    (state.monthlyBudget.remaining /
-                      state.monthlyBudget.total_budget) *
-                    100
-                  ).toFixed(1),
-                );
-              }
-            }
-
-            // Aggiorna Monthly Budget solo per le spese
-            if (isExpense && state.monthlyBudget.expenses !== null) {
-              state.monthlyBudget.expenses += txImporto;
-
-              if (
-                state.monthlyBudget.total_budget !== null &&
-                state.monthlyBudget.total_budget > 0
-              ) {
-                state.monthlyBudget.percentage = Number(
-                  (
-                    (state.monthlyBudget.expenses /
-                      state.monthlyBudget.total_budget) *
-                    100
-                  ).toFixed(1),
-                );
-              }
-
-              if (state.monthlyBudget.total_budget !== null) {
-                state.monthlyBudget.remaining =
-                  state.monthlyBudget.total_budget -
-                  state.monthlyBudget.expenses;
-              }
-            }
-
-            // Aggiorna Expenses By Category
-            if (isExpense) {
-              const categoryName =
-                (newTx as any).categoria?.nome || "Uncategorized";
-
-              const catIndex = state.monthlyExpensesByCategory.findIndex(
-                (item) => item.label === categoryName,
-              );
-
-              if (catIndex !== -1) {
-                state.monthlyExpensesByCategory[catIndex].value += txImporto;
-              } else {
-                state.monthlyExpensesByCategory.push({
-                  label: categoryName,
-                  value: txImporto,
-                });
-              }
-            }
-
-            // Filtro pulizia categorie
-            state.monthlyExpensesByCategory =
-              state.monthlyExpensesByCategory.filter((c) => c.value > 0);
           }
         },
       )

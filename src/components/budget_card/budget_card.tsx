@@ -27,10 +27,10 @@ export default function BudgetCard() {
   const loading = useAppSelector(selectContiLoading);
   const includeFutureRecurring = useAppSelector(selectIncludeFutureRecurring);
 
-  const { total_budget, expenses, percentage, remaining } = monthlyBudget;
+  const { total_budget, percentage, remaining } = monthlyBudget;
 
-  const displayAmount =
-    expenses !== null ? expenses : remaining !== undefined ? remaining : null;
+  // Il risparmio del mese, così come lo calcola il BE. Non ricalcolarlo qui.
+  const displayAmount = remaining;
 
   const [isDialogVisible, setIsDialogVisible] = useState<boolean>(false);
 
