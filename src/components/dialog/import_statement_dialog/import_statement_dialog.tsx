@@ -157,6 +157,7 @@ export default function ImportStatementDialog({
               optionValue="id"
               onChange={(e: any) => setContoId(e.value)}
               placeholder={t("bank_account_placeholder")}
+              showClear={false}
             />
           </div>
         </div>

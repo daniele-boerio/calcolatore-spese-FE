@@ -130,6 +130,7 @@ export default function MigrateTransactionsDialog({
               optionValue="id"
               onChange={(e) => setOldCategoriaId(e.value)}
               placeholder={t("category_placeholder")}
+              showClear={false}
             />
           </div>
           <div className="field">
@@ -142,7 +143,6 @@ export default function MigrateTransactionsDialog({
               onChange={(e) => setOldSottoCategoriaId(e.value)}
               placeholder={t("sub_category_placeholder")}
               disabled={!oldCategoriaId}
-              showClear
             />
           </div>
         </div>
@@ -158,6 +158,7 @@ export default function MigrateTransactionsDialog({
               optionValue="id"
               onChange={(e) => setNewCategoriaId(e.value)}
               placeholder={t("category_placeholder")}
+              showClear={false}
             />
           </div>
           <div className="field">
@@ -172,7 +173,6 @@ export default function MigrateTransactionsDialog({
               onChange={(e) => setNewSottoCategoriaId(e.value)}
               placeholder={t("sub_category_placeholder")}
               disabled={!newCategoriaId}
-              showClear
             />
           </div>
         </div>

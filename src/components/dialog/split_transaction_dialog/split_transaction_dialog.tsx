@@ -255,7 +255,6 @@ export default function SplitTransactionDialog({
                         handleCategoriaChange(idx, e.value)
                       }
                       placeholder={t("select_category")}
-                      showClear
                     />
                   </div>
                   <div className="field">
@@ -270,7 +269,6 @@ export default function SplitTransactionDialog({
                       }
                       placeholder={t("sub_category_placeholder")}
                       disabled={!p.categoria_id}
-                      showClear
                     />
                   </div>
                 </div>
@@ -285,7 +283,6 @@ export default function SplitTransactionDialog({
                       value={p.tag_id || null}
                       onChange={(e: any) => updatePart(idx, "tag_id", e.value)}
                       placeholder={t("select_tag")}
-                      showClear
                     />
                   </div>
                 </div>

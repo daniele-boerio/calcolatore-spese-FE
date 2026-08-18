@@ -172,7 +172,6 @@ export default function DebitoDialog({
             optionLabel="label"
             optionValue="value"
             placeholder={t("bank_account_placeholder")}
-            showClear
           />
         </div>
       </div>

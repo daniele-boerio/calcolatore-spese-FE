@@ -167,6 +167,7 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
               optionValue="id"
               onChange={(e) => setContoId(e.value)}
               placeholder={t("bank_account_placeholder")}
+              showClear={false}
             />
             <Dropdown
               label={t("tag")}
@@ -176,7 +177,6 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
               optionValue="id"
               onChange={(e) => setTagId(e.value)}
               placeholder={t("tag_placeholder")}
-              showClear
             />
           </div>
 
@@ -192,7 +192,6 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
                 setSottoCategoriaId(null);
               }}
               placeholder={t("category_placeholder")}
-              showClear
             />
             <Dropdown
               label={t("sub_category")}
@@ -203,7 +202,6 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
               onChange={(e) => setSottoCategoriaId(e.value)}
               placeholder={t("sub_category_placeholder")}
               disabled={!categoriaId}
-              showClear
             />
           </div>
 

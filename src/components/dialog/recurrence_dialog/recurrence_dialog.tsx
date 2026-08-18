@@ -356,6 +356,7 @@ export default function RecurrenceDialog({
               options={frequenzaOptions}
               onChange={(e) => setFrequenza(e.value)}
               placeholder={t("select_frequency")}
+              showClear={false}
             />
           </div>
           <div className="field">
@@ -367,6 +368,7 @@ export default function RecurrenceDialog({
               optionValue="id"
               onChange={(e) => setContoId(e.value)}
               placeholder={t("bank_account_placeholder")}
+              showClear={false}
             />
           </div>
         </div>

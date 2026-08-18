@@ -7075,7 +7075,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-07-14"
+            "default": "2026-08-19"
           },
           "descrizione": {
             "anyOf": [
@@ -7181,7 +7181,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-07-14"
+            "default": "2026-08-19"
           },
           "descrizione": {
             "anyOf": [
@@ -7475,7 +7475,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-07-14"
+            "default": "2026-08-19"
           },
           "descrizione": {
             "anyOf": [
@@ -7638,6 +7638,17 @@
             "type": "boolean",
             "title": "Is Open Banking Admin",
             "default": false
+          },
+          "last_tag_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Tag Id"
           }
         },
         "type": "object",

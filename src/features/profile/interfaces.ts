@@ -21,10 +21,15 @@ export interface ProfileState {
   email: string | null;
   isAuthenticated: boolean;
   isOpenBankingAdmin: boolean;
+  // Tag da preselezionare nel form di nuova transazione: è l'ultimo usato,
+  // ricordato sull'account (quindi valido su ogni dispositivo). null = nessuna
+  // precompilazione, ed è lo stato in cui si torna salvando senza tag.
+  lastTagId: string | null;
 }
 
 export interface ProfileResponse {
   username: string;
   email: string;
   is_open_banking_admin?: boolean;
+  last_tag_id?: number | null;
 }

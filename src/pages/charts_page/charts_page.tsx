@@ -346,6 +346,7 @@ export default function ChartsPage() {
                 onChange={(e) => setSelectedCategoryId(e.value)}
                 placeholder={t("select_category")}
                 className="compact-dropdown"
+                showClear={false}
               />
             </div>
             <div className="card-filters" style={{ marginTop: "0.5rem" }}>

@@ -20,6 +20,7 @@ import Compensation from "./compensation/compensation";
 import { selectContiConti } from "../../../features/conti/conto_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../features/tags/tag_slice";
+import { selectLastTagId } from "../../../features/profile/profile_slice";
 import { createTag } from "../../../features/tags/api_calls";
 import {
   createCategoria,
@@ -45,6 +46,7 @@ export default function TransactionDialog({
   const conti = useAppSelector(selectContiConti);
   const categorie = useAppSelector(selectCategoriaCategorie);
   const tags = useAppSelector(selectTagTags);
+  const lastTagId = useAppSelector(selectLastTagId);
 
   // Stati del form
   const [tipo, setTipo] = useState<tipoTransaction>("USCITA");
@@ -93,7 +95,6 @@ export default function TransactionDialog({
         setDescrizione("");
         setCategoriaId(null);
         setSottoCategoriaId(null);
-        setTagId(null);
         setContoDestinazioneId(null);
         setFromData(null);
         setToData(null);
@@ -107,6 +108,24 @@ export default function TransactionDialog({
       }
     }
   }, [visible, transaction, conti]);
+
+  // Precompilazione del tag all'apertura del form di creazione, con l'ultimo
+  // tag usato (ricordato sull'account). Volutamente in un effetto separato da
+  // quello di reset: `tags` e `lastTagId` cambiano quando le liste si
+  // ricaricano, e nelle dipendenze del reset ripulirebbero il form mentre
+  // l'utente lo sta compilando.
+  //
+  // Il default si risolve *attraverso* la lista tag invece di usarlo così com'è:
+  // serve il valore con lo stesso tipo delle opzioni (altrimenti la Dropdown non
+  // trova la corrispondenza) e scarta da solo un tag nel frattempo cancellato.
+  useEffect(() => {
+    if (!visible || transaction) return;
+
+    const rememberedTag = tags.find(
+      (tag) => String(tag.id) === String(lastTagId),
+    );
+    setTagId(rememberedTag ? rememberedTag.id : null);
+  }, [visible, transaction]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Costruisce il payload risolvendo (e creando se serve) tag/categoria/sottocategoria.
   // Estratto da handleSave per poterlo riusare anche nel flusso "crea e dividi".
@@ -481,6 +500,7 @@ export default function TransactionDialog({
                   optionValue="id"
                   onChange={(e) => setContoId(e.value)}
                   placeholder={t("bank_account_placeholder")}
+                  showClear={false}
                 />
               </div>
               <div className="field">
@@ -493,6 +513,7 @@ export default function TransactionDialog({
                     optionValue="id"
                     onChange={(e) => setContoDestinazioneId(e.value)}
                     placeholder={t("destination_account_placeholder")}
+                    showClear={false}
                   />
                 ) : (
                   <Dropdown
@@ -531,7 +552,6 @@ export default function TransactionDialog({
                     optionValue="id"
                     onChange={(e) => setContoDestinazioneId(e.value)}
                     placeholder={t("set_aside_destination_placeholder")}
-                    showClear
                   />
                 </div>
               </div>

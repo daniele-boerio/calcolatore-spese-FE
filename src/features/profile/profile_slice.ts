@@ -8,6 +8,8 @@ import {
 } from "./api_calls";
 import { AuthResponse, ProfileResponse, ProfileState } from "./interfaces";
 import { RootState } from "../../store/store";
+import { createTransaction } from "../transactions/api_calls";
+import { Transaction } from "../transactions/interfaces";
 
 // --- STATO INIZIALE ---
 
@@ -21,6 +23,7 @@ const initialState: ProfileState = {
   email: null,
   isAuthenticated: !!savedToken,
   isOpenBankingAdmin: false,
+  lastTagId: null,
 };
 
 // --- HELPERS ---
@@ -42,6 +45,7 @@ const profileSlice = createSlice({
       state.username = null;
       state.isAuthenticated = false;
       state.isOpenBankingAdmin = false;
+      state.lastTagId = null;
       localStorage.removeItem("token");
       localStorage.removeItem("username");
     },
@@ -81,16 +85,43 @@ const profileSlice = createSlice({
           state.email = action.payload.email;
           state.isOpenBankingAdmin =
             action.payload.is_open_banking_admin ?? false;
+          // Il BE lo espone come intero: lo normalizziamo a stringa perché è
+          // così che gli id della tassonomia viaggiano nel resto del FE.
+          state.lastTagId =
+            action.payload.last_tag_id != null
+              ? String(action.payload.last_tag_id)
+              : null;
         },
       )
 
       .addCase(getProfile.rejected, (state) => {
         state.isAuthenticated = false;
         state.isOpenBankingAdmin = false;
+        state.lastTagId = null;
 
         localStorage.removeItem("token");
         localStorage.removeItem("username");
       })
+
+      // Creare una transazione sposta il tag di default del prossimo inserimento.
+      // Lo rispecchiamo dalla risposta invece di rifare una GET /me: `getProfile`
+      // in caso di errore chiude la sessione, e un blip di rete dopo un
+      // salvataggio butterebbe fuori l'utente.
+      //
+      // La condizione è il gemello di quella in BE/routers/transazioni.py
+      // (create_transazione): il default si muove solo se il tag l'ha scelto
+      // l'utente nel form — il giroconto quel campo non ce l'ha e il rimborso
+      // eredita il tag del padre. Se le due dovessero divergere, il /me
+      // all'avvio dell'app risincronizza dal valore autorevole del BE.
+      .addCase(
+        createTransaction.fulfilled,
+        (state, action: PayloadAction<Transaction>) => {
+          const newTx = action.payload;
+          if (newTx.tipo === "RICARICA" || newTx.parent_transaction_id) return;
+
+          state.lastTagId = newTx.tag_id != null ? String(newTx.tag_id) : null;
+        },
+      )
 
       // Sessione recuperata dal solo cookie httpOnly (payload null = nessuna sessione,
       // resta la pagina di login).
@@ -113,6 +144,7 @@ const profileSlice = createSlice({
         state.email = null;
         state.isAuthenticated = false;
         state.isOpenBankingAdmin = false;
+        state.lastTagId = null;
 
         localStorage.removeItem("token");
         localStorage.removeItem("username");
@@ -151,5 +183,7 @@ export const selectProfileIsAuthenticated = (state: RootState) =>
 
 export const selectIsOpenBankingAdmin = (state: RootState) =>
   state.profile.isOpenBankingAdmin;
+
+export const selectLastTagId = (state: RootState) => state.profile.lastTagId;
 
 export default profileSlice.reducer;

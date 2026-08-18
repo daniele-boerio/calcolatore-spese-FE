@@ -227,6 +227,7 @@ export default function Compensation({
                       optionValue="id"
                       onChange={(e) => setTransactionId(e.value)}
                       placeholder={t("transaction_placeholder")}
+                      showClear={false}
                     />
                   </div>
                 </div>
@@ -285,6 +286,7 @@ export default function Compensation({
                       optionValue="id"
                       onChange={(e) => setContoId(e.value)}
                       placeholder={t("bank_account_placeholder")}
+                      showClear={false}
                     />
                   </div>
                   <div className="field">

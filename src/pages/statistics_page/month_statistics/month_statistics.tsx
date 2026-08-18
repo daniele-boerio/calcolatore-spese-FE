@@ -18,6 +18,7 @@ import "./month_statistics.scss";
 import { MonthlyDetailCategory } from "../../../features/statistics/interfaces";
 import CustomCard from "../../../components/custom_card/custom_card";
 import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
+import { TransactionsListFilters } from "../../../components/dialog/transactions_list_dialog/transactions_query";
 
 export default function MonthStatistics() {
   const { t } = useI18n();
@@ -43,13 +44,8 @@ export default function MonthStatistics() {
   // Dialog State
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
-  const [dialogFilters, setDialogFilters] = useState<{
-    categoria_id?: string;
-    sottocategoria_id?: string;
-    tag_id?: string; // <-- Aggiunto
-    data_inizio?: string;
-    data_fine?: string;
-  }>({});
+  const [dialogFilters, setDialogFilters] =
+    useState<TransactionsListFilters>({});
 
   // Helpers
   const toDateStr = (d: Date) => {
@@ -169,6 +165,7 @@ export default function MonthStatistics() {
             optionValue="value"
             placeholder={t("month")}
             onChange={(e) => setSelectedMonth(e.value)}
+            showClear={false}
           />
           <Dropdown
             label={t("year")}
@@ -178,6 +175,7 @@ export default function MonthStatistics() {
             optionValue="value"
             placeholder={t("year")}
             onChange={(e) => setSelectedYear(e.value)}
+            showClear={false}
           />
           <Dropdown
             label={t("category")}
@@ -187,7 +185,6 @@ export default function MonthStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedCategoriaId(e.value)}
             placeholder={t("categories")}
-            showClear
           />
           {/* NUOVO DROPDOWN PER I TAG */}
           <Dropdown
@@ -198,7 +195,6 @@ export default function MonthStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedTagId(e.value)}
             placeholder={t("tag") || "Tag"}
-            showClear
           />
         </div>
       </header>

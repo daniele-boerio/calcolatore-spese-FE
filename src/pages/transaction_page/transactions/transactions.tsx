@@ -362,7 +362,6 @@ export default function Transactions() {
                 setCurrentPage(0);
               }}
               placeholder={t("select_type")}
-              showClear
             />
           </div>
 
@@ -378,7 +377,6 @@ export default function Transactions() {
                 setCurrentPage(0);
               }}
               placeholder={t("bank_account")}
-              showClear
             />
           </div>
 
@@ -399,7 +397,6 @@ export default function Transactions() {
                 setCurrentPage(0);
               }}
               placeholder={t("category")}
-              showClear
             />
           </div>
 
@@ -421,7 +418,6 @@ export default function Transactions() {
               }}
               placeholder={t("sub_category")}
               disabled={!filters.categoria_id}
-              showClear
             />
           </div>
 
@@ -437,7 +433,6 @@ export default function Transactions() {
                 setCurrentPage(0);
               }}
               placeholder={t("tag")}
-              showClear
             />
           </div>
 

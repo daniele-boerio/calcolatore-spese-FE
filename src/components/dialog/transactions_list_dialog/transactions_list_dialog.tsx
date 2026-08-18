@@ -17,18 +17,17 @@ import {
 } from "../../../features/categorie/interfaces";
 import { Tag } from "../../../features/tags/interfaces";
 import { Conto } from "../../../features/conti/interfaces";
+import {
+  buildTransactionsQuery,
+  TransactionsListFilters,
+} from "./transactions_query";
 import "./transactions_list_dialog.scss";
 
 export interface TransactionsListDialogProps {
   visible: boolean;
   onHide: () => void;
   title: string;
-  filters: {
-    categoria_id?: string;
-    sottocategoria_id?: string;
-    data_inizio?: string;
-    data_fine?: string;
-  };
+  filters: TransactionsListFilters;
 }
 
 export default function TransactionsListDialog({
@@ -63,21 +62,9 @@ export default function TransactionsListDialog({
   const fetchData = async (pageIndex: number) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams();
-      params.append("page", (pageIndex + 1).toString());
-      params.append("size", pageSize.toString());
+      const query = buildTransactionsQuery(filters, pageIndex + 1, pageSize);
 
-      if (filters.categoria_id)
-        params.append("categoria_id", filters.categoria_id);
-      if (filters.sottocategoria_id)
-        params.append("sottocategoria_id", filters.sottocategoria_id);
-      if (filters.data_inizio)
-        params.append("data_inizio", filters.data_inizio);
-      if (filters.data_fine) params.append("data_fine", filters.data_fine);
-
-      const response = await api.get(
-        `/transazioni/paginated?${params.toString()}`,
-      );
+      const response = await api.get(`/transazioni/paginated?${query}`);
 
       const mapped = response.data.data.map((tx: any) => ({
         ...tx,

@@ -13,6 +13,7 @@ import Dropdown from "../../../components/dropdown/dropdown";
 import { useI18n } from "../../../i18n/use-i18n";
 import CustomCard from "../../../components/custom_card/custom_card";
 import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
+import { TransactionsListFilters } from "../../../components/dialog/transactions_list_dialog/transactions_query";
 import "./year_statistics.scss";
 
 export default function YearStatistics() {
@@ -36,13 +37,8 @@ export default function YearStatistics() {
   // Dialog State
   const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
-  const [dialogFilters, setDialogFilters] = useState<{
-    categoria_id?: string;
-    sottocategoria_id?: string;
-    tag_id?: string; // <-- Aggiunto
-    data_inizio?: string;
-    data_fine?: string;
-  }>({});
+  const [dialogFilters, setDialogFilters] =
+    useState<TransactionsListFilters>({});
 
   // Helpers
   const toDateStr = (d: Date) => {
@@ -269,6 +265,7 @@ export default function YearStatistics() {
             optionValue="value"
             placeholder={t("year")}
             onChange={(e) => setSelectedYear(e.value)}
+            showClear={false}
           />
           <Dropdown
             label={t("category")}
@@ -278,7 +275,6 @@ export default function YearStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedCategoriaId(e.value)}
             placeholder={t("categories")}
-            showClear
           />
           {/* NUOVO DROPDOWN PER I TAG */}
           <Dropdown
@@ -289,7 +285,6 @@ export default function YearStatistics() {
             optionValue="id"
             onChange={(e) => setSelectedTagId(e.value)}
             placeholder={t("tag") || "Tag"}
-            showClear
           />
         </div>
       </header>

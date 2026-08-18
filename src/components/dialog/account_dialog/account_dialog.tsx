@@ -276,6 +276,7 @@ export default function AccountDialog({
                     options={frequenzaOptions}
                     onChange={(e) => setFrequenzaControllo(e.value)}
                     placeholder={t("select_frequency")}
+                    showClear={false}
                   />
                 </div>
               </div>
@@ -303,6 +304,7 @@ export default function AccountDialog({
                     optionLabel="nome"
                     optionValue="id"
                     placeholder={t("select_source")}
+                    showClear={false}
                   />
                 </div>
               </div>
