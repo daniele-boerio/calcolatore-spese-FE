@@ -15,7 +15,6 @@ import Button from "../../components/button/button";
 import ThreeDotsActionsMenu from "../../components/three_dots_action_menu/three_dots_action_menu";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
 import BankConnectDialog from "../../components/dialog/bank_connect_dialog/bank_connect_dialog";
-import ImportStatementDialog from "../../components/dialog/import_statement_dialog/import_statement_dialog";
 import "./conti_page.scss";
 import {
   countContoTransactions,
@@ -69,7 +68,6 @@ export default function ContiPage() {
   const [editing, setEditing] = useState<Conto | null>(null);
   const [isAccountDialogVisible, setIsAccountDialogVisible] = useState(false);
   const [bankAccount, setBankAccount] = useState<Conto | null>(null);
-  const [isImportDialogVisible, setIsImportDialogVisible] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
 
   useEffect(() => {
@@ -314,14 +312,6 @@ export default function ContiPage() {
               />
 
               <ListRow
-                icon="pi pi-file-excel"
-                iconShape="square"
-                title={t("import_statement_title")}
-                chevron
-                onClick={() => setIsImportDialogVisible(true)}
-              />
-
-              <ListRow
                 icon="pi pi-cog"
                 iconShape="square"
                 title={t("nav_settings")}
@@ -356,11 +346,6 @@ export default function ContiPage() {
         visible={Boolean(bankAccount)}
         conto={bankAccount}
         onHide={() => setBankAccount(null)}
-      />
-
-      <ImportStatementDialog
-        visible={isImportDialogVisible}
-        onHide={() => setIsImportDialogVisible(false)}
       />
 
       <Alert

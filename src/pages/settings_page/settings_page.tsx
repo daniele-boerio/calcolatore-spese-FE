@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Page, PageContent, PageHeader } from "../../components/page/page";
@@ -6,6 +7,7 @@ import Sheet from "../../components/sheet/sheet";
 import Toggle from "../../components/toggle/toggle";
 import Button from "../../components/button/button";
 import Amount from "../../components/amount/amount";
+import ImportStatementDialog from "../../components/dialog/import_statement_dialog/import_statement_dialog";
 import {
   selectHideAmounts,
   selectTheme,
@@ -20,10 +22,16 @@ import {
 } from "../../features/profile/profile_slice";
 import { logout } from "../../features/profile/api_calls";
 import {
+  getConti,
   getCurrentMonthExpenses,
   updateBudget,
 } from "../../features/conti/api_calls";
-import { selectContiMonthlySpending } from "../../features/conti/conto_slice";
+import {
+  selectContiConti,
+  selectContiMonthlySpending,
+  selectIncludeFutureRecurring,
+  setIncludeFutureRecurring,
+} from "../../features/conti/conto_slice";
 import "./settings_page.scss";
 
 const THEMES: ThemePreference[] = ["light", "dark", "system"];
@@ -39,13 +47,17 @@ const initialsOf = (username: string | null) =>
 export default function SettingsPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const theme = useAppSelector(selectTheme);
   const hideAmounts = useAppSelector(selectHideAmounts);
   const username = useAppSelector(selectProfileUsername);
   const email = useAppSelector(selectProfileEmail);
   const spending = useAppSelector(selectContiMonthlySpending);
+  const conti = useAppSelector(selectContiConti);
+  const includeFutureRecurring = useAppSelector(selectIncludeFutureRecurring);
 
+  const [importOpen, setImportOpen] = useState(false);
   const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
   const [budgetDraft, setBudgetDraft] = useState("");
   const [budgetInvalid, setBudgetInvalid] = useState(false);
@@ -53,7 +65,22 @@ export default function SettingsPage() {
   useEffect(() => {
     // Il tetto di spesa arriva con la card del mese.
     dispatch(getCurrentMonthExpenses());
+    // "Banche collegate" conta i conti con un collegamento attivo.
+    dispatch(getConti());
   }, [dispatch]);
+
+  const linkedAccounts = conti.filter(
+    (conto) => conto.bank_connector_account_id,
+  ).length;
+
+  /**
+   * Il flag cambia il *calcolo* del budget, non solo la vista: dopo averlo
+   * mosso il totale del mese va richiesto di nuovo, o resta quello di prima.
+   */
+  const toggleFutureRecurring = (checked: boolean) => {
+    dispatch(setIncludeFutureRecurring(checked));
+    dispatch(getCurrentMonthExpenses({ include_future_recurring: checked }));
+  };
 
   const openBudgetSheet = () => {
     setBudgetDraft(spending.budget !== null ? String(spending.budget) : "");
@@ -85,7 +112,15 @@ export default function SettingsPage() {
 
   return (
     <Page className="settings-page">
-      <PageHeader>
+      <PageHeader className="settings-page__header">
+        <button
+          type="button"
+          className="settings-page__back"
+          aria-label={t("back")}
+          onClick={() => navigate(-1)}
+        >
+          <i className="pi pi-arrow-left" aria-hidden="true" />
+        </button>
         <h1 className="page-title">{t("nav_settings")}</h1>
       </PageHeader>
 
@@ -155,6 +190,53 @@ export default function SettingsPage() {
               </span>
               <i className="pi pi-chevron-right" aria-hidden="true" />
             </button>
+
+            <label className="settings-row">
+              <span className="settings-row__text">
+                <span className="settings-row__label">
+                  {t("include_future_recurring")}
+                </span>
+                <span className="settings-row__hint">
+                  {t("settings_future_recurring_hint")}
+                </span>
+              </span>
+
+              <Toggle
+                checked={includeFutureRecurring}
+                onChange={toggleFutureRecurring}
+              />
+            </label>
+
+            <button
+              type="button"
+              className="settings-row settings-row--tappable"
+              onClick={() => setImportOpen(true)}
+            >
+              <span className="settings-row__text">
+                <span className="settings-row__label">
+                  {t("import_statement_title")}
+                </span>
+              </span>
+              <i className="pi pi-chevron-right" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              className="settings-row settings-row--tappable"
+              onClick={() => navigate("/accounts")}
+            >
+              <span className="settings-row__text">
+                <span className="settings-row__label">
+                  {t("settings_linked_banks")}
+                </span>
+                <span className="settings-row__hint">
+                  {linkedAccounts > 0
+                    ? `${linkedAccounts} ${t("settings_linked_count")}`
+                    : t("settings_linked_none")}
+                </span>
+              </span>
+              <i className="pi pi-chevron-right" aria-hidden="true" />
+            </button>
           </div>
         </section>
 
@@ -189,6 +271,11 @@ export default function SettingsPage() {
           {t("logout")}
         </button>
       </PageContent>
+
+      <ImportStatementDialog
+        visible={importOpen}
+        onHide={() => setImportOpen(false)}
+      />
 
       <Sheet
         open={budgetSheetOpen}
