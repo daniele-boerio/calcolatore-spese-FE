@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import {
   createRecurring,
   deleteRecurring,
+  executeRecurring,
   getRecurrings,
   updateRecurring,
 } from "./api_calls";
@@ -60,6 +61,20 @@ const recurringsSlice = createSlice({
         (state, action: PayloadAction<Recurring>) => {
           const index = state.recurrings.findIndex(
             (rec) => rec.id === action.payload.id,
+          );
+          if (index !== -1) {
+            state.recurrings[index] = mapRecurring(action.payload);
+          }
+        },
+      )
+
+      // Registrata a mano: il server torna la ricorrenza con la data già
+      // spostata alla prossima occorrenza.
+      .addCase(
+        executeRecurring.fulfilled,
+        (state, action: PayloadAction<Recurring>) => {
+          const index = state.recurrings.findIndex(
+            (rec) => String(rec.id) === String(action.payload.id),
           );
           if (index !== -1) {
             state.recurrings[index] = mapRecurring(action.payload);

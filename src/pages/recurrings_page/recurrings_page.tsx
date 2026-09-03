@@ -16,6 +16,7 @@ import RecurrenceDialog from "../../components/dialog/recurrence_dialog/recurren
 import "./recurrings_page.scss";
 import {
   deleteRecurring,
+  executeRecurring,
   getRecurrings,
 } from "../../features/recurrings/api_calls";
 import {
@@ -120,6 +121,21 @@ export default function RecurringsPage() {
     setPendingDelete(null);
   };
 
+  const register = async (recurring: Recurring) => {
+    try {
+      await dispatch(executeRecurring({ id: recurring.id })).unwrap();
+      dispatch(
+        showToast({ variant: "success", title: t("recurring_registered") }),
+      );
+      // Il saldo del conto si è mosso: la card dell'impegno e le entrate del
+      // mese vanno rilette, o restano indietro di una transazione.
+      dispatch(getConti());
+      dispatch(getCurrentMonthExpenses());
+    } catch {
+      // L'errore arriva dal middleware: qui non c'è niente da aggiungere.
+    }
+  };
+
   const row = (recurring: Recurring, tone?: "late") => (
     <RecurringRow
       key={recurring.id}
@@ -127,6 +143,7 @@ export default function RecurringsPage() {
       meta={metaOf(recurring)}
       tone={tone}
       onOpen={() => openEdit(recurring)}
+      onRegister={tone === "late" ? () => register(recurring) : undefined}
       actions={
         <ThreeDotsActionsMenu
           className="recurrings__menu"
@@ -273,6 +290,8 @@ type RecurringRowProps = {
   meta: string;
   tone?: "late";
   onOpen: () => void;
+  /** Presente solo sulle scadute: le registra adesso. */
+  onRegister?: () => void;
   actions: ReactNode;
 };
 
@@ -281,6 +300,7 @@ function RecurringRow({
   meta,
   tone,
   onOpen,
+  onRegister,
   actions,
 }: RecurringRowProps) {
   const { t } = useI18n();
@@ -325,6 +345,16 @@ function RecurringRow({
           </span>
         </span>
       </button>
+
+      {onRegister && (
+        <button
+          type="button"
+          className="recurring-row__register"
+          onClick={onRegister}
+        >
+          {t("recurring_register")}
+        </button>
+      )}
 
       {actions}
     </div>

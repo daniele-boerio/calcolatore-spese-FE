@@ -269,6 +269,8 @@
   "recurring_state_active": "active",
   "recurring_state_suspended": "suspended",
   "recurring_state_late": "overdue",
+  "recurring_register": "Record",
+  "recurring_registered": "Recurring item recorded",
   "nav_home": "Home",
   "nav_movements": "Movements",
   "nav_analysis": "Analysis",

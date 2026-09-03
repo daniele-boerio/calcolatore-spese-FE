@@ -85,3 +85,25 @@ export const deleteRecurring = createAsyncThunk<string, DeleteRecurringParams>(
     }
   },
 );
+
+/**
+ * Registra adesso una ricorrenza già scaduta. Serve quando lo scheduler del BE
+ * non è passato: da qui si sblocca a mano. Non anticipa niente — una
+ * ricorrenza non ancora scaduta viene rifiutata dal server.
+ */
+export const executeRecurring = createAsyncThunk<
+  Recurring,
+  DeleteRecurringParams
+>("recurring/executeRecurring", async (params, { rejectWithValue }) => {
+  try {
+    const response = await api.post<Recurring>(
+      `/ricorrenze/${params.id}/esegui`,
+    );
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(
+      err.response?.data || "Errore esecuzione ricorrenza",
+    );
+  }
+});

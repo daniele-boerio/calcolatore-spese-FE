@@ -269,6 +269,8 @@
   "recurring_state_active": "attiva",
   "recurring_state_suspended": "sospesa",
   "recurring_state_late": "in ritardo",
+  "recurring_register": "Registra",
+  "recurring_registered": "Ricorrenza registrata",
   "nav_home": "Home",
   "nav_movements": "Movimenti",
   "nav_analysis": "Analisi",

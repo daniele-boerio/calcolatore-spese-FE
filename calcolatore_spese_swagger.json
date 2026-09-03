@@ -2985,7 +2985,55 @@
         }
       }
     },
-    "/ricorrenze/{ricorrenza_id}": {
+    "/ricorrenze/{ricorrenza_id}/esegui": {
+    "post": {
+      "tags": [
+        "Ricorrenze"
+      ],
+      "summary": "Esegui Ricorrenza Ora",
+      "description": "Registra adesso una ricorrenza già scaduta.\n\nServe quando lo scheduler notturno non è passato (macchina spenta, deploy\na cavallo di mezzanotte): la ricorrenza resta indietro e da qui la si\nsblocca a mano. Non anticipa niente — una ricorrenza non ancora scaduta\nviene rifiutata — quindi non può fare doppioni con il task.",
+      "operationId": "esegui_ricorrenza_ora_ricorrenze__ricorrenza_id__esegui_post",
+      "security": [
+        {
+          "HTTPBearer": []
+        }
+      ],
+      "parameters": [
+        {
+          "name": "ricorrenza_id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer",
+            "title": "Ricorrenza Id"
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RicorrenzaOut"
+              }
+            }
+          }
+        },
+        "422": {
+          "description": "Validation Error",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HTTPValidationError"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/ricorrenze/{ricorrenza_id}": {
       "put": {
         "tags": [
           "Ricorrenze"

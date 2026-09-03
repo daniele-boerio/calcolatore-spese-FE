@@ -248,3 +248,24 @@
     color: v.$negative;
   }
 }
+
+// Bottone delle sole scadute: registra adesso quello che lo scheduler non ha
+// registrato stanotte.
+.recurring-row__register {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: v.$r-pill;
+
+  background: v.$accent;
+  color: v.$on-accent;
+  font-family: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &:active {
+    transform: scale(0.97);
+    transition: transform v.$dur-press;
+  }
+}
