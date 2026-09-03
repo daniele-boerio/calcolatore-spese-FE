@@ -1,27 +1,27 @@
 import React, { useState } from "react";
 import { login, register } from "../../features/profile/api_calls";
-import InputText from "../../components/input_text/input_text";
-import Button from "../../components/legacy_button/legacy_button";
+import Button from "../../components/button/button";
 import "./auth_page.scss";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import Password from "../../components/password/password";
 import { useI18n } from "../../i18n/use-i18n";
 import { selectProfileLoading } from "../../features/profile/profile_slice";
 import ForgotPasswordDialog from "../../components/dialog/forgot_password_dialog/forgot_password_dialog";
 
 export default function AuthPage() {
   const { t } = useI18n();
-  const [isLogin, setIsLogin] = useState<boolean>(true);
-  const [email, setEmail] = useState<string>("");
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [forgotDialogVisible, setForgotDialogVisible] = useState(false);
+
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [revealed, setRevealed] = useState(false);
+  const [forgotOpen, setForgotOpen] = useState(false);
 
   const loading = useAppSelector(selectProfileLoading);
   const dispatch = useAppDispatch();
 
-  const handleSubmit = async (e?: React.BaseSyntheticEvent) => {
-    if (e) e.preventDefault();
+  const submit = async (event?: React.FormEvent) => {
+    event?.preventDefault();
 
     if (isLogin) {
       await dispatch(login({ username, password }));
@@ -30,75 +30,152 @@ export default function AuthPage() {
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === "Enter") {
-      handleSubmit(e);
-    }
-  };
+  const canSubmit =
+    username.trim() !== "" &&
+    password !== "" &&
+    (isLogin || email.trim() !== "");
 
   return (
-    <div className="auth-page-wrapper">
-      <div className="auth-container" onKeyDown={handleKeyDown}>
-        <h2>{isLogin ? t("login") : t("sign_in")}</h2>
+    <div className="auth">
+      <form className="auth__form" onSubmit={submit}>
+        <div className="auth__intro">
+          <span className="auth__logo" aria-hidden="true">
+            S
+          </span>
 
-        {!isLogin && (
-          <InputText
-            className="input-email"
-            label={t("email")}
-            value={email}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-            placeholder={t("email_placeholder")}
+          <h1 className="auth__title">
+            {isLogin ? t("auth_welcome_back") : t("auth_welcome")}
+          </h1>
+          <p className="auth__subtitle">
+            {isLogin ? t("auth_subtitle_login") : t("auth_subtitle_register")}
+          </p>
+        </div>
+
+        <div className="auth__fields">
+          {!isLogin && (
+            <Field
+              id="auth-email"
+              label={t("email")}
+              icon="pi pi-envelope"
+              type="email"
+              autoComplete="email"
+              value={email}
+              placeholder={t("email_placeholder")}
+              onChange={setEmail}
+            />
+          )}
+
+          <Field
+            id="auth-username"
+            label={t("username")}
+            icon="pi pi-user"
+            autoComplete="username"
+            value={username}
+            placeholder={t("username_placeholder")}
+            onChange={setUsername}
           />
-        )}
 
-        <InputText
-          className="input-username"
-          label={t("username")}
-          value={username}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setUsername(e.target.value)
-          }
-          placeholder={t("username_placeholder")}
-        />
+          <Field
+            id="auth-password"
+            label={t("password")}
+            icon="pi pi-lock"
+            type={revealed ? "text" : "password"}
+            autoComplete={isLogin ? "current-password" : "new-password"}
+            value={password}
+            placeholder={t("password_placeholder")}
+            onChange={setPassword}
+            trailing={
+              <button
+                type="button"
+                className="auth__reveal"
+                aria-label={t(revealed ? "auth_hide" : "auth_show")}
+                onClick={() => setRevealed((current) => !current)}
+              >
+                <i
+                  className={`pi ${revealed ? "pi-eye-slash" : "pi-eye"}`}
+                  aria-hidden="true"
+                />
+              </button>
+            }
+          />
 
-        <Password
-          className="input-password"
-          label={t("password")}
-          value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setPassword(e.target.value)
-          }
-          placeholder={t("password_placeholder")}
-          feedback={!isLogin}
-          toggleMask={true}
-        />
+          {isLogin && (
+            <button
+              type="button"
+              className="auth__forgot"
+              onClick={() => setForgotOpen(true)}
+            >
+              {t("forgot_password_question")}
+            </button>
+          )}
+        </div>
 
-        <Button
-          className="btn-submit"
-          onClick={handleSubmit}
-          label={isLogin ? t("login") : t("sign_in")}
-          loading={loading}
-        />
+        <div className="auth__actions">
+          <Button type="submit" block disabled={!canSubmit || loading}>
+            {isLogin ? t("login") : t("sign_in")}
+          </Button>
 
-        <p className="auth-toggle-text">
-          {isLogin ? t("no_account") : t("account")}
-          <span onClick={() => setIsLogin(!isLogin)}>
-            {isLogin ? t("sign_in_space") : t("login_space")}
-          </span>
-        </p>
-        <p className="auth-toggle-text">
-          {t("forgot_password_question")}{" "}
-          <span onClick={() => setForgotDialogVisible(true)}>
-            {t("forgot_password")}
-          </span>
-        </p>
-      </div>
+          <p className="auth__switch">
+            {isLogin ? t("no_account") : t("account")}{" "}
+            <button type="button" onClick={() => setIsLogin(!isLogin)}>
+              {isLogin ? t("sign_in") : t("login")}
+            </button>
+          </p>
+        </div>
+      </form>
+
       <ForgotPasswordDialog
-        visible={forgotDialogVisible}
-        onHide={() => setForgotDialogVisible(false)}
+        visible={forgotOpen}
+        onHide={() => setForgotOpen(false)}
       />
+    </div>
+  );
+}
+
+type FieldProps = {
+  id: string;
+  label: string;
+  icon: string;
+  value: string;
+  placeholder?: string;
+  type?: string;
+  autoComplete?: string;
+  onChange: (value: string) => void;
+  /** Bottone a destra dentro al campo (l'occhio della password). */
+  trailing?: React.ReactNode;
+};
+
+function Field({
+  id,
+  label,
+  icon,
+  value,
+  placeholder,
+  type = "text",
+  autoComplete,
+  onChange,
+  trailing,
+}: FieldProps) {
+  return (
+    <div className="auth__field">
+      <label className="auth__label" htmlFor={id}>
+        {label}
+      </label>
+
+      <div className="auth__control">
+        <i className={`${icon} auth__icon`} aria-hidden="true" />
+
+        <input
+          id={id}
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          onChange={(event) => onChange(event.target.value)}
+        />
+
+        {trailing}
+      </div>
     </div>
   );
 }
