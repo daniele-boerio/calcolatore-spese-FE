@@ -1,190 +1,273 @@
 @use "../../styles/variables" as v;
 
-.investimenti-page {
+// Coppia etichetta/valore delle griglie: la usano il riepilogo e ogni titolo.
+.figure {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
-  width: 100%;
-  padding: 1rem;
-  animation: fadeIn 0.3s ease-in;
+  min-width: 0;
 
-  .page-header {
-    display: flex;
-    justify-content: space-between;
-    gap: 1rem;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid v.$border-color;
-
-    h1 {
-      margin: 0;
-      font-size: 1.75rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: v.$text-main;
-    }
-
-    .subtitle {
-      margin: 0;
-      color: v.$text-muted;
-      font-size: 0.9rem;
-    }
+  &__label {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: v.$muted;
   }
 
-  .header-content {
+  &__value {
+    font-size: 14.5px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.investments {
+  &__header {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 16px;
   }
 
-  .add-investment-button {
-    position: fixed;
-    bottom: 2rem;
-    right: 2rem;
-    z-index: 1000;
-  }
-}
-
-.investments-grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
-}
-
-.investment-card {
-  background: v.$bg-card;
-  border: 1px solid v.$border-color;
-  border-radius: v.$radius-lg;
-  box-shadow: v.$shadow-sm;
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  transition:
-    transform v.$transition-base,
-    box-shadow v.$transition-base;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: v.$shadow-md;
-  }
-}
-
-.inv-card-top {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: flex-start;
-
-  .inv-title h2 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: v.$text-main;
-  }
-
-  .inv-tags {
+  &__top {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    margin-top: 0.4rem;
+    align-items: center;
+    gap: 12px;
   }
 
-  .inv-tag {
-    padding: 0.15rem 0.55rem;
-    border-radius: v.$radius-pill;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+  &__back {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: v.$tap-target;
+    height: v.$tap-target;
+    margin-left: -10px;
 
-    &.ticker {
-      background: rgba(59, 130, 246, 0.16);
-      color: v.$light-blue;
-    }
+    border: 0;
+    background: transparent;
+    color: v.$ink;
+    cursor: pointer;
 
-    &.isin {
-      background: v.$surface-hover;
-      color: v.$text-muted;
+    i {
+      font-size: 16px;
     }
   }
 
-  .inv-pnl-badge {
-    flex-shrink: 0;
-    padding: 0.3rem 0.6rem;
-    border-radius: v.$radius-pill;
-    font-size: 0.8rem;
+  &__summary {
+    gap: 16px;
+  }
+
+  &__summary-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  &__market {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: v.$muted;
+  }
+
+  &__market-value {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: v.$r-pill;
+    font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
 
-    &.positive {
-      background: rgba(34, 197, 94, 0.16);
-      color: v.$green;
+    i {
+      font-size: 10px;
     }
 
-    &.negative {
-      background: rgba(239, 68, 68, 0.16);
-      color: v.$red;
+    &--up {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+
+    &--down {
+      background: v.$negative-soft;
+      color: v.$negative;
+    }
+  }
+
+  &__pair {
+    display: flex;
+    gap: 20px;
+  }
+
+  &__list {
+    gap: 12px;
+  }
+
+  &__add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px;
+
+    border: 1px dashed v.$line;
+    border-radius: 18px;
+    background: transparent;
+    color: v.$accent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+
+    i {
+      font-size: 13px;
     }
   }
 }
 
-.inv-metrics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.6rem 1rem;
+.titolo {
+  gap: 16px;
 
-  .inv-metric {
+  &__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  &__identity {
     display: flex;
     flex-direction: column;
-    gap: 0.1rem;
+    gap: 6px;
+    min-width: 0;
+  }
 
-    span {
-      font-size: 0.75rem;
-      color: v.$text-muted;
-    }
+  &__name {
+    font-size: 15.5px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
 
-    strong {
-      font-size: 0.95rem;
-      color: v.$text-main;
-    }
+  &__codes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
 
-    &.highlight strong {
-      color: v.$light-blue;
+  // Ticker e ISIN sono etichette, non azioni: pillole piccole e mute.
+  &__code {
+    padding: 3px 8px;
+    border-radius: v.$r-pill;
+    background: v.$surface-2;
+    color: v.$muted;
+    font-size: 10.5px;
+    font-weight: 600;
+
+    &--ticker {
+      background: v.$accent-soft;
+      color: v.$accent;
+      font-weight: 700;
     }
   }
-}
 
-.inv-updated {
-  margin: 0;
-  font-size: 0.75rem;
-  color: v.$text-muted;
-}
+  &__gain {
+    flex: 0 0 auto;
+    padding: 5px 9px;
+    border-radius: v.$r-pill;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
 
-.inv-card-actions {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-top: auto;
-  padding-top: 0.5rem;
-  border-top: 1px solid v.$border-color;
-}
+    &--up {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
 
-.no-data {
-  padding: 2rem;
-  text-align: center;
-  color: v.$text-muted;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
+    &--down {
+      background: v.$negative-soft;
+      color: v.$negative;
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 16px;
+  }
+
+  &__value {
+    color: v.$accent;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid v.$line-soft;
+  }
+
+  &__updated {
+    font-size: 11.5px;
+    color: v.$muted;
+  }
+
+  &__actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+  }
+
+  &__action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+
+    border: 0;
+    border-radius: v.$r-pill;
+    background: v.$surface-2;
+    color: v.$muted;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+
+    i {
+      font-size: 13px;
+    }
+
+    &--wide {
+      width: auto;
+      padding: 0 12px;
+      color: v.$ink;
+    }
+
+    &--danger {
+      background: v.$negative-soft;
+      color: v.$negative;
+    }
+
+    &:active {
+      transform: scale(0.97);
+      transition: transform v.$dur-press;
+    }
   }
 }
