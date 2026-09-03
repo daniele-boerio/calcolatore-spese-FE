@@ -1,0 +1,214 @@
+@use "../../../styles/variables" as v;
+
+.year-card {
+  gap: 18px;
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    font-size: 12.5px;
+    color: v.$muted;
+
+    strong .amount {
+      color: v.$positive;
+      font-weight: 700;
+    }
+  }
+}
+
+// ── Entrate e uscite, due barre per mese ────────────────────────────────────
+.year-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  height: 158px;
+
+  &__group {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__pair {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    width: 100%;
+    height: 130px;
+  }
+
+  &__bar {
+    flex: 1;
+    border-radius: 6px 6px 0 0;
+    // Una barra a zero deve restare visibile come "zero", non sparire.
+    min-height: 2px;
+
+    &--in {
+      background: v.$accent;
+    }
+
+    &--out {
+      background: v.$surface-2;
+    }
+
+    // Il mese in corso è ancora incompleto: si distingue dagli altri.
+    &--current {
+      background: v.$accent-2;
+    }
+  }
+
+  &__label {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: v.$muted-2;
+    text-transform: capitalize;
+
+    &--current {
+      color: v.$ink;
+      font-weight: 700;
+    }
+  }
+}
+
+.year-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 12px;
+  color: v.$muted;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+
+    &--in {
+      background: v.$accent;
+    }
+
+    &--out {
+      background: v.$surface-2;
+    }
+
+    &--current {
+      background: v.$accent-2;
+    }
+  }
+}
+
+// ── Trend del risparmio ─────────────────────────────────────────────────────
+.year-trend {
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    border-radius: v.$r-pill;
+    font-size: 12px;
+    font-weight: 700;
+
+    &--up {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+
+    &--down {
+      background: v.$negative-soft;
+      color: v.$negative;
+    }
+  }
+
+  &__chart {
+    display: block;
+    width: 100%;
+    height: 150px;
+  }
+
+  &__area {
+    fill: v.$accent-soft;
+  }
+
+  &__line {
+    fill: none;
+    stroke: v.$accent;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  // Tendenza: tratteggiata, perché è una lettura, non un dato.
+  &__guide {
+    stroke: v.$muted-2;
+    stroke-width: 1.5;
+    stroke-dasharray: 5 5;
+  }
+
+  &__dot {
+    fill: v.$accent;
+  }
+
+  &__labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: v.$muted-2;
+    text-transform: capitalize;
+  }
+}
+
+// ── Tabella dei totali ──────────────────────────────────────────────────────
+.year-totals {
+  gap: 0;
+  padding: 6px 20px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 0;
+
+    & + & {
+      border-top: 1px solid v.$line-soft;
+    }
+  }
+
+  &__label {
+    font-size: 13.5px;
+    color: v.$muted;
+  }
+
+  &__value {
+    font-size: 14.5px;
+    font-weight: 700;
+  }
+
+  &__row--net &__label {
+    color: v.$ink;
+    font-weight: 700;
+  }
+
+  &__net {
+    font-size: 16px;
+    font-weight: 800;
+  }
+}

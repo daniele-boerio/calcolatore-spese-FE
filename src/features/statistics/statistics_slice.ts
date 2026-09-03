@@ -3,6 +3,7 @@ import { RootState } from "../../store/store";
 import {
   MonthlyDetailCategory,
   MonthlyDetailResponse,
+  YearDetailsResponse,
   YearDetailsStatRow,
 } from "./interfaces";
 import {
@@ -14,6 +15,12 @@ import {
 
 interface StatisticsState {
   yearlyData: YearDetailsStatRow[];
+  /** Totali dell'anno selezionato; le uscite arrivano negative. */
+  yearlyTotals: {
+    incomes: number;
+    expenses: number;
+    accantonamento: number;
+  };
   monthlyData: MonthlyDetailCategory[];
   totals: {
     incomes: number;
@@ -30,6 +37,7 @@ interface StatisticsState {
 
 const initialState: StatisticsState = {
   yearlyData: [],
+  yearlyTotals: { incomes: 0, expenses: 0, accantonamento: 0 },
   monthlyData: [],
   totals: {
     incomes: 0,
@@ -58,9 +66,14 @@ const statisticsSlice = createSlice({
     builder
       .addCase(
         getYearDetailsStatistics.fulfilled,
-        (state, action: PayloadAction<YearDetailsStatRow[]>) => {
+        (state, action: PayloadAction<YearDetailsResponse>) => {
           state.loading = false;
-          state.yearlyData = action.payload;
+          state.yearlyData = action.payload.data;
+          state.yearlyTotals = {
+            incomes: Number(action.payload.totale_entrata ?? 0),
+            expenses: Number(action.payload.totale_uscita ?? 0),
+            accantonamento: Number(action.payload.totale_accantonamento ?? 0),
+          };
         },
       )
 
@@ -115,6 +128,9 @@ export const selectMonthlyStatisticsData = (state: RootState) =>
   state.statistics.monthlyData;
 export const selectMonthlyTotals = (state: RootState) =>
   state.statistics.totals;
+export const selectYearlyTotals = (state: RootState) =>
+  state.statistics.yearlyTotals;
+
 export const selectPreviousMonthSavings = (state: RootState) =>
   state.statistics.previousTotal;
 

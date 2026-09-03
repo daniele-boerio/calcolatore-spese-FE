@@ -4,7 +4,7 @@ import { AxiosError } from "axios";
 import {
   FetchYearStatisticsParams,
   FetchMonthStatisticsParams,
-  YearDetailsStatRow,
+  YearDetailsResponse,
   MonthlyDetailResponse,
 } from "./interfaces";
 import { toIsoDate } from "../../services/dates";
@@ -12,11 +12,13 @@ import { toIsoDate } from "../../services/dates";
 // --- API CALLS ---
 
 export const getYearDetailsStatistics = createAsyncThunk<
-  YearDetailsStatRow[],
+  YearDetailsResponse,
   FetchYearStatisticsParams
 >("statistics/yearDetails", async (params, { rejectWithValue }) => {
   try {
-    const response = await api.get<{ data: YearDetailsStatRow[] }>(
+    // La risposta porta anche i totali dell'anno: servono alla tabella in
+    // fondo alla vista Anno, e prima venivano buttati via.
+    const response = await api.get<YearDetailsResponse>(
       "/statistics/yearDetails",
       {
         params: {
@@ -26,7 +28,7 @@ export const getYearDetailsStatistics = createAsyncThunk<
         },
       },
     );
-    return response.data.data;
+    return response.data;
   } catch (error) {
     const err = error as AxiosError;
     return rejectWithValue(

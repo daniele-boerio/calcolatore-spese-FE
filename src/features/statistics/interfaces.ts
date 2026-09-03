@@ -3,6 +3,15 @@ export interface YearDetailsStatRow {
   [key: string]: number; // Chiavi dinamiche per categorie (es. "Stipendio": 1500, "Spesa": -400)
 }
 
+/** Risposta di `/statistics/yearDetails`: le righe più i totali dell'anno. */
+export interface YearDetailsResponse {
+  data: YearDetailsStatRow[];
+  totale_entrata: number;
+  /** Negativo, come in `monthDetails`. */
+  totale_uscita: number;
+  totale_accantonamento: number;
+}
+
 export interface FetchYearStatisticsParams {
   year: number;
   categoria_id?: string | null;

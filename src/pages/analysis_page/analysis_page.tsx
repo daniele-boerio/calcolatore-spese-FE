@@ -12,10 +12,10 @@ import "./analysis_page.scss";
 // Statistiche e Grafici erano due voci di menu distinte: ora sono tre viste
 // della stessa schermata.
 const MonthStatistics = lazy(
-  () => import("../statistics_page/month_statistics/month_statistics"),
+  () => import("./month_statistics/month_statistics"),
 );
 const YearStatistics = lazy(
-  () => import("../statistics_page/year_statistics/year_statistics"),
+  () => import("./year_statistics/year_statistics"),
 );
 const ChartsPage = lazy(() => import("../charts_page/charts_page"));
 
@@ -72,7 +72,7 @@ export default function AnalysisPage() {
       case "month":
         return <MonthStatistics year={year} month={month} tagId={tagId} />;
       case "year":
-        return <YearStatistics />;
+        return <YearStatistics year={year} tagId={tagId} />;
       case "categories":
         return <ChartsPage />;
     }
