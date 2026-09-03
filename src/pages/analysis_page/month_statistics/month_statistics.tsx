@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { Card, CardTitle } from "../../../components/card/card";
 import Amount from "../../../components/amount/amount";
@@ -23,8 +24,6 @@ import { getExpenseCompositionChart } from "../../../features/charts/api_calls";
 import { selectChartsExpenseComposition } from "../../../features/charts/charts_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
-import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
-import { TransactionsListFilters } from "../../../components/dialog/transactions_list_dialog/transactions_query";
 import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../services/dates";
 
 // Mesi su cui si misura il "sopra media" e categorie mostrate: entrambi dal
@@ -52,6 +51,7 @@ export default function MonthStatistics({
 }: MonthStatisticsProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const data = useAppSelector(selectMonthlyStatisticsData);
   const totals = useAppSelector(selectMonthlyTotals);
@@ -60,10 +60,6 @@ export default function MonthStatistics({
   const composition = useAppSelector(selectChartsExpenseComposition);
   const categorie = useAppSelector(selectCategoriaCategorie);
   const loading = useAppSelector(selectStatisticsLoading);
-
-  const [dialogTitle, setDialogTitle] = useState("");
-  const [dialogFilters, setDialogFilters] =
-    useState<TransactionsListFilters | null>(null);
 
   useEffect(() => {
     dispatch(getCategorie());
@@ -139,13 +135,15 @@ export default function MonthStatistics({
     const categoria = categorie.find((item) => item.nome === nome);
     if (!categoria) return;
 
-    setDialogFilters({
-      categoria_id: categoria.id,
-      tag_id: tagId || undefined,
-      data_inizio: toIsoDate(new Date(year, month - 1, 1)),
-      data_fine: toIsoDate(new Date(year, month, 0)),
+    // Il periodo viaggia con il link: la pagina di dettaglio apre sullo stesso
+    // mese che si stava guardando, non su quello corrente.
+    const query = new URLSearchParams({
+      anno: String(year),
+      mese: String(month),
     });
-    setDialogTitle(nome);
+    if (tagId) query.set("tag", tagId);
+
+    navigate(`/categories/${categoria.id}?${query.toString()}`);
   };
 
   const sentence = (insight: Insight) => {
@@ -344,12 +342,6 @@ export default function MonthStatistics({
         </Card>
       )}
 
-      <TransactionsListDialog
-        visible={dialogFilters !== null}
-        onHide={() => setDialogFilters(null)}
-        title={dialogTitle}
-        filters={dialogFilters ?? {}}
-      />
     </>
   );
 }

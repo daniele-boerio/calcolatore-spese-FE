@@ -32,6 +32,11 @@ export interface Trend {
   guide: { x1: number; y1: number; x2: number; y2: number } | null;
   /** Pendenza della tendenza, nell'unità dei valori per passo. */
   slope: number;
+  /**
+   * Dove finisce un valore qualunque sull'asse verticale. Serve a tracciare
+   * righe di riferimento (la media) sulla stessa scala della linea.
+   */
+  scaleY: (value: number) => number;
 }
 
 /**
@@ -100,7 +105,7 @@ export function buildTrend(values: number[], box: TrendBox): Trend | null {
         }
       : null;
 
-  return { points, line, area, guide, slope };
+  return { points, line, area, guide, slope, scaleY: yOf };
 }
 
 // Mezzo pixel di precisione basta e tiene il markup leggibile.

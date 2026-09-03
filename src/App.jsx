@@ -27,6 +27,9 @@ const TransactionPage = lazy(
   () => import("./pages/transaction_page/transaction_page"),
 );
 const CategoryPage = lazy(() => import("./pages/category_page/category_page"));
+const CategoryDetailPage = lazy(
+  () => import("./pages/category_detail_page/category_detail_page"),
+);
 const ContiPage = lazy(() => import("./pages/conti_page/conti_page"));
 const DebitiPage = lazy(() => import("./pages/debiti_page/debiti_page"));
 const TagsPage = lazy(() => import("./pages/tags_page/tags_page"));
@@ -104,6 +107,11 @@ function App() {
 
                 {/* Destinazioni secondarie, raggiunte dalla lista in "Conti" */}
                 <Route path="/categories" element={<CategoryPage />} />
+                {/* Dettaglio di una categoria, aperto da Analisi. */}
+                <Route
+                  path="/categories/:id"
+                  element={<CategoryDetailPage />}
+                />
                 <Route path="/tags" element={<TagsPage />} />
                 <Route path="/recurrings" element={<RecurringsPage />} />
                 <Route path="/debts" element={<DebitiPage />} />

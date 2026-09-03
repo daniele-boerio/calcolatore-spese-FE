@@ -74,3 +74,19 @@ describe("buildTrend", () => {
     expect(trend.guide!.y2).toBeLessThan(trend.guide!.y1);
   });
 });
+
+describe("scaleY", () => {
+  it("porta un valore qualunque sulla stessa scala della linea", () => {
+    const trend = buildTrend([100, 500], box)!;
+
+    // La media di 100 e 500 cade a metà fra i due punti disegnati.
+    expect(trend.scaleY(300)).toBeCloseTo((box.top + box.bottom) / 2);
+  });
+
+  it("è coerente con gli estremi della serie", () => {
+    const trend = buildTrend([100, 500, 300], box)!;
+
+    expect(trend.scaleY(100)).toBe(box.bottom);
+    expect(trend.scaleY(500)).toBe(box.top);
+  });
+});

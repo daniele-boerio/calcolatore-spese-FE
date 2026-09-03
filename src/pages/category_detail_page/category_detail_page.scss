@@ -1,0 +1,225 @@
+@use "../../styles/variables" as v;
+
+.category-detail {
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__back {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: v.$tap-target;
+    height: v.$tap-target;
+    margin-left: -10px;
+
+    border: 0;
+    background: transparent;
+    color: v.$ink;
+    cursor: pointer;
+
+    i {
+      font-size: 16px;
+    }
+  }
+
+  &__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+
+    font-family: v.$font-display;
+    font-size: 22px;
+    font-weight: v.$fw-display;
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__period {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 9px 14px;
+
+    border: 1px solid v.$line;
+    border-radius: v.$r-pill;
+    background: v.$surface;
+    color: v.$muted;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    text-transform: capitalize;
+    cursor: pointer;
+
+    i {
+      font-size: 10px;
+    }
+  }
+
+  &__summary {
+    gap: 16px;
+  }
+
+  &__figures {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__current {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: v.$muted;
+  }
+
+  &__value {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
+
+  &__average {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    text-align: right;
+
+    .amount {
+      font-size: 14px;
+      font-weight: 700;
+    }
+  }
+
+  &__average-label {
+    font-size: 12px;
+    color: v.$muted;
+  }
+
+  &__movements {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__card {
+    gap: 0;
+    padding: 4px 16px;
+    border-radius: v.$r-inner;
+  }
+}
+
+// ── Sparkline della categoria ───────────────────────────────────────────────
+.spark {
+  display: block;
+  width: 100%;
+  height: 120px;
+
+  &__line {
+    fill: none;
+    stroke: v.$accent;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  // La media dei mesi è una riga di riferimento, non un dato: tratteggiata.
+  &__average {
+    stroke: v.$muted-2;
+    stroke-width: 1.5;
+    stroke-dasharray: 4 5;
+  }
+
+  &__dot {
+    fill: v.$accent;
+  }
+
+  &__labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: v.$muted-2;
+    text-transform: capitalize;
+  }
+}
+
+// ── Sottocategorie ──────────────────────────────────────────────────────────
+.sub-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &__row {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13.5px;
+  }
+
+  &__name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__value {
+    font-weight: 700;
+  }
+
+  &__track {
+    display: block;
+    height: 6px;
+    border-radius: v.$r-pill;
+    background: v.$surface-2;
+    overflow: hidden;
+  }
+
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: v.$r-pill;
+
+    &--1 {
+      background: v.$series-1;
+    }
+    &--2 {
+      background: v.$series-2;
+    }
+    &--3 {
+      background: v.$series-3;
+    }
+    &--4 {
+      background: v.$series-4;
+    }
+    &--5 {
+      background: v.$series-5;
+    }
+  }
+}
