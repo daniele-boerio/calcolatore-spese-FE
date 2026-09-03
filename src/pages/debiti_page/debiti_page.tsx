@@ -1,193 +1,310 @@
-import React, { useEffect, useState } from "react";
-import { confirmPopup } from "primereact/confirmpopup";
-import { useAppDispatch, useAppSelector } from "../../store/store";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
-import Button from "../../components/legacy_button/legacy_button";
-import { getDebiti, deleteDebito } from "../../features/debiti/api_calls";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { Page, PageContent, PageHeader } from "../../components/page/page";
+import { Card } from "../../components/card/card";
+import Amount from "../../components/amount/amount";
+import Alert from "../../components/alert/alert";
+import ProgressBar from "../../components/progress_bar/progress_bar";
+import EmptyState from "../../components/empty_state/empty_state";
+import SkeletonList from "../../components/skeleton/skeleton";
+import Button from "../../components/button/button";
+import DebitoDialog from "../../components/dialog/debito_dialog/debito_dialog";
+import PayDebitoDialog from "../../components/dialog/pay_debito_dialog/pay_debito_dialog";
+import "./debiti_page.scss";
+import { deleteDebito, getDebiti } from "../../features/debiti/api_calls";
 import {
   selectDebitiDebiti,
   selectDebitiLoading,
 } from "../../features/debiti/debito_slice";
-import DebitoDialog from "../../components/dialog/debito_dialog/debito_dialog";
-import PayDebitoDialog from "../../components/dialog/pay_debito_dialog/pay_debito_dialog";
+import { Debito } from "../../features/debiti/interfaces";
 import { getConti } from "../../features/conti/api_calls";
 import { selectContiConti } from "../../features/conti/conto_slice";
-import { Debito } from "../../features/debiti/interfaces";
-import "./debiti_page.scss";
+import { showToast } from "../../features/ui/ui_slice";
+
+/** Quanto resta da restituire: `residuo` a null vuol dire "tutto". */
+const residuoOf = (debito: Debito) =>
+  Number(debito.residuo ?? debito.ammontare);
+
+const isOpen = (debito: Debito) => residuoOf(debito) > 0;
 
 export default function DebitiPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const debiti = useAppSelector(selectDebitiDebiti);
   const loading = useAppSelector(selectDebitiLoading);
   const conti = useAppSelector(selectContiConti);
 
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
-  const [selectedDebito, setSelectedDebito] = useState<Debito | null>(null);
-  const [isPayDialogVisible, setIsPayDialogVisible] = useState(false);
-  const [debitoToPay, setDebitoToPay] = useState<Debito | null>(null);
+  const [editing, setEditing] = useState<Debito | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [paying, setPaying] = useState<Debito | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Debito | null>(null);
 
   useEffect(() => {
     dispatch(getDebiti());
     dispatch(getConti());
   }, [dispatch]);
 
-  const openCreateDialog = () => {
-    setSelectedDebito(null);
-    setIsDialogVisible(true);
+  const totals = useMemo(() => {
+    const open = debiti.filter(isOpen);
+
+    return {
+      open: open.length,
+      closed: debiti.length - open.length,
+      // Il totale contrattato conta tutti i debiti: la percentuale rimborsata
+      // deve includere quelli già chiusi, o al primo estinto scenderebbe.
+      contracted: debiti.reduce(
+        (sum, debito) => sum + Number(debito.ammontare),
+        0,
+      ),
+      residual: debiti.reduce((sum, debito) => sum + residuoOf(debito), 0),
+    };
+  }, [debiti]);
+
+  const repaid =
+    totals.contracted > 0
+      ? (totals.contracted - totals.residual) / totals.contracted
+      : 0;
+
+  const openDialog = (debito: Debito | null) => {
+    setEditing(debito);
+    setDialogOpen(true);
   };
 
-  const openEditDialog = (debito: Debito) => {
-    setSelectedDebito(debito);
-    setIsDialogVisible(true);
+  const confirmDelete = () => {
+    if (!pendingDelete) return;
+
+    dispatch(deleteDebito({ id: pendingDelete.id, force: true }));
+    dispatch(showToast({ variant: "success", title: t("debts_deleted") }));
+    setPendingDelete(null);
   };
 
-  const openPayDialog = (debito: Debito) => {
-    setDebitoToPay(debito);
-    setIsPayDialogVisible(true);
-  };
-
-  const deleteDebt = (
-    event: React.MouseEvent<unknown>,
-    id: string,
-  ) => {
-    confirmPopup({
-      target: event.currentTarget as HTMLElement,
-      message: t("delete_message"),
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
-      acceptLabel: t("yes"),
-      rejectLabel: t("no"),
-      accept: () => {
-        dispatch(deleteDebito({ id, force: true }));
-      },
-    });
-  };
-
-  const refreshDebiti = () => {
-    dispatch(getDebiti());
-  };
+  const contoOf = (debito: Debito) =>
+    conti.find((conto) => String(conto.id) === String(debito.conto_id))?.nome;
 
   return (
     <>
-      <div className="debiti-page">
-        <header className="page-header">
-          <div className="header-content">
-            <h1>{t("debts_title")}</h1>
-            <p className="subtitle">{t("debts_subtitle")}</p>
+      <Page className="debts">
+        <PageHeader className="debts__header">
+          <div className="debts__top">
+            <button
+              type="button"
+              className="debts__back"
+              aria-label={t("back")}
+              onClick={() => navigate(-1)}
+            >
+              <i className="pi pi-arrow-left" aria-hidden="true" />
+            </button>
+            <h1 className="page-title">{t("nav_debts")}</h1>
           </div>
-        </header>
 
-        <div className="debts-grid">
-          {debiti.length > 0 ? (
-            debiti.map((debito) => {
-              const accountName = conti.find(
-                (conto) => conto.id === debito.conto_id,
-              )?.nome;
-              const residualLabel =
-                debito.residuo !== null
-                  ? debito.residuo.toLocaleString("it-IT", {
-                      minimumFractionDigits: 2,
-                    })
-                  : "-";
-              return (
-                <article key={debito.id} className="debt-card">
-                  <div className="debt-card-top">
-                    <div>
-                      <h2>{debito.nome}</h2>
-                      <div className="debt-badges">
-                        <span
-                          className={`debt-status ${debito.residuo === 0 ? "paid" : "open"}`}
-                        >
-                          {debito.residuo === 0
-                            ? t("debt_paid")
-                            : t("debt_open")}
-                        </span>
-                      </div>
-                    </div>
-                    <div className="debt-amounts">
-                      <div className="debt-amount-row">
-                        <span>{t("debt_amount")}</span>
-                        <strong>
-                          {debito.ammontare.toLocaleString("it-IT", {
-                            minimumFractionDigits: 2,
-                          })}{" "}
-                          €
-                        </strong>
-                      </div>
-                      <div className="debt-amount-row">
-                        <span>{t("debt_residual")}</span>
-                        <strong>{residualLabel} €</strong>
-                      </div>
-                    </div>
-                  </div>
+          <Card className="debts__summary">
+            <div className="debts__summary-top">
+              <span className="debts__eyebrow">{t("debts_residual_total")}</span>
+              <span className="debts__counts">
+                {`${totals.open} ${t("debts_open")} · ${totals.closed} ${t("debts_closed")}`}
+              </span>
+            </div>
 
-                  <div className="debt-card-content">
-                    <p>
-                      <strong>{t("debt_description")}:</strong>{" "}
-                      {debito.descrizione || t("no_description")}
-                    </p>
-                    {accountName && (
-                      <p>
-                        <strong>{t("debt_account")}:</strong> {accountName}
-                      </p>
-                    )}
-                  </div>
+            <Amount
+              className="debts__residual"
+              value={totals.residual}
+              tone={totals.residual > 0 ? "negative" : "positive"}
+            />
 
-                  <div className="debt-card-actions">
-                    <Button
-                      className="trasparent-button"
-                      icon="pi pi-pencil"
-                      compact
-                      onClick={() => openEditDialog(debito)}
-                    />
-                    <Button
-                      className="trasparent-button"
-                      icon="pi pi-dollar"
-                      compact
-                      onClick={() => openPayDialog(debito)}
-                      disabled={debito.residuo === 0}
-                    />
-                    <Button
-                      className="trasparent-danger-button"
-                      icon="pi pi-trash"
-                      compact
-                      onClick={(event) => deleteDebt(event, debito.id)}
-                    />
-                  </div>
-                </article>
-              );
-            })
+            {totals.contracted > 0 && (
+              <div className="debts__progress">
+                <ProgressBar
+                  height={8}
+                  label={t("debts_repaid")}
+                  segments={[{ value: repaid, tone: "accent" }]}
+                />
+
+                <span className="debts__legend">
+                  {`${t("debts_repaid")} `}
+                  <strong>{`${Math.round(repaid * 100)}%`}</strong>
+                  {" "}
+                  {t("debts_of")}{" "}
+                  <Amount value={totals.contracted} decimals={0} />
+                </span>
+              </div>
+            )}
+          </Card>
+        </PageHeader>
+
+        <PageContent className="debts__list">
+          {loading && debiti.length === 0 ? (
+            <Card>
+              <SkeletonList />
+            </Card>
+          ) : debiti.length === 0 ? (
+            <EmptyState
+              icon="pi pi-receipt"
+              title={t("debts_empty_title")}
+              description={t("debts_empty_text")}
+              actions={
+                <Button size="sm" onClick={() => openDialog(null)}>
+                  {t("debts_add")}
+                </Button>
+              }
+            />
           ) : (
-            <p className="no-data">{t("no_data")}</p>
-          )}
-        </div>
+            <>
+              {debiti.map((debito) => (
+                <DebitoCard
+                  key={debito.id}
+                  debito={debito}
+                  conto={contoOf(debito)}
+                  onPay={() => setPaying(debito)}
+                  onEdit={() => openDialog(debito)}
+                  onDelete={() => setPendingDelete(debito)}
+                />
+              ))}
 
-        <Button
-          icon="pi pi-plus"
-          className="add-debt-button"
-          compact
-          rounded
-          onClick={openCreateDialog}
-        />
-      </div>
+              <button
+                type="button"
+                className="debts__add"
+                onClick={() => openDialog(null)}
+              >
+                <i className="pi pi-plus" aria-hidden="true" />
+                {t("debts_add")}
+              </button>
+            </>
+          )}
+        </PageContent>
+      </Page>
 
       <DebitoDialog
-        visible={isDialogVisible}
-        onHide={() => setIsDialogVisible(false)}
-        debito={selectedDebito}
-        loading={loading}
-        onSaved={refreshDebiti}
+        visible={dialogOpen}
+        debito={editing}
+        onHide={() => {
+          setDialogOpen(false);
+          setEditing(null);
+        }}
+        onSaved={() => dispatch(getDebiti())}
       />
 
       <PayDebitoDialog
-        visible={isPayDialogVisible}
-        onHide={() => setIsPayDialogVisible(false)}
-        debito={debitoToPay}
-        loading={loading}
-        onPaid={refreshDebiti}
+        visible={paying !== null}
+        debito={paying}
+        onHide={() => setPaying(null)}
+        onPaid={() => {
+          dispatch(getDebiti());
+          // Il pagamento è una transazione vera: il saldo del conto si è mosso.
+          dispatch(getConti());
+        }}
+      />
+
+      <Alert
+        open={pendingDelete !== null}
+        title={t("debts_delete_title")}
+        description={t("debts_delete_text")}
+        confirmLabel={t("delete")}
+        cancelLabel={t("cancel")}
+        onConfirm={confirmDelete}
+        onCancel={() => setPendingDelete(null)}
       />
     </>
+  );
+}
+
+function DebitoCard({
+  debito,
+  conto,
+  onPay,
+  onEdit,
+  onDelete,
+}: {
+  debito: Debito;
+  conto?: string;
+  onPay: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const { t } = useI18n();
+
+  const residuo = residuoOf(debito);
+  const ammontare = Number(debito.ammontare);
+  const open = residuo > 0;
+  const repaid = ammontare > 0 ? (ammontare - residuo) / ammontare : 1;
+
+  // Un debito chiuso non ha più niente da fare: resta come riga di storia.
+  if (!open) {
+    return (
+      <Card className="debt debt--closed">
+        <div className="debt__closed-row">
+          <div className="debt__identity">
+            <span className="debt__name">{debito.nome}</span>
+            <span className="debt__badge debt__badge--paid">
+              {t("debts_state_paid")}
+            </span>
+          </div>
+
+          <Amount className="debt__closed-value" value={ammontare} />
+        </div>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className="debt">
+      <div className="debt__head">
+        <div className="debt__identity">
+          <span className="debt__name">{debito.nome}</span>
+          <span className="debt__badge debt__badge--open">
+            {t("debts_state_open")}
+          </span>
+        </div>
+
+        <div className="debt__figures">
+          <Amount className="debt__residual" value={residuo} />
+          <span className="debt__of">
+            {`${t("debts_of")} `}
+            <Amount value={ammontare} />
+          </span>
+        </div>
+      </div>
+
+      <ProgressBar
+        label={debito.nome}
+        segments={[{ value: repaid, tone: "accent" }]}
+      />
+
+      <div className="debt__meta">
+        {debito.descrizione && <span>{debito.descrizione}</span>}
+        {conto && <span>{conto}</span>}
+      </div>
+
+      <div className="debt__actions">
+        <button
+          type="button"
+          className="debt__action debt__action--primary"
+          onClick={onPay}
+        >
+          {t("debts_pay")}
+        </button>
+
+        <button
+          type="button"
+          className="debt__action"
+          aria-label={t("edit")}
+          onClick={onEdit}
+        >
+          <i className="pi pi-pencil" aria-hidden="true" />
+        </button>
+
+        <button
+          type="button"
+          className="debt__action debt__action--danger"
+          aria-label={t("delete")}
+          onClick={onDelete}
+        >
+          <i className="pi pi-trash" aria-hidden="true" />
+        </button>
+      </div>
+    </Card>
   );
 }
