@@ -107,3 +107,26 @@ describe("decodeFilters", () => {
     expect(filters).toMatchObject(original);
   });
 });
+
+describe("filtro senza categoria", () => {
+  it("finisce nell'URL solo quando è acceso", () => {
+    expect(
+      encodeFilters({ senza_categoria: true }, "month").get("senza_categoria"),
+    ).toBe("1");
+
+    expect(
+      encodeFilters({ senza_categoria: false }, "month").toString(),
+    ).toBe("");
+  });
+
+  it("torna indietro come booleano, o sparisce", () => {
+    expect(
+      decodeFilters(new URLSearchParams("senza_categoria=1")).filters
+        .senza_categoria,
+    ).toBe(true);
+
+    expect(
+      decodeFilters(new URLSearchParams()).filters.senza_categoria,
+    ).toBeUndefined();
+  });
+});

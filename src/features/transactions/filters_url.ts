@@ -20,6 +20,7 @@ const KEYS = {
   min: "min",
   max: "max",
   query: "q",
+  uncategorized: "senza_categoria",
 } as const;
 
 export const DEFAULT_PERIOD: PeriodPreset = "month";
@@ -80,6 +81,8 @@ export function encodeFilters(
   if (filters.importo_max !== undefined)
     params.set(KEYS.max, String(filters.importo_max));
   if (filters.descrizione) params.set(KEYS.query, filters.descrizione);
+  // Solo l'acceso finisce nell'URL: "senza_categoria=0" non è un filtro.
+  if (filters.senza_categoria) params.set(KEYS.uncategorized, "1");
 
   return params;
 }
@@ -107,6 +110,7 @@ export function decodeFilters(params: URLSearchParams): UrlFilters {
       importo_min: number(params.get(KEYS.min)),
       importo_max: number(params.get(KEYS.max)),
       descrizione: params.get(KEYS.query) ?? undefined,
+      senza_categoria: params.get(KEYS.uncategorized) === "1" || undefined,
     },
   };
 }

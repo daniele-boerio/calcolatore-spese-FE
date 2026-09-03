@@ -114,6 +114,8 @@ export interface TransactionsFilters {
   data_inizio?: string;
   data_fine?: string;
   descrizione?: string;
+  /** Solo le transazioni a cui manca la categoria (`categoria_id IS NULL`). */
+  senza_categoria?: boolean;
   conto_id?: string[];
   categoria_id?: string[];
   sottocategoria_id?: string[];

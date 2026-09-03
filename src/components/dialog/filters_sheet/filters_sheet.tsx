@@ -5,6 +5,7 @@ import Button from "../../button/button";
 import Calendar from "../../calendar/calendar";
 import SegmentedControl from "../../segmented_control/segmented_control";
 import RangeSlider from "../../range_slider/range_slider";
+import Toggle from "../../toggle/toggle";
 import { useI18n } from "../../../i18n/use-i18n";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { useDebouncedValue } from "../../../features/ui/use_debounced_value";
@@ -253,6 +254,16 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
           </div>
         </Section>
       )}
+
+      <label className="filters-sheet__switch">
+        <span>{t("mov_only_uncategorized")}</span>
+        <Toggle
+          checked={filters.senza_categoria ?? false}
+          onChange={(checked) =>
+            dispatch(updateFilters({ senza_categoria: checked || undefined }))
+          }
+        />
+      </label>
 
       <RangeSlider
         label={t("amount")}

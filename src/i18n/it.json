@@ -188,6 +188,7 @@
   "mov_refresh": "Aggiorna",
   "mov_all_accounts": "Tutti i conti",
   "mov_categories_short": "Cat.",
+  "mov_only_uncategorized": "Solo senza categoria",
   "mov_period": "Periodo",
   "mov_type": "Tipo",
   "mov_type_all": "Tutte",

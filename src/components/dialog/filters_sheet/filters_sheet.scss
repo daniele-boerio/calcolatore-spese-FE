@@ -37,4 +37,18 @@
     grid-template-columns: 1fr 1fr;
     gap: 10px;
   }
+
+  &__switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 16px;
+
+    border-radius: v.$r-field;
+    background: v.$bg;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
 }

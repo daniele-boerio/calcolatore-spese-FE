@@ -1303,6 +1303,22 @@
             }
           },
           {
+            "name": "senza_categoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Senza Categoria"
+            }
+          },
+          {
             "name": "conto_id",
             "in": "query",
             "required": false,
@@ -1628,6 +1644,22 @@
                 }
               ],
               "title": "Descrizione"
+            }
+          },
+          {
+            "name": "senza_categoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Senza Categoria"
             }
           },
           {
