@@ -9,6 +9,8 @@ type SheetProps = {
   open: boolean;
   onClose: () => void;
   title?: ReactNode;
+  /** Azione a destra del titolo ("Azzera" nei filtri), prima della chiusura. */
+  action?: ReactNode;
   children: ReactNode;
   /** Footer fisso in fondo (i bottoni di conferma). */
   footer?: ReactNode;
@@ -25,6 +27,7 @@ export default function Sheet({
   open,
   onClose,
   title,
+  action,
   children,
   footer,
   heightPercent,
@@ -115,14 +118,18 @@ export default function Sheet({
         {title && (
           <div className="sheet__header">
             <h2 className="sheet__title">{title}</h2>
-            <button
-              type="button"
-              className="sheet__close"
-              onClick={onClose}
-              aria-label="close"
-            >
-              <i className="pi pi-times" aria-hidden="true" />
-            </button>
+
+            <div className="sheet__actions">
+              {action}
+              <button
+                type="button"
+                className="sheet__close"
+                onClick={onClose}
+                aria-label="close"
+              >
+                <i className="pi pi-times" aria-hidden="true" />
+              </button>
+            </div>
           </div>
         )}
 

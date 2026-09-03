@@ -1,6 +1,13 @@
+import { PeriodPreset } from "./period";
+
 export interface PaginationParams {
   page: number;
   size: number;
+  /**
+   * Accoda i risultati invece di sostituirli: è il "carica altri" della lista
+   * Movimenti, che tiene a schermo le pagine già scorse.
+   */
+  append?: boolean;
 }
 
 export interface LastTransactionsParams {
@@ -43,6 +50,8 @@ export interface PaginatedResponse {
 
 export interface TransactionsState {
   loading: boolean;
+  /** Periodo scelto nei Movimenti; le date che ne derivano stanno in `filters`. */
+  period: PeriodPreset;
   transactions: Transaction[];
   selectedTransaction: Transaction | null;
   pagination: {
@@ -91,6 +100,12 @@ export interface TransactionByTagParams {
   tagId: string;
 }
 
+/**
+ * Filtri come li accetta il BE. Conti, categorie, sottocategorie e tag sono
+ * liste: `TransazioneFilters` li dichiara `List[int]` e li applica con una
+ * clausola IN, quindi la selezione multipla dello sheet dei filtri non
+ * richiede nulla di nuovo lato server.
+ */
 export interface TransactionsFilters {
   sort_by?: string[];
   importo_min?: number;
@@ -99,8 +114,8 @@ export interface TransactionsFilters {
   data_inizio?: string;
   data_fine?: string;
   descrizione?: string;
-  conto_id?: string;
-  categoria_id?: string;
-  sottocategoria_id?: string;
-  tag_id?: string;
+  conto_id?: string[];
+  categoria_id?: string[];
+  sottocategoria_id?: string[];
+  tag_id?: string[];
 }

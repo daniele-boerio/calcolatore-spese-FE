@@ -13,18 +13,24 @@ import {
   TransactionsState,
 } from "./interfaces";
 import { RootState } from "../../store/store";
+import { PeriodPreset, periodRange } from "./period";
+import { DEFAULT_PERIOD } from "./filters_url";
+
+const DEFAULT_SORT = ["data:desc", "lastUpdate:desc"];
 
 const initialState: TransactionsState = {
   loading: false,
   transactions: [],
   selectedTransaction: null,
+  period: DEFAULT_PERIOD,
   pagination: {
     total: null,
     page: null,
     size: null,
   },
   filters: {
-    sort_by: ["data:desc", "lastUpdate:desc"],
+    sort_by: DEFAULT_SORT,
+    ...periodRange(DEFAULT_PERIOD),
   },
 };
 
@@ -71,8 +77,43 @@ const transactionsSlice = createSlice({
     ) => {
       state.filters = { ...state.filters, ...action.payload };
     },
+
+    /**
+     * Sostituisce il blocco di filtri per intero. La usa il ripristino
+     * dall'URL: una fusione lascerebbe in piedi i filtri della visita
+     * precedente, che nell'indirizzo non ci sono più.
+     */
+    applyFilters: (
+      state,
+      action: PayloadAction<{
+        period: PeriodPreset;
+        filters: TransactionsState["filters"];
+      }>,
+    ) => {
+      state.period = action.payload.period;
+      state.filters = { sort_by: DEFAULT_SORT, ...action.payload.filters };
+    },
+
+    /**
+     * Cambia periodo e ricalcola le date. "custom" non tocca `data_inizio` e
+     * `data_fine`: le ha scelte l'utente.
+     */
+    setPeriod: (state, action: PayloadAction<PeriodPreset>) => {
+      state.period = action.payload;
+
+      if (action.payload === "custom") return;
+
+      const range = periodRange(action.payload);
+      state.filters.data_inizio = range.data_inizio;
+      state.filters.data_fine = range.data_fine;
+    },
+
     resetFilters: (state) => {
-      state.filters = { sort_by: ["data:desc", "lastUpdate:desc"] };
+      state.period = DEFAULT_PERIOD;
+      state.filters = {
+        sort_by: DEFAULT_SORT,
+        ...periodRange(DEFAULT_PERIOD),
+      };
     },
   },
   extraReducers: (builder) => {
@@ -86,28 +127,26 @@ const transactionsSlice = createSlice({
       )
 
       // GET TransactionsPaginated
-      .addCase(
-        getTransactionsPaginated.fulfilled,
-        (state, action: PayloadAction<PaginatedResponse>) => {
-          state.transactions = action.payload.data
-            .map(mapTransaction)
-            .sort(sortTransactions);
-          state.pagination.total = action.payload.total;
-          state.pagination.page = action.payload.page;
-          state.pagination.size = action.payload.size;
+      .addCase(getTransactionsPaginated.fulfilled, (state, action) => {
+        // Le pagine oltre la prima si accodano: la lista dei Movimenti cresce
+        // verso il basso invece di ripartire da capo.
+        const loaded = action.payload.data.map(mapTransaction);
+        const merged = action.meta.arg.append
+          ? [...state.transactions, ...loaded]
+          : loaded;
 
-          // Cast obbligatorio per i totali aggregati che arrivano come stringhe
-          state.pagination.total_incomes = Number(
-            action.payload.total_entrata || 0,
-          );
-          state.pagination.total_expenses = Number(
-            action.payload.total_uscita || 0,
-          );
-          state.pagination.total_compensation = Number(
-            action.payload.total_rimborsi || 0,
-          );
-        },
-      )
+        state.transactions = merged.sort(sortTransactions);
+        state.pagination.total = action.payload.total;
+        state.pagination.page = action.payload.page;
+        state.pagination.size = action.payload.size;
+
+        // Cast obbligatorio per i totali aggregati che arrivano come stringhe
+        state.pagination.total_incomes = Number(action.payload.total_entrata || 0);
+        state.pagination.total_expenses = Number(action.payload.total_uscita || 0);
+        state.pagination.total_compensation = Number(
+          action.payload.total_rimborsi || 0,
+        );
+      })
 
       .addCase(
         createTransaction.fulfilled,
@@ -220,6 +259,10 @@ export const selectTransactionPagination = (state: RootState) =>
 export const selectTransactionFilters = (state: RootState) =>
   state.transaction.filters;
 
-export const { updateFilters, resetFilters } = transactionsSlice.actions;
+export const selectTransactionPeriod = (state: RootState) =>
+  state.transaction.period;
+
+export const { updateFilters, applyFilters, setPeriod, resetFilters } =
+  transactionsSlice.actions;
 
 export default transactionsSlice.reducer;

@@ -41,46 +41,33 @@ const refreshMonthlyTotals = async (
   await dispatch(getCurrentMonthExpensesByCategory());
 };
 
-// Parametri per la paginazione
-
+/**
+ * Le ultime N transazioni, per la card "Ultimi movimenti" della Home.
+ *
+ * Non passa dai filtri dei Movimenti: quelli ora vivono nell'URL e
+ * sopravvivono all'uscita dalla pagina, per cui ereditarli qui vorrebbe dire
+ * mostrare in Home i movimenti di un periodo scelto altrove.
+ */
 export const getLastTransactions = createAsyncThunk<
   Transaction[],
   LastTransactionsParams
->(
-  "transazioni/getLastTransactions",
-  async ({ n }, { getState, rejectWithValue }) => {
-    try {
-      const params = new URLSearchParams();
+>("transazioni/getLastTransactions", async ({ n }, { rejectWithValue }) => {
+  try {
+    const params = new URLSearchParams();
+    params.append("n", n.toString());
 
-      // Aggiungiamo n ai parametri
-      params.append("n", n.toString());
+    const response = await api.get<Transaction[]>(
+      `/transazioni?${params.toString()}`,
+    );
 
-      const state = getState() as RootState;
-      const filters = state.transaction.filters;
-
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (Array.isArray(value)) {
-            value.forEach((v) => params.append(key, v.toString()));
-          } else {
-            params.append(key, value.toString());
-          }
-        }
-      });
-
-      // Passiamo i parametri SOLO nell'URL tramite la stringa generata
-      const response = await api.get<Transaction[]>(
-        `/transazioni?${params.toString()}`,
-      );
-      return response.data;
-    } catch (error) {
-      const err = error as AxiosError;
-      return rejectWithValue(
-        err.response?.data || "Errore ricezione ultime transazioni",
-      );
-    }
-  },
-);
+    return response.data;
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(
+      err.response?.data || "Errore ricezione ultime transazioni",
+    );
+  }
+});
 
 export const getTransactionsPaginated = createAsyncThunk<
   PaginatedResponse,

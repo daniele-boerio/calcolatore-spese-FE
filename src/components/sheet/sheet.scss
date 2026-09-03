@@ -70,6 +70,12 @@
     letter-spacing: -0.02em;
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
   &__close {
     display: flex;
     align-items: center;

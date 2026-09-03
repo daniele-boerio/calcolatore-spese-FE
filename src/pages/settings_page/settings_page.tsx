@@ -3,6 +3,7 @@ import { useI18n } from "../../i18n/use-i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Page, PageContent, PageHeader } from "../../components/page/page";
 import Sheet from "../../components/sheet/sheet";
+import Toggle from "../../components/toggle/toggle";
 import Button from "../../components/button/button";
 import Amount from "../../components/amount/amount";
 import {
@@ -171,9 +172,7 @@ export default function SettingsPage() {
                 </span>
               </span>
 
-              <input
-                type="checkbox"
-                className="toggle"
+              <Toggle
                 checked={hideAmounts}
                 onChange={() => dispatch(toggleHideAmounts())}
               />

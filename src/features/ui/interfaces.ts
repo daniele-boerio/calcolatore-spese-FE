@@ -6,7 +6,11 @@ import type { ToastItem } from "./toast";
  * discriminata invece di un booleano per dialog — cresce con un caso per ogni
  * sheet del design.
  */
-export type ActiveSheet = { name: "newTransaction" };
+export type ActiveSheet =
+  /** Form di inserimento; con `transactionId` è la modifica di un movimento. */
+  | { name: "newTransaction"; transactionId?: string }
+  | { name: "transactionDetail"; transactionId: string }
+  | { name: "filters" };
 
 export interface UiState {
   /** Preferenza di tema dell'utente, persistita in localStorage. */

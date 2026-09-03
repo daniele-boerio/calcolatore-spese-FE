@@ -32,6 +32,7 @@ import {
   selectTransactionTransactions,
 } from "../../features/transactions/transaction_slice";
 import { categoryIcon } from "../../features/categorie/icons";
+import { transactionIcon } from "../../features/transactions/icons";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
 import {
   getCategoryAverages,
@@ -346,11 +347,7 @@ export default function HomePage() {
                 return (
                   <ListRow
                     key={transaction.id}
-                    icon={
-                      isIncome
-                        ? "pi pi-arrow-down-right"
-                        : categoryIcon(categoryName)
-                    }
+                    icon={transactionIcon(transaction.tipo, categoryName)}
                     iconTone={isIncome ? "accent" : "neutral"}
                     title={transaction.descrizione || categoryName || "—"}
                     meta={[formatDay(transaction.data), categoryName]

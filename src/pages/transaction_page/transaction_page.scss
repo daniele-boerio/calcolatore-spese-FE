@@ -1,91 +1,173 @@
 @use "../../styles/variables" as v;
 
-.transaction-page-container {
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-
-  .card-menu {
-    background: color-mix(in srgb, v.$text-main 3%, transparent); // Leggera tinta basata sul testo
-    border-radius: 12px;
-    padding: 0.5rem;
-    border: 1px solid color-mix(in srgb, v.$text-main 8%, transparent);
-    backdrop-filter: blur(10px);
+.movements {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
-  /* Personalizzazione TabMenu di PrimeReact */
-  .p-tabmenu {
-    .p-tabmenu-nav {
-      background: transparent !important;
-      border: none !important;
-      display: flex;
-      justify-content: center; // Centra i tab
-      gap: 0.5rem;
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
 
-      .p-tabmenuitem {
-        margin-right: 0;
+  &__actions {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 8px;
+  }
 
-        .p-menuitem-link {
-          background: transparent !important;
-          border: none !important;
-          color: v.$text-muted !important;
-          transition: all 0.3s ease;
-          border-radius: 8px;
-          padding: 0.75rem 1.25rem;
-          font-weight: 500;
+  &__icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
 
-          .p-menuitem-icon {
-            margin-right: 0.5rem;
-            color: v.$text-muted;
-          }
+    border: 1px solid v.$line;
+    border-radius: v.$r-pill;
+    background: v.$surface;
+    color: v.$muted;
+    cursor: pointer;
 
-          &:focus {
-            box-shadow: none !important;
-          }
-        }
+    i {
+      font-size: 14px;
+    }
 
-        /* Stato Attivo */
-        &.p-highlight {
-          .p-menuitem-link {
-            color: v.$text-main !important; // Usa il tuo colore primario (es. blu)
-            background: v.$bg-dark !important;
+    &:active {
+      transform: scale(0.97);
+      transition: transform v.$dur-press;
+    }
+  }
 
-            .p-menuitem-icon {
-              color: v.$text-main !important;
-            }
-          }
-        }
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 16px;
+
+    border: 1px solid v.$line;
+    border-radius: v.$r-pill;
+    background: v.$surface;
+    color: v.$muted-2;
+
+    i {
+      flex: 0 0 auto;
+      font-size: 14px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: v.$ink;
+      font-family: inherit;
+      font-size: 14px;
+
+      &::placeholder {
+        color: v.$muted-2;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      // La X nativa di `type="search"` non segue il tema: la togliamo, il
+      // campo si svuota con "Azzera i filtri" o cancellando.
+      &::-webkit-search-cancel-button {
+        appearance: none;
       }
     }
   }
-}
 
-/* Animazione per il cambio tab */
-.tab-content-area {
-  animation: slideUp 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Mobile Responsive */
-@media screen and (max-width: v.$mobile) {
-  .p-tabmenu .p-tabmenu-nav {
-    justify-content: flex-start;
-    overflow-x: auto; // Permette lo scroll orizzontale su mobile
-    padding-bottom: 0.5rem;
+  // I chip escono dai margini della pagina: scorrono in orizzontale senza far
+  // scorrere il resto dell'intestazione.
+  &__chips {
+    display: flex;
+    gap: 8px;
+    margin: 0 calc(-1 * v.$gutter);
+    padding: 2px v.$gutter 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
 
     &::-webkit-scrollbar {
-      display: none; // Nasconde la barra scroll su mobile
+      display: none;
     }
+  }
+
+  &__summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+
+    border-radius: 18px;
+    background: v.$surface;
+    box-shadow: v.$shadow-card;
+  }
+
+  &__balance {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: v.$muted;
+  }
+
+  &__balance-value {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  &__totals {
+    flex: 0 0 auto;
+    display: flex;
+    gap: 16px;
+  }
+
+  &__total {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  &__total-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: v.$muted;
+  }
+
+  // I gruppi hanno un respiro maggiore delle card: l'intestazione del giorno
+  // appartiene alla lista che segue, non a quella sopra.
+  &__list {
+    gap: 18px;
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  // La card di un gruppo è solo il contenitore delle righe: il padding
+  // verticale lo mettono le righe stesse.
+  &__card {
+    gap: 0;
+    padding: 4px 16px;
+    border-radius: v.$r-inner;
   }
 }

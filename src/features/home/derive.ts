@@ -1,7 +1,28 @@
 import { Transaction } from "../transactions/interfaces";
+import {
+  addMonths,
+  dayKey,
+  daysBetweenIso,
+  endOfMonth,
+  endOfWeek,
+  startOfMonth,
+  startOfWeek,
+  toIsoDate,
+  WEEK_LENGTH,
+} from "../../services/dates";
 
-/** Numero di giorni in una settimana, con lunedì in prima posizione. */
-export const WEEK_LENGTH = 7;
+// Il calendario sta in `services/dates`: qui restano i calcoli che servono solo
+// alla Home. Ri-esportiamo quello che la Home usa, così i suoi import non
+// devono conoscere due moduli.
+export {
+  addMonths,
+  endOfMonth,
+  endOfWeek,
+  startOfMonth,
+  startOfWeek,
+  toIsoDate,
+  WEEK_LENGTH,
+};
 
 /**
  * Importo che conta negli aggregati: al netto degli eventuali rimborsi.
@@ -12,41 +33,6 @@ export const WEEK_LENGTH = 7;
 export function effectiveAmount(transaction: Transaction): number {
   const netto = transaction.importo_netto;
   return Number(netto ?? transaction.importo);
-}
-
-/** Le date viaggiano come "YYYY-MM-DD": la formattiamo senza passare da Date. */
-export function toIsoDate(date: Date): string {
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
-/** Lunedì della settimana che contiene `date`. */
-export function startOfWeek(date: Date): Date {
-  const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-  // getDay(): 0 = domenica. Con la settimana che parte di lunedì, la domenica
-  // è il settimo giorno, non il primo.
-  const offset = (start.getDay() + 6) % WEEK_LENGTH;
-  start.setDate(start.getDate() - offset);
-  return start;
-}
-
-export function endOfWeek(date: Date): Date {
-  const end = startOfWeek(date);
-  end.setDate(end.getDate() + WEEK_LENGTH - 1);
-  return end;
-}
-
-export function startOfMonth(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth(), 1);
-}
-
-export function endOfMonth(date: Date): Date {
-  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
-}
-
-export function addMonths(date: Date, months: number): Date {
-  return new Date(date.getFullYear(), date.getMonth() + months, 1);
 }
 
 /**
@@ -61,10 +47,7 @@ export function spendingByWeekday(
   const startKey = toIsoDate(weekStart);
 
   for (const transaction of transactions) {
-    // La data arriva come "YYYY-MM-DD" (o ISO con orario): il giorno è nei
-    // primi dieci caratteri, e confrontarli come stringhe evita il fuso.
-    const dayKey = transaction.data.slice(0, 10);
-    const index = daysBetween(startKey, dayKey);
+    const index = daysBetweenIso(startKey, dayKey(transaction.data));
 
     if (index >= 0 && index < WEEK_LENGTH) {
       totals[index] += effectiveAmount(transaction);
@@ -72,15 +55,6 @@ export function spendingByWeekday(
   }
 
   return totals;
-}
-
-function daysBetween(fromIso: string, toIso: string): number {
-  const from = Date.parse(`${fromIso}T00:00:00Z`);
-  const to = Date.parse(`${toIso}T00:00:00Z`);
-
-  if (Number.isNaN(from) || Number.isNaN(to)) return -1;
-
-  return Math.round((to - from) / 86_400_000);
 }
 
 /**
