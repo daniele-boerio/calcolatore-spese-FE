@@ -47,6 +47,14 @@
 
   --tabbar-bg: #ffffff;
 
+  // Anteprime del selettore tema in Impostazioni: mostrano gli *altri* temi,
+  // quindi restano identiche nei due blocchi. Sono gli unici colori che non
+  // seguono il tema attivo.
+  --preview-light: #f6f8f7;
+  --preview-dark: #0a1526;
+  // Il pallino del toggle resta bianco in entrambi i temi.
+  --knob: #ffffff;
+
   // Serie grafici, nell'ordine (per categoria).
   --series-1: #0e7c5a;
   --series-2: #3f9d7f;
@@ -137,6 +145,10 @@
 
   // Al buio la tab bar si fonde con lo sfondo pagina.
   --tabbar-bg: #0a1526;
+
+  --preview-light: #f6f8f7;
+  --preview-dark: #0a1526;
+  --knob: #ffffff;
 
   --series-1: #e2a44f;
   --series-2: #c98d3f;

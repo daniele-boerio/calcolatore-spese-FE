@@ -1,0 +1,9 @@
+@use "../../styles/variables" as v;
+
+.analysis-page {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+}

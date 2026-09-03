@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import AuthPage from "./pages/auth_page/auth_page";
-import Navbar from "./components/navbar/navbar";
+import TabBar from "./components/tab_bar/tab_bar";
 import {
   BrowserRouter as Router,
   Routes,
@@ -15,11 +15,12 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_gate";
+import SheetHost from "./components/sheet_host/sheet_host";
 import { useThemeSync } from "./features/ui/use_theme";
 
 // Code-splitting per route: ogni pagina è un chunk separato caricato solo
-// quando ci si naviga. Le pagine pesanti (statistiche/grafici, che portano
-// chart.js + @mui/x-charts) non gravano più sul bundle iniziale.
+// quando ci si naviga. Le pagine pesanti (analisi, che porta chart.js +
+// @mui/x-charts) non gravano più sul bundle iniziale.
 const HomePage = lazy(() => import("./pages/home_page/home_page"));
 const TransactionPage = lazy(
   () => import("./pages/transaction_page/transaction_page"),
@@ -28,10 +29,11 @@ const CategoryPage = lazy(() => import("./pages/category_page/category_page"));
 const ContiPage = lazy(() => import("./pages/conti_page/conti_page"));
 const DebitiPage = lazy(() => import("./pages/debiti_page/debiti_page"));
 const TagsPage = lazy(() => import("./pages/tags_page/tags_page"));
-const StatisticsPage = lazy(
-  () => import("./pages/statistics_page/statistics_page"),
+const AnalysisPage = lazy(() => import("./pages/analysis_page/analysis_page"));
+const RecurringsPage = lazy(
+  () => import("./pages/transaction_page/recurrings/recurrings"),
 );
-const ChartsPage = lazy(() => import("./pages/charts_page/charts_page"));
+const SettingsPage = lazy(() => import("./pages/settings_page/settings_page"));
 const InvestimentiPage = lazy(
   () => import("./pages/investimenti_page/investimenti_page"),
 );
@@ -90,26 +92,42 @@ function App() {
           </Suspense>
         ) : (
           <>
-            <Navbar /> {/* Resta sempre qui in alto */}
             <BankProposalsGate /> {/* Controllo automatico proposte bancarie */}
-            <div className="page-content">
-              <Suspense fallback={<RouteFallback />}>
-                <Routes>
-                  {/* Quando l'URL cambia, React Router decide cosa mostrare qui sotto */}
-                  <Route path="/" element={<HomePage />} />
-                  <Route path="/transactions" element={<TransactionPage />} />
-                  <Route path="/categories" element={<CategoryPage />} />
-                  <Route path="/tags" element={<TagsPage />} />
-                  <Route path="/accounts" element={<ContiPage />} />
-                  <Route path="/debts" element={<DebitiPage />} />
-                  <Route path="/investments" element={<InvestimentiPage />} />
-                  <Route path="/statistics" element={<StatisticsPage />} />
-                  <Route path="/charts" element={<ChartsPage />} />
-                  <Route path="/bank-callback" element={<BankCallbackPage />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-              </Suspense>
-            </div>
+            <Suspense fallback={<RouteFallback />}>
+              <Routes>
+                {/* I quattro slot della tab bar */}
+                <Route path="/" element={<HomePage />} />
+                <Route path="/transactions" element={<TransactionPage />} />
+                <Route path="/analysis" element={<AnalysisPage />} />
+                <Route path="/accounts" element={<ContiPage />} />
+
+                {/* Destinazioni secondarie, raggiunte dalla lista in "Conti" */}
+                <Route path="/categories" element={<CategoryPage />} />
+                <Route path="/tags" element={<TagsPage />} />
+                <Route path="/recurrings" element={<RecurringsPage />} />
+                <Route path="/debts" element={<DebitiPage />} />
+                <Route path="/investments" element={<InvestimentiPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+
+                <Route path="/bank-callback" element={<BankCallbackPage />} />
+
+                {/* Statistiche e Grafici si sono fuse in Analisi */}
+                <Route
+                  path="/statistics"
+                  element={<Navigate to="/analysis" replace />}
+                />
+                <Route
+                  path="/charts"
+                  element={
+                    <Navigate to="/analysis?scope=categories" replace />
+                  }
+                />
+
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
+            <TabBar />
+            <SheetHost />
           </>
         )}
       </div>

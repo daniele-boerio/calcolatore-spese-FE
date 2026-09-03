@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./home_page.scss";
 import BudgetCard from "../../components/budget_card/budget_card";
 import CardCarousel from "../../components/card_carousel/card_carousel";
@@ -9,9 +9,7 @@ import {
   getCurrentMonthExpenses,
   getCurrentMonthExpensesByCategory,
 } from "../../features/conti/api_calls";
-import Button from "../../components/button/button";
 import CustomDoughnutChart from "../../components/charts/custom_doughnut_chart";
-import TransactionDialog from "../../components/dialog/transaction_dialog/transaction_dialog";
 import {
   selectContiConti,
   selectContiMonthlyExpensesByCategory,
@@ -27,11 +25,6 @@ export default function HomePage() {
   const monthlyExpensesByCategory = useAppSelector(
     selectContiMonthlyExpensesByCategory,
   );
-
-  const [
-    isCreateTransactionDialogVisible,
-    setIsCreateTransactionDialogVisible,
-  ] = useState<boolean>(false);
 
   useEffect(() => {
     // Caricamento dati iniziale
@@ -63,19 +56,7 @@ export default function HomePage() {
         <CardCarousel conti={conti} direction="horizontal" />
 
         <TransactionList num={3} />
-
-        <Button
-          className="add-transaction-button"
-          icon="pi pi-plus"
-          compact
-          rounded
-          onClick={() => setIsCreateTransactionDialogVisible(true)}
-        />
       </div>
-      <TransactionDialog
-        visible={isCreateTransactionDialogVisible}
-        onHide={() => setIsCreateTransactionDialogVisible(false)}
-      />
     </div>
   );
 }

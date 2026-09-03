@@ -14,6 +14,7 @@ import {
   selectContiLoading,
 } from "../../features/conti/conto_slice";
 import { selectIsOpenBankingAdmin } from "../../features/profile/profile_slice";
+import MenuList from "../../components/menu_list/menu_list";
 
 export default function ContiPage() {
   const { t } = useI18n();
@@ -102,6 +103,30 @@ export default function ContiPage() {
             </div>
           </section>
         </div>
+
+        {/* Le destinazioni ex-hamburger: da qui si raggiunge il resto dell'app. */}
+        <MenuList
+          entries={[
+            {
+              to: "/investments",
+              icon: "pi pi-chart-line",
+              label: t("nav_investments"),
+            },
+            { to: "/debts", icon: "pi pi-receipt", label: t("nav_debts") },
+            {
+              to: "/categories",
+              icon: "pi pi-tags",
+              label: t("nav_categories"),
+            },
+            { to: "/tags", icon: "pi pi-hashtag", label: t("nav_tags") },
+            {
+              to: "/recurrings",
+              icon: "pi pi-refresh",
+              label: t("nav_recurrings"),
+            },
+            { to: "/settings", icon: "pi pi-cog", label: t("nav_settings") },
+          ]}
+        />
 
         {/* FAB BUTTON */}
         <Button

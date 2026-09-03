@@ -1,0 +1,84 @@
+@use "../../styles/variables" as v;
+
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 900;
+
+  width: 100%;
+  max-width: v.$app-max-width;
+  height: calc(v.$tabbar-h + env(safe-area-inset-bottom));
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px calc(12px + env(safe-area-inset-bottom));
+
+  background: v.$tabbar-bg;
+  border-top: 1px solid v.$line;
+  box-shadow: v.$shadow-tabbar;
+
+  &__slot {
+    flex: 1;
+    min-width: v.$tap-target;
+    min-height: v.$tap-target;
+    padding-top: 12px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    text-decoration: none;
+    color: v.$muted;
+
+    i {
+      font-size: 18px;
+    }
+
+    &.active {
+      color: v.$accent;
+
+      .tab-bar__label {
+        font-weight: 700;
+      }
+    }
+  }
+
+  &__label {
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1;
+  }
+
+  // Sollevato sopra la barra: è l'azione principale dell'app.
+  &__fab {
+    flex: 0 0 auto;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 14px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: 0;
+    border-radius: v.$r-pill;
+    background: v.$accent;
+    color: v.$on-accent;
+    box-shadow: v.$shadow-fab;
+    cursor: pointer;
+
+    i {
+      font-size: 20px;
+    }
+
+    &:active {
+      transform: scale(0.97);
+      transition: transform v.$dur-press;
+    }
+  }
+}

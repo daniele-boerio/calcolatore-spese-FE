@@ -33,6 +33,44 @@ body {
   box-sizing: border-box;
 }
 
+// Layout comune a tutte le schermate principali: header fermo in alto,
+// contenuto che scorre sotto, tab bar fissa in fondo.
+.page {
+  display: flex;
+  flex-direction: column;
+  // Altezza definita, non `min-height`: serve perché l'area di contenuto
+  // scorra al suo interno lasciando fermo l'header.
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--bg);
+
+  &__header {
+    flex: 0 0 auto;
+    padding: 20px var(--gutter) 14px;
+  }
+
+  &__content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    // Lo spazio in fondo tiene l'ultima card sopra la tab bar.
+    padding: 0 var(--gutter) calc(100px + env(safe-area-inset-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-card);
+  }
+}
+
+// Titolo di pagina: nel tema scuro passa al serif e cresce.
+.page-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--fs-page-title);
+  font-weight: var(--fw-display);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.15;
+}
+
 // Il design è a 430px; su schermo largo il contenuto resta in una colonna
 // centrata invece di stirarsi.
 .App {
@@ -41,6 +79,13 @@ body {
   margin-inline: auto;
   min-height: 100dvh;
   position: relative;
+}
+
+// COMPATIBILITÀ — DA RIMUOVERE
+// La tab bar sta sopra il contenuto e le schermate non ancora convertite al
+// layout `.page` non lo sanno: lo spazio per non finirci sotto lo mettiamo qui.
+.App > *:not(.page):not(.tab-bar) {
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
 }
 
 // Ogni cifra è allineata in colonna: segno prima del numero, valuta dopo.

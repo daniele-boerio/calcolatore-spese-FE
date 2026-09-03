@@ -90,7 +90,8 @@
 
   .add-account-button {
     position: fixed;
-    bottom: 2rem;
+    // Sopra la tab bar, non sotto.
+    bottom: calc(var(--tabbar-h) + 1rem + env(safe-area-inset-bottom));
     right: 2rem;
     z-index: 1000;
   }
