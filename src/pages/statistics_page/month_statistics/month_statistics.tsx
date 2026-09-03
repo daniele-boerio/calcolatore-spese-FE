@@ -1,321 +1,378 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
-import { getMonthlyDetailsStatistics } from "../../../features/statistics/api_calls";
-import {
-  selectMonthlyStatisticsData,
-  selectMonthlyTotals,
-  selectStatisticsLoading,
-} from "../../../features/statistics/statistics_slice";
-import {
-  selectCategoriaCategorie,
-} from "../../../features/categorie/categoria_slice";
-import { getCategorie } from "../../../features/categorie/api_calls";
-import { selectTagTags } from "../../../features/tags/tag_slice"; // <-- Aggiunto
-import { getTags } from "../../../features/tags/api_calls"; // <-- Aggiunto
-import Dropdown from "../../../components/dropdown/dropdown";
+import { Card, CardTitle } from "../../../components/card/card";
+import Amount from "../../../components/amount/amount";
+import EmptyState from "../../../components/empty_state/empty_state";
+import SkeletonList from "../../../components/skeleton/skeleton";
 import { useI18n } from "../../../i18n/use-i18n";
 import "./month_statistics.scss";
-import { MonthlyDetailCategory } from "../../../features/statistics/interfaces";
-import CustomCard from "../../../components/custom_card/custom_card";
+import {
+  getMonthRefunds,
+  getMonthlyDetailsStatistics,
+  getPreviousMonthSavings,
+} from "../../../features/statistics/api_calls";
+import {
+  selectMonthRefunds,
+  selectMonthlyStatisticsData,
+  selectMonthlyTotals,
+  selectPreviousMonthSavings,
+  selectStatisticsLoading,
+} from "../../../features/statistics/statistics_slice";
+import { buildInsights, Insight } from "../../../features/statistics/insights";
+import { getExpenseCompositionChart } from "../../../features/charts/api_calls";
+import { selectChartsExpenseComposition } from "../../../features/charts/charts_slice";
+import { getCategorie } from "../../../features/categorie/api_calls";
+import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import TransactionsListDialog from "../../../components/dialog/transactions_list_dialog/transactions_list_dialog";
 import { TransactionsListFilters } from "../../../components/dialog/transactions_list_dialog/transactions_query";
+import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../services/dates";
 
-export default function MonthStatistics() {
+// Mesi su cui si misura il "sopra media" e categorie mostrate: entrambi dal
+// design, e le tinte della serie grafici sono cinque.
+const AVERAGE_MONTHS = 3;
+const TOP_CATEGORIES = 5;
+
+const ICONS: Record<Insight["kind"], string> = {
+  above_average: "pi pi-arrow-up-right",
+  concentration: "pi pi-chart-pie",
+  overspent: "pi pi-exclamation-circle",
+  saved_share: "pi pi-check",
+};
+
+type MonthStatisticsProps = {
+  year: number;
+  month: number;
+  tagId: string | null;
+};
+
+export default function MonthStatistics({
+  year,
+  month,
+  tagId,
+}: MonthStatisticsProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
-  // Selettori Redux
   const data = useAppSelector(selectMonthlyStatisticsData);
   const totals = useAppSelector(selectMonthlyTotals);
-  const loading = useAppSelector(selectStatisticsLoading);
+  const previous = useAppSelector(selectPreviousMonthSavings);
+  const refunds = useAppSelector(selectMonthRefunds);
+  const composition = useAppSelector(selectChartsExpenseComposition);
   const categorie = useAppSelector(selectCategoriaCategorie);
-  const tags = useAppSelector(selectTagTags); // <-- Aggiunto
+  const loading = useAppSelector(selectStatisticsLoading);
 
-  // Stati locali per i filtri
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth() + 1;
-  const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [selectedMonth, setSelectedMonth] = useState<number>(currentMonth);
-  const [selectedCategoriaId, setSelectedCategoriaId] = useState<string | null>(
-    null,
-  );
-  const [selectedTagId, setSelectedTagId] = useState<string | null>(null); // <-- Aggiunto
-
-  // Dialog State
-  const [isDialogVisible, setIsDialogVisible] = useState(false);
   const [dialogTitle, setDialogTitle] = useState("");
   const [dialogFilters, setDialogFilters] =
-    useState<TransactionsListFilters>({});
+    useState<TransactionsListFilters | null>(null);
 
-  // Helpers
-  const toDateStr = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, "0");
-    const day = String(d.getDate()).padStart(2, "0");
-    return `${y}-${m}-${day}`;
-  };
-
-  const handleCategoryClick = (categoryName: string) => {
-    const catId = categorie.find((c) => c.nome === categoryName)?.id;
-    if (!catId) return;
-
-    const start = new Date(selectedYear, selectedMonth - 1, 1);
-    const end = new Date(selectedYear, selectedMonth, 0);
-
-    setDialogFilters({
-      categoria_id: catId,
-      tag_id: selectedTagId || undefined, // <-- Passiamo il tag se selezionato
-      data_inizio: toDateStr(start),
-      data_fine: toDateStr(end),
-    });
-    setDialogTitle(`${t("nav_transactions")} - ${categoryName}`);
-    setIsDialogVisible(true);
-  };
-
-  const handleSubcategoryClick = (
-    subcategoryName: string,
-    categoryName: string,
-  ) => {
-    const cat = categorie.find((c) => c.nome === categoryName);
-    if (!cat) return;
-    const subCat = cat.sottocategorie?.find((s) => s.nome === subcategoryName);
-
-    const start = new Date(selectedYear, selectedMonth - 1, 1);
-    const end = new Date(selectedYear, selectedMonth, 0);
-
-    setDialogFilters({
-      categoria_id: cat.id,
-      sottocategoria_id: subCat?.id,
-      tag_id: selectedTagId || undefined, // <-- Passiamo il tag se selezionato
-      data_inizio: toDateStr(start),
-      data_fine: toDateStr(end),
-    });
-    setDialogTitle(`${t("nav_transactions")} - ${subcategoryName}`);
-    setIsDialogVisible(true);
-  };
-
-  // Opzioni Anno
-  const yearOptions = useMemo(() => {
-    const years = [];
-    for (let y = currentYear - 5; y <= currentYear; y++) {
-      years.push({ label: y.toString(), value: y });
-    }
-    return years.reverse();
-  }, [currentYear]);
-
-  // Caricamento Dati all'avvio
   useEffect(() => {
     dispatch(getCategorie());
-    dispatch(getTags()); // <-- Carichiamo i tag
   }, [dispatch]);
 
-  // Fetch dati statistici
   useEffect(() => {
+    dispatch(getMonthlyDetailsStatistics({ year, month, tag_id: tagId }));
+    dispatch(getPreviousMonthSavings({ year, month, tag_id: tagId }));
+    dispatch(getMonthRefunds({ year, month, tag_id: tagId }));
+
+    // Media per categoria dei mesi *precedenti*: il mese corrente è quello da
+    // confrontare, includerlo appiattirebbe lo scostamento.
+    const selected = new Date(year, month - 1, 1);
     dispatch(
-      getMonthlyDetailsStatistics({
-        month: selectedMonth,
-        year: selectedYear,
-        categoria_id: selectedCategoriaId,
-        tag_id: selectedTagId, // <-- Passiamo il tag all'API
+      getExpenseCompositionChart({
+        data_inizio: toIsoDate(startOfMonth(addMonths(selected, -AVERAGE_MONTHS))),
+        data_fine: toIsoDate(endOfMonth(addMonths(selected, -1))),
       }),
     );
-  }, [
-    dispatch,
-    selectedYear,
-    selectedMonth,
-    selectedCategoriaId,
-    selectedTagId,
-  ]);
+  }, [dispatch, year, month, tagId]);
 
-  const monthNames = [
-    { value: 1, label: t("Jan") },
-    { value: 2, label: t("Feb") },
-    { value: 3, label: t("Mar") },
-    { value: 4, label: t("Apr") },
-    { value: 5, label: t("May") },
-    { value: 6, label: t("Jun") },
-    { value: 7, label: t("Jul") },
-    { value: 8, label: t("Aug") },
-    { value: 9, label: t("Sept") },
-    { value: 10, label: t("Oct") },
-    { value: 11, label: t("Nov") },
-    { value: 12, label: t("Dec") },
-  ];
+  const averages = useMemo(
+    () =>
+      Object.fromEntries(
+        composition.map((entry) => [
+          entry.categoria,
+          Number(entry.totale) / AVERAGE_MONTHS,
+        ]),
+      ),
+    [composition],
+  );
 
-  // Filtriamo i dati per colonna
-  const incomes = data.filter((cat) => cat.tipo === "ENTRATA");
-  const expenses = data.filter((cat) => cat.tipo === "USCITA");
-  const others = data.filter((cat) => cat.tipo === "OTHER");
+  // `monthDetails` manda le uscite col segno meno: qui si ragiona in valore
+  // assoluto, il segno lo rimette la scrittura.
+  const expenses = useMemo(
+    () =>
+      data
+        .filter((category) => category.totale < 0)
+        .map((category) => ({
+          nome: category.categoria,
+          totale: Math.abs(category.totale),
+        }))
+        .sort((a, b) => b.totale - a.totale),
+    [data],
+  );
 
-  // Calcolo totali
-  const totalIncomes = totals.incomes;
-  const totalExpenses = totals.expenses;
-  const totalAccantonamento = totals.accantonamento;
-  const totalNet = totals.total;
+  const insights = useMemo(
+    () =>
+      buildInsights({
+        categories: data,
+        averages,
+        savings: totals.total,
+        income: totals.incomes,
+      }),
+    [data, averages, totals.total, totals.incomes],
+  );
+
+  const income = totals.incomes;
+  const spent = Math.abs(totals.expenses);
+  const savedAside = totals.accantonamento;
+  const savings = totals.total;
+
+  // I tre segmenti sono quote delle entrate: senza entrate non c'è barra da
+  // disegnare, e dividere per zero darebbe una barra piena a caso.
+  const share = (value: number) => (income > 0 ? (value / income) * 100 : 0);
+
+  const delta =
+    previous !== null && previous !== 0
+      ? Math.round(((savings - previous) / Math.abs(previous)) * 100)
+      : null;
+
+  const openCategory = (nome: string) => {
+    const categoria = categorie.find((item) => item.nome === nome);
+    if (!categoria) return;
+
+    setDialogFilters({
+      categoria_id: categoria.id,
+      tag_id: tagId || undefined,
+      data_inizio: toIsoDate(new Date(year, month - 1, 1)),
+      data_fine: toIsoDate(new Date(year, month, 0)),
+    });
+    setDialogTitle(nome);
+  };
+
+  const sentence = (insight: Insight) => {
+    switch (insight.kind) {
+      case "above_average":
+        return {
+          strong: `${insight.category} +${insight.percent}%`,
+          rest: ` ${t("analysis_insight_above_average")}`,
+        };
+      case "concentration":
+        return {
+          strong: `${insight.category} ${insight.percent}%`,
+          rest: ` ${t("analysis_insight_concentration")}`,
+        };
+      case "overspent":
+        return { strong: t("analysis_insight_overspent"), rest: "" };
+      case "saved_share":
+        return {
+          strong: `${insight.percent}%`,
+          rest: ` ${t("analysis_insight_saved_share")}`,
+        };
+    }
+  };
+
+  if (loading && data.length === 0) {
+    return (
+      <Card>
+        <SkeletonList />
+      </Card>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <EmptyState
+        icon="pi pi-chart-bar"
+        title={t("analysis_empty_title")}
+        description={t("analysis_empty_text")}
+      />
+    );
+  }
 
   return (
-    <div className="monthly-statistics-page">
-      <header className="page-header">
-        <div className="filters-row">
-          <Dropdown
-            label={t("month")}
-            value={selectedMonth}
-            options={monthNames}
-            optionLabel="label"
-            optionValue="value"
-            placeholder={t("month")}
-            onChange={(e) => setSelectedMonth(e.value)}
-            showClear={false}
-          />
-          <Dropdown
-            label={t("year")}
-            value={selectedYear}
-            options={yearOptions}
-            optionLabel="label"
-            optionValue="value"
-            placeholder={t("year")}
-            onChange={(e) => setSelectedYear(e.value)}
-            showClear={false}
-          />
-          <Dropdown
-            label={t("category")}
-            value={selectedCategoriaId}
-            options={categorie}
-            optionLabel="nome"
-            optionValue="id"
-            onChange={(e) => setSelectedCategoriaId(e.value)}
-            placeholder={t("categories")}
-          />
-          {/* NUOVO DROPDOWN PER I TAG */}
-          <Dropdown
-            label={t("tag")}
-            value={selectedTagId}
-            options={tags}
-            optionLabel="nome"
-            optionValue="id"
-            onChange={(e) => setSelectedTagId(e.value)}
-            placeholder={t("tag") || "Tag"}
-          />
-        </div>
-      </header>
+    <>
+      <Card className="savings-card">
+        <div className="savings-card__top">
+          <div className="savings-card__headline">
+            <span className="savings-card__eyebrow">
+              {t("analysis_month_savings")}
+            </span>
+            <Amount
+              className="savings-card__value"
+              value={savings}
+              tone={savings >= 0 ? "positive" : "negative"}
+            />
+          </div>
 
-      <div className="summary-stats-row">
-        <div className="stats">
-          <h3 className="stats-item income">
-            {t("income")}:{" "}
-            <span>
-              {totalIncomes.toLocaleString("it-IT", {
-                minimumFractionDigits: 2,
-              })}{" "}
-              €
+          {delta !== null && (
+            <span
+              className={`savings-card__delta savings-card__delta--${
+                delta >= 0 ? "up" : "down"
+              }`}
+            >
+              <i
+                className={`pi ${delta >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
+                aria-hidden="true"
+              />
+              {`${Math.abs(delta)}%`}
             </span>
-          </h3>
-          <h3 className="stats-item expenses">
-            {t("expenses")}:{" "}
-            <span>
-              {totalExpenses.toLocaleString("it-IT", {
-                minimumFractionDigits: 2,
-              })}{" "}
-              €
-            </span>
-          </h3>
-          {totalAccantonamento !== 0 && (
-            <h3 className="stats-item set-aside">
-              {t("set_aside")}:{" "}
-              <span>
-                {totalAccantonamento.toLocaleString("it-IT", {
-                  minimumFractionDigits: 2,
-                })}{" "}
-                €
-              </span>
-            </h3>
           )}
-          <h3 className="stats-item total">
-            {t("total")}:{" "}
-            <span>
-              {totalNet.toLocaleString("it-IT", {
-                minimumFractionDigits: 2,
-              })}{" "}
-              €
-            </span>
-          </h3>
         </div>
-      </div>
 
-      {loading && <p className="no-data">{t("loading_data")}</p>}
+        <div className="savings-card__bar">
+          <span
+            className="savings-card__segment savings-card__segment--spent"
+            style={{ width: `${share(spent)}%` }}
+          />
+          <span
+            className="savings-card__segment savings-card__segment--aside"
+            style={{ width: `${share(savedAside)}%` }}
+          />
+          <span
+            className="savings-card__segment savings-card__segment--left"
+            style={{ width: `${share(Math.max(savings, 0))}%` }}
+          />
+        </div>
 
-      <div className="statistics-container">
-        {/* COLONNA ENTRATE */}
-        <div className="incomes">
-          <h3>{t("income")}</h3>
-          <div className="categories-wrapper">
-            {incomes.length > 0 ? (
-              incomes.map((cat) => (
-                <CustomCard
-                  key={cat.categoria}
-                  title={cat.categoria}
-                  totale={cat.totale}
-                  sottocategorie={cat.sottocategorie}
-                  onClick={handleCategoryClick}
-                  onSubcategoryClick={handleSubcategoryClick}
-                />
-              ))
-            ) : (
-              <p className="no-data">{t("no_data")}</p>
-            )}
+        <div className="savings-card__legend">
+          <LegendRow
+            variant="spent"
+            label={t("expenses")}
+            value={spent}
+          />
+          <LegendRow
+            variant="aside"
+            label={t("set_aside")}
+            value={savedAside}
+          />
+          <LegendRow
+            variant="left"
+            label={t("analysis_left")}
+            value={Math.max(savings, 0)}
+          />
+        </div>
+
+        <div className="savings-card__footer">
+          <span>
+            {`${t("income")} `}
+            <strong>
+              <Amount value={income} />
+            </strong>
+          </span>
+          <span>
+            {`${t("compensations")} `}
+            <strong>
+              <Amount value={refunds} />
+            </strong>
+          </span>
+        </div>
+      </Card>
+
+      <Card>
+        <CardTitle aside={t("analysis_tap_for_transactions")}>
+          {t("analysis_expenses_by_category")}
+        </CardTitle>
+
+        {expenses.length === 0 ? (
+          <p className="analysis-muted">{t("no_data")}</p>
+        ) : (
+          <div className="category-bars">
+            {expenses.slice(0, TOP_CATEGORIES).map((category, index) => {
+              const percent = spent > 0 ? (category.totale / spent) * 100 : 0;
+
+              return (
+                <button
+                  type="button"
+                  className="category-bars__row"
+                  key={category.nome}
+                  onClick={() => openCategory(category.nome)}
+                >
+                  <span className="category-bars__body">
+                    <span className="category-bars__line">
+                      <span className="category-bars__name">
+                        {category.nome}
+                      </span>
+                      <span className="category-bars__figure">
+                        {`${Math.round(percent)}% · `}
+                        <strong>
+                          <Amount value={category.totale} />
+                        </strong>
+                      </span>
+                    </span>
+
+                    <span className="category-bars__track">
+                      <span
+                        className={`category-bars__fill category-bars__fill--${index + 1}`}
+                        style={{ width: `${percent}%` }}
+                      />
+                    </span>
+                  </span>
+
+                  <i
+                    className="pi pi-chevron-right category-bars__chevron"
+                    aria-hidden="true"
+                  />
+                </button>
+              );
+            })}
           </div>
-        </div>
+        )}
+      </Card>
 
-        {/* COLONNA USCITE */}
-        <div className="expenses">
-          <h3>{t("expenses")}</h3>
-          <div className="categories-wrapper">
-            {expenses.length > 0 ? (
-              expenses.map((cat) => (
-                <CustomCard
-                  key={cat.categoria}
-                  title={cat.categoria}
-                  totale={cat.totale}
-                  sottocategorie={cat.sottocategorie}
-                  forceNegative
-                  onClick={handleCategoryClick}
-                  onSubcategoryClick={handleSubcategoryClick}
-                />
-              ))
-            ) : (
-              <p className="no-data">{t("no_data")}</p>
-            )}
-          </div>
-        </div>
+      {insights.length > 0 && (
+        <Card>
+          <CardTitle>{t("analysis_notable")}</CardTitle>
 
-        {/* COLONNA OTHER */}
-        <div className="others">
-          <h3>{t("other") || "Other"}</h3>
-          <div className="categories-wrapper">
-            {others.length > 0 ? (
-              others.map((cat) => (
-                <CustomCard
-                  key={cat.categoria}
-                  title={cat.categoria}
-                  totale={cat.totale}
-                  sottocategorie={cat.sottocategorie}
-                  onClick={handleCategoryClick}
-                  onSubcategoryClick={handleSubcategoryClick}
-                />
-              ))
-            ) : (
-              <p className="no-data">{t("no_data")}</p>
-            )}
-          </div>
-        </div>
-      </div>
+          {insights.map((insight) => {
+            const { strong, rest } = sentence(insight);
+
+            return (
+              <div className="insight" key={insight.kind}>
+                <span
+                  className={`insight__icon insight__icon--${insight.tone}`}
+                  aria-hidden="true"
+                >
+                  <i className={ICONS[insight.kind]} />
+                </span>
+
+                <span className="insight__text">
+                  <strong>{strong}</strong>
+                  {rest}
+                </span>
+              </div>
+            );
+          })}
+        </Card>
+      )}
 
       <TransactionsListDialog
-        visible={isDialogVisible}
-        onHide={() => setIsDialogVisible(false)}
+        visible={dialogFilters !== null}
+        onHide={() => setDialogFilters(null)}
         title={dialogTitle}
-        filters={dialogFilters}
+        filters={dialogFilters ?? {}}
       />
+    </>
+  );
+}
+
+function LegendRow({
+  variant,
+  label,
+  value,
+}: {
+  variant: "spent" | "aside" | "left";
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="savings-card__legend-row">
+      <span className="savings-card__legend-label">
+        <span
+          className={`savings-card__dot savings-card__dot--${variant}`}
+          aria-hidden="true"
+        />
+        {label}
+      </span>
+      <Amount value={value} />
     </div>
   );
 }

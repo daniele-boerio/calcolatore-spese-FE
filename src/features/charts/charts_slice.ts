@@ -6,6 +6,7 @@ import {
   getCategoryTrendChart,
 } from "./api_calls";
 import { ChartsState } from "./interfaces";
+import { RootState } from "../../store/store";
 
 const initialState: ChartsState = {
   incomeExpense: [],
@@ -60,5 +61,18 @@ const chartsSlice = createSlice({
       );
   },
 });
+
+export const selectChartsIncomeExpense = (state: RootState) =>
+  state.charts.incomeExpense;
+
+export const selectChartsSavings = (state: RootState) => state.charts.savings;
+
+export const selectChartsExpenseComposition = (state: RootState) =>
+  state.charts.expenseComposition;
+
+export const selectChartsCategoryTrend = (state: RootState) =>
+  state.charts.categoryTrend;
+
+export const selectChartsLoading = (state: RootState) => state.charts.loading;
 
 export default chartsSlice.reducer;

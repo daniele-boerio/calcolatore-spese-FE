@@ -6,7 +6,9 @@ import {
   YearDetailsStatRow,
 } from "./interfaces";
 import {
+  getMonthRefunds,
   getMonthlyDetailsStatistics,
+  getPreviousMonthSavings,
   getYearDetailsStatistics,
 } from "./api_calls";
 
@@ -19,6 +21,10 @@ interface StatisticsState {
     accantonamento: number;
     total: number;
   };
+  /** Netto del mese precedente: il riferimento del badge di variazione. */
+  previousTotal: number | null;
+  /** Rimborsi del mese, che i totali di `monthDetails` non contengono. */
+  refunds: number;
   loading: boolean;
 }
 
@@ -31,6 +37,8 @@ const initialState: StatisticsState = {
     accantonamento: 0,
     total: 0,
   },
+  previousTotal: null,
+  refunds: 0,
   loading: false,
 };
 
@@ -69,6 +77,20 @@ const statisticsSlice = createSlice({
         },
       )
 
+      .addCase(
+        getPreviousMonthSavings.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.previousTotal = action.payload;
+        },
+      )
+
+      .addCase(
+        getMonthRefunds.fulfilled,
+        (state, action: PayloadAction<number>) => {
+          state.refunds = action.payload;
+        },
+      )
+
       // Matchers (rimangono invariati)
       .addMatcher(
         (action: Action) =>
@@ -93,6 +115,12 @@ export const selectMonthlyStatisticsData = (state: RootState) =>
   state.statistics.monthlyData;
 export const selectMonthlyTotals = (state: RootState) =>
   state.statistics.totals;
+export const selectPreviousMonthSavings = (state: RootState) =>
+  state.statistics.previousTotal;
+
+export const selectMonthRefunds = (state: RootState) =>
+  state.statistics.refunds;
+
 export const selectStatisticsLoading = (state: RootState) =>
   state.statistics.loading;
 

@@ -1,135 +1,285 @@
 @use "../../../styles/variables" as v;
 
-.monthly-statistics-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  width: 100%;
-  height: 100%;
-  animation: fadeIn 0.3s ease-in; // Animazione di ingresso morbida
-  padding: 1rem;
+.analysis-muted {
+  margin: 0;
+  font-size: 13.5px;
+  color: v.$muted;
+}
 
-  .page-header {
+// ── Card del risparmio del mese ─────────────────────────────────────────────
+.savings-card {
+  gap: 18px;
+  padding: 22px;
+
+  &__top {
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid v.$border-color;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
 
-    .filters-row {
-      display: flex;
-      gap: 1.5rem;
-      align-items: center;
+  &__headline {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
 
-      // Forza una larghezza minima per i dropdown su desktop per non farli sembrare troppo piccoli
-      .p-dropdown {
-        min-width: 14rem;
-      }
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: v.$muted;
+  }
 
-      @media screen and (max-width: v.$mobile) {
-        flex-direction: column;
-        width: 100%;
-        align-items: stretch;
-        gap: 1rem;
+  &__value {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+  }
 
-        // Su mobile i dropdown occupano tutta la larghezza disponibile
-        .p-dropdown {
-          width: 100%;
-        }
-      }
+  &__delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    border-radius: v.$r-pill;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    i {
+      font-size: 10px;
+    }
+
+    &--up {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+
+    &--down {
+      background: v.$negative-soft;
+      color: v.$negative;
     }
   }
 
-  .summary-stats-row {
+  // Barra impilata: le tre quote sono frazioni delle entrate, e quello che
+  // avanza resta il fondo della traccia.
+  &__bar {
     display: flex;
-    justify-content: center;
-    width: 100%;
-    margin-top: 0.5rem;
+    height: 12px;
+    border-radius: v.$r-pill;
+    background: v.$surface-2;
+    overflow: hidden;
+  }
 
-    .stats {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 2rem;
-      font-size: 1rem;
-      background: color-mix(in srgb, v.$text-main 3%, transparent);
-      padding: 0.8rem 2rem;
-      border-radius: 50px;
-      border: 1px solid color-mix(in srgb, v.$text-main 5%, transparent);
+  &__segment {
+    height: 100%;
 
-      .stats-item {
-        margin: 0;
-        font-weight: 500;
-        color: v.$text-muted;
+    &--spent {
+      background: v.$accent;
+    }
 
-        span {
-          font-weight: 700;
-          margin-left: 0.35rem;
-        }
+    &--aside {
+      background: v.$accent-2;
+    }
 
-        &.income span {
-          color: v.$green;
-        }
-        &.expenses span {
-          color: v.$red;
-        }
-        &.others span {
-          color: #3498db;
-        }
-        &.set-aside span {
-          color: #f59e0b;
-        }
-        &.total span {
-          color: v.$text-main;
-        }
-      }
-
-      @media screen and (max-width: v.$mobile) {
-        gap: 1rem;
-        padding: 0.8rem 1.2rem;
-        border-radius: 16px;
-        font-size: 0.85rem;
-      }
+    &--left {
+      background: v.$surface-2;
     }
   }
 
-  .value-high {
-    color: v.$green;
-  }
-  .value-low {
-    color: v.$red;
+  &__legend {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
   }
 
-  .statistics-container {
-    .incomes,
-    .expenses,
-    .others {
-      h3 {
-        margin-bottom: 1rem;
-        color: v.$text-main;
-        font-weight: 600;
-      }
+  &__legend-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13.5px;
 
-      .categories-wrapper {
-        display: flex;
-        flex-direction: row;
-        gap: 1rem;
-        flex-wrap: wrap;
-      }
+    .amount {
+      font-weight: 700;
+    }
+  }
+
+  &__legend-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 3px;
+
+    &--spent {
+      background: v.$accent;
+    }
+
+    &--aside {
+      background: v.$accent-2;
+    }
+
+    &--left {
+      background: v.$surface-2;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid v.$line-soft;
+    font-size: 12.5px;
+    color: v.$muted;
+
+    strong .amount {
+      color: v.$ink;
+      font-weight: 700;
     }
   }
 }
 
-// Animazione
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
+// ── Uscite per categoria ────────────────────────────────────────────────────
+.category-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: v.$tap-target;
+
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.99);
+      transition: transform v.$dur-press;
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__line {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 13.5px;
+  }
+
+  &__name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__figure {
+    flex: 0 0 auto;
+    color: v.$muted;
+
+    strong .amount {
+      color: v.$ink;
+      font-weight: 700;
+    }
+  }
+
+  &__track {
+    display: block;
+    height: 6px;
+    border-radius: v.$r-pill;
+    background: v.$surface-2;
+    overflow: hidden;
+  }
+
+  // Le righe prendono la serie grafici nell'ordine: il colore dice la
+  // posizione in classifica, non la categoria.
+  &__fill {
+    display: block;
+    height: 100%;
+    border-radius: v.$r-pill;
+
+    &--1 {
+      background: v.$series-1;
+    }
+    &--2 {
+      background: v.$series-2;
+    }
+    &--3 {
+      background: v.$series-3;
+    }
+    &--4 {
+      background: v.$series-4;
+    }
+    &--5 {
+      background: v.$series-5;
+    }
+  }
+
+  &__chevron {
+    flex: 0 0 auto;
+    font-size: 11px;
+    color: v.$muted-2;
+  }
+}
+
+// ── Da notare ───────────────────────────────────────────────────────────────
+.insight {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  &__icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: v.$r-icon;
+
+    i {
+      font-size: 13px;
+    }
+
+    &--negative {
+      background: v.$negative-soft;
+      color: v.$negative;
+    }
+
+    &--positive {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+  }
+
+  &__text {
+    flex: 1;
+    font-size: 13.5px;
+    line-height: 1.45;
   }
 }
