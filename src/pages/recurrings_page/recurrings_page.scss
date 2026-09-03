@@ -1,0 +1,250 @@
+@use "../../styles/variables" as v;
+
+.recurrings {
+  &__header {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &__back {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: v.$tap-target;
+    height: v.$tap-target;
+    margin-left: -10px;
+
+    border: 0;
+    background: transparent;
+    color: v.$ink;
+    cursor: pointer;
+
+    i {
+      font-size: 16px;
+    }
+  }
+
+  // Card a superficie invertita: al buio è solo un bordo accento.
+  &__commitment {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 18px 20px;
+
+    border: 1px solid v.$invert-border;
+    border-radius: v.$r-inner;
+    background: v.$invert-surface;
+    color: v.$invert-ink;
+  }
+
+  &__commitment-main {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: v.$invert-meta;
+  }
+
+  &__commitment-value {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+
+    .amount__currency {
+      color: v.$invert-meta;
+    }
+  }
+
+  &__commitment-share {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+    flex: 0 0 auto;
+  }
+
+  &__commitment-label {
+    font-size: 12px;
+    color: v.$invert-meta;
+  }
+
+  &__commitment-percent {
+    font-size: 16px;
+    font-weight: 800;
+  }
+
+  &__content {
+    gap: 18px;
+  }
+
+  &__group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__card {
+    gap: 0;
+    padding: 4px 16px;
+    border-radius: v.$r-inner;
+  }
+
+  &__menu {
+    flex: 0 0 auto;
+    margin-right: -12px;
+
+    .p-button {
+      width: 36px;
+      height: v.$tap-target;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      color: v.$muted-2;
+    }
+  }
+
+  &__add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px;
+
+    border: 1px dashed v.$line;
+    border-radius: 18px;
+    background: transparent;
+    color: v.$accent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+
+    i {
+      font-size: 13px;
+    }
+  }
+}
+
+.recurring-row {
+  display: flex;
+  align-items: center;
+
+  & + & {
+    border-top: 1px solid v.$line-soft;
+  }
+
+  &__main {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 0;
+
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.99);
+      transition: transform v.$dur-press;
+    }
+  }
+
+  // Colonna della data: larghezza fissa così i titoli restano allineati.
+  &__date {
+    flex: 0 0 42px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  &__day {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  &__month {
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: v.$muted;
+  }
+
+  &__text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__name {
+    font-size: 14.5px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__meta {
+    font-size: 12px;
+    color: v.$muted;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__figures {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .amount {
+      font-size: 15px;
+      font-weight: 700;
+    }
+  }
+
+  &__state {
+    font-size: 11px;
+    font-weight: 700;
+
+    &--on {
+      color: v.$positive;
+    }
+
+    &--off {
+      color: v.$muted-2;
+    }
+
+    &--late {
+      color: v.$negative;
+    }
+  }
+
+  &--late &__day,
+  &--late &__month {
+    color: v.$negative;
+  }
+}

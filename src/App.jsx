@@ -35,7 +35,7 @@ const DebitiPage = lazy(() => import("./pages/debiti_page/debiti_page"));
 const TagsPage = lazy(() => import("./pages/tags_page/tags_page"));
 const AnalysisPage = lazy(() => import("./pages/analysis_page/analysis_page"));
 const RecurringsPage = lazy(
-  () => import("./pages/transaction_page/recurrings/recurrings"),
+  () => import("./pages/recurrings_page/recurrings_page"),
 );
 const SettingsPage = lazy(() => import("./pages/settings_page/settings_page"));
 const InvestimentiPage = lazy(
