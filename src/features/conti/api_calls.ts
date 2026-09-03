@@ -52,9 +52,19 @@ export const updateBudget = createAsyncThunk<
   UpdateBudgetParams
 >("conti/monthlyBudget", async (params, { rejectWithValue }) => {
   try {
-    const response = await api.put<MonthlyBudgetResponse>(`/monthlyBudget`, {
-      total_budget: params.total_budget,
-    });
+    // Aggiornamento parziale: obiettivo di risparmio e tetto di spesa si
+    // impostano da due controlli separati e il BE legge solo i campi presenti,
+    // quindi mandiamo solo quelli passati. Un `null` esplicito cancella.
+    const body: UpdateBudgetParams = {};
+    if ("total_budget" in params) body.total_budget = params.total_budget;
+    if ("monthly_spending_budget" in params)
+      body.monthly_spending_budget = params.monthly_spending_budget;
+
+    const response = await api.put<MonthlyBudgetResponse>(
+      `/monthlyBudget`,
+      body,
+    );
+
     return response.data;
   } catch (error) {
     const err = error as AxiosError;

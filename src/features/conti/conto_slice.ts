@@ -30,6 +30,15 @@ const initialState: ContoState = {
     remaining: null,
     percentage: null,
   },
+  monthlySpending: {
+    budget: null,
+    spent: 0,
+    projected: 0,
+    remaining: null,
+    percentage: null,
+  },
+  monthIncome: 0,
+  monthSaved: 0,
   monthlyExpensesByCategory: [],
   filters: {
     sort_by: ["saldo:desc"],
@@ -47,23 +56,33 @@ const handleRejected = (state: ContoState) => {
   state.loading = false;
 };
 
+// I Decimal del BE arrivano come stringhe: la conversione a Number avviene solo
+// qui, al confine con lo store.
+const toNumber = (value: number | string | null | undefined): number | null =>
+  value !== null && value !== undefined ? Number(value) : null;
+
 // GET /conti/currentMonthExpenses e PUT /monthlyBudget rispondono con la stessa
-// struttura: un solo posto dove convertire i Decimal (che arrivano come stringhe).
+// struttura: un solo posto dove leggerla.
 const applyMonthlyBudget = (
   state: ContoState,
   payload: MonthlyBudgetResponse,
 ) => {
-  const { monthly_budget } = payload;
-  state.monthlyBudget.total_budget =
-    monthly_budget.total_budget !== null &&
-    monthly_budget.total_budget !== undefined
-      ? Number(monthly_budget.total_budget)
-      : null;
-  state.monthlyBudget.remaining =
-    monthly_budget.remaining !== null && monthly_budget.remaining !== undefined
-      ? Number(monthly_budget.remaining)
-      : null;
+  const { monthly_budget, spending } = payload;
+
+  state.monthlyBudget.total_budget = toNumber(monthly_budget.total_budget);
+  state.monthlyBudget.remaining = toNumber(monthly_budget.remaining);
   state.monthlyBudget.percentage = monthly_budget.percentage ?? 0;
+
+  state.monthlySpending = {
+    budget: toNumber(spending.budget),
+    spent: toNumber(spending.spent) ?? 0,
+    projected: toNumber(spending.projected) ?? 0,
+    remaining: toNumber(spending.remaining),
+    percentage: spending.percentage ?? null,
+  };
+
+  state.monthIncome = toNumber(payload.income) ?? 0;
+  state.monthSaved = toNumber(payload.saved) ?? 0;
 };
 
 const contoSlice = createSlice({
@@ -256,6 +275,15 @@ export const selectContiLoading = (state: RootState) => state.conto.loading;
 export const selectContiConti = (state: RootState) => state.conto.conti;
 export const selectContiSelectedConto = (state: RootState) =>
   state.conto.selectedConto;
+export const selectContiMonthlySpending = (state: RootState) =>
+  state.conto.monthlySpending;
+
+export const selectContiMonthIncome = (state: RootState) =>
+  state.conto.monthIncome;
+
+export const selectContiMonthSaved = (state: RootState) =>
+  state.conto.monthSaved;
+
 export const selectContiMonthlyBudget = (state: RootState) =>
   state.conto.monthlyBudget;
 export const selectContiMonthlyExpensesByCategory = (state: RootState) =>

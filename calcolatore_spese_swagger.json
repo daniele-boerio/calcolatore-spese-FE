@@ -141,7 +141,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentMonthBudgetOut"
+                }
               }
             }
           },
@@ -511,7 +513,9 @@
             "description": "Successful Response",
             "content": {
               "application/json": {
-                "schema": {}
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentMonthBudgetOut"
+                }
               }
             }
           },
@@ -5795,6 +5799,34 @@
         "type": "object",
         "title": "ContoUpdate"
       },
+      "CurrentMonthBudgetOut": {
+        "properties": {
+          "monthly_budget": {
+            "$ref": "#/components/schemas/SavingsBudgetOut"
+          },
+          "spending": {
+            "$ref": "#/components/schemas/SpendingBudgetOut"
+          },
+          "income": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Income"
+          },
+          "saved": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Saved"
+          }
+        },
+        "type": "object",
+        "required": [
+          "monthly_budget",
+          "spending",
+          "income",
+          "saved"
+        ],
+        "title": "CurrentMonthBudgetOut"
+      },
       "DebitoCreate": {
         "properties": {
           "nome": {
@@ -6412,6 +6444,26 @@
         ],
         "title": "MonthlySavingsOut"
       },
+      "PeriodoOut": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "PeriodoOut"
+      },
       "ResetPasswordRequest": {
         "properties": {
           "token": {
@@ -6727,6 +6779,48 @@
         "type": "object",
         "title": "RicorrenzaUpdate"
       },
+      "SavingsBudgetOut": {
+        "properties": {
+          "total_budget": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Budget"
+          },
+          "remaining": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Remaining"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          },
+          "period": {
+            "$ref": "#/components/schemas/PeriodoOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "remaining",
+          "period"
+        ],
+        "title": "SavingsBudgetOut",
+        "description": "Obiettivo di risparmio: quanto l'utente punta a mettere da parte."
+      },
       "SottocategoriaCreate": {
         "properties": {
           "nome": {
@@ -6844,6 +6938,62 @@
         },
         "type": "object",
         "title": "SottocategoriaUpdate"
+      },
+      "SpendingBudgetOut": {
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget"
+          },
+          "spent": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Spent"
+          },
+          "projected": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Projected"
+          },
+          "remaining": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remaining"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "spent",
+          "projected"
+        ],
+        "title": "SpendingBudgetOut",
+        "description": "Tetto di spesa: quanto l'utente si concede di spendere nel mese.\n\nÈ il riferimento dell'hero della Home. `remaining` può essere negativo — è lo\nsforamento — e resta `None` finché un tetto non è stato impostato."
       },
       "StoricoInvestimentoCreate": {
         "properties": {
@@ -7075,7 +7225,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-08-19"
+            "default": "2026-09-03"
           },
           "descrizione": {
             "anyOf": [
@@ -7181,7 +7331,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-08-19"
+            "default": "2026-09-03"
           },
           "descrizione": {
             "anyOf": [
@@ -7475,7 +7625,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-08-19"
+            "default": "2026-09-03"
           },
           "descrizione": {
             "anyOf": [
@@ -7583,10 +7733,26 @@
               }
             ],
             "title": "Total Budget"
+          },
+          "monthly_spending_budget": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Spending Budget"
           }
         },
         "type": "object",
-        "title": "UserBudgetUpdate"
+        "title": "UserBudgetUpdate",
+        "description": "Aggiornamento parziale: i campi non inviati restano com'erano.\n\nI due budget sono cose diverse — `total_budget` è l'obiettivo di risparmio,\n`monthly_spending_budget` il tetto di spesa — e si impostano da due controlli\nseparati, quindi l'endpoint legge solo i campi presenti nel payload."
       },
       "UserCreate": {
         "properties": {
@@ -7633,6 +7799,18 @@
               }
             ],
             "title": "Total Budget"
+          },
+          "monthly_spending_budget": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Spending Budget"
           },
           "is_open_banking_admin": {
             "type": "boolean",

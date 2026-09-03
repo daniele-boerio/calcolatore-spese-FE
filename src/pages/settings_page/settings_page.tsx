@@ -1,10 +1,15 @@
+import { useEffect, useState } from "react";
 import { useI18n } from "../../i18n/use-i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Page, PageContent, PageHeader } from "../../components/page/page";
+import Sheet from "../../components/sheet/sheet";
+import Button from "../../components/button/button";
+import Amount from "../../components/amount/amount";
 import {
   selectHideAmounts,
   selectTheme,
   setTheme,
+  showToast,
   toggleHideAmounts,
 } from "../../features/ui/ui_slice";
 import type { ThemePreference } from "../../features/ui/theme";
@@ -13,6 +18,11 @@ import {
   selectProfileUsername,
 } from "../../features/profile/profile_slice";
 import { logout } from "../../features/profile/api_calls";
+import {
+  getCurrentMonthExpenses,
+  updateBudget,
+} from "../../features/conti/api_calls";
+import { selectContiMonthlySpending } from "../../features/conti/conto_slice";
 import "./settings_page.scss";
 
 const THEMES: ThemePreference[] = ["light", "dark", "system"];
@@ -33,6 +43,44 @@ export default function SettingsPage() {
   const hideAmounts = useAppSelector(selectHideAmounts);
   const username = useAppSelector(selectProfileUsername);
   const email = useAppSelector(selectProfileEmail);
+  const spending = useAppSelector(selectContiMonthlySpending);
+
+  const [budgetSheetOpen, setBudgetSheetOpen] = useState(false);
+  const [budgetDraft, setBudgetDraft] = useState("");
+  const [budgetInvalid, setBudgetInvalid] = useState(false);
+
+  useEffect(() => {
+    // Il tetto di spesa arriva con la card del mese.
+    dispatch(getCurrentMonthExpenses());
+  }, [dispatch]);
+
+  const openBudgetSheet = () => {
+    setBudgetDraft(spending.budget !== null ? String(spending.budget) : "");
+    setBudgetInvalid(false);
+    setBudgetSheetOpen(true);
+  };
+
+  const saveBudget = async () => {
+    const normalized = budgetDraft.trim().replace(",", ".");
+    const parsed = normalized === "" ? null : Number(normalized);
+
+    // Numero non valido: lo sheet resta aperto con l'errore sotto al campo,
+    // invece di non fare niente in silenzio.
+    if (parsed !== null && (Number.isNaN(parsed) || parsed < 0)) {
+      setBudgetInvalid(true);
+      return;
+    }
+
+    setBudgetSheetOpen(false);
+
+    const result = await dispatch(
+      updateBudget({ monthly_spending_budget: parsed }),
+    );
+
+    if (updateBudget.fulfilled.match(result)) {
+      dispatch(showToast({ variant: "success", title: t("save") }));
+    }
+  };
 
   return (
     <Page className="settings-page">
@@ -80,6 +128,36 @@ export default function SettingsPage() {
         </section>
 
         <section className="settings-group">
+          <h2 className="settings-group__title">{t("settings_money")}</h2>
+
+          <div className="settings-card">
+            <button
+              type="button"
+              className="settings-row settings-row--tappable"
+              onClick={openBudgetSheet}
+            >
+              <span className="settings-row__text">
+                <span className="settings-row__label">
+                  {t("settings_spending_budget")}
+                </span>
+                <span className="settings-row__hint">
+                  {t("settings_spending_budget_hint")}
+                </span>
+              </span>
+
+              <span className="settings-row__value">
+                {spending.budget !== null ? (
+                  <Amount value={spending.budget} decimals={0} />
+                ) : (
+                  t("settings_spending_budget_none")
+                )}
+              </span>
+              <i className="pi pi-chevron-right" aria-hidden="true" />
+            </button>
+          </div>
+        </section>
+
+        <section className="settings-group">
           <h2 className="settings-group__title">{t("settings_privacy")}</h2>
 
           <div className="settings-card">
@@ -112,6 +190,53 @@ export default function SettingsPage() {
           {t("logout")}
         </button>
       </PageContent>
+
+      <Sheet
+        open={budgetSheetOpen}
+        onClose={() => setBudgetSheetOpen(false)}
+        title={t("settings_spending_budget")}
+        footer={
+          <>
+            <Button
+              variant="neutral"
+              block
+              onClick={() => setBudgetSheetOpen(false)}
+            >
+              {t("cancel")}
+            </Button>
+            <Button block onClick={saveBudget}>
+              {t("save")}
+            </Button>
+          </>
+        }
+      >
+        <label className="budget-field">
+          <input
+            className="budget-field__input"
+            type="text"
+            inputMode="decimal"
+            autoFocus
+            value={budgetDraft}
+            placeholder={t("settings_spending_budget_placeholder")}
+            aria-invalid={budgetInvalid}
+            onChange={(event) => {
+              setBudgetDraft(event.target.value);
+              setBudgetInvalid(false);
+            }}
+          />
+          <span className="budget-field__currency">€</span>
+        </label>
+
+        <p
+          className={`budget-field__hint ${
+            budgetInvalid ? "budget-field__hint--error" : ""
+          }`}
+        >
+          {budgetInvalid
+            ? t("settings_spending_budget_invalid")
+            : t("settings_spending_budget_hint")}
+        </p>
+      </Sheet>
     </Page>
   );
 }

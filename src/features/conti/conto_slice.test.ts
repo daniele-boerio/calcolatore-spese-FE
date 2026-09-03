@@ -13,6 +13,15 @@ const budgetFromServer = (remaining: number) =>
   getCurrentMonthExpenses.fulfilled(
     {
       monthly_budget: { total_budget: 1000, remaining, percentage: null },
+      spending: {
+        budget: null,
+        spent: 0,
+        projected: 0,
+        remaining: null,
+        percentage: null,
+      },
+      income: 0,
+      saved: 0,
     },
     "req",
     undefined,
@@ -92,6 +101,15 @@ describe("conto_slice — totali del mese dopo una nuova transazione", () => {
             remaining: "-42.50" as unknown as number,
             percentage: null,
           },
+          spending: {
+            budget: "1200.00" as unknown as number,
+            spent: "900.00" as unknown as number,
+            projected: "650.00" as unknown as number,
+            remaining: "300.00" as unknown as number,
+            percentage: 75,
+          },
+          income: "1850.00" as unknown as number,
+          saved: "125.00" as unknown as number,
         },
         "req",
         undefined,
@@ -100,5 +118,27 @@ describe("conto_slice — totali del mese dopo una nuova transazione", () => {
 
     expect(state.monthlyBudget.total_budget).toBe(1000);
     expect(state.monthlyBudget.remaining).toBe(-42.5);
+
+    // Il tetto di spesa è un blocco a parte: obiettivo di risparmio e tetto di
+    // spesa non si sovrascrivono a vicenda.
+    expect(state.monthlySpending).toEqual({
+      budget: 1200,
+      spent: 900,
+      projected: 650,
+      remaining: 300,
+      percentage: 75,
+    });
+    expect(state.monthIncome).toBe(1850);
+    expect(state.monthSaved).toBe(125);
+  });
+
+  it("tiene il tetto di spesa a null finché l'utente non lo imposta", () => {
+    const state = reducer(initial, budgetFromServer(100));
+
+    expect(state.monthlySpending.budget).toBeNull();
+    expect(state.monthlySpending.remaining).toBeNull();
+    expect(state.monthlySpending.percentage).toBeNull();
+    // Lo speso c'è comunque: l'hero mostra le spese anche senza tetto.
+    expect(state.monthlySpending.spent).toBe(0);
   });
 });

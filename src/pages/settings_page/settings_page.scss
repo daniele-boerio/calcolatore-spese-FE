@@ -135,6 +135,15 @@
   min-height: v.$tap-target;
   cursor: pointer;
 
+  // Come riga-bottone perde gli stili nativi del button.
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  text-align: left;
+
   &__text {
     display: flex;
     flex-direction: column;
@@ -144,6 +153,23 @@
   &__label {
     font-size: 14.5px;
     font-weight: 600;
+  }
+
+  &__value {
+    flex: 0 0 auto;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  &--tappable:active {
+    transform: scale(0.97);
+    transition: transform v.$dur-press;
+  }
+
+  & > .pi-chevron-right {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: v.$muted-2;
   }
 
   &__hint {
@@ -207,4 +233,53 @@
     transform: scale(0.97);
     transition: transform v.$dur-press;
   }
+}
+
+// Campo importo dello sheet "Budget di spesa": il numero è il protagonista.
+.budget-field {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 8px;
+
+  &__input {
+    width: 100%;
+    max-width: 240px;
+
+    border: 0;
+    background: transparent;
+    color: v.$ink;
+
+    font-family: inherit;
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+
+    &::placeholder {
+      color: v.$muted-2;
+      font-weight: 700;
+    }
+
+    &:focus {
+      outline: none;
+    }
+  }
+
+  &__currency {
+    font-size: 22px;
+    color: v.$muted-2;
+  }
+
+  &__hint {
+    margin: 0;
+    font-size: 12.5px;
+    color: v.$muted;
+    text-align: center;
+  }
+}
+
+.budget-field__hint--error {
+  color: v.$negative;
 }

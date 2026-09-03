@@ -35,8 +35,22 @@ export interface MonthlyBudget {
   remaining: number | null;
 }
 
+// Il tetto di spesa del mese: quanto l'utente si concede di spendere. Concetto
+// distinto da `MonthlyBudget`, che è l'obiettivo di risparmio.
+// `remaining` può essere negativo — è lo sforamento — ed è `null` finché un
+// tetto non è stato impostato.
+export interface MonthlySpending {
+  budget: number | null;
+  spent: number;
+  /** Uscite ricorrenti attive non ancora scattate entro fine mese. */
+  projected: number;
+  remaining: number | null;
+  percentage: number | null;
+}
+
 export interface BudgetUpdateData {
-  total_budget: number | null;
+  total_budget?: number | null;
+  monthly_spending_budget?: number | null;
 }
 
 // Struttura specifica della risposta API per il budget
@@ -48,6 +62,15 @@ export interface MonthlyBudgetResponse {
     remaining: number | null;
     period?: { start: string; end: string };
   };
+  spending: {
+    budget: number | null;
+    spent: number;
+    projected: number;
+    remaining: number | null;
+    percentage: number | null;
+  };
+  income: number;
+  saved: number;
 }
 
 export interface ContoState {
@@ -55,6 +78,10 @@ export interface ContoState {
   conti: Conto[];
   selectedConto: Conto | null;
   monthlyBudget: MonthlyBudget;
+  monthlySpending: MonthlySpending;
+  /** Entrate e accantonamenti del mese, dalla stessa risposta del budget. */
+  monthIncome: number;
+  monthSaved: number;
   monthlyExpensesByCategory: ExpenseByCategory[];
   filters: ContoFilters;
   include_future_recurring: boolean;
@@ -62,7 +89,8 @@ export interface ContoState {
 
 // Interfaccia per il payload di aggiornamento budget
 export interface UpdateBudgetParams {
-  total_budget: number | null;
+  total_budget?: number | null;
+  monthly_spending_budget?: number | null;
 }
 
 export interface GetMonthExpensesParams {
