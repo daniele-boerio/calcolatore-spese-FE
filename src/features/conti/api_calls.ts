@@ -224,6 +224,32 @@ export const disconnectBank = createAsyncThunk<Conto, DisconnectBankParams>(
   },
 );
 
+/**
+ * Quante transazioni ha un conto. Serve alla conferma di eliminazione, che
+ * deve dire quante righe sta per nascondere: la cancellazione è reversibile
+ * sul BE, ma chi sbaglia conto deve capirlo prima di confermare, non dopo.
+ *
+ * Non finisce in nessun reducer: chi la chiama ne legge il risultato con
+ * `.unwrap()` e lo mostra nell'alert.
+ */
+export const countContoTransactions = createAsyncThunk<
+  number,
+  DeleteContoParams
+>("conti/countContoTransactions", async (params, { rejectWithValue }) => {
+  try {
+    const response = await api.get<{ total: number }>(
+      `/transazioni/paginated?conto_id=${params.id}&size=1`,
+    );
+
+    return response.data?.total ?? 0;
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(
+      err.response?.data || "Errore conteggio transazioni del conto",
+    );
+  }
+});
+
 export const deleteConto = createAsyncThunk<string, DeleteContoParams>(
   "conti/deleteConto",
   async (params, { rejectWithValue }) => {

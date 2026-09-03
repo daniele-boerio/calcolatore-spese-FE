@@ -1,110 +1,209 @@
-@use "../../styles/variables.scss" as v;
+@use "../../styles/variables" as v;
 
-.conti-page {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  width: 100%;
-  height: 100%; // Occupa l'altezza completa (fino al bordo dello schermo)
-  animation: fadeIn 0.3s ease-in;
-  padding: 1rem;
-
-  .page-header {
+.accounts {
+  &__header {
     display: flex;
-    justify-content: space-between;
     align-items: flex-end;
-    gap: 1rem;
-    flex-wrap: wrap;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid v.$border-color;
-
-    .header-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .header-content {
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
-
-      h1 {
-        margin: 0;
-        font-size: 1.75rem;
-        letter-spacing: -0.02em;
-        color: var(--text-main);
-        font-weight: 800;
-      }
-
-      .subtitle {
-        margin: 0;
-        color: var(--text-muted);
-        font-size: 0.9rem;
-      }
-    }
+    justify-content: space-between;
+    gap: 12px;
   }
 
-  .split-wrapper {
+  &__worth {
     display: flex;
     flex-direction: column;
-    flex: 1;
-    min-height: 0; // Fondamentale per far funzionare lo scroll interno all'area dedicata
+    gap: 3px;
+    min-width: 0;
   }
 
-  .conti-list {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
+  &__eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: v.$muted;
+  }
 
-    .scrollable-area {
-      flex: 1;
-      overflow-y: auto;
-      padding-top: 0.5rem; // Respiro per il sollevamento in hover delle card
-      padding-right: 0.5rem; // Spazio per non far attaccare le card alla scrollbar
-      padding-bottom: 6rem; // Spazio in fondo per evitare che il "+" copra l'ultima riga
+  &__worth-value {
+    font-family: v.$font-display;
+    font-size: 34px;
+    font-weight: v.$fw-display;
+    letter-spacing: -0.035em;
+    line-height: 1;
 
-      .conti-grid {
-        display: flex;
-        flex-wrap: wrap; // IL SEGRETO: manda a capo le credit card quando lo schermo si stringe!
-        gap: 1.5rem;
-        align-content: flex-start;
-      }
-
-      .no-data {
-        color: var(--text-muted);
-        font-style: italic;
-      }
-
-      // Stile scrollbar
-      &::-webkit-scrollbar {
-        width: 0.313rem;
-      }
-      &::-webkit-scrollbar-thumb {
-        background: v.$border-color;
-        border-radius: 10px;
-      }
+    .amount__currency {
+      font-size: 18px;
     }
   }
 
-  .add-account-button {
-    position: fixed;
-    // Sopra la tab bar, non sotto.
-    bottom: calc(var(--tabbar-h) + 1rem + env(safe-area-inset-bottom));
-    right: 2rem;
-    z-index: 1000;
+  &__delta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-bottom: 4px;
+    padding: 6px 10px;
+
+    border-radius: v.$r-pill;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+
+    i {
+      font-size: 10px;
+    }
+
+    &--up {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+
+    &--down {
+      background: v.$negative-soft;
+      color: v.$negative;
+    }
+  }
+
+  &__cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  // La card-lista assorbe il vecchio menu laterale: il padding verticale lo
+  // mettono le righe.
+  &__menu {
+    gap: 0;
+    padding: 6px 20px;
+  }
+
+  &__menu-button {
+    flex: 0 0 auto;
+    margin-right: -10px;
+
+    .p-button {
+      width: v.$tap-target;
+      height: v.$tap-target;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      color: v.$muted-2;
+    }
+  }
+
+  &__count {
+    font-size: 12px;
+    font-weight: 600;
+    color: v.$muted;
+  }
+
+  &__add {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px;
+
+    border: 1px dashed v.$line;
+    border-radius: 18px;
+    background: transparent;
+    color: v.$accent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+
+    i {
+      font-size: 13px;
+    }
+
+    &:active {
+      transform: scale(0.98);
+      transition: transform v.$dur-press;
+    }
   }
 }
 
-// Animazione d'ingresso
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
+.account-card {
+  gap: 14px;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__icon {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+
+    border-radius: v.$r-icon;
+    background: v.$accent-soft;
+    color: v.$accent;
+
+    i {
+      font-size: 14px;
+    }
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    font-size: 15px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__badge {
+    flex: 0 0 auto;
+    padding: 4px 9px;
+    border-radius: v.$r-pill;
+    background: v.$accent-soft;
+    color: v.$accent;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  &__figures {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  &__balance {
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+  }
+
+  &__percent {
+    color: v.$accent;
+    font-size: 12.5px;
+    font-weight: 700;
+  }
+
+  &__sync {
+    font-size: 12px;
+    color: v.$muted;
+
+    &--failed {
+      color: v.$negative;
+      font-weight: 600;
+    }
+  }
+
+  &__goal {
+    font-size: 12px;
+    color: v.$muted;
+
+    .amount {
+      font-size: inherit;
+      color: inherit;
+    }
   }
 }

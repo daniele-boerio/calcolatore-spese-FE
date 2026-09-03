@@ -81,3 +81,43 @@ export function daysBetweenIso(fromIso: string, toIso: string): number {
 export function dayKey(value: string): string {
   return value.slice(0, 10);
 }
+
+// Scala del tempo relativo, dalla più grossa alla più fine. Si sceglie la
+// prima unità in cui la distanza vale almeno 1: "2 ore fa", non "120 minuti fa".
+const RELATIVE_UNITS: [Intl.RelativeTimeFormatUnit, number][] = [
+  ["year", 365 * 24 * 60 * 60 * 1000],
+  ["month", 30 * 24 * 60 * 60 * 1000],
+  ["day", MS_PER_DAY],
+  ["hour", 60 * 60 * 1000],
+  ["minute", 60 * 1000],
+];
+
+/**
+ * "2 ore fa", "ieri", "adesso". `locale` è un tag BCP 47 ("it-IT").
+ * Restituisce `null` per una data non leggibile, così chi chiama può
+ * semplicemente non scrivere la riga.
+ */
+export function relativeTime(
+  iso: string | null | undefined,
+  locale: string,
+  now: Date = new Date(),
+): string | null {
+  if (!iso) return null;
+
+  const timestamp = Date.parse(iso);
+  if (Number.isNaN(timestamp)) return null;
+
+  const delta = timestamp - now.getTime();
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: "auto" });
+
+  for (const [unit, size] of RELATIVE_UNITS) {
+    const value = delta / size;
+
+    if (Math.abs(value) >= 1) {
+      return formatter.format(Math.round(value), unit);
+    }
+  }
+
+  // Sotto il minuto: "ora", che è quello che Intl scrive per lo zero.
+  return formatter.format(0, "second");
+}
