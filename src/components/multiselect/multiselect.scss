@@ -107,7 +107,7 @@
       }
 
       &.p-highlight {
-        background-color: rgba(v.$bg-button-primary, 0.15) !important;
+        background-color: color-mix(in srgb, v.$bg-button-primary 15%, transparent) !important;
         color: v.$text-main !important; // Rimosso white per leggibilità in Light Mode
         font-weight: 600;
       }

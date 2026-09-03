@@ -15,6 +15,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_gate";
+import { useThemeSync } from "./features/ui/use_theme";
 
 // Code-splitting per route: ogni pagina è un chunk separato caricato solo
 // quando ci si naviga. Le pagine pesanti (statistiche/grafici, che portano
@@ -51,6 +52,9 @@ function RouteFallback() {
 
 function App() {
   const { isAuthenticated } = useSelector((state) => state.profile);
+
+  // Tiene `data-theme` su <html> allineato alla preferenza salvata.
+  useThemeSync();
 
   const dispatch = useAppDispatch();
 

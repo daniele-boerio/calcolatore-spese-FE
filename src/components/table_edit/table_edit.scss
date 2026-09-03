@@ -64,7 +64,7 @@
     transition: background-color 0.2s;
 
     &:hover {
-      background-color: rgba(v.$bg-button-primary, 0.03) !important;
+      background-color: color-mix(in srgb, v.$bg-button-primary 3%, transparent) !important;
     }
   }
 

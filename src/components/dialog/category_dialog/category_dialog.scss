@@ -87,7 +87,7 @@
           padding: 0.5rem;
 
           &:hover {
-            background-color: rgba(v.$bg-button-primary, 0.05);
+            background-color: color-mix(in srgb, v.$bg-button-primary 5%, transparent);
           }
         }
       }

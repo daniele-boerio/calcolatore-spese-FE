@@ -11,6 +11,7 @@ import debitiReducer from "../features/debiti/debito_slice";
 import statisticsReducer from "../features/statistics/statistics_slice";
 import chartsReducer from "../features/charts/charts_slice";
 import bankProposalsReducer from "../features/bank_proposals/bank_proposals_slice";
+import uiReducer from "../features/ui/ui_slice";
 import { useDispatch, useSelector } from "react-redux";
 import { errorMiddleware } from "./error_middleware";
 
@@ -28,6 +29,7 @@ export const store = configureStore({
     statistics: statisticsReducer,
     charts: chartsReducer,
     bankProposals: bankProposalsReducer,
+    ui: uiReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(errorMiddleware),

@@ -7,10 +7,10 @@
   gap: 1.5rem;
 
   .card-menu {
-    background: rgba(v.$text-main, 0.03); // Leggera tinta basata sul testo
+    background: color-mix(in srgb, v.$text-main 3%, transparent); // Leggera tinta basata sul testo
     border-radius: 12px;
     padding: 0.5rem;
-    border: 1px solid rgba(v.$text-main, 0.08);
+    border: 1px solid color-mix(in srgb, v.$text-main 8%, transparent);
     backdrop-filter: blur(10px);
   }
 

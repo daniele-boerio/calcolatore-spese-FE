@@ -48,7 +48,7 @@
     .recharge-section {
       margin-top: 1rem;
       padding: 1.25rem;
-      background-color: rgba(v.$text-main, 0.03);
+      background-color: color-mix(in srgb, v.$text-main 3%, transparent);
       border-radius: 8px;
       border: 1px solid v.$border-color;
 

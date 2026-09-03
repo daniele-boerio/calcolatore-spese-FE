@@ -6,7 +6,9 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Il pacchetto di handoff del redesign è materiale di riferimento (prototipi
+  // HTML + runtime vendored), non codice dell'app.
+  globalIgnores(['dist', 'design_handoff_spassoconto_redesign']),
   // JS / JSX — App.jsx, main.jsx, config, services/api.js (intentionally JS)
   {
     files: ['**/*.{js,jsx}'],

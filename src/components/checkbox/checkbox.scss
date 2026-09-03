@@ -44,7 +44,7 @@
 
   // Stato Focus
   &:not(.p-checkbox-disabled) .p-checkbox-box.p-focus {
-    box-shadow: 0 0 0 0.2rem rgba(v.$bg-button-primary, 0.25) !important;
+    box-shadow: 0 0 0 0.2rem color-mix(in srgb, v.$bg-button-primary 25%, transparent) !important;
     border-color: v.$bg-button-primary !important;
   }
 }

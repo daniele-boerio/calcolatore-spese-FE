@@ -1,22 +1,30 @@
-// src/index.scss o src/App.scss
+// src/App.scss — base globale dell'app.
+//
+// `tokens` emette qui, una volta sola, il blocco `:root` / `[data-theme="dark"]`
+// del design system: gli altri fogli di stile importano solo gli alias SCSS.
+@use "./styles/tokens";
 @use "./styles/variables" as v;
+
+html {
+  // Il tema è già su <html> allo script inline di index.html.
+  background-color: var(--bg);
+}
 
 body {
   margin: 0;
   padding: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  line-height: 1.5;
 
-  // Applichiamo lo sfondo variabile
-  background-color: v.$bg-app;
+  background-color: var(--bg);
+  color: var(--ink);
 
-  // Applichiamo anche il colore del testo di base per evitare scritte invisibili
-  color: v.$text-main;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
-  // Aggiungiamo una transizione fluida per quando si cambia tema
-  transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+  // Nessuna transizione sui colori: al cambio tema eviterebbe il flash solo
+  // per sostituirlo con un fade altrettanto visibile.
 }
 
 *,
@@ -25,41 +33,63 @@ body {
   box-sizing: border-box;
 }
 
-// --- Scrollbar moderna ---
+// Il design è a 430px; su schermo largo il contenuto resta in una colonna
+// centrata invece di stirarsi.
+.App {
+  width: 100%;
+  max-width: var(--app-max-width);
+  margin-inline: auto;
+  min-height: 100dvh;
+  position: relative;
+}
+
+// Ogni cifra è allineata in colonna: segno prima del numero, valuta dopo.
+.amount {
+  font-variant-numeric: tabular-nums;
+}
+
+// --- Scrollbar ---
 * {
   scrollbar-width: thin;
-  scrollbar-color: v.$border-color transparent;
+  scrollbar-color: var(--line) transparent;
 }
 *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 *::-webkit-scrollbar-thumb {
-  background: v.$border-color;
-  border-radius: v.$radius-pill;
+  background: var(--line);
+  border-radius: var(--r-pill);
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: v.$text-muted;
+  background: var(--muted);
   background-clip: padding-box;
 }
 
-// --- Focus accessibile e moderno ---
+// --- Focus visibile ---
 :focus-visible {
-  outline: 2px solid v.$light-blue;
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
+// ──────────────────────────────────────────────────────────────────────────
+// COMPATIBILITÀ — DA RIMUOVERE
+//
+// Override dei componenti PrimeReact ancora usati dalle schermate non
+// convertite. Vanno via man mano che le schermate passano ai componenti
+// condivisi del nuovo design system.
+// ──────────────────────────────────────────────────────────────────────────
 .dialog-custom {
-  border: 1px solid v.$border-dialog;
-  border-radius: v.$radius-lg;
-  box-shadow: v.$shadow-lg;
+  border: 1px solid v.$line;
+  border-radius: v.$r-field;
+  box-shadow: v.$shadow-sheet;
   overflow: hidden;
 
   > div {
-    background-color: v.$bg-dialog;
-    color: v.$text-main;
+    background-color: v.$surface;
+    color: v.$ink;
   }
 
   .p-dialog-header {
@@ -80,12 +110,12 @@ body {
   }
 
   .p-dialog-header-icon {
-    color: v.$text-main;
-    border-radius: v.$radius-pill;
+    color: v.$ink;
+    border-radius: v.$r-pill;
     transition: background-color v.$transition-fast;
 
     &:hover {
-      background-color: v.$surface-hover;
+      background-color: v.$surface-2;
     }
   }
 }
@@ -95,19 +125,19 @@ body {
 }
 
 .p-confirm-popup {
-  border: 1px solid v.$border-dialog;
-  background-color: v.$bg-dialog;
-  color: v.$text-main;
+  border: 1px solid v.$line;
+  background-color: v.$surface;
+  color: v.$ink;
 }
 
 .p-calendar {
-  border: 1px solid v.$border-dialog;
+  border: 1px solid v.$line;
   border-radius: 6px;
 
   .p-datepicker-trigger {
-    background-color: v.$bg-button-primary;
+    background-color: v.$accent;
     svg {
-      color: v.$text-on-button;
+      color: v.$on-accent;
     }
   }
 
@@ -117,24 +147,24 @@ body {
 }
 
 .p-datepicker {
-  background-color: v.$bg-dialog;
-  color: v.$text-main;
-  border: 1px solid v.$border-dialog;
+  background-color: v.$surface;
+  color: v.$ink;
+  border: 1px solid v.$line;
 
   .p-datepicker-header {
-    background-color: v.$bg-datepicker-header;
+    background-color: v.$accent;
 
     .p-datepicker-month {
-      color: v.$text-on-dark;
+      color: v.$on-accent;
     }
     .p-datepicker-year {
-      color: v.$text-on-dark;
+      color: v.$on-accent;
     }
 
     .p-datepicker-next,
     .p-datepicker-prev {
       svg {
-        color: v.$text-on-dark;
+        color: v.$on-accent;
       }
     }
   }
@@ -142,18 +172,18 @@ body {
   td {
     span {
       background-color: transparent;
-      color: v.$text-main;
+      color: v.$ink;
     }
     .p-highlight {
-      background-color: v.$bg-button-primary;
-      color: v.$text-on-dark;
+      background-color: v.$accent;
+      color: v.$on-accent;
     }
   }
 
   .p-datepicker-today {
     span {
-      background-color: v.$bg-datepicker-header;
-      color: v.$text-on-dark;
+      background-color: v.$accent-soft;
+      color: v.$accent;
     }
   }
 }
@@ -164,22 +194,21 @@ body {
 
 .type-selector {
   .p-button {
-    background-color: v.$bg-card;
-    color: v.$text-main;
+    background-color: v.$surface;
+    color: v.$ink;
   }
   .p-highlight {
-    background-color: v.$bg-button-primary;
-    color: v.$text-on-button;
+    background-color: v.$accent;
+    color: v.$on-accent;
   }
 }
 
-// Override stile Paginator PrimeReact se necessario
 .p-paginator {
   background: transparent !important;
   border: none !important;
   margin-top: 1.5rem;
 
   .p-paginator-element {
-    color: v.$text-main;
+    color: v.$ink;
   }
 }

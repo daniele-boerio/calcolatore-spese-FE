@@ -7,7 +7,7 @@
   }
 
   &:hover {
-    background-color: rgba(v.$text-red, 0.1) !important;
+    background-color: color-mix(in srgb, v.$text-red 10%, transparent) !important;
   }
 }
 

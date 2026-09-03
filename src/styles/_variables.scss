@@ -1,176 +1,159 @@
 // src/styles/_variables.scss
+//
+// Mappatura SCSS dei token del design system. I valori veri stanno in
+// `_tokens.scss`, emesso una sola volta da `App.scss`: qui ci sono solo alias,
+// così questo file non produce CSS e può essere `@use`ato da ogni componente
+// senza duplicare il blocco `:root` in ogni foglio di stile.
 
-:root {
-  // Tema Chiaro (Default)
-  --bg-app: #f4f7f6;
-  --bg-dark: #121212;
-  --bg-card: #ffffff;
-  --bg-dialog: #ffffff;
-  --border-dialog: #dce2e1;
-  --bg-table-paginator-selected: #e0e0e0;
-  --bg-gradient-table: #f9f9f9;
-  --border-table: #dce2e1;
-  --bg-datepicker-header: #1f2937;
-  --bg-datepicker-today: rgba(34, 211, 238, 0.16);
-  --text-main: #333333;
-  --text-account: #f0f0f0;
-  --text-on-dark: #f0f0f0;
-  --text-on-button: #f0f0f0;
-  --text-muted: #95a5a6;
-  --border-color: #e0e0e0;
-  --bar-neutral: #333333;
-  --bar-gray: #e0e0e0;
-  --bar-green: #2ecc71;
-  --bar-red: #e74c3c;
-  // Semantic amount colors (usati anche inline nei componenti)
-  --green-500: #16a34a;
-  --red-500: #dc2626;
-  --btn-light: #95a5a6;
-  --table-header: linear-gradient(90deg, #00c9ff 0%, #92fe9d 100%);
-  --text-table-header: #333333;
-  --month-table-header: #00c9ff;
-  --card-gradient: linear-gradient(to right, #f0d6fab6, #d4effa6b);
-  --border-card: #0285ad33;
-  --accent-split: #6c5ce7;
-  --accent-split-hover: #5a4bd4;
+// ── Colore ────────────────────────────────────────────────────────────────
+$bg: var(--bg);
+$surface: var(--surface);
+$surface-2: var(--surface-2);
+$ink: var(--ink);
+$muted: var(--muted);
+$muted-2: var(--muted-2);
+$line: var(--line);
+$line-soft: var(--line-soft);
 
-  // --- Modern design tokens (light) ---
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
-  --radius-pill: 999px;
+$accent: var(--accent);
+$accent-soft: var(--accent-soft);
+$accent-2: var(--accent-2);
+$on-accent: var(--on-accent);
 
-  --shadow-xs: 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.09), 0 1px 2px rgba(16, 24, 40, 0.05);
-  --shadow-md: 0 6px 16px rgba(16, 24, 40, 0.1), 0 2px 6px rgba(16, 24, 40, 0.05);
-  --shadow-lg: 0 16px 36px rgba(16, 24, 40, 0.14), 0 6px 12px rgba(16, 24, 40, 0.07);
+$positive: var(--positive);
+$positive-soft: var(--positive-soft);
+$negative: var(--negative);
+$negative-soft: var(--negative-soft);
+$negative-line: var(--negative-line);
 
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$invert-surface: var(--invert-surface);
+$invert-border: var(--invert-border);
+$invert-ink: var(--invert-ink);
+$invert-meta: var(--invert-meta);
+$invert-fill: var(--invert-fill);
 
-  --surface-hover: #f1f5f9;
-}
+$track: var(--track);
+$bar-past: var(--bar-past);
+$bar-idle: var(--bar-idle);
+$tabbar-bg: var(--tabbar-bg);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg-app: #121212;
-    --bg-dark: #f4f7f6;
-    --bg-card: #1e1e1e;
-    --bg-dialog: #1e1e1e;
-    --border-dialog: #333333;
-    --bg-table-paginator-selected: #2c2c2c;
-    --bg-gradient-table: #252525;
-    --border-table: #333333;
-    --bg-datepicker-header: #e0e3e7;
-    --bg-datepicker-today: #3cfbfba1;
-    --text-main: #f0f0f0;
-    --text-account: #f0f0f0;
-    --text-on-dark: #333333;
-    --text-on-button: #f0f0f0;
-    --text-muted: #b0b0b0;
-    --border-color: #333333;
-    --bar-neutral: #f0f0f0;
-    --bar-gray: #333333;
-    --bar-green: #2ecc71;
-    --bar-red: #e74c3c;
-    --green-500: #4ade80;
-    --red-500: #f87171;
-    --btn-light: #b0b0b0;
-    --table-header: linear-gradient(90deg, #3f2b96 0%, #3c73ff 100%);
-    --text-table-header: #f0f0f0;
-    --month-table-header: #3f2b96;
-    --card-gradient: linear-gradient(to left, #162058a6, #111944a6);
-    --border-card: #fcd6d610;
-  --accent-split: #8b7bf0;
-  --accent-split-hover: #9d8ff5;
+$series-1: var(--series-1);
+$series-2: var(--series-2);
+$series-3: var(--series-3);
+$series-4: var(--series-4);
+$series-5: var(--series-5);
 
-  // --- Modern design tokens (dark) ---
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
-  --radius-pill: 999px;
+// ── Ombre e overlay ───────────────────────────────────────────────────────
+$shadow-card: var(--shadow-card);
+$shadow-tabbar: var(--shadow-tabbar);
+$shadow-fab: var(--shadow-fab);
+$shadow-sheet: var(--shadow-sheet);
+$overlay: var(--overlay);
+$overlay-strong: var(--overlay-strong);
 
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 6px 18px rgba(0, 0, 0, 0.55);
-  --shadow-lg: 0 18px 38px rgba(0, 0, 0, 0.65);
+// ── Tipografia ────────────────────────────────────────────────────────────
+$font-ui: var(--font-ui);
+$font-display: var(--font-display);
+$fw-display: var(--fw-display);
+$tracking-display: var(--tracking-display);
 
-  --transition-fast: 0.15s ease;
-  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$fs-hero: var(--fs-hero);
+$lh-hero: var(--lh-hero);
+$tracking-hero: var(--tracking-hero);
+$fs-page-title: var(--fs-page-title);
+$fs-card-title: var(--fs-card-title);
+$fw-card-title: var(--fw-card-title);
+$fs-greeting: var(--fs-greeting);
+$fw-greeting: var(--fw-greeting);
 
-  --surface-hover: #2a2a2a;
-  }
-}
+// ── Raggi ─────────────────────────────────────────────────────────────────
+$r-card: var(--r-card);
+$r-inner: var(--r-inner);
+$r-field: var(--r-field);
+$r-icon: var(--r-icon);
+$r-sheet: var(--r-sheet);
+$r-alert: var(--r-alert);
+$r-pill: var(--r-pill);
 
-// Palette accent (rifinita verso toni più moderni)
-$light-blue: #3b82f6;
-$light-gray: #7b8794;
-$red: #ef4444;
-$green: #22c55e;
+// ── Metrica ───────────────────────────────────────────────────────────────
+$gutter: var(--gutter);
+$gap-card: var(--gap-card);
+$pad-card: var(--pad-card);
+$tabbar-h: var(--tabbar-h);
+$app-max-width: var(--app-max-width);
+$tap-target: var(--tap-target);
 
-// Mappatura variabili SCSS
-$bg-app: var(--bg-app);
-$bg-dark: var(--border-dialog);
-$bg-card: var(--bg-card);
-$bg-dialog: var(--bg-dialog);
-$border-dialog: var(--border-dialog);
-$border-table: var(--border-table);
-$bg-table-paginator-selected: var(--bg-table-paginator-selected);
-$bg-datepicker-header: var(--bg-datepicker-header);
-$bg-datepicker-today: var(--bg-datepicker-today);
-$bg-chips: $light-gray;
-$bg-button-primary: $light-blue;
-$bc-button-primary: $light-blue;
-$bg-button-secondary: $light-gray;
-$bc-button-secondary: $light-gray;
-$bg-gradient-table: var(--bg-gradient-table);
-$text-main: var(--text-main);
-$text-account: var(--text-account);
-$text-on-dark: var(--text-on-dark);
-$text-on-button: var(--text-on-button);
-$text-muted: var(--text-muted);
-$text-red: $red;
-$text-green: $green;
-$border-color: var(--border-color);
-$shadow-color: var(--shadow-color);
-$bar-neutral: var(--bar-neutral);
-$shadow-color: 0 4px 6px rgba(0, 0, 0, 0.05);
-$bar-gray: var(--bar-gray);
-$bar-green: $green;
-$bar-red: $red;
-$btn-light: var(--btn-light);
-$table-header: var(--table-header);
-$text-table-header: var(--text-table-header);
-$month-table-header: var(--month-table-header);
-$card-gradient: var(--card-gradient);
-$border-card: var(--border-card);
-$accent-split: var(--accent-split);
-$accent-split-hover: var(--accent-split-hover);
+// ── Movimento ─────────────────────────────────────────────────────────────
+// Curva e durata dello slide-up degli sheet.
+$ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+$dur-sheet: 220ms;
+$dur-overlay: 160ms;
+$dur-press: 120ms;
+$transition-fast: 0.15s ease;
+$transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 
-// --- Modern design tokens (mapping) ---
-$radius-sm: var(--radius-sm);
-$radius-md: var(--radius-md);
-$radius-lg: var(--radius-lg);
-$radius-xl: var(--radius-xl);
-$radius-pill: var(--radius-pill);
-$shadow-xs: var(--shadow-xs);
-$shadow-sm: var(--shadow-sm);
-$shadow-md: var(--shadow-md);
-$shadow-lg: var(--shadow-lg);
-$transition-fast: var(--transition-fast);
-$transition-base: var(--transition-base);
-$surface-hover: var(--surface-hover);
-
-// --- Breakpoints per il responsive ---
+// ── Breakpoint ────────────────────────────────────────────────────────────
 $mobile: 480px;
 $tablet: 768px;
 $desktop: 1024px;
 
-// Typography
-$font-main:
-  "Inter",
-  -apple-system,
-  BlinkMacSystemFont,
-  sans-serif;
+// ──────────────────────────────────────────────────────────────────────────
+// COMPATIBILITÀ — DA RIMUOVERE
+//
+// Alias dei vecchi nomi, rimappati sui token nuovi, così le schermate non
+// ancora convertite continuano a compilare e adottano già la nuova palette.
+// Vanno via con la pulizia (step 7 del redesign): quando questo blocco è
+// vuoto la conversione è completa.
+// ──────────────────────────────────────────────────────────────────────────
+$bg-app: var(--bg);
+$bg-dark: var(--line);
+$bg-card: var(--surface);
+$bg-dialog: var(--surface);
+$border-dialog: var(--line);
+$border-table: var(--line);
+$bg-table-paginator-selected: var(--surface-2);
+$bg-datepicker-header: var(--accent);
+$bg-datepicker-today: var(--accent-soft);
+$bg-chips: var(--surface-2);
+$bg-button-primary: var(--accent);
+$bc-button-primary: var(--accent);
+$bg-button-secondary: var(--surface-2);
+$bc-button-secondary: var(--line);
+$bg-gradient-table: var(--surface-2);
+$text-main: var(--ink);
+$text-account: var(--invert-ink);
+$text-on-dark: var(--invert-ink);
+$text-on-button: var(--on-accent);
+$text-muted: var(--muted);
+$text-red: var(--negative);
+$text-green: var(--positive);
+$border-color: var(--line);
+$bar-neutral: var(--ink);
+$bar-gray: var(--track);
+$bar-green: var(--positive);
+$bar-red: var(--negative);
+$btn-light: var(--muted);
+$table-header: var(--surface-2);
+$text-table-header: var(--ink);
+$month-table-header: var(--accent);
+$card-gradient: var(--surface);
+$border-card: var(--line);
+$accent-split: var(--accent);
+$accent-split-hover: var(--accent);
+$light-blue: var(--accent);
+$light-gray: var(--muted);
+$red: var(--negative);
+$green: var(--positive);
+$shadow-color: var(--shadow-card);
+$surface-hover: var(--surface-2);
+$font-main: var(--font-ui);
+
+$radius-sm: 8px;
+$radius-md: var(--r-icon);
+$radius-lg: var(--r-field);
+$radius-xl: var(--r-card);
+$radius-pill: var(--r-pill);
+$shadow-xs: var(--shadow-card);
+$shadow-sm: var(--shadow-card);
+$shadow-md: var(--shadow-card);
+$shadow-lg: var(--shadow-sheet);

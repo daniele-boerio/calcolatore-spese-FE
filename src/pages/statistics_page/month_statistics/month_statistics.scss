@@ -54,10 +54,10 @@
       justify-content: center;
       gap: 2rem;
       font-size: 1rem;
-      background: rgba(v.$text-main, 0.03);
+      background: color-mix(in srgb, v.$text-main 3%, transparent);
       padding: 0.8rem 2rem;
       border-radius: 50px;
-      border: 1px solid rgba(v.$text-main, 0.05);
+      border: 1px solid color-mix(in srgb, v.$text-main 5%, transparent);
 
       .stats-item {
         margin: 0;

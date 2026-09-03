@@ -49,7 +49,7 @@
           v.$bg-button-primary,
           v.$accent-split
         );
-        box-shadow: 0 0 0 3px rgba(v.$bg-button-primary, 0.18);
+        box-shadow: 0 0 0 3px color-mix(in srgb, v.$bg-button-primary 18%, transparent);
       }
     }
   }
@@ -142,7 +142,7 @@
       &.active {
         color: v.$bg-button-primary;
         font-weight: 700;
-        background-color: rgba(v.$bg-button-primary, 0.12);
+        background-color: color-mix(in srgb, v.$bg-button-primary 12%, transparent);
       }
     }
   }

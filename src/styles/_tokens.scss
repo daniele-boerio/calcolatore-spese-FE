@@ -1,0 +1,169 @@
+// src/styles/_tokens.scss
+//
+// Design system SpassoConto — blocco unico di token, due temi.
+// Regola: nessun componente contiene un colore letterale, solo `var(--…)`.
+//
+// Il tema si applica scrivendo `data-theme="light" | "dark"` su <html>.
+// La preferenza dell'utente ("system" inclusa) vive in localStorage e viene
+// risolta in JS (src/features/ui/theme.ts) prima del primo paint, così qui
+// bastano esattamente due blocchi di variabili.
+
+:root {
+  // ── Colore — tema chiaro (Menta) ────────────────────────────────────────
+  --bg: #f6f8f7;
+  --surface: #ffffff;
+  --surface-2: #eef1f0;
+  --ink: #12211c;
+  --muted: #5d6b65;
+  --muted-2: #68786f;
+  --line: #e8ecea;
+  --line-soft: #f1f4f3;
+
+  --accent: #0e7c5a;
+  --accent-soft: #e4f2ec;
+  // Accento secondario: segmento "previsto" del budget, "accantonato",
+  // mese corrente nei grafici a barre.
+  --accent-2: #9ed9c1;
+  --on-accent: #ffffff;
+
+  --positive: #0e7c5a;
+  --positive-soft: #e4f2ec;
+  --negative: #c2513c;
+  --negative-soft: #f4ece7;
+  // Bordo delle card di allerta (ricorrenze scadute, righe da rivedere).
+  --negative-line: #eddcd4;
+
+  // Card "In arrivo" e toast di successo: superficie invertita.
+  --invert-surface: #0f2e24;
+  --invert-border: transparent;
+  --invert-ink: #eaf3ef;
+  --invert-meta: #9ed9c1;
+  --invert-fill: rgba(255, 255, 255, 0.1);
+
+  // Riempimenti di barre e track.
+  --track: #eef1f0;
+  --bar-past: #e4f2ec;
+  --bar-idle: #eef1f0;
+
+  --tabbar-bg: #ffffff;
+
+  // Serie grafici, nell'ordine (per categoria).
+  --series-1: #0e7c5a;
+  --series-2: #3f9d7f;
+  --series-3: #6fbba1;
+  --series-4: #9ed9c1;
+  --series-5: #c2513c;
+
+  // ── Ombre e overlay ─────────────────────────────────────────────────────
+  --shadow-card: 0 1px 2px rgba(18, 33, 28, 0.04);
+  --shadow-tabbar: 0 -8px 20px -12px rgba(18, 33, 28, 0.25);
+  --shadow-fab: 0 10px 22px -8px rgba(14, 124, 90, 0.7);
+  --shadow-sheet: 0 -12px 40px -16px rgba(18, 33, 28, 0.3);
+  --overlay: rgba(18, 33, 28, 0.45);
+  --overlay-strong: rgba(18, 33, 28, 0.5);
+
+  // ── Tipografia ──────────────────────────────────────────────────────────
+  --font-ui:
+    "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  // Nel tema chiaro il display è lo stesso font UI in peso 800; nel tema scuro
+  // diventa Instrument Serif. I componenti usano sempre questa terna.
+  --font-display: var(--font-ui);
+  --fw-display: 800;
+  --tracking-display: -0.03em;
+
+  // Ruoli che cambiano misura tra i due temi.
+  --fs-hero: 46px;
+  --lh-hero: 1;
+  --tracking-hero: -0.04em;
+  --fs-page-title: 24px;
+  --fs-card-title: 15px;
+  --fw-card-title: 700;
+  --fs-greeting: 17px;
+  --fw-greeting: 700;
+
+  // ── Raggi ───────────────────────────────────────────────────────────────
+  --r-card: 22px;
+  --r-inner: 20px;
+  --r-field: 16px;
+  --r-icon: 12px;
+  --r-sheet: 28px;
+  --r-alert: 24px;
+  --r-pill: 999px;
+
+  // ── Metrica di layout ───────────────────────────────────────────────────
+  --gutter: 20px;
+  --gap-card: 14px;
+  --pad-card: 20px;
+  --tabbar-h: 82px;
+  // Larghezza di riferimento del design; su desktop il contenuto resta
+  // centrato in una colonna di questa misura.
+  --app-max-width: 480px;
+  --tap-target: 44px;
+}
+
+[data-theme="dark"] {
+  // ── Colore — tema scuro (Notte) ─────────────────────────────────────────
+  --bg: #0a1526;
+  --surface: #101f38;
+  --surface-2: #16294a;
+  --ink: #eaf0f8;
+  --muted: #8fa2bd;
+  --muted-2: #6a7d99;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-soft: rgba(255, 255, 255, 0.06);
+
+  --accent: #e2a44f;
+  --accent-soft: rgba(226, 164, 79, 0.14);
+  --accent-2: rgba(226, 164, 79, 0.35);
+  --on-accent: #10203a;
+
+  --positive: #5ec98f;
+  --positive-soft: rgba(94, 201, 143, 0.14);
+  --negative: #e4796b;
+  --negative-soft: rgba(228, 121, 107, 0.16);
+  --negative-line: rgba(228, 121, 107, 0.28);
+
+  // Al buio la card "In arrivo" non ha fondo: la disegna solo il bordo.
+  --invert-surface: transparent;
+  --invert-border: rgba(226, 164, 79, 0.28);
+  --invert-ink: var(--ink);
+  --invert-meta: var(--muted);
+  --invert-fill: rgba(255, 255, 255, 0.06);
+
+  --track: rgba(255, 255, 255, 0.09);
+  --bar-past: rgba(226, 164, 79, 0.24);
+  --bar-idle: rgba(255, 255, 255, 0.07);
+
+  // Al buio la tab bar si fonde con lo sfondo pagina.
+  --tabbar-bg: #0a1526;
+
+  --series-1: #e2a44f;
+  --series-2: #c98d3f;
+  --series-3: #a97633;
+  --series-4: #5ec98f;
+  --series-5: #e4796b;
+
+  // Le card non hanno ombra: si separano con --surface.
+  --shadow-card: none;
+  --shadow-tabbar: 0 -8px 20px -12px rgba(0, 0, 0, 0.6);
+  --shadow-fab: 0 10px 22px -8px rgba(226, 164, 79, 0.6);
+  --shadow-sheet: 0 -12px 40px -16px rgba(0, 0, 0, 0.7);
+  --overlay: rgba(3, 10, 20, 0.55);
+  --overlay-strong: rgba(3, 10, 20, 0.62);
+
+  // I titoli passano al serif; il display perde il peso 800 (Instrument Serif
+  // ha un solo peso) e stringe meno.
+  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --fw-display: 400;
+  --tracking-display: -0.01em;
+
+  --fs-hero: 56px;
+  --lh-hero: 0.9;
+  --tracking-hero: -0.02em;
+  --fs-page-title: 28px;
+  --fs-card-title: 20px;
+  --fw-card-title: 400;
+  --fs-greeting: 26px;
+  --fw-greeting: 400;
+}
