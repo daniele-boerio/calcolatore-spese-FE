@@ -32,7 +32,6 @@ const CategoryDetailPage = lazy(
 );
 const ContiPage = lazy(() => import("./pages/conti_page/conti_page"));
 const DebitiPage = lazy(() => import("./pages/debiti_page/debiti_page"));
-const TagsPage = lazy(() => import("./pages/tags_page/tags_page"));
 const AnalysisPage = lazy(() => import("./pages/analysis_page/analysis_page"));
 const RecurringsPage = lazy(
   () => import("./pages/recurrings_page/recurrings_page"),
@@ -112,7 +111,11 @@ function App() {
                   path="/categories/:id"
                   element={<CategoryDetailPage />}
                 />
-                <Route path="/tags" element={<TagsPage />} />
+                {/* I tag sono la terza vista di "Categorie e tag". */}
+                <Route
+                  path="/tags"
+                  element={<Navigate to="/categories?vista=tags" replace />}
+                />
                 <Route path="/recurrings" element={<RecurringsPage />} />
                 <Route path="/debts" element={<DebitiPage />} />
                 <Route path="/investments" element={<InvestimentiPage />} />

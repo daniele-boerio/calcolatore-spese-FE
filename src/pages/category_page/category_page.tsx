@@ -1,242 +1,409 @@
-import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../store/store";
-import {
-  getCategorie,
-  deleteCategoria,
-} from "../../features/categorie/api_calls";
-import "./category_page.scss";
-import Button from "../../components/legacy_button/legacy_button";
-import CustomCard from "../../components/custom_card/custom_card";
-import { Categoria } from "../../features/categorie/interfaces";
-import { confirmPopup } from "primereact/confirmpopup";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
+import { useAppDispatch, useAppSelector } from "../../store/store";
+import { Page, PageContent, PageHeader } from "../../components/page/page";
+import { Card, CardTitle } from "../../components/card/card";
+import SegmentedControl from "../../components/segmented_control/segmented_control";
+import Chip from "../../components/chip/chip";
+import Amount from "../../components/amount/amount";
+import Alert from "../../components/alert/alert";
+import EmptyState from "../../components/empty_state/empty_state";
+import Button from "../../components/button/button";
 import CategoryDialog from "../../components/dialog/category_dialog/category_dialog";
+import TagDialog from "../../components/dialog/tag_dialog/tag_dialog";
 import MigrateTransactionsDialog from "../../components/dialog/migrate_transactions_dialog/migrate_transactions_dialog";
+import "./category_page.scss";
+import {
+  deleteCategoria,
+  getCategorie,
+} from "../../features/categorie/api_calls";
 import {
   selectCategoriaCategorie,
   selectCategoriaLoading,
 } from "../../features/categorie/categoria_slice";
+import { Categoria } from "../../features/categorie/interfaces";
+import { categoryIcon } from "../../features/categorie/icons";
+import { deleteTag, getTags } from "../../features/tags/api_calls";
+import { selectTagTags } from "../../features/tags/tag_slice";
+import { Tag } from "../../features/tags/interfaces";
+import { getMonthlyDetailsStatistics } from "../../features/statistics/api_calls";
+import { selectMonthlyStatisticsData } from "../../features/statistics/statistics_slice";
+import { showToast } from "../../features/ui/ui_slice";
 
+type View = "expenses" | "incomes" | "tags";
+
+const VIEWS: View[] = ["expenses", "incomes", "tags"];
+
+// Come il BE chiama le transazioni senza categoria negli aggregati.
+const UNCATEGORIZED = "Uncategorized";
+
+const isView = (value: string | null): value is View =>
+  VIEWS.includes(value as View);
+
+/**
+ * Categorie e tag in una schermata sola, come nel design: due viste sulle
+ * categorie (uscite ed entrate) più una sui tag. Le categorie senza vincolo di
+ * tipo compaiono in tutte e due — sono usabili in tutte e due.
+ */
 export default function CategoryPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+
   const categorie = useAppSelector(selectCategoriaCategorie);
-  const CatLoading = useAppSelector(selectCategoriaLoading);
+  const loading = useAppSelector(selectCategoriaLoading);
+  const tags = useAppSelector(selectTagTags);
+  const monthlyData = useAppSelector(selectMonthlyStatisticsData);
 
-  const [isDialogCatVisible, setIsDialogCatVisible] = useState(false);
-  const [isMigrateDialogVisible, setIsMigrateDialogVisible] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Categoria | null>(
-    null,
-  );
+  const viewParam = searchParams.get("vista");
+  const view: View = isView(viewParam) ? viewParam : "expenses";
 
-  // --- NUOVO STATO PER LE SEZIONI COLLASSABILI ---
-  // Di default le teniamo tutte aperte (true)
-  const [expandedSections, setExpandedSections] = useState({
-    incomes: false,
-    expenses: false,
-    others: false,
-  });
-
-  const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections((prev) => ({
-      ...prev,
-      [section]: !prev[section],
-    }));
-  };
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [editingCategory, setEditingCategory] = useState<Categoria | null>(null);
+  const [categoryDialogOpen, setCategoryDialogOpen] = useState(false);
+  const [editingTag, setEditingTag] = useState<Tag | null>(null);
+  const [tagDialogOpen, setTagDialogOpen] = useState(false);
+  const [migrateOpen, setMigrateOpen] = useState(false);
+  const [pendingCategory, setPendingCategory] = useState<Categoria | null>(null);
+  const [pendingTag, setPendingTag] = useState<Tag | null>(null);
 
   useEffect(() => {
+    const today = new Date();
+
     dispatch(getCategorie());
+    dispatch(getTags());
+    // Gli importi del mese accanto a ogni categoria vengono da qui, insieme
+    // ai totali delle sottocategorie e alle transazioni senza categoria.
+    dispatch(
+      getMonthlyDetailsStatistics({
+        year: today.getFullYear(),
+        month: today.getMonth() + 1,
+      }),
+    );
   }, [dispatch]);
 
-  const handleOpenCreate = () => {
-    setSelectedCategory(null);
-    setIsDialogCatVisible(true);
+  // Totali del mese indicizzati per nome: `monthDetails` non manda gli id.
+  const totals = useMemo(
+    () => new Map(monthlyData.map((entry) => [entry.categoria, entry])),
+    [monthlyData],
+  );
+
+  const uncategorized = totals.get(UNCATEGORIZED);
+
+  const visible = useMemo(
+    () =>
+      categorie.filter((categoria) => {
+        // Una categoria senza vincoli va bene per entrambi i versi: nasconderla
+        // da una delle due viste la renderebbe irraggiungibile a metà.
+        const generic = !categoria.solo_entrata && !categoria.solo_uscita;
+
+        return view === "incomes"
+          ? categoria.solo_entrata || generic
+          : categoria.solo_uscita || generic;
+      }),
+    [categorie, view],
+  );
+
+  const openCategory = (categoria: Categoria | null) => {
+    setEditingCategory(categoria);
+    setCategoryDialogOpen(true);
   };
 
-  const handleOpenCatEdit = (cat: Categoria) => {
-    setSelectedCategory(cat);
-    setIsDialogCatVisible(true);
+  const openTag = (tag: Tag | null) => {
+    setEditingTag(tag);
+    setTagDialogOpen(true);
   };
 
-  const deleteObject = (
-    event: React.MouseEvent<HTMLButtonElement>,
-    id: string,
-  ) => {
-    confirmPopup({
-      target: event.currentTarget,
-      message: t("delete_message"),
-      icon: "pi pi-exclamation-triangle",
-      acceptClassName: "p-button-danger",
-      acceptLabel: t("yes"),
-      rejectLabel: t("no"),
-      accept: () => {
-        dispatch(deleteCategoria({ id }));
-      },
-      reject: () => {},
-    });
+  const confirmDeleteCategory = () => {
+    if (!pendingCategory) return;
+
+    dispatch(deleteCategoria({ id: pendingCategory.id }));
+    dispatch(showToast({ variant: "success", title: t("category_deleted") }));
+    setPendingCategory(null);
   };
 
-  // --- LOGICA DI FILTRAGGIO DELLE CATEGORIE ---
-  const incomesCategories = categorie.filter(
-    (cat) => cat.solo_entrata && !cat.solo_uscita,
-  );
+  const confirmDeleteTag = () => {
+    if (!pendingTag) return;
 
-  const expensesCategories = categorie.filter(
-    (cat) => cat.solo_uscita && !cat.solo_entrata,
-  );
-
-  const othersCategories = categorie.filter(
-    (cat) =>
-      (cat.solo_entrata && cat.solo_uscita) ||
-      (!cat.solo_entrata && !cat.solo_uscita),
-  );
-
-  // --- HELPER PER IL RENDER DELLA CARD ---
-  const renderCategoryCard = (cat: Categoria) => (
-    <CustomCard
-      key={cat.id}
-      title={cat.nome}
-      // Trasformiamo le sottocategorie del Redux store nel formato richiesto dalla card
-      sottocategorie={cat.sottocategorie?.map((sub) => ({
-        sottocategoria: sub.nome,
-      }))}
-      // Passiamo i bottoni come ReactNode
-      actions={
-        <div className="buttons" style={{ display: "flex", gap: "0.25rem" }}>
-          <Button
-            className="trasparent-button"
-            icon="pi pi-pencil"
-            compact
-            onClick={() => handleOpenCatEdit(cat)}
-          />
-          <Button
-            className="trasparent-danger-button"
-            icon="pi pi-trash"
-            compact
-            onClick={(e: any) => deleteObject(e, cat.id)}
-          />
-        </div>
-      }
-    />
-  );
+    dispatch(deleteTag({ id: pendingTag.id }));
+    dispatch(showToast({ variant: "success", title: t("tag_deleted") }));
+    setPendingTag(null);
+  };
 
   return (
     <>
-      <div className="categorie-page">
-        <div
-          className="page-header"
-          style={{ justifyContent: "space-between", alignItems: "center" }}
-        >
-          <h1>
-            <i
-              className="pi pi-tags"
-              style={{ fontSize: "1.5rem", marginRight: "0.625rem" }}
-            ></i>
-            {t("category_title")}
-          </h1>
-          <Button
-            className="action-button"
-            label={t("migrate_transactions")}
-            icon="pi pi-arrow-right-arrow-left"
-            onClick={() => setIsMigrateDialogVisible(true)}
-            compact
+      <Page className="taxonomy">
+        <PageHeader className="taxonomy__header">
+          <div className="taxonomy__top">
+            <button
+              type="button"
+              className="taxonomy__back"
+              aria-label={t("back")}
+              onClick={() => navigate(-1)}
+            >
+              <i className="pi pi-arrow-left" aria-hidden="true" />
+            </button>
+
+            <h1 className="page-title">{t("taxonomy_title")}</h1>
+
+            <Chip
+              label={t("migrate_transactions")}
+              variant="outline"
+              onClick={() => setMigrateOpen(true)}
+            />
+          </div>
+
+          <SegmentedControl
+            value={view}
+            ariaLabel={t("taxonomy_title")}
+            onChange={(next) => setSearchParams({ vista: next }, { replace: true })}
+            options={[
+              { value: "expenses", label: t("expenses") },
+              { value: "incomes", label: t("income") },
+              { value: "tags", label: t("nav_tags") },
+            ]}
           />
-        </div>
+        </PageHeader>
 
-        {/* --- CONTENITORE PRINCIPALE --- */}
-        <div className="split-wrapper">
-          <section className="category-list">
-            <div className="scrollable-area">
-              {/* --- SEZIONE ENTRATE --- */}
-              <div className="category-section">
-                <h3
-                  onClick={() => toggleSection("incomes")}
-                  className="section-title"
-                >
-                  <i
-                    className={`pi ${expandedSections.incomes ? "pi-chevron-down" : "pi-chevron-right"}`}
-                  ></i>
-                  {t("income")}
-                </h3>
-                {/* Mostra la griglia solo se la sezione è espansa */}
-                {expandedSections.incomes && (
-                  <div className="categories-grid">
-                    {incomesCategories.length > 0 ? (
-                      incomesCategories.map(renderCategoryCard)
-                    ) : (
-                      <p className="no-data">{t("no_data")}</p>
-                    )}
+        <PageContent>
+          {view === "tags" ? (
+            <>
+              <Card>
+                <CardTitle>{t("taxonomy_tags")}</CardTitle>
+
+                {tags.length === 0 ? (
+                  <p className="taxonomy__muted">{t("taxonomy_no_tags")}</p>
+                ) : (
+                  <div className="taxonomy__pills">
+                    {tags.map((tag) => (
+                      // Pillola in due pezzi: il nome apre la modifica, la x
+                      // elimina. Un tag non ha una schermata sua dove mettere
+                      // le azioni.
+                      <span className="tag-pill" key={tag.id}>
+                        <button
+                          type="button"
+                          className="tag-pill__name"
+                          onClick={() => openTag(tag)}
+                        >
+                          {`#${tag.nome}`}
+                        </button>
+
+                        <button
+                          type="button"
+                          className="tag-pill__remove"
+                          aria-label={`${t("delete")} ${tag.nome}`}
+                          onClick={() => setPendingTag(tag)}
+                        >
+                          <i className="pi pi-times" aria-hidden="true" />
+                        </button>
+                      </span>
+                    ))}
                   </div>
                 )}
-              </div>
+              </Card>
 
-              {/* --- SEZIONE USCITE --- */}
-              <div className="category-section">
-                <h3
-                  onClick={() => toggleSection("expenses")}
-                  className="section-title"
-                >
-                  <i
-                    className={`pi ${expandedSections.expenses ? "pi-chevron-down" : "pi-chevron-right"}`}
-                  ></i>
-                  {t("expenses")}
-                </h3>
-                {expandedSections.expenses && (
-                  <div className="categories-grid">
-                    {expensesCategories.length > 0 ? (
-                      expensesCategories.map(renderCategoryCard)
-                    ) : (
-                      <p className="no-data">{t("no_data")}</p>
-                    )}
+              <button
+                type="button"
+                className="taxonomy__add"
+                onClick={() => openTag(null)}
+              >
+                <i className="pi pi-plus" aria-hidden="true" />
+                {t("add_tag")}
+              </button>
+            </>
+          ) : (
+            <>
+              {uncategorized && (
+                <Card className="taxonomy__orphans">
+                  <div className="taxonomy__orphans-text">
+                    <span className="taxonomy__orphans-title">
+                      {t("taxonomy_uncategorized")}
+                    </span>
+                    <Amount
+                      className="taxonomy__orphans-value"
+                      value={Math.abs(uncategorized.totale)}
+                    />
                   </div>
-                )}
-              </div>
 
-              {/* --- SEZIONE MISTE (ALTRO) --- */}
-              <div className="category-section">
-                <h3
-                  onClick={() => toggleSection("others")}
-                  className="section-title"
-                >
-                  <i
-                    className={`pi ${expandedSections.others ? "pi-chevron-down" : "pi-chevron-right"}`}
-                  ></i>
-                  {t("others")}
-                </h3>
-                {expandedSections.others && (
-                  <div className="categories-grid">
-                    {othersCategories.length > 0 ? (
-                      othersCategories.map(renderCategoryCard)
-                    ) : (
-                      <p className="no-data">{t("no_data")}</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        </div>
+                  <Button
+                    size="sm"
+                    variant="neutral"
+                    onClick={() => navigate("/transactions?senza_categoria=1")}
+                  >
+                    {t("taxonomy_assign")}
+                  </Button>
+                </Card>
+              )}
 
-        <Button
-          icon="pi pi-plus"
-          className="add-category-button"
-          compact
-          rounded
-          onClick={handleOpenCreate}
-        />
+              {!loading && visible.length === 0 ? (
+                <EmptyState
+                  icon="pi pi-tags"
+                  title={t("taxonomy_empty_title")}
+                  description={t("taxonomy_empty_text")}
+                  actions={
+                    <Button size="sm" onClick={() => openCategory(null)}>
+                      {t("add_category")}
+                    </Button>
+                  }
+                />
+              ) : (
+                visible.map((categoria) => {
+                  const detail = totals.get(categoria.nome);
+                  const isOpen = expanded === categoria.id;
+                  const children = categoria.sottocategorie ?? [];
 
-        <CategoryDialog
-          visible={isDialogCatVisible}
-          category={selectedCategory!}
-          onHide={() => setIsDialogCatVisible(false)}
-          loading={CatLoading}
-        />
+                  return (
+                    <Card key={categoria.id} className="category-card">
+                      <button
+                        type="button"
+                        className="category-card__head"
+                        onClick={() =>
+                          setExpanded(isOpen ? null : categoria.id)
+                        }
+                      >
+                        <span
+                          className="category-card__icon"
+                          aria-hidden="true"
+                        >
+                          <i className={categoryIcon(categoria.nome)} />
+                        </span>
 
-        <MigrateTransactionsDialog
-          visible={isMigrateDialogVisible}
-          onHide={() => setIsMigrateDialogVisible(false)}
-        />
-      </div>
+                        <span className="category-card__text">
+                          <span className="category-card__name">
+                            {categoria.nome}
+                          </span>
+                          <span className="category-card__meta">
+                            {[
+                              children.length > 0
+                                ? `${children.length} ${t("taxonomy_subcategories")}`
+                                : null,
+                              detail ? (
+                                <Amount
+                                  key="amount"
+                                  value={Math.abs(detail.totale)}
+                                />
+                              ) : null,
+                            ]
+                              .filter(Boolean)
+                              .map((piece, index) => (
+                                <span key={index}>
+                                  {index > 0 && " · "}
+                                  {piece}
+                                </span>
+                              ))}
+                          </span>
+                        </span>
+
+                        <i
+                          className={`pi pi-chevron-${isOpen ? "down" : "right"} category-card__chevron`}
+                          aria-hidden="true"
+                        />
+                      </button>
+
+                      {isOpen && (
+                        <div className="category-card__children">
+                          {children.map((sub) => {
+                            const subTotal = detail?.sottocategorie.find(
+                              (item) => item.sottocategoria === sub.nome,
+                            );
+
+                            return (
+                              <Chip
+                                key={sub.id}
+                                variant="solid"
+                                label={sub.nome}
+                                meta={
+                                  subTotal ? (
+                                    <Amount
+                                      value={Math.abs(subTotal.totale)}
+                                      decimals={0}
+                                    />
+                                  ) : undefined
+                                }
+                                onClick={() => openCategory(categoria)}
+                              />
+                            );
+                          })}
+
+                          <Chip
+                            variant="dashed"
+                            icon="pi pi-plus"
+                            label={t("add")}
+                            onClick={() => openCategory(categoria)}
+                          />
+
+                          <Chip
+                            variant="dashed"
+                            icon="pi pi-trash"
+                            label={t("delete")}
+                            className="chip--danger"
+                            onClick={() => setPendingCategory(categoria)}
+                          />
+                        </div>
+                      )}
+                    </Card>
+                  );
+                })
+              )}
+
+              <button
+                type="button"
+                className="taxonomy__add"
+                onClick={() => openCategory(null)}
+              >
+                <i className="pi pi-plus" aria-hidden="true" />
+                {t("add_category")}
+              </button>
+            </>
+          )}
+        </PageContent>
+      </Page>
+
+      <CategoryDialog
+        visible={categoryDialogOpen}
+        category={editingCategory}
+        onHide={() => {
+          setCategoryDialogOpen(false);
+          setEditingCategory(null);
+        }}
+        loading={loading}
+      />
+
+      <TagDialog
+        visible={tagDialogOpen}
+        tag={editingTag}
+        onHide={() => {
+          setTagDialogOpen(false);
+          setEditingTag(null);
+        }}
+      />
+
+      <MigrateTransactionsDialog
+        visible={migrateOpen}
+        onHide={() => setMigrateOpen(false)}
+      />
+
+      <Alert
+        open={pendingCategory !== null}
+        title={t("taxonomy_delete_category_title")}
+        description={t("taxonomy_delete_category_text")}
+        confirmLabel={t("delete")}
+        cancelLabel={t("cancel")}
+        onConfirm={confirmDeleteCategory}
+        onCancel={() => setPendingCategory(null)}
+      />
+
+      <Alert
+        open={pendingTag !== null}
+        title={t("taxonomy_delete_tag_title")}
+        description={t("taxonomy_delete_tag_text")}
+        confirmLabel={t("delete")}
+        cancelLabel={t("cancel")}
+        onConfirm={confirmDeleteTag}
+        onCancel={() => setPendingTag(null)}
+      />
     </>
   );
 }

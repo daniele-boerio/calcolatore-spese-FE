@@ -293,20 +293,9 @@ export default function ContiPage() {
               <ListRow
                 icon="pi pi-tags"
                 iconShape="square"
-                title={t("nav_categories")}
+                title={t("taxonomy_title")}
                 chevron
                 onClick={() => navigate("/categories")}
-              />
-
-              {/* Categorie e tag diventeranno una pagina sola con la schermata
-                  "Categorie e tag": finché non c'è, il tag ha bisogno di una
-                  riga sua o resta irraggiungibile. */}
-              <ListRow
-                icon="pi pi-hashtag"
-                iconShape="square"
-                title={t("nav_tags")}
-                chevron
-                onClick={() => navigate("/tags")}
               />
 
               <ListRow
