@@ -1,158 +1,218 @@
-@use "../../../styles/variables.scss" as v;
+@use "../../../styles/variables" as v;
 
-.create-transaction-dialog {
-  .dialog-footer {
+.tx-sheet {
+  gap: 18px;
+
+  // Cinque tipi in una pillola sola: le etichette stanno strette, il padding
+  // orizzontale lascia il posto al testo invece che ai bordi.
+  .segmented__option {
+    padding-inline: 4px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  &__hero {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 0 4px;
+  }
 
-    justify-content: flex-end;
+  &__amount {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    max-width: 100%;
 
-    gap: 0.75rem;
-
-    padding-top: 1rem;
-
-    .div-button {
-      flex: 1;
+    input {
       min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: v.$ink;
 
-      button {
-        width: 100%;
+      font-family: inherit;
+      font-size: 52px;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
 
-        max-width: 100%;
+      &::placeholder {
+        color: v.$muted-2;
       }
 
-      // La label non deve forzare l'allargamento del pulsante oltre la dialog
-      .span-button {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-    }
-
-    // Su mobile 3 pulsanti in fila (incluso "Dividi transazione" con label
-    // lunga) sforano la larghezza della dialog: li impiliamo in verticale.
-    @media screen and (max-width: v.$mobile) {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.5rem;
-
-      .div-button {
-        flex: 1 1 auto;
-        width: 100%;
+      &:focus {
+        outline: none;
       }
     }
   }
-}
 
-.transaction-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
+  &__currency {
+    font-size: 24px;
+    font-weight: 700;
+    color: v.$muted-2;
+  }
 
-  .type-selector {
-    align-self: center;
+  &__hint {
+    font-size: 12.5px;
+    color: v.$muted;
+
+    .amount {
+      font-size: inherit;
+      color: inherit;
+    }
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__row,
+  &__compact {
+    display: flex;
+    align-items: center;
     width: 100%;
-    display: flex;
+    min-height: v.$tap-target;
 
-    .p-button {
-      flex: 1;
-      font-weight: 600;
-      min-width: 0;
+    border: 0;
+    border-radius: v.$r-field;
+    background: v.$bg;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+  }
 
-      .p-button-label {
-        display: block;
-        width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        padding: 0 0.5rem;
-      }
-    }
+  &__row {
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
 
-    // Su telefono 4 pulsanti in fila sono troppo stretti e le label vanno
-    // in ellipsis: li disponiamo 2x2 (ogni pulsante diventa una pillola).
-    @media screen and (max-width: v.$mobile) {
-      flex-wrap: wrap;
-      gap: 0.4rem;
-
-      .p-button {
-        flex: 1 1 calc(50% - 0.2rem);
-        border-radius: v.$radius-md !important;
-
-        .p-button-label {
-          padding: 0 0.25rem;
-        }
-      }
+    &:active {
+      transform: scale(0.99);
+      transition: transform v.$dur-press;
     }
   }
 
-  .form-row {
-    width: 100%;
+  &__icon {
+    flex: 0 0 auto;
     display: flex;
-    flex-direction: row; // Layout desktop
-    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
 
-    // --- MODIFICA RESPONSIVE ---
-    @media screen and (max-width: v.$mobile) {
-      flex-direction: column; // Layout smartphone: elementi impilati
-      gap: 1.25rem;
-    }
+    border-radius: v.$r-icon;
+    background: v.$accent-soft;
+    color: v.$accent;
 
-    .field {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-
-      .field-label {
-        font-size: 0.85rem;
-        font-family: v.$font-main;
-        margin: 0 0 0.25rem 0;
-        color: v.$text-main;
-      }
-
-      .p-inputnumber,
-      .p-calendar,
-      .p-dropdown,
-      .p-inputtext,
-      .p-selectbutton {
-        flex: 1;
-        width: 100%; // Assicura che i componenti occupino tutta la larghezza
-      }
+    i {
+      font-size: 14px;
     }
   }
 
-  // Dropdown + input "nuova categoria/sottocategoria" affiancati,
-  // impilati su mobile. Senza input, resta solo il dropdown a tutta larghezza.
-  .field-inline {
+  &__row-text,
+  &__compact-text {
+    flex: 1;
+    min-width: 0;
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    gap: 0.75rem;
+    flex-direction: column;
+  }
+
+  &__label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: v.$muted;
+  }
+
+  &__value {
+    font-size: 14.5px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &--empty {
+      color: v.$muted-2;
+      font-weight: 500;
+    }
+  }
+
+  &__chevron {
+    flex: 0 0 auto;
+    font-size: 12px;
+    color: v.$muted-2;
+  }
+
+  &__pair {
+    display: flex;
+    gap: 10px;
 
     > * {
       flex: 1;
       min-width: 0;
     }
+  }
 
-    @media screen and (max-width: v.$mobile) {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.75rem;
+  &__compact {
+    gap: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+
+    > i {
+      flex: 0 0 auto;
+      font-size: 14px;
+      color: v.$muted-2;
+    }
+
+    // La descrizione occupa la riga intera e scrive dentro il campo.
+    &--wide input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: v.$ink;
+      font-family: inherit;
+      font-size: 14.5px;
+
+      &::placeholder {
+        color: v.$muted-2;
+      }
+
+      &:focus {
+        outline: none;
+      }
     }
   }
-}
 
-// Semplice animazione per la sottocategoria che appare
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-in;
-}
+  // Il campo data nativo apre il selettore del sistema: lo lasciamo fare e gli
+  // togliamo solo la veste da input.
+  input[type="date"] {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: v.$ink;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-5px);
+    &:focus {
+      outline: none;
+    }
+
+    &::-webkit-calendar-picker-indicator {
+      display: none;
+    }
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 2px 4px;
   }
 }

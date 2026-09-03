@@ -70,6 +70,13 @@
     opacity: 0.8;
   }
 
+  // Azione non ancora disponibile: resta visibile perché dice cosa si potrà
+  // fare, ma non finge di essere toccabile.
+  &--disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
   &:active {
     transform: scale(0.97);
     transition: transform v.$dur-press;

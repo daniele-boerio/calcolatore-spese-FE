@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { Dialog } from "primereact/dialog";
-import { SelectButton } from "primereact/selectbutton";
-import InputText from "../../input_text/input_text";
-import Button from "../../legacy_button/legacy_button";
-import Dropdown from "../../dropdown/dropdown";
+import { ReactNode, useEffect, useMemo, useState } from "react";
+import Sheet from "../../sheet/sheet";
+import Button from "../../button/button";
+import Chip from "../../chip/chip";
+import Amount from "../../amount/amount";
+import SegmentedControl from "../../segmented_control/segmented_control";
+import PickerSheet, { PickerOption } from "../../picker_sheet/picker_sheet";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import "./transaction_dialog.scss";
 import {
@@ -15,8 +16,8 @@ import {
   Transaction,
 } from "../../../features/transactions/interfaces";
 import { useI18n } from "../../../i18n/use-i18n";
-import Calendar from "../../calendar/calendar";
 import Compensation from "./compensation/compensation";
+import { showToast } from "../../../features/ui/ui_slice";
 import { selectContiConti } from "../../../features/conti/conto_slice";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../features/tags/tag_slice";
@@ -27,12 +28,31 @@ import {
   createSottoCategorie,
 } from "../../../features/categorie/api_calls";
 import SplitTransactionDialog from "../split_transaction_dialog/split_transaction_dialog";
+import RecurrenceDialog from "../recurrence_dialog/recurrence_dialog";
+import { toIsoDate } from "../../../services/dates";
 
 interface TransactionDialogProps {
   visible: boolean;
   onHide: () => void;
   transaction?: Transaction; // Se passata, siamo in modalità EDIT
 }
+
+/** Quali campi hanno un valore da scegliere: uno alla volta, in un foglio suo. */
+type PickerName =
+  | "categoria"
+  | "sottocategoria"
+  | "conto"
+  | "destinazione"
+  | "tag";
+
+// Larghezza minima del campo importo: sotto i tre caratteri il cursore
+// finirebbe appiccicato al simbolo di valuta.
+const MIN_AMOUNT_WIDTH = 3;
+
+const parseAmount = (value: string) => {
+  const parsed = parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+};
 
 export default function TransactionDialog({
   visible,
@@ -66,7 +86,11 @@ export default function TransactionDialog({
   const [from_data, setFromData] = useState<Date | null>(null);
   const [to_data, setToData] = useState<Date | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
+
+  const [picker, setPicker] = useState<PickerName | null>(null);
   const [isSplitDialogVisible, setIsSplitDialogVisible] =
+    useState<boolean>(false);
+  const [isRecurrenceVisible, setIsRecurrenceVisible] =
     useState<boolean>(false);
   // Transazione su cui agisce lo split: quella esistente (modifica) o quella
   // appena creata (creazione + dividi).
@@ -116,8 +140,8 @@ export default function TransactionDialog({
   // l'utente lo sta compilando.
   //
   // Il default si risolve *attraverso* la lista tag invece di usarlo così com'è:
-  // serve il valore con lo stesso tipo delle opzioni (altrimenti la Dropdown non
-  // trova la corrispondenza) e scarta da solo un tag nel frattempo cancellato.
+  // serve il valore con lo stesso tipo delle opzioni e scarta da solo un tag
+  // nel frattempo cancellato.
   useEffect(() => {
     if (!visible || transaction) return;
 
@@ -130,13 +154,12 @@ export default function TransactionDialog({
   // Costruisce il payload risolvendo (e creando se serve) tag/categoria/sottocategoria.
   // Estratto da handleSave per poterlo riusare anche nel flusso "crea e dividi".
   const preparePayload = async () => {
-    const formattedDate = data
-      ? `${data.getFullYear()}-${String(data.getMonth() + 1).padStart(2, "0")}-${String(data.getDate()).padStart(2, "0")}`
-      : "";
+    const formattedDate = data ? toIsoDate(data) : "";
 
     const numericImporto = parseFloat(importo || "");
 
-    // Prepariamo delle variabili temporanee per gli ID che invieremo
+    // I selettori scrivono qui un id oppure — per una voce nuova — il nome
+    // digitato: la creazione vera avviene solo ora, al salvataggio.
     let finalTagId = tagId === "NEW_TAG" ? newTagName : tagId;
     let finalCategoriaId =
       categoriaId === "NEW_CATEGORY" ? newCategoryName : categoriaId;
@@ -149,15 +172,14 @@ export default function TransactionDialog({
     if (finalTagId) {
       // Cerchiamo se il valore corrisponde a un ID o a un nome esistente (case-insensitive)
       const tagExists = tags.find(
-        (t) =>
-          String(t.id) === String(finalTagId) ||
-          t.nome.toLowerCase() === String(finalTagId).toLowerCase(),
+        (tag) =>
+          String(tag.id) === String(finalTagId) ||
+          tag.nome.toLowerCase() === String(finalTagId).toLowerCase(),
       );
 
       if (tagExists) {
         finalTagId = tagExists.id;
       } else {
-        // Il tag non esiste, lo creiamo!
         const newTag = await dispatch(
           createTag({ nome: String(finalTagId) }),
         ).unwrap();
@@ -168,9 +190,9 @@ export default function TransactionDialog({
     // --- 2. CONTROLLO E CREAZIONE CATEGORIA ---
     if (finalCategoriaId) {
       const catExists = categorie.find(
-        (c) =>
-          String(c.id) === String(finalCategoriaId) ||
-          c.nome.toLowerCase() === String(finalCategoriaId).toLowerCase(),
+        (categoria) =>
+          String(categoria.id) === String(finalCategoriaId) ||
+          categoria.nome.toLowerCase() === String(finalCategoriaId).toLowerCase(),
       );
 
       if (catExists) {
@@ -192,18 +214,17 @@ export default function TransactionDialog({
     if (finalSottoCategoriaId && finalCategoriaId) {
       // Cerchiamo la madre (appena creata o esistente) per vedere le sue sub
       const parentCat = categorie.find(
-        (c) => String(c.id) === String(finalCategoriaId),
+        (categoria) => String(categoria.id) === String(finalCategoriaId),
       );
       const subExists = parentCat?.sottocategorie?.find(
-        (s) =>
-          String(s.id) === String(finalSottoCategoriaId) ||
-          s.nome.toLowerCase() === String(finalSottoCategoriaId).toLowerCase(),
+        (sub) =>
+          String(sub.id) === String(finalSottoCategoriaId) ||
+          sub.nome.toLowerCase() === String(finalSottoCategoriaId).toLowerCase(),
       );
 
       if (subExists) {
         finalSottoCategoriaId = subExists.id;
       } else {
-        // La sottocategoria non esiste, la creiamo (usando la tua API che accetta una lista)
         const createdSubs = await dispatch(
           createSottoCategorie({
             id: finalCategoriaId as string, // ID della madre appena risolto
@@ -217,7 +238,6 @@ export default function TransactionDialog({
           }),
         ).unwrap();
 
-        // Prendiamo l'ID della prima (e unica) sottocategoria creata
         finalSottoCategoriaId = createdSubs[0].id;
       }
     }
@@ -228,34 +248,34 @@ export default function TransactionDialog({
     const hasDestination = isRicarica || isAccantonamento;
 
     // --- 4. PREPARAZIONE DEL PAYLOAD FINALE ---
-    const payload: any = {
+    return {
       importo: isNaN(numericImporto) ? 0 : numericImporto,
       tipo,
       data: formattedDate,
-      descrizione: descrizione,
-      conto_id: contoId,
+      descrizione,
+      conto_id: contoId as string,
       // Giroconto: destinazione obbligatoria. Accantonamento: destinazione
       // opzionale (salvadanaio) ma con categoria/tag come una normale transazione.
       conto_destinazione_id: hasDestination ? contoDestinazioneId : null,
-      categoria_id: isRicarica ? null : finalCategoriaId,
-      sottocategoria_id: isRicarica ? null : finalSottoCategoriaId,
-      tag_id: isRicarica ? null : finalTagId,
+      categoria_id: isRicarica ? null : (finalCategoriaId as string | null),
+      sottocategoria_id: isRicarica
+        ? null
+        : (finalSottoCategoriaId as string | null),
+      tag_id: isRicarica ? null : (finalTagId as string | null),
       parent_transaction_id: isRicarica ? null : transactionId,
     };
-
-    return payload;
   };
 
   const handleSave = async () => {
     const payload = await preparePayload();
 
-    // --- SALVATAGGIO TRANSAZIONE ---
     if (transaction?.id) {
       await dispatch(updateTransaction({ id: transaction.id, ...payload }));
     } else {
       await dispatch(createTransaction(payload));
     }
 
+    dispatch(showToast({ variant: "success", title: t("tx_saved") }));
     onHide();
   };
 
@@ -280,17 +300,9 @@ export default function TransactionDialog({
     }
   };
 
-  const tipoOptions = [
-    { label: t("income"), value: "ENTRATA" },
-    { label: t("expenses"), value: "USCITA" },
-    { label: t("compensation"), value: "RIMBORSO" },
-    { label: t("transfer"), value: "RICARICA" },
-    { label: t("set_aside"), value: "ACCANTONAMENTO" },
-  ];
-
   // Conti selezionabili come destinazione: tutti tranne la sorgente
   const contiDestinazione = useMemo(
-    () => conti.filter((c) => String(c.id) !== String(contoId)),
+    () => conti.filter((conto) => String(conto.id) !== String(contoId)),
     [conti, contoId],
   );
 
@@ -301,141 +313,107 @@ export default function TransactionDialog({
     }
   };
 
-  const categorieFiltrate = useMemo(() => {
-    if (!categorie) return [];
+  // Categorie e sottocategorie ammesse dal tipo scelto: una categoria di sole
+  // uscite non ha senso su un'entrata.
+  const categorieFiltrate = useMemo(
+    () =>
+      categorie.filter((categoria) => {
+        if (tipo === "ENTRATA") return categoria.solo_entrata === true;
+        if (tipo === "USCITA") return categoria.solo_uscita === true;
+        return true;
+      }),
+    [categorie, tipo],
+  );
 
-    return categorie.filter((cat) => {
-      if (tipo === "ENTRATA") {
-        return cat.solo_entrata === true;
-      }
-      if (tipo === "USCITA") {
-        return cat.solo_uscita === true;
-      }
-      return true; // Caso di fallback se tipo non è ancora definito
+  const sottocategorieFiltrate = useMemo(() => {
+    const cat = categorie.find(
+      (categoria) => String(categoria.id) === String(categoriaId),
+    );
+
+    return (cat?.sottocategorie ?? []).filter((sub) => {
+      if (tipo === "ENTRATA") return sub.solo_entrata === true;
+      if (tipo === "USCITA") return sub.solo_uscita === true;
+      return true;
     });
-  }, [categorie, tipo]);
+  }, [categoriaId, categorie, tipo]);
 
-  const categorieOptions = useMemo(() => {
-    return [
-      ...categorieFiltrate,
-      {
-        id: "NEW_CATEGORY",
-        nome: `+ ${t("add_new_category")}`,
-      },
-    ];
-  }, [categorieFiltrate, t]);
+  const tutteLeSottocategorie = useMemo(
+    () => categorie.flatMap((categoria) => categoria.sottocategorie ?? []),
+    [categorie],
+  );
 
-  const filteredSottoCategorie = useMemo(() => {
-    // 1. Trova la categoria selezionata
-    const cat = categorie.find((c) => c.id === categoriaId);
+  const asOptions = (list: { id: string; nome: string }[]): PickerOption[] =>
+    list.map((item) => ({ id: item.id, label: item.nome }));
 
-    if (!cat || !cat.sottocategorie) return [];
+  // Il valore scelto può essere un id o il nome di una voce ancora da creare:
+  // quando non corrisponde a niente in lista, è già l'etichetta da mostrare.
+  const labelOf = (
+    list: { id: string; nome: string }[],
+    value: string | null,
+  ) =>
+    value
+      ? (list.find((item) => String(item.id) === String(value))?.nome ?? value)
+      : undefined;
 
-    // 2. Ritorna solo le sottocategorie che corrispondono al "tipo" attuale
-    return cat.sottocategorie.filter((sub) => {
-      if (tipo === "ENTRATA") {
-        return sub.solo_entrata === true;
-      }
-      if (tipo === "USCITA") {
-        return sub.solo_uscita === true;
-      }
-      return true; // Fallback
-    });
-  }, [categoriaId, categorie, tipo]); // Aggiunto 'tipo' alle dipendenze
+  const sourceConto = conti.find(
+    (conto) => String(conto.id) === String(contoId),
+  );
 
-  const sottocategorieOptions = useMemo(() => {
-    return [
-      ...filteredSottoCategorie,
-      {
-        id: "NEW_SUBCATEGORY",
-        nome: `+ ${t("add_new_subcategory")}`,
-      },
-    ];
-  }, [filteredSottoCategorie, t]);
+  // Effetto della transazione sul conto di partenza: un'entrata lo alza, tutto
+  // il resto (uscita, accantonamento, giro in uscita) lo abbassa.
+  const balanceAfter = sourceConto
+    ? Number(sourceConto.saldo) +
+      (tipo === "ENTRATA" || tipo === "RIMBORSO" ? 1 : -1) *
+        parseAmount(importo)
+    : null;
 
-  const tagOptions = useMemo(() => {
-    return [
-      ...tags,
-      {
-        id: "NEW_TAG",
-        nome: `+ ${t("add_new_tag")}`,
-      },
-    ];
-  }, [tags, t]);
+  const isRicarica = tipo === "RICARICA";
+
+  const canSave =
+    tipo === "RIMBORSO"
+      ? Boolean(importo && contoId && data && transactionId)
+      : isRicarica
+        ? Boolean(
+            importo &&
+              contoId &&
+              contoDestinazioneId &&
+              String(contoId) !== String(contoDestinazioneId) &&
+              data,
+          )
+        : Boolean(importo && contoId && data);
+
+  const canSplit = Boolean(transaction) || Boolean(importo && contoId && data);
+  const canRepeat = tipo === "USCITA" || tipo === "ENTRATA";
 
   return (
-    <Dialog
-      id="transaction-dialog"
-      header={transaction ? t("edit_transaction") : t("new_transaction")}
-      visible={visible}
-      className="dialog-custom create-transaction-dialog"
-      style={{ width: "95vw", maxWidth: "45rem" }}
-      onHide={onHide}
-      blockScroll={true}
-      footer={
-        <div className="dialog-footer">
-          <Button
-            label={t("cancel")}
-            className="reset-button"
-            onClick={onHide}
-          />
-          {(transaction || tipo === "ENTRATA" || tipo === "USCITA") && (
-            <Button
-              className="split-button"
-              icon="pi pi-sitemap"
-              iconPos="left"
-              label={t("split_transaction") || "Split"}
-              onClick={handleOpenSplit}
-              disabled={!transaction && !(importo && contoId && data)}
-            />
-          )}
-          <Button
-            className="action-button"
-            label={transaction ? t("save_changes") : t("save")}
-            onClick={handleSave}
-            disabled={
-              tipo === "RIMBORSO"
-                ? !(importo && contoId && data && transactionId)
-                : tipo === "RICARICA"
-                  ? !(
-                      importo &&
-                      contoId &&
-                      contoDestinazioneId &&
-                      String(contoId) !== String(contoDestinazioneId) &&
-                      data
-                    )
-                  : !(importo && contoId && data)
-            }
-          />
-        </div>
-      }
-      draggable={false}
-      resizable={false}
-    >
-      <SplitTransactionDialog
-        visible={isSplitDialogVisible}
-        onHide={() => {
-          setIsSplitDialogVisible(false);
-          // In creazione (crea + dividi) la transazione è già stata salvata:
-          // chiudiamo anche il dialog principale al termine dello split.
-          if (!transaction) {
-            setSplitTarget(null);
-            onHide();
-          }
-        }}
-        transaction={splitTarget}
-      />
-      <div className="transaction-form">
-        <div className="form-row">
-          <SelectButton
-            value={tipo}
-            options={tipoOptions}
-            onChange={(e) => setTipo(e.value || "USCITA")}
-            className="type-selector"
-          />
-        </div>
+    <>
+      <Sheet
+        open={visible}
+        onClose={onHide}
+        title={transaction ? t("edit_transaction") : t("new_transaction")}
+        className="tx-sheet"
+        footer={
+          <Button block disabled={!canSave} onClick={handleSave}>
+            {transaction ? t("save_changes") : t("tx_save")}
+          </Button>
+        }
+      >
+        <SegmentedControl
+          ariaLabel={t("select_type")}
+          value={tipo}
+          options={[
+            { value: "USCITA", label: t("tx_type_expense") },
+            { value: "ENTRATA", label: t("tx_type_income") },
+            { value: "RICARICA", label: t("tx_type_transfer") },
+            { value: "RIMBORSO", label: t("tx_type_refund") },
+            { value: "ACCANTONAMENTO", label: t("tx_type_saving") },
+          ]}
+          onChange={setTipo}
+        />
 
         {tipo === "RIMBORSO" ? (
+          // Il rimborso si aggancia a una spesa esistente: ha un percorso suo,
+          // ancora nella veste vecchia.
           <Compensation
             importo={importo}
             setImporto={setImporto}
@@ -462,164 +440,268 @@ export default function TransactionDialog({
           />
         ) : (
           <>
-            <div className="form-row">
-              <div className="field">
-                <InputText
+            <div className="tx-sheet__hero">
+              <div className="tx-sheet__amount">
+                <input
                   value={importo}
-                  onChange={(e) => handleImportoChange(e.target.value)}
-                  label={t("amount")}
-                  icon="pi pi-euro"
-                  iconPos="right"
-                  keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
-                  inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-                  placeholder="0.00"
+                  onChange={(event) => handleImportoChange(event.target.value)}
+                  inputMode="decimal"
+                  placeholder="0"
+                  aria-label={t("amount")}
+                  style={{
+                    width: `${Math.max(importo.length, MIN_AMOUNT_WIDTH)}ch`,
+                  }}
                 />
+                <span className="tx-sheet__currency">€</span>
               </div>
-              <div className="field">
-                <Calendar
-                  label={t("date")}
-                  value={data}
-                  onChange={(e) => setData(e.value as Date)}
-                  showIcon
-                  showTime={false}
-                  hourFormat="24"
-                  showButtonBar
-                />
-              </div>
+
+              {sourceConto && balanceAfter !== null && (
+                <span className="tx-sheet__hint">
+                  {`${sourceConto.nome} · ${t("tx_balance_after")}: `}
+                  <Amount value={balanceAfter} />
+                </span>
+              )}
             </div>
 
-            <div className="form-row">
-              <div className="field">
-                <Dropdown
-                  label={
-                    tipo === "RICARICA" ? t("source_account") : t("bank_account")
-                  }
-                  value={contoId}
-                  options={conti}
-                  optionLabel="nome"
-                  optionValue="id"
-                  onChange={(e) => setContoId(e.value)}
-                  placeholder={t("bank_account_placeholder")}
-                  showClear={false}
+            <div className="tx-sheet__fields">
+              {!isRicarica && (
+                <PickerRow
+                  icon="pi pi-tag"
+                  label={t("category")}
+                  value={labelOf(categorie, categoriaId)}
+                  placeholder={t("category_placeholder")}
+                  onClick={() => setPicker("categoria")}
                 />
-              </div>
-              <div className="field">
-                {tipo === "RICARICA" ? (
-                  <Dropdown
-                    label={t("destination_account")}
-                    value={contoDestinazioneId}
-                    options={contiDestinazione}
-                    optionLabel="nome"
-                    optionValue="id"
-                    onChange={(e) => setContoDestinazioneId(e.value)}
-                    placeholder={t("destination_account_placeholder")}
-                    showClear={false}
-                  />
-                ) : (
-                  <Dropdown
-                    label={t("tag")}
-                    value={tagId}
-                    options={tagOptions}
-                    optionLabel="nome"
-                    optionValue="id"
-                    onChange={(e) => setTagId(e.value)}
-                    placeholder={t("tag_placeholder")}
-                  />
+              )}
+
+              {!isRicarica && categoriaId && (
+                <PickerRow
+                  icon="pi pi-hashtag"
+                  label={t("sub_category")}
+                  value={labelOf(tutteLeSottocategorie, sottoCategoriaId)}
+                  placeholder={t("sub_category_placeholder")}
+                  onClick={() => setPicker("sottocategoria")}
+                />
+              )}
+
+              <PickerRow
+                icon="pi pi-wallet"
+                label={isRicarica ? t("source_account") : t("bank_account")}
+                value={labelOf(conti, contoId)}
+                placeholder={t("bank_account_placeholder")}
+                onClick={() => setPicker("conto")}
+              />
+
+              {(isRicarica || tipo === "ACCANTONAMENTO") && (
+                <PickerRow
+                  icon="pi pi-arrow-right-arrow-left"
+                  label={
+                    isRicarica
+                      ? t("destination_account")
+                      : t("set_aside_destination")
+                  }
+                  value={labelOf(conti, contoDestinazioneId)}
+                  placeholder={t("destination_account_placeholder")}
+                  onClick={() => setPicker("destinazione")}
+                />
+              )}
+
+              <div className="tx-sheet__pair">
+                <div className="tx-sheet__compact">
+                  <i className="pi pi-calendar" aria-hidden="true" />
+                  <span className="tx-sheet__compact-text">
+                    <span className="tx-sheet__label">{t("date")}</span>
+                    <input
+                      type="date"
+                      value={data ? toIsoDate(data) : ""}
+                      aria-label={t("date")}
+                      onChange={(event) => {
+                        const [year, month, day] = event.target.value
+                          .split("-")
+                          .map(Number);
+
+                        setData(
+                          year ? new Date(year, month - 1, day) : null,
+                        );
+                      }}
+                    />
+                  </span>
+                </div>
+
+                {!isRicarica && (
+                  <button
+                    type="button"
+                    className="tx-sheet__compact"
+                    onClick={() => setPicker("tag")}
+                  >
+                    <i className="pi pi-hashtag" aria-hidden="true" />
+                    <span className="tx-sheet__compact-text">
+                      <span className="tx-sheet__label">{t("tag")}</span>
+                      <span className="tx-sheet__value">
+                        {labelOf(tags, tagId) ?? t("tx_none")}
+                      </span>
+                    </span>
+                  </button>
                 )}
               </div>
-            </div>
-            {tagId === "NEW_TAG" && (
-              <div className="form-row">
-                <div className="field" style={{ width: "100%" }}>
-                  <InputText
-                    label={t("new_tag_name")}
-                    value={newTagName}
-                    onChange={(e) => setNewTagName(e.target.value)}
-                    placeholder={t("ex_corsica")}
-                  />
-                </div>
-              </div>
-            )}
 
-            {tipo === "ACCANTONAMENTO" && (
-              <div className="form-row">
-                <div className="field">
-                  <Dropdown
-                    label={t("set_aside_destination")}
-                    value={contoDestinazioneId}
-                    options={contiDestinazione}
-                    optionLabel="nome"
-                    optionValue="id"
-                    onChange={(e) => setContoDestinazioneId(e.value)}
-                    placeholder={t("set_aside_destination_placeholder")}
-                  />
-                </div>
-              </div>
-            )}
-
-            {tipo !== "RICARICA" && (
-              <div className="form-row">
-                <div className="field">
-                  <div className="field-inline">
-                    <Dropdown
-                      label={t("category")}
-                    value={categoriaId}
-                    options={categorieOptions}
-                    optionLabel="nome"
-                    optionValue="id"
-                    onChange={(e) => setCategoriaId(e.value)}
-                    placeholder={t("category_placeholder")}
-                  />
-                  {categoriaId === "NEW_CATEGORY" && (
-                    <InputText
-                      label={t("new_category_name")}
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder={t("ex_subscriptions")}
-                      autoFocus
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="field">
-                <div className="field-inline">
-                  <Dropdown
-                    label={t("sub_category")}
-                    value={sottoCategoriaId}
-                    options={sottocategorieOptions}
-                    optionLabel="nome"
-                    optionValue="id"
-                    onChange={(e) => setSottoCategoriaId(e.value)}
-                    placeholder={t("sub_category_placeholder")}
-                    disabled={!categoriaId}
-                  />
-                  {sottoCategoriaId === "NEW_SUBCATEGORY" && (
-                    <InputText
-                      label={t("new_subcategory_name")}
-                      value={newSubCategoryName}
-                      onChange={(e) => setNewSubCategoryName(e.target.value)}
-                      placeholder={t("ex_netflix")}
-                      autoFocus
-                    />
-                  )}
-                </div>
-              </div>
-              </div>
-            )}
-
-            <div className="form-row">
-              <div className="field">
-                <InputText
-                  label={t("description")}
+              <div className="tx-sheet__compact tx-sheet__compact--wide">
+                <i className="pi pi-align-left" aria-hidden="true" />
+                <input
                   value={descrizione}
-                  onChange={(e) => setDescrizione(e.target.value)}
-                  placeholder={t("description_placeholder")}
+                  placeholder={t("tx_description_optional")}
+                  aria-label={t("description")}
+                  onChange={(event) => setDescrizione(event.target.value)}
                 />
               </div>
             </div>
+
           </>
         )}
-      </div>
-    </Dialog>
+
+        <div className="tx-sheet__chips">
+          {canRepeat && (
+            <Chip
+              variant="solid"
+              icon="pi pi-refresh"
+              label={t("tx_make_recurring")}
+              onClick={() => setIsRecurrenceVisible(true)}
+            />
+          )}
+
+          <Chip
+            variant="solid"
+            icon="pi pi-clone"
+            label={t("split_transaction")}
+            onClick={canSplit ? handleOpenSplit : undefined}
+            className={canSplit ? undefined : "chip--disabled"}
+          />
+        </div>
+      </Sheet>
+
+      <PickerSheet
+        open={picker === "categoria"}
+        onClose={() => setPicker(null)}
+        title={t("category")}
+        options={asOptions(categorieFiltrate)}
+        value={categoriaId}
+        clearLabel={t("tx_none")}
+        createLabel={t("add_new_category")}
+        onSelect={(value) => {
+          setCategoriaId(value);
+          // La sottocategoria appartiene alla categoria: cambiandola resta
+          // orfana, e il payload la manderebbe sotto la madre sbagliata.
+          setSottoCategoriaId(null);
+        }}
+      />
+
+      <PickerSheet
+        open={picker === "sottocategoria"}
+        onClose={() => setPicker(null)}
+        title={t("sub_category")}
+        options={asOptions(sottocategorieFiltrate)}
+        value={sottoCategoriaId}
+        clearLabel={t("tx_none")}
+        createLabel={t("add_new_subcategory")}
+        onSelect={setSottoCategoriaId}
+      />
+
+      <PickerSheet
+        open={picker === "conto"}
+        onClose={() => setPicker(null)}
+        title={isRicarica ? t("source_account") : t("bank_account")}
+        options={asOptions(conti)}
+        value={contoId}
+        onSelect={setContoId}
+      />
+
+      <PickerSheet
+        open={picker === "destinazione"}
+        onClose={() => setPicker(null)}
+        title={
+          isRicarica ? t("destination_account") : t("set_aside_destination")
+        }
+        options={asOptions(contiDestinazione)}
+        value={contoDestinazioneId}
+        clearLabel={isRicarica ? undefined : t("tx_none")}
+        onSelect={setContoDestinazioneId}
+      />
+
+      <PickerSheet
+        open={picker === "tag"}
+        onClose={() => setPicker(null)}
+        title={t("tag")}
+        options={asOptions(tags)}
+        value={tagId}
+        clearLabel={t("tx_none")}
+        createLabel={t("add_new_tag")}
+        onSelect={setTagId}
+      />
+
+      <SplitTransactionDialog
+        visible={isSplitDialogVisible}
+        onHide={() => {
+          setIsSplitDialogVisible(false);
+          // In creazione (crea + dividi) la transazione è già stata salvata:
+          // chiudiamo anche il foglio principale al termine dello split.
+          if (!transaction) {
+            setSplitTarget(null);
+            onHide();
+          }
+        }}
+        transaction={splitTarget}
+      />
+
+      <RecurrenceDialog
+        visible={isRecurrenceVisible}
+        onHide={() => setIsRecurrenceVisible(false)}
+        defaults={{
+          nome: descrizione || labelOf(categorie, categoriaId) || "",
+          importo,
+          tipo: tipo === "ENTRATA" ? "ENTRATA" : "USCITA",
+          conto_id: contoId,
+          categoria_id: categoriaId,
+          sottocategoria_id: sottoCategoriaId,
+          tag_id: tagId,
+          prossima_esecuzione: data,
+        }}
+      />
+    </>
+  );
+}
+
+type PickerRowProps = {
+  icon: string;
+  label: string;
+  value?: ReactNode;
+  placeholder: string;
+  onClick: () => void;
+};
+
+/** Riga-campo: mostra la scelta fatta, il tocco apre il foglio che la cambia. */
+function PickerRow({
+  icon,
+  label,
+  value,
+  placeholder,
+  onClick,
+}: PickerRowProps) {
+  return (
+    <button type="button" className="tx-sheet__row" onClick={onClick}>
+      <span className="tx-sheet__icon" aria-hidden="true">
+        <i className={icon} />
+      </span>
+
+      <span className="tx-sheet__row-text">
+        <span className="tx-sheet__label">{label}</span>
+        <span
+          className={`tx-sheet__value${value ? "" : " tx-sheet__value--empty"}`}
+        >
+          {value ?? placeholder}
+        </span>
+      </span>
+
+      <i className="pi pi-chevron-right tx-sheet__chevron" aria-hidden="true" />
+    </button>
   );
 }

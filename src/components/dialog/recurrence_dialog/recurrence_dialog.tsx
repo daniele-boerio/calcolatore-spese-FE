@@ -24,16 +24,34 @@ import {
   updateRecurring,
 } from "../../../features/recurrings/api_calls";
 
+/**
+ * Valori con cui aprire il form in creazione. Li passa il foglio "Nuova
+ * transazione" quando si tocca "Rendi ricorrente": la ricorrenza nasce dai
+ * dati già scritti lì, non da un form vuoto.
+ */
+export interface RecurrenceDefaults {
+  nome?: string;
+  importo?: string;
+  tipo?: tipoTransaction;
+  conto_id?: string | null;
+  categoria_id?: string | null;
+  sottocategoria_id?: string | null;
+  tag_id?: string | null;
+  prossima_esecuzione?: Date | null;
+}
+
 interface RecurrenceDialogProps {
   visible: boolean;
   onHide: () => void;
   recurring?: Recurring;
+  defaults?: RecurrenceDefaults;
 }
 
 export default function RecurrenceDialog({
   visible,
   onHide,
   recurring,
+  defaults,
 }: RecurrenceDialogProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
@@ -78,21 +96,24 @@ export default function RecurrenceDialog({
         setSottoCategoriaId(recurring.sottocategoria_id);
         setTagId(recurring.tag_id);
       } else {
-        setNome("");
-        setImporto("");
-        setTipo("USCITA");
+        setNome(defaults?.nome ?? "");
+        setImporto(defaults?.importo ?? "");
+        setTipo(defaults?.tipo ?? "USCITA");
         setFrequenza("MENSILE");
-        setProssimaEsecuzione(new Date());
+        setProssimaEsecuzione(defaults?.prossima_esecuzione ?? new Date());
         setAttiva(true);
-        setContoId(null);
-        setCategoriaId(null);
-        setSottoCategoriaId(null);
-        setTagId(null);
+        setContoId(defaults?.conto_id ?? null);
+        setCategoriaId(defaults?.categoria_id ?? null);
+        setSottoCategoriaId(defaults?.sottocategoria_id ?? null);
+        setTagId(defaults?.tag_id ?? null);
         setNewCategoryName("");
         setNewSubCategoryName("");
         setNewTagName("");
       }
     }
+    // `defaults` è un oggetto ricreato a ogni render del form chiamante:
+    // metterlo fra le dipendenze ripulirebbe questo form a ogni battuta.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, recurring]);
 
   const categorieFiltrate = useMemo(() => {
