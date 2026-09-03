@@ -1,6 +1,6 @@
 import "./credit_card.scss";
 import { useI18n } from "../../i18n/use-i18n";
-import Button from "../button/button";
+import Button from "../legacy_button/legacy_button";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useAppDispatch } from "../../store/store";
 import { deleteConto } from "../../features/conti/api_calls";

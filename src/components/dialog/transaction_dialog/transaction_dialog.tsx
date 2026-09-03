@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Dialog } from "primereact/dialog";
 import { SelectButton } from "primereact/selectbutton";
 import InputText from "../../input_text/input_text";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import Dropdown from "../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import "./transaction_dialog.scss";

@@ -5,7 +5,7 @@ import "./bank_callback_page.scss";
 import { useAppDispatch } from "../../store/store";
 import { confirmBankSession } from "../../features/conti/api_calls";
 import { useI18n } from "../../i18n/use-i18n";
-import Button from "../../components/button/button";
+import Button from "../../components/legacy_button/legacy_button";
 
 type CallbackStatus = "loading" | "success" | "error";
 

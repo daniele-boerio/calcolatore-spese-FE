@@ -1,4 +1,5 @@
 import type { ThemePreference } from "./theme";
+import type { ToastItem } from "./toast";
 
 /**
  * Navigazione modale: quale sheet è aperto e con quale payload. Unione
@@ -14,4 +15,6 @@ export interface UiState {
   hideAmounts: boolean;
   /** Sheet attualmente aperto, `null` se nessuno. */
   sheet: ActiveSheet | null;
+  /** Coda dei toast visibili, dal più vecchio al più recente. */
+  toasts: ToastItem[];
 }

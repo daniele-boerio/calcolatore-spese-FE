@@ -1,0 +1,291 @@
+// src/styles/_primereact.scss
+//
+// PrimeReact resta solo dove porta logica vera — date picker, dropdown con
+// filtro, overlay. Il suo tema `lara` ha i colori hard-coded (non segue le
+// custom properties), quindi la palette la rimettiamo qui, sempre su token.
+//
+// Emesso una volta sola da App.scss, che viene dopo il tema nel bundle.
+@use "./variables" as v;
+
+// ── Campi ─────────────────────────────────────────────────────────────────
+.p-inputtext,
+.p-dropdown,
+.p-multiselect,
+.p-inputnumber-input {
+  background: v.$surface;
+  border: 1px solid v.$line;
+  border-radius: v.$r-field;
+  color: v.$ink;
+  font-family: v.$font-ui;
+
+  &::placeholder {
+    color: v.$muted-2;
+  }
+
+  &:enabled:hover {
+    border-color: v.$line;
+  }
+
+  &:enabled:focus,
+  &.p-focus {
+    border-color: v.$accent;
+    box-shadow: none;
+    outline: 2px solid v.$accent;
+    outline-offset: -2px;
+  }
+}
+
+.p-dropdown .p-dropdown-label,
+.p-multiselect .p-multiselect-label {
+  color: v.$ink;
+}
+
+.p-dropdown .p-dropdown-trigger,
+.p-multiselect .p-multiselect-trigger {
+  color: v.$muted;
+}
+
+// ── Pannelli in overlay (montati fuori da .App) ───────────────────────────
+.p-dropdown-panel,
+.p-multiselect-panel,
+.p-overlaypanel,
+.p-menu,
+.p-tieredmenu {
+  background: v.$surface;
+  border: 1px solid v.$line;
+  border-radius: v.$r-field;
+  color: v.$ink;
+
+  .p-dropdown-items,
+  .p-multiselect-items,
+  .p-menu-list {
+    padding: 6px;
+  }
+
+  .p-dropdown-item,
+  .p-multiselect-item,
+  .p-menuitem-link {
+    border-radius: v.$r-icon;
+    color: v.$ink;
+
+    &:hover,
+    &.p-focus {
+      background: v.$surface-2;
+    }
+
+    &.p-highlight {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+  }
+}
+
+// ── Bottoni PrimeReact ────────────────────────────────────────────────────
+.p-button {
+  border-radius: v.$r-field;
+  background: v.$accent;
+  border-color: v.$accent;
+  color: v.$on-accent;
+  font-family: v.$font-ui;
+  font-weight: 700;
+
+  &:enabled:hover,
+  &:enabled:active {
+    background: v.$accent;
+    border-color: v.$accent;
+    color: v.$on-accent;
+  }
+
+  &:focus {
+    box-shadow: none;
+  }
+
+  &.p-button-text {
+    background: transparent;
+    border-color: transparent;
+    color: v.$accent;
+  }
+}
+
+// ── Selezione ─────────────────────────────────────────────────────────────
+.p-checkbox .p-checkbox-box,
+.p-radiobutton .p-radiobutton-box {
+  background: v.$surface;
+  border-color: v.$line;
+
+  &.p-highlight {
+    background: v.$accent;
+    border-color: v.$accent;
+  }
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  background: v.$accent;
+}
+
+.p-selectbutton .p-button {
+  background: v.$surface-2;
+  border-color: transparent;
+  color: v.$ink;
+
+  &.p-highlight {
+    background: v.$accent;
+    color: v.$on-accent;
+  }
+}
+
+// ── Calendario ────────────────────────────────────────────────────────────
+.p-calendar {
+  border-radius: v.$r-field;
+
+  .p-datepicker-trigger {
+    background: v.$accent;
+    border-color: v.$accent;
+
+    svg {
+      color: v.$on-accent;
+    }
+  }
+
+  .p-inputtext {
+    padding: 0 0.5rem;
+  }
+
+  &:not(.p-calendar-disabled).p-focus > .p-inputtext {
+    box-shadow: none;
+  }
+}
+
+.p-datepicker {
+  background: v.$surface;
+  border: 1px solid v.$line;
+  border-radius: v.$r-field;
+  color: v.$ink;
+
+  .p-datepicker-header {
+    background: v.$surface;
+    border-bottom-color: v.$line-soft;
+    color: v.$ink;
+
+    .p-datepicker-title button,
+    .p-datepicker-prev,
+    .p-datepicker-next {
+      color: v.$ink;
+    }
+  }
+
+  table td > span {
+    border-radius: v.$r-icon;
+    color: v.$ink;
+
+    &.p-highlight {
+      background: v.$accent;
+      color: v.$on-accent;
+    }
+  }
+
+  table td.p-datepicker-today > span {
+    background: v.$accent-soft;
+    color: v.$accent;
+
+    &.p-highlight {
+      background: v.$accent;
+      color: v.$on-accent;
+    }
+  }
+}
+
+// ── Dialog e popup ────────────────────────────────────────────────────────
+.p-dialog {
+  border: 1px solid v.$line;
+  border-radius: v.$r-card;
+  box-shadow: v.$shadow-sheet;
+  overflow: hidden;
+
+  .p-dialog-header,
+  .p-dialog-content,
+  .p-dialog-footer {
+    background: v.$surface;
+    color: v.$ink;
+  }
+
+  .p-dialog-header {
+    padding: 1.4rem 1.5rem 0.75rem;
+
+    .p-dialog-title {
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+  }
+
+  .p-dialog-content {
+    padding: 0.5rem 1.5rem 1rem;
+  }
+
+  .p-dialog-footer {
+    padding: 1rem 1.5rem 1.4rem;
+  }
+
+  .p-dialog-header-icon {
+    color: v.$muted;
+    border-radius: v.$r-pill;
+
+    &:hover {
+      background: v.$surface-2;
+      color: v.$ink;
+    }
+  }
+}
+
+.p-confirm-popup {
+  background: v.$surface;
+  border: 1px solid v.$line;
+  border-radius: v.$r-field;
+  color: v.$ink;
+
+  &:after,
+  &:before {
+    border-bottom-color: v.$surface;
+  }
+}
+
+// ── Tabelle e paginazione ─────────────────────────────────────────────────
+.p-paginator {
+  background: transparent;
+  border: none;
+
+  .p-paginator-element {
+    color: v.$ink;
+    border-radius: v.$r-icon;
+
+    &.p-highlight {
+      background: v.$accent-soft;
+      color: v.$accent;
+    }
+  }
+}
+
+// ── Tab menu (ancora usato dalle schermate non convertite) ────────────────
+.p-tabmenu .p-tabmenu-nav {
+  background: transparent;
+  border-color: v.$line;
+
+  .p-menuitem-link {
+    background: transparent;
+    border-color: transparent;
+    color: v.$muted;
+    font-family: v.$font-ui;
+  }
+
+  .p-highlight .p-menuitem-link {
+    background: transparent;
+    border-color: v.$accent;
+    color: v.$accent;
+  }
+}
+
+.p-progress-spinner-circle {
+  stroke: v.$accent;
+  animation: p-progress-spinner-dash 1.5s ease-in-out infinite;
+}

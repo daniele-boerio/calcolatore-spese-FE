@@ -1,4 +1,4 @@
-import Button from "../button/button";
+import Button from "../legacy_button/legacy_button";
 import { Sidebar } from "primereact/sidebar";
 import React from "react";
 import "./filters_panel.scss";

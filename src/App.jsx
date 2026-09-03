@@ -16,6 +16,7 @@ import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_gate";
 import SheetHost from "./components/sheet_host/sheet_host";
+import ToastHost from "./components/toast/toast";
 import { useThemeSync } from "./features/ui/use_theme";
 
 // Code-splitting per route: ogni pagina è un chunk separato caricato solo
@@ -128,6 +129,7 @@ function App() {
             </Suspense>
             <TabBar />
             <SheetHost />
+            <ToastHost />
           </>
         )}
       </div>

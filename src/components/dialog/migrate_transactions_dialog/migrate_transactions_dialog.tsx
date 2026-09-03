@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import Dropdown from "../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";

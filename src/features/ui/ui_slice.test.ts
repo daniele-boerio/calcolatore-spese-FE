@@ -21,6 +21,8 @@ vi.hoisted(() => {
 });
 
 import reducer, {
+  dismissToast,
+  pushToast,
   setHideAmounts,
   setTheme,
   toggleHideAmounts,
@@ -68,5 +70,32 @@ describe("ui_slice", () => {
 
     expect(state.hideAmounts).toBe(true);
     expect(localStorage.getItem("hideAmounts")).toBe("true");
+  });
+});
+
+describe("ui_slice · toast", () => {
+  const toast = (id: string) => ({
+    id,
+    variant: "success" as const,
+    title: "Transazione salvata",
+    duration: 5000,
+  });
+
+  it("accoda i toast nell'ordine di arrivo", () => {
+    const one = reducer(initial, pushToast(toast("a")));
+    const two = reducer(one, pushToast(toast("b")));
+
+    expect(two.toasts.map((t) => t.id)).toEqual(["a", "b"]);
+  });
+
+  it("chiude solo il toast indicato", () => {
+    const withTwo = reducer(
+      reducer(initial, pushToast(toast("a"))),
+      pushToast(toast("b")),
+    );
+
+    const state = reducer(withTwo, dismissToast("a"));
+
+    expect(state.toasts.map((t) => t.id)).toEqual(["b"]);
   });
 });

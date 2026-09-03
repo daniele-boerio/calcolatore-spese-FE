@@ -3,7 +3,7 @@ import { Dialog } from "primereact/dialog";
 import Calendar from "../../calendar/calendar";
 import Dropdown from "../../dropdown/dropdown";
 import InputText from "../../input_text/input_text";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import "./pay_debito_dialog.scss";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { payDebito } from "../../../features/debiti/api_calls";

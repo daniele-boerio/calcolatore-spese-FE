@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import InputText from "../../input_text/input_text";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import { useI18n } from "../../../i18n/use-i18n";
 import api from "../../../services/api"; // Usa la tua istanza axios configurata
 

@@ -3,7 +3,7 @@ import { Dialog } from "primereact/dialog";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { confirmPopup } from "primereact/confirmpopup";
 import InputText from "../../input_text/input_text";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import "./bank_connect_dialog.scss";
 import { useAppDispatch } from "../../../store/store";
 import {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import Dropdown from "../../dropdown/dropdown";
 import InputText from "../../input_text/input_text";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import "./debito_dialog.scss";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { createDebito, updateDebito } from "../../../features/debiti/api_calls";

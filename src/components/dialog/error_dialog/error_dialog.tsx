@@ -1,5 +1,5 @@
 import { Dialog } from "primereact/dialog";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { hideError, selectError } from "../../../features/error/error_slice";
 import { useI18n } from "../../../i18n/use-i18n";

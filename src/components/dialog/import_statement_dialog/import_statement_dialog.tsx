@@ -3,7 +3,7 @@ import { Dialog } from "primereact/dialog";
 import { Checkbox } from "primereact/checkbox";
 import Dropdown from "../../dropdown/dropdown";
 import Calendar from "../../calendar/calendar";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import "./import_statement_dialog.scss";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { useI18n } from "../../../i18n/use-i18n";

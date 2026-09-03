@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import "./recurrings.scss";
 import { Conto } from "../../../features/conti/interfaces";
-import Button from "../../../components/button/button";
+import Button from "../../../components/legacy_button/legacy_button";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../../i18n/use-i18n";
 import {

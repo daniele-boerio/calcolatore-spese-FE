@@ -6,7 +6,7 @@ import {
 } from "primereact/datatable";
 import { confirmPopup } from "primereact/confirmpopup";
 import { type ReactNode } from "react";
-import Button from "../button/button";
+import Button from "../legacy_button/legacy_button";
 import { useI18n } from "../../i18n/use-i18n";
 import "./table_visualization.scss";
 

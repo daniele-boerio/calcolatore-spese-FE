@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Dialog } from "primereact/dialog";
 import InputText from "../../input_text/input_text";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import "./tag_dialog.scss"; // Puoi unificare i due SCSS in questo
 import { useAppDispatch } from "../../../store/store";
 import { createTag, updateTag } from "../../../features/tags/api_calls";

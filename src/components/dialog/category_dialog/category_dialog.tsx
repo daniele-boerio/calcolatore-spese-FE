@@ -3,7 +3,7 @@ import { Dialog } from "primereact/dialog";
 import { confirmPopup } from "primereact/confirmpopup";
 import InputText from "../../input_text/input_text";
 import Switch from "../../switch/switch";
-import Button from "../../button/button";
+import Button from "../../legacy_button/legacy_button";
 import { Categoria } from "../../../features/categorie/interfaces";
 import "./category_dialog.scss";
 import { useAppDispatch } from "../../../store/store";

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import "./tags_page.scss";
-import Button from "../../components/button/button";
+import Button from "../../components/legacy_button/legacy_button";
 import { deleteTag, getTags } from "../../features/tags/api_calls";
 import { Tag } from "../../features/tags/interfaces";
 import { confirmPopup } from "primereact/confirmpopup";

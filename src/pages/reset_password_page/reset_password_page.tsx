@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import InputText from "../../components/input_text/input_text";
 import Password from "../../components/password/password"; // Usa il tuo componente password
-import Button from "../../components/button/button";
+import Button from "../../components/legacy_button/legacy_button";
 import api from "../../services/api";
 import { useI18n } from "../../i18n/use-i18n";
 

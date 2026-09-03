@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { login, register } from "../../features/profile/api_calls";
 import InputText from "../../components/input_text/input_text";
-import Button from "../../components/button/button";
+import Button from "../../components/legacy_button/legacy_button";
 import "./auth_page.scss";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import Password from "../../components/password/password";

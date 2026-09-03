@@ -5,7 +5,7 @@ import {
   deleteCategoria,
 } from "../../features/categorie/api_calls";
 import "./category_page.scss";
-import Button from "../../components/button/button";
+import Button from "../../components/legacy_button/legacy_button";
 import CustomCard from "../../components/custom_card/custom_card";
 import { Categoria } from "../../features/categorie/interfaces";
 import { confirmPopup } from "primereact/confirmpopup";

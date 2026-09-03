@@ -7,7 +7,7 @@ import {
 import { getConti } from "../../../features/conti/api_calls";
 import "./transactions.scss";
 import { Conto } from "../../../features/conti/interfaces";
-import Button from "../../../components/button/button";
+import Button from "../../../components/legacy_button/legacy_button";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useI18n } from "../../../i18n/use-i18n";
 import TransactionDialog from "../../../components/dialog/transaction_dialog/transaction_dialog";

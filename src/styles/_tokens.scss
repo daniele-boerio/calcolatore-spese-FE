@@ -46,6 +46,9 @@
   --bar-idle: #eef1f0;
 
   --tabbar-bg: #ffffff;
+  // Chip filtro selezionato: al chiaro è un blocco scuro, al buio è l'accento.
+  --chip-active-bg: #0f2e24;
+  --chip-active-ink: #ffffff;
 
   // Anteprime del selettore tema in Impostazioni: mostrano gli *altri* temi,
   // quindi restano identiche nei due blocchi. Sono gli unici colori che non
@@ -108,6 +111,11 @@
   // centrato in una colonna di questa misura.
   --app-max-width: 480px;
   --tap-target: 44px;
+
+  // PrimeReact legge queste due dal proprio tema: le riportiamo sui nostri
+  // token. Funziona perché il tema lara è importato prima di App.scss.
+  --font-family: var(--font-ui);
+  --maskbg: var(--overlay);
 }
 
 [data-theme="dark"] {
@@ -145,6 +153,8 @@
 
   // Al buio la tab bar si fonde con lo sfondo pagina.
   --tabbar-bg: #0a1526;
+  --chip-active-bg: var(--accent);
+  --chip-active-ink: var(--on-accent);
 
   --preview-light: #f6f8f7;
   --preview-dark: #0a1526;

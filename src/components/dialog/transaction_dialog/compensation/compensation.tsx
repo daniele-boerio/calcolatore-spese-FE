@@ -1,7 +1,7 @@
 import { useState, useMemo, useRef } from "react";
 import Stepper from "../../../stepper/stepper";
 import InputText from "../../../input_text/input_text";
-import Button from "../../../button/button";
+import Button from "../../../legacy_button/legacy_button";
 import Dropdown from "../../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import "./compensation.scss";

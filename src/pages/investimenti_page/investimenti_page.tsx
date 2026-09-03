@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { confirmPopup } from "primereact/confirmpopup";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { useI18n } from "../../i18n/use-i18n";
-import Button from "../../components/button/button";
+import Button from "../../components/legacy_button/legacy_button";
 import {
   getInvestimenti,
   deleteInvestimento,

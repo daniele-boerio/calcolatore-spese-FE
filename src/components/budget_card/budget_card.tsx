@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Button from "../button/button";
+import Button from "../legacy_button/legacy_button";
 import Checkbox from "../checkbox/checkbox";
 import "./budget_card.scss";
 import BudgetSettingsDialog from "../dialog/budget_settings_dialog/budget_settings_dialog";

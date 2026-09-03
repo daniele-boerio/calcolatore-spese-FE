@@ -1,216 +1,70 @@
-@use "../../styles/variables.scss" as v;
-// Stato interattivo di base condiviso da tutti i bottoni
-.div-button .p-button {
-  font-weight: 600;
-  transition:
-    background-color v.$transition-fast,
-    border-color v.$transition-fast,
-    box-shadow v.$transition-fast,
-    transform v.$transition-fast,
-    filter v.$transition-fast;
+@use "../../styles/variables" as v;
 
-  &:active {
-    transform: translateY(1px);
-  }
-}
-
-.action-button {
-  .p-button {
-    color: v.$text-on-button;
-    border-color: v.$bc-button-primary;
-    background-color: v.$bg-button-primary;
-    box-shadow: v.$shadow-sm;
-
-    &:hover {
-      filter: brightness(1.07);
-      box-shadow: v.$shadow-md;
-      transform: translateY(-1px);
-    }
-  }
-}
-
-.reset-button {
-  .p-button {
-    color: v.$text-on-button;
-    border-color: v.$bc-button-secondary;
-    background-color: v.$bg-button-secondary;
-
-    &:hover {
-      filter: brightness(1.07);
-    }
-  }
-}
-
-.trasparent-button {
-  .p-button {
-    color: v.$text-main;
-    border-color: transparent;
-    background-color: transparent;
-  }
-}
-
-.split-button {
-  .p-button {
-    color: v.$text-on-button;
-    border-color: v.$accent-split;
-    background-color: v.$accent-split;
-    transition:
-      background-color 0.15s ease,
-      border-color 0.15s ease;
-
-    &:hover {
-      border-color: v.$accent-split-hover;
-      background-color: v.$accent-split-hover;
-    }
-  }
-}
-
-.trasparent-button-account {
-  .p-button {
-    background: transparent !important;
-    border: none !important;
-    color: v.$text-account !important;
-    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.4));
-  }
-}
-
-.trasparent-button-clear {
-  .p-button {
-    color: v.$text-on-dark;
-    border-color: transparent;
-    background-color: transparent;
-  }
-}
-
-.trasparent-danger-button {
-  .p-button {
-    color: v.$text-red;
-    border-color: transparent;
-    background-color: transparent;
-    filter: drop-shadow(0px 0px 3px rgba(0, 0, 0, 0.4));
-  }
-}
-
-.div-button {
-  display: flex;
-  border-radius: v.$radius-md;
-
-  &.invisible {
-    display: none;
-  }
-
-  button {
-    &.compact {
-      width: fit-content;
-    }
-  }
-}
-
-.div-icon-label-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0.313rem;
-
-  &.row {
-    flex-direction: row;
-  }
-
-  &.column {
-    flex-direction: column;
-  }
-
-  &.compact {
-    width: fit-content;
-  }
-
-  // stato base (non compatto)
-  &:not(.compact) {
-    width: 100%;
-  }
-}
-
-.icon-button {
-  display: flex;
+.btn {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  line-height: 1;
-}
+  gap: 8px;
 
-.span-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-}
+  border: 1px solid transparent;
+  border-radius: v.$r-field;
+  cursor: pointer;
 
-.table-add-button {
-  .p-button {
+  font-family: inherit;
+  font-weight: 700;
+
+  &--lg {
+    min-height: 54px;
+    padding: 0 20px;
+    font-size: 15px;
+  }
+
+  &--md {
+    min-height: 50px;
+    padding: 0 18px;
+    border-radius: 15px;
+    font-size: 15px;
+  }
+
+  &--sm {
+    min-height: v.$tap-target;
+    padding: 12px 18px;
+    border-radius: 14px;
+    font-size: 14px;
+  }
+
+  &--block {
     width: 100%;
-    color: v.$text-main;
-    border: 1px dashed v.$text-main;
-    background-color: transparent;
-    .div-icon-label-button {
-      justify-content: flex-start !important; /* sposta il contenuto a sinistra */
-      text-align: left !important;
-    }
   }
-}
 
-.add-transaction-button {
-  .p-button {
-    justify-content: center !important;
-    max-width: 4rem !important;
-    max-height: 4rem !important;
-    color: v.$text-on-dark;
-    border: none;
-    background-color: v.$btn-light;
-    .icon-button {
-      font-size: 1.5rem;
-    }
+  &--primary {
+    background: v.$accent;
+    color: v.$on-accent;
   }
-}
 
-.add-category-button,
-.add-account-button,
-.add-tag-button,
-.add-debt-button,
-.add-investment-button,
-.add-transaction-button {
-  border-radius: v.$radius-pill;
-
-  .p-button {
-    justify-content: center !important;
-    max-width: 4rem !important;
-    max-height: 4rem !important;
-    width: 4rem;
-    height: 4rem;
-    border-radius: v.$radius-pill;
-    color: v.$text-on-button;
-    border: none;
-    background-color: v.$bg-button-primary;
-    box-shadow: v.$shadow-md;
-    .icon-button {
-      font-size: 1.5rem;
-    }
-
-    &:hover {
-      filter: brightness(1.07);
-      transform: translateY(-2px);
-      box-shadow: v.$shadow-lg;
-    }
+  &--secondary {
+    background: v.$surface;
+    border-color: v.$line;
+    color: v.$ink;
   }
-}
 
-.add-subcategory-button {
-  .p-button {
-    width: 100%;
-    color: v.$text-main;
-    border: none;
-    background-color: transparent;
-    .div-icon-label-button {
-      justify-content: flex-start !important; /* sposta il contenuto a sinistra */
-      text-align: left !important;
-    }
+  &--neutral {
+    background: v.$surface-2;
+    color: v.$ink;
+  }
+
+  &--danger {
+    background: v.$negative;
+    color: var(--knob);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):active {
+    transform: scale(0.97);
+    transition: transform v.$dur-press;
   }
 }
