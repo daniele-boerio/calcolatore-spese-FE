@@ -82,40 +82,21 @@
           applyHeights(h);
         }
 
-        // Measure the actual tab bar after paint and apply its height to CSS
-        // so padding-bottom matches the painted element (prevents initial gap).
+        // La tab bar dipinta è più bassa del valore dichiarato nei token:
+        // qui si misura quella vera e si aggiorna --tabbar-h. Lo spazio in
+        // fondo lo calcola il CSS da quella variabile — scriverlo anche qui
+        // voleva dire tenere due formule allineate a mano, e una delle due
+        // era rimasta indietro.
         function measureTabbarAndApply() {
           try {
             var tab = document.querySelector(".tab-bar");
             if (!tab) return;
-            var rect = tab.getBoundingClientRect();
-            var tabH = Math.round(rect.height) || 0;
-            // Set token override to measured value
+
+            var tabH = Math.round(tab.getBoundingClientRect().height) || 0;
             document.documentElement.style.setProperty(
               "--tabbar-h",
               tabH + "px",
             );
-
-            // Force the tab to sit at the visual bottom to avoid layout shifts
-            try {
-              tab.style.bottom = "0px";
-              tab.style.transform = tab.style.transform || "translateX(-50%)";
-            } catch (e) {}
-
-            // Also set explicit padding on the content area to guarantee no gap
-            var content = document.querySelector(".page__content");
-            if (content) {
-              // Match SCSS: calc(var(--tabbar-h) - 18px + env(safe-area-inset-bottom))
-              content.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
-            }
-
-            // For legacy slots (non .page) try to apply similar override
-            var legacySlots = document.querySelectorAll(
-              ".App > *:not(.page):not(.tab-bar)",
-            );
-            legacySlots.forEach(function (el) {
-              el.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
-            });
           } catch (e) {}
         }
 

@@ -22,7 +22,7 @@ type CardTitleProps = {
   aside?: ReactNode;
 };
 
-/** Titolo di card: nel tema scuro passa al serif e cresce a 20px. */
+/** Titolo di card: stesso font del resto, in peso da display. */
 export function CardTitle({ children, aside }: CardTitleProps) {
   return (
     <div className="card__title-row">
