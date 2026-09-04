@@ -17,6 +17,7 @@
   border-radius: v.$r-field;
   color: v.$ink;
   font-family: v.$font-ui;
+  font-size: v.$fs-field;
 
   &::placeholder {
     color: v.$muted-2;

@@ -69,6 +69,8 @@ $fs-card-title: var(--fs-card-title);
 $fw-card-title: var(--fw-card-title);
 $fs-greeting: var(--fs-greeting);
 $fw-greeting: var(--fw-greeting);
+// Minimo per il testo di un campo scrivibile: sotto, iOS zooma al fuoco.
+$fs-field: var(--fs-field);
 
 // ── Raggi ─────────────────────────────────────────────────────────────────
 $r-card: var(--r-card);

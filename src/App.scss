@@ -10,6 +10,11 @@
 html {
   // Il tema è già su <html> allo script inline di index.html.
   background-color: var(--bg);
+
+  // In orizzontale iOS gonfia da solo il testo di certi blocchi: le misure le
+  // decidiamo noi.
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -33,6 +38,18 @@ body {
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+// Il pavimento di ogni campo scrivibile. Safari su iPhone ingrandisce la
+// pagina quando prende il fuoco un campo con testo sotto i 16px, e quello zoom
+// resta lì anche dopo che il campo è stato chiuso: l'app finisce tutta
+// ingrandita finché l'utente non la rimpicciolisce a mano. Qui c'è solo la
+// base, per i campi che non si danno una misura loro; chi se la dà deve
+// partire da `v.$fs-field`, non da un numero più piccolo.
+input,
+textarea,
+select {
+  font-size: var(--fs-field);
 }
 
 // Layout comune a tutte le schermate principali: intestazione appiccicata in

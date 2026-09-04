@@ -90,7 +90,7 @@
       background: transparent;
       color: v.$ink;
       font-family: inherit;
-      font-size: 15px;
+      font-size: v.$fs-field;
 
       &::placeholder {
         color: v.$muted-2;

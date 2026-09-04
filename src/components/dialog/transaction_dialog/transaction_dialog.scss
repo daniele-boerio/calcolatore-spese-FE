@@ -130,7 +130,7 @@
   }
 
   &__value {
-    font-size: 14.5px;
+    font-size: v.$fs-field;
     font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -177,7 +177,7 @@
       background: transparent;
       color: v.$ink;
       font-family: inherit;
-      font-size: 14.5px;
+      font-size: v.$fs-field;
 
       &::placeholder {
         color: v.$muted-2;
@@ -197,7 +197,7 @@
     background: transparent;
     color: v.$ink;
     font-family: inherit;
-    font-size: 14px;
+    font-size: v.$fs-field;
     font-weight: 600;
 
     &:focus {

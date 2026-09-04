@@ -1,12 +1,17 @@
 @use "../../styles/variables" as v;
 
 .sheet {
+  // Il riquadro dove lo sheet può stare. `bottom` lo riscrive sheet.tsx quando
+  // la tastiera è aperta: da lì in giù lo schermo è coperto dai tasti, e il
+  // pannello — ancorato al fondo di questo riquadro — si accorcia invece di
+  // finirci sotto.
   position: fixed;
   inset: 0;
   z-index: 1200;
 
+  // Lo scurito resta a tutto schermo anche quando il riquadro si accorcia.
   &__overlay {
-    position: absolute;
+    position: fixed;
     inset: 0;
     background: v.$overlay;
     animation: sheet-fade v.$dur-overlay ease-out;
@@ -37,6 +42,15 @@
 
     &:focus {
       outline: none;
+    }
+
+    // Con la tastiera aperta la maschera in fondo non c'è più: lo spazio che
+    // le tenevamo diventa un vuoto tra il bottone di conferma e i tasti.
+    &--keyboard {
+      padding-bottom: 16px;
+      // Il pannello arriva quasi in cima: sopra la tastiera lo spazio è poco e
+      // va speso tutto per i campi.
+      max-height: 100%;
     }
   }
 

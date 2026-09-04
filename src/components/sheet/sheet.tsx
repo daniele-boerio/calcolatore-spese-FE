@@ -5,6 +5,11 @@ import "./sheet.scss";
 // Oltre questa trascinata verso il basso lo sheet si chiude invece di tornare su.
 const DISMISS_THRESHOLD = 120;
 
+// Sotto questa fetta di schermo mancante non c'è una tastiera, ci sono le
+// barre di sistema che si assestano: alzare lo sheet per quelle sarebbe solo
+// tremolio.
+const KEYBOARD_MIN_HEIGHT = 120;
+
 type SheetProps = {
   open: boolean;
   onClose: () => void;
@@ -39,6 +44,8 @@ export default function Sheet({
   // Serve in render per togliere la transizione mentre il dito trascina: deve
   // essere stato, non un ref.
   const [dragging, setDragging] = useState(false);
+  // Quanto schermo si mangia la tastiera. Zero quando è chiusa.
+  const [keyboardInset, setKeyboardInset] = useState(0);
 
   // Esc chiude, e il corpo dietro non deve scorrere.
   useEffect(() => {
@@ -63,6 +70,45 @@ export default function Sheet({
       panelRef.current?.focus();
     }
   }, [open]);
+
+  // Con la tastiera aperta iOS non rimpicciolisce il viewport di layout: un
+  // pannello `fixed` ancorato in fondo resta ancorato al fondo dello *schermo*,
+  // cioè finisce sotto ai tasti — è il motivo per cui il campo descrizione non
+  // si vedeva più. Quanto spazio resta davvero lo sa solo `visualViewport`: da
+  // lì ricaviamo l'ingombro della tastiera e lo ridiamo al CSS.
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    if (!open || !viewport) return;
+
+    const sync = () => {
+      const covered = window.innerHeight - viewport.height - viewport.offsetTop;
+
+      setKeyboardInset(covered > KEYBOARD_MIN_HEIGHT ? covered : 0);
+    };
+
+    sync();
+    viewport.addEventListener("resize", sync);
+    viewport.addEventListener("scroll", sync);
+
+    return () => {
+      viewport.removeEventListener("resize", sync);
+      viewport.removeEventListener("scroll", sync);
+      setKeyboardInset(0);
+    };
+  }, [open]);
+
+  // Ristretto lo sheet, il campo che ha il fuoco può essere rimasto fuori dalla
+  // parte visibile del corpo: il browser lo aveva già portato in vista, ma
+  // ragionando sull'ingombro di prima. Lo rimettiamo al centro noi, dopo che la
+  // nuova altezza è stata applicata.
+  useEffect(() => {
+    if (!keyboardInset) return;
+
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && panelRef.current?.contains(focused)) {
+      focused.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }, [keyboardInset]);
 
   if (!open) return null;
 
@@ -90,7 +136,12 @@ export default function Sheet({
   };
 
   return createPortal(
-    <div className="sheet">
+    // Il fondo dello sheet è il bordo alto della tastiera, non quello dello
+    // schermo: il pannello dentro resta `bottom: 0` e si accorcia da sé.
+    <div
+      className="sheet"
+      style={keyboardInset ? { bottom: keyboardInset } : undefined}
+    >
       <div className="sheet__overlay" onClick={onClose} />
 
       <div
@@ -98,7 +149,7 @@ export default function Sheet({
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
-        className={`sheet__panel ${className ?? ""}`}
+        className={`sheet__panel ${keyboardInset ? "sheet__panel--keyboard" : ""} ${className ?? ""}`}
         style={{
           height: heightPercent ? `${heightPercent}%` : undefined,
           transform: dragOffset

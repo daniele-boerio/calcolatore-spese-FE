@@ -99,6 +99,12 @@
   --fs-greeting: 17px;
   --fw-greeting: 700;
 
+  // Misura minima del testo dentro un campo scrivibile. Non è gusto: sotto i
+  // 16px Safari su iPhone ingrandisce la pagina quando il campo prende il
+  // fuoco, e da quello zoom non torna più indietro da solo. Ogni input e ogni
+  // textarea parte da qui, mai da un numero suo.
+  --fs-field: 16px;
+
   // ── Raggi ───────────────────────────────────────────────────────────────
   --r-card: 22px;
   --r-inner: 20px;
