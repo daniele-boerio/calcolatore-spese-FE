@@ -215,10 +215,6 @@ export default function ChartsPage() {
 
   return (
     <div className="charts-page">
-      <header className="charts-header">
-        <h1>{t("financial_charts")}</h1>
-      </header>
-
       <div className="charts-grid">
         {/* CARD 1: ENTRATE VS USCITE */}
         <div className="chart-card">

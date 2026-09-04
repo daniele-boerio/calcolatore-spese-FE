@@ -12,8 +12,8 @@ export interface HomeState {
   upcoming: UpcomingRecurrence[];
   /** Giorni di orizzonte della card "In arrivo". */
   upcomingDays: number;
-  /** Uscite del mese precedente: il riferimento del delta sull'hero. */
-  previousMonthExpenses: number | null;
+  /** Risparmio del mese precedente: il riferimento del delta sull'hero. */
+  previousMonthSavings: number | null;
   /** Media mensile per categoria sui mesi precedenti, per nome categoria. */
   categoryAverages: Record<string, number>;
 }

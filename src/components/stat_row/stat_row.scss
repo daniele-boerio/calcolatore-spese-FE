@@ -1,8 +1,10 @@
 @use "../../styles/variables" as v;
 
-.stat-trio {
+.stat-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  // Una colonna per metrica, larghe uguali: due o tre cambia solo il conto.
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
 
   border-radius: v.$r-card;
   background: v.$surface;

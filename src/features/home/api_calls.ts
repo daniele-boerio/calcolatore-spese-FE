@@ -48,9 +48,9 @@ export const getUpcomingRecurrences = createAsyncThunk<
   }
 });
 
-/** Uscite del mese precedente: il "vs agosto" del badge sull'hero. */
-export const getPreviousMonthExpenses = createAsyncThunk<number, void>(
-  "home/getPreviousMonthExpenses",
+/** Risparmio del mese precedente: il "vs agosto" del badge sull'hero. */
+export const getPreviousMonthSavings = createAsyncThunk<number, void>(
+  "home/getPreviousMonthSavings",
   async (_, { rejectWithValue }) => {
     try {
       const previous = addMonths(new Date(), -1);
@@ -66,11 +66,19 @@ export const getPreviousMonthExpenses = createAsyncThunk<number, void>(
       );
 
       // Il range copre un mese solo: la risposta ha una riga.
-      return Number(response.data[0]?.uscite ?? 0);
+      const row = response.data[0];
+
+      // Stessa formula di GET /conti/currentMonthExpenses: gli accantonamenti
+      // non sono spese, ma i soldi non restano liberi a fine mese.
+      return (
+        Number(row?.entrate ?? 0) -
+        Number(row?.uscite ?? 0) -
+        Number(row?.accantonamento ?? 0)
+      );
     } catch (error) {
       const err = error as AxiosError;
       return rejectWithValue(
-        err.response?.data || "Errore ricezione uscite del mese precedente",
+        err.response?.data || "Errore ricezione risparmio del mese precedente",
       );
     }
   },

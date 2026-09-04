@@ -8,7 +8,7 @@ import { Card, CardTitle } from "../../components/card/card";
 import ListRow, { List } from "../../components/list_row/list_row";
 import Amount from "../../components/amount/amount";
 import ProgressBar from "../../components/progress_bar/progress_bar";
-import StatTrio from "../../components/stat_trio/stat_trio";
+import StatRow from "../../components/stat_row/stat_row";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
 import Button from "../../components/button/button";
@@ -36,12 +36,12 @@ import { transactionIcon } from "../../features/transactions/icons";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
 import {
   getCategoryAverages,
-  getPreviousMonthExpenses,
+  getPreviousMonthSavings,
   getUpcomingRecurrences,
 } from "../../features/home/api_calls";
 import {
   selectHomeCategoryAverages,
-  selectHomePreviousMonthExpenses,
+  selectHomePreviousMonthSavings,
   selectHomeUpcoming,
   selectHomeUpcomingDays,
 } from "../../features/home/home_slice";
@@ -96,7 +96,7 @@ export default function HomePage() {
 
   const upcoming = useAppSelector(selectHomeUpcoming);
   const upcomingDays = useAppSelector(selectHomeUpcomingDays);
-  const previousMonthExpenses = useAppSelector(selectHomePreviousMonthExpenses);
+  const previousMonthSavings = useAppSelector(selectHomePreviousMonthSavings);
   const categoryAverages = useAppSelector(selectHomeCategoryAverages);
   const username = useAppSelector(selectProfileUsername);
 
@@ -110,7 +110,7 @@ export default function HomePage() {
 
     // Dati che il BE non espone come tali: li ricompone lo slice `home`.
     dispatch(getUpcomingRecurrences({ days: UPCOMING_DAYS }));
-    dispatch(getPreviousMonthExpenses());
+    dispatch(getPreviousMonthSavings());
     dispatch(getCategoryAverages({ months: AVERAGE_MONTHS }));
   }, [dispatch]);
 
@@ -118,11 +118,6 @@ export default function HomePage() {
   const previousMonth = useMemo(
     () => new Date(today.getFullYear(), today.getMonth() - 1, 1),
     [today],
-  );
-
-  const netWorth = useMemo(
-    () => conti.reduce((sum, conto) => sum + Number(conto.saldo), 0),
-    [conti],
   );
 
   const topCategories = useMemo(
@@ -141,7 +136,15 @@ export default function HomePage() {
     [conti],
   );
 
-  const delta = percentDelta(spending.spent, previousMonthExpenses);
+  const saved = budget.remaining ?? 0;
+
+  // Solo contro un mese scorso in attivo: "+180% vs agosto" partendo da -50 €
+  // e' aritmetica giusta e informazione falsa.
+  const delta =
+    previousMonthSavings !== null && previousMonthSavings > 0
+      ? percentDelta(saved, previousMonthSavings)
+      : null;
+
   const upcomingTotal = upcoming.reduce((sum, item) => sum + item.importo, 0);
 
   return (
@@ -169,30 +172,23 @@ export default function HomePage() {
 
       <PageContent>
         <HeroCard
-          spent={spending.spent}
-          budget={spending.budget}
-          projected={spending.projected}
-          remaining={spending.remaining}
-          percentage={spending.percentage}
+          saved={saved}
+          income={income}
           delta={delta}
-          eyebrow={`${t("home_expenses_of")} ${monthName(today)}`}
+          eyebrow={`${t("home_savings_of")} ${monthName(today)}`}
           deltaLabel={`${t("home_vs")} ${monthName(previousMonth)}`}
         />
 
-        <StatTrio
+        <StatRow
           stats={[
             {
-              label: t("home_income"),
+              label: t("income"),
               value: <Amount value={income} decimals={0} />,
+              tone: "positive",
             },
             {
-              label: t("home_savings"),
-              value: <Amount value={budget.remaining ?? 0} decimals={0} />,
-              tone: (budget.remaining ?? 0) >= 0 ? "positive" : "negative",
-            },
-            {
-              label: t("home_net_worth"),
-              value: <Amount value={netWorth} decimals={0} />,
+              label: t("expenses"),
+              value: <Amount value={spending.spent} decimals={0} />,
             },
           ]}
         />
@@ -207,6 +203,14 @@ export default function HomePage() {
           >
             {t("home_where_money_goes")}
           </CardTitle>
+
+          <SpendingCap
+            spent={spending.spent}
+            budget={spending.budget}
+            projected={spending.projected}
+            remaining={spending.remaining}
+            percentage={spending.percentage}
+          />
 
           {topCategories.length === 0 ? (
             <p className="home-page__muted">{t("home_no_categories")}</p>
@@ -364,36 +368,27 @@ export default function HomePage() {
 }
 
 type HeroCardProps = {
-  spent: number;
-  budget: number | null;
-  projected: number;
-  remaining: number | null;
-  percentage: number | null;
+  saved: number;
+  income: number;
   delta: number | null;
   eyebrow: string;
   deltaLabel: string;
 };
 
+/**
+ * Quanto e' rimasto questo mese: entrate meno uscite meno accantonamenti, il
+ * numero che l'app mette al centro. La barra dice che fetta delle entrate e'.
+ */
 function HeroCard({
-  spent,
-  budget,
-  projected,
-  remaining,
-  percentage,
+  saved,
+  income,
   delta,
   eyebrow,
   deltaLabel,
 }: HeroCardProps) {
   const { t } = useI18n();
 
-  // Speso e previsto sono due segmenti della stessa barra: il secondo prende
-  // solo quello che avanza, altrimenti a budget sforato la barra deborda.
-  const spentRatio = budget ? Math.min(1, spent / budget) : 0;
-  const projectedRatio = budget
-    ? Math.min(1 - spentRatio, projected / budget)
-    : 0;
-
-  const overBudget = remaining !== null && remaining < 0;
+  const share = income > 0 ? Math.min(1, Math.max(0, saved / income)) : 0;
 
   return (
     <Card className="hero">
@@ -402,10 +397,10 @@ function HeroCard({
 
         {delta !== null && (
           <span
-            className={`hero__delta hero__delta--${delta <= 0 ? "good" : "bad"}`}
+            className={`hero__delta hero__delta--${delta >= 0 ? "good" : "bad"}`}
           >
             <i
-              className={`pi ${delta <= 0 ? "pi-arrow-down-right" : "pi-arrow-up-right"}`}
+              className={`pi ${delta >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
               aria-hidden="true"
             />
             {`${Math.abs(delta)}% ${deltaLabel}`}
@@ -413,41 +408,99 @@ function HeroCard({
         )}
       </div>
 
-      <Amount className="hero__number" value={spent} decimals={0} />
+      <Amount
+        className="hero__number"
+        value={saved}
+        decimals={0}
+        tone={saved < 0 ? "negative" : "neutral"}
+      />
 
-      {budget !== null ? (
-        <div className="hero__budget">
-          <ProgressBar
-            height={10}
-            label={t("home_of_budget")}
-            segments={[
-              { value: spentRatio, tone: "accent" },
-              { value: projectedRatio, tone: "accent-2" },
-            ]}
-          />
+      {income > 0 &&
+        (saved > 0 ? (
+          <div className="hero__budget">
+            <ProgressBar
+              height={10}
+              label={t("home_of_income")}
+              segments={[{ value: share, tone: "accent" }]}
+            />
 
-          <div className="hero__legend">
-            <span>
-              {percentage !== null ? `${Math.round(percentage)}% ` : ""}
-              {`${t("home_of_budget")} `}
-              <strong>
-                <Amount value={budget} decimals={0} />
-              </strong>
-            </span>
-            <span>
-              {`${overBudget ? t("home_over_budget") : t("home_remaining")} `}
-              <strong className={overBudget ? "hero__over" : undefined}>
-                <Amount value={Math.abs(remaining ?? 0)} decimals={0} />
-              </strong>
-            </span>
+            <p className="hero__caption">
+              <strong>{`${Math.round(share * 100)}% `}</strong>
+              {t("home_of_income")}
+            </p>
           </div>
-        </div>
-      ) : (
-        <Link className="hero__set-budget" to="/settings">
-          {t("home_set_budget")}
-          <i className="pi pi-chevron-right" aria-hidden="true" />
-        </Link>
-      )}
+        ) : (
+          <p className="hero__caption">{t("home_savings_negative")}</p>
+        ))}
     </Card>
+  );
+}
+
+type SpendingCapProps = {
+  spent: number;
+  budget: number | null;
+  projected: number;
+  remaining: number | null;
+  percentage: number | null;
+};
+
+/**
+ * Il tetto di spesa del mese (si imposta nelle impostazioni). Sta con le
+ * categorie perche' e' la stessa domanda: dove stanno andando i soldi.
+ */
+function SpendingCap({
+  spent,
+  budget,
+  projected,
+  remaining,
+  percentage,
+}: SpendingCapProps) {
+  const { t } = useI18n();
+
+  // Senza tetto impostato la proposta ha senso solo se c'e' qualcosa da tenere
+  // d'occhio: a mese vuoto sarebbe solo un invito in piu' da ignorare.
+  if (budget === null) {
+    return spent > 0 ? (
+      <Link className="spending-cap__set" to="/settings">
+        {t("home_set_budget")}
+        <i className="pi pi-chevron-right" aria-hidden="true" />
+      </Link>
+    ) : null;
+  }
+
+  // Speso e previsto sono due segmenti della stessa barra: il secondo prende
+  // solo quello che avanza, altrimenti a budget sforato la barra deborda.
+  const spentRatio = Math.min(1, spent / budget);
+  const projectedRatio = Math.min(1 - spentRatio, projected / budget);
+
+  const overBudget = remaining !== null && remaining < 0;
+
+  return (
+    <div className="spending-cap">
+      <ProgressBar
+        height={8}
+        label={t("home_of_budget")}
+        segments={[
+          { value: spentRatio, tone: "accent" },
+          { value: projectedRatio, tone: "accent-2" },
+        ]}
+      />
+
+      <div className="spending-cap__legend">
+        <span>
+          {percentage !== null ? `${Math.round(percentage)}% ` : ""}
+          {`${t("home_of_budget")} `}
+          <strong>
+            <Amount value={budget} decimals={0} />
+          </strong>
+        </span>
+        <span>
+          {`${overBudget ? t("home_over_budget") : t("home_remaining")} `}
+          <strong className={overBudget ? "spending-cap__over" : undefined}>
+            <Amount value={Math.abs(remaining ?? 0)} decimals={0} />
+          </strong>
+        </span>
+      </div>
+    </div>
   );
 }

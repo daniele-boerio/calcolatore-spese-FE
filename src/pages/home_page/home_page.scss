@@ -69,7 +69,7 @@
   }
 }
 
-// ── Card hero: la spesa del mese contro il budget ──────────────────────────
+// ── Card hero: il risparmio del mese ─────────────────────────────────────
 .hero {
   &__top {
     display: flex;
@@ -100,8 +100,8 @@
       font-size: 10px;
     }
 
-    // Spendere meno del mese scorso è la notizia buona: il colore segue il
-    // significato, non il segno.
+    // Mettere da parte più del mese scorso è la notizia buona: il colore segue
+    // il significato, non il segno.
     &--good {
       background: v.$accent-soft;
       color: v.$accent;
@@ -132,6 +132,24 @@
     gap: 10px;
   }
 
+  &__caption {
+    margin: 0;
+    font-size: 12.5px;
+    color: v.$muted;
+
+    strong {
+      color: v.$ink;
+      font-weight: 700;
+    }
+  }
+}
+
+// ── Tetto di spesa, in testa alle categorie ──────────────────────────
+.spending-cap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
   &__legend {
     display: flex;
     align-items: baseline;
@@ -154,7 +172,7 @@
     }
   }
 
-  &__set-budget {
+  &__set {
     display: flex;
     align-items: center;
     justify-content: space-between;

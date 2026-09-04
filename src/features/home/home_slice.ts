@@ -5,7 +5,7 @@ import { ExpenseCompositionOut } from "../charts/interfaces";
 import { monthlyAverage } from "./derive";
 import {
   getCategoryAverages,
-  getPreviousMonthExpenses,
+  getPreviousMonthSavings,
   getUpcomingRecurrences,
 } from "./api_calls";
 
@@ -13,7 +13,7 @@ const initialState: HomeState = {
   loading: false,
   upcoming: [],
   upcomingDays: 0,
-  previousMonthExpenses: null,
+  previousMonthSavings: null,
   categoryAverages: {},
 };
 
@@ -37,9 +37,9 @@ const homeSlice = createSlice({
       )
 
       .addCase(
-        getPreviousMonthExpenses.fulfilled,
+        getPreviousMonthSavings.fulfilled,
         (state, action: PayloadAction<number>) => {
-          state.previousMonthExpenses = action.payload;
+          state.previousMonthSavings = action.payload;
         },
       )
 
@@ -89,8 +89,8 @@ export const selectHomeUpcoming = (state: RootState) => state.home.upcoming;
 export const selectHomeUpcomingDays = (state: RootState) =>
   state.home.upcomingDays;
 
-export const selectHomePreviousMonthExpenses = (state: RootState) =>
-  state.home.previousMonthExpenses;
+export const selectHomePreviousMonthSavings = (state: RootState) =>
+  state.home.previousMonthSavings;
 
 export const selectHomeCategoryAverages = (state: RootState) =>
   state.home.categoryAverages;

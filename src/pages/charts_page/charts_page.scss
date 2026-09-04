@@ -7,37 +7,6 @@
   gap: 2rem;
   animation: fadeIn 0.3s ease-in;
 
-  .charts-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid v.$border-color;
-
-    h1 {
-      margin: 0;
-      font-size: 1.85rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      color: v.$text-main;
-    }
-
-    .filters-container {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-
-      .filter-item {
-        display: flex;
-        flex-direction: column;
-        gap: 0.4rem;
-        min-width: 150px;
-      }
-    }
-  }
-
   .charts-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
@@ -131,17 +100,6 @@
       grid-template-columns: 1fr;
     }
 
-    .charts-header {
-      flex-direction: column;
-      align-items: flex-start;
-
-      .filters-container {
-        width: 100%;
-        .filter-item {
-          flex: 1;
-        }
-      }
-    }
   }
 }
 
