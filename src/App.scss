@@ -42,13 +42,16 @@ body {
   flex-direction: column;
   // Altezza definita, non `min-height`: serve perché l'area di contenuto
   // scorra al suo interno lasciando fermo l'header.
-  height: 100dvh;
+  // Usare la variabile --app-height impostata dallo script inline per evitare
+  // il comportamento dinamico di 100dvh su iOS (Dynamic Island / UI changes).
+  height: var(--app-height);
   overflow: hidden;
   background: var(--bg);
 
   &__header {
     flex: 0 0 auto;
-    padding: 20px var(--gutter) 14px;
+    /* Considera l'area superiore sicura (es. Dynamic Island) quando presente */
+    padding: calc(20px + env(safe-area-inset-top)) var(--gutter) 14px;
   }
 
   &__content {
@@ -79,7 +82,7 @@ body {
   width: 100%;
   max-width: var(--app-max-width);
   margin-inline: auto;
-  min-height: 100dvh;
+  min-height: var(--app-height);
   position: relative;
 }
 

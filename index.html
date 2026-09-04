@@ -54,6 +54,20 @@
           document.documentElement.dataset.theme = "light";
         }
       })();
+
+      // Fix mobile viewport height (iOS Safari): set --app-height to window.innerHeight
+      // and update on resize/orientation changes. Used instead of relying solely on 100dvh.
+      (function () {
+        function setAppHeight() {
+          document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+        }
+        setAppHeight();
+        window.addEventListener('resize', setAppHeight);
+        window.addEventListener('orientationchange', setAppHeight);
+        if (window.visualViewport) {
+          window.visualViewport.addEventListener('resize', setAppHeight);
+        }
+      })();
     </script>
   </head>
   <body>
