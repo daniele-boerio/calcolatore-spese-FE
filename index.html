@@ -76,25 +76,77 @@
           applyHeights(h);
         }
 
+        // Measure the actual tab bar after paint and apply its height to CSS
+        // so padding-bottom matches the painted element (prevents initial gap).
+        function measureTabbarAndApply() {
+          try {
+            var tab = document.querySelector('.tab-bar');
+            if (!tab) return;
+            var rect = tab.getBoundingClientRect();
+            var tabH = Math.round(rect.height) || 0;
+            // Set token override to measured value
+            document.documentElement.style.setProperty('--tabbar-h', tabH + 'px');
+
+            // Also set explicit padding on the content area to guarantee no gap
+            var content = document.querySelector('.page__content');
+            if (content) {
+              // Match SCSS: calc(var(--tabbar-h) - 18px + env(safe-area-inset-bottom))
+              content.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
+            }
+
+            // For legacy slots (non .page) try to apply similar override
+            var legacySlots = document.querySelectorAll('.App > *:not(.page):not(.tab-bar)');
+            legacySlots.forEach(function (el) {
+              el.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
+            });
+          } catch (e) {}
+        }
+
         // Run before paint if possible
         setAppHeight();
-        // also schedule a rAF to ensure layout is stable
-        requestAnimationFrame(setAppHeight);
+        // schedule a rAF to ensure layout is stable and tab-bar exists
+        requestAnimationFrame(function () {
+          setAppHeight();
+          measureTabbarAndApply();
+        });
 
         window.addEventListener('resize', function () {
           setAppHeight();
-          requestAnimationFrame(setAppHeight);
+          requestAnimationFrame(function () {
+            setAppHeight();
+            measureTabbarAndApply();
+          });
         });
         window.addEventListener('orientationchange', function () {
           setAppHeight();
-          requestAnimationFrame(setAppHeight);
+          requestAnimationFrame(function () {
+            setAppHeight();
+            measureTabbarAndApply();
+          });
         });
 
         if (window.visualViewport) {
           window.visualViewport.addEventListener('resize', function () {
             setAppHeight();
-            requestAnimationFrame(setAppHeight);
+            requestAnimationFrame(function () {
+              setAppHeight();
+              measureTabbarAndApply();
+            });
           });
+        }
+
+        // Also ensure we measure again after DOMContentLoaded in case app mounts later
+        document.addEventListener('DOMContentLoaded', function () {
+          requestAnimationFrame(measureTabbarAndApply);
+        });
+
+        // If the SPA mounts after a delay (hot reload / dev), observe the root for the tab-bar
+        var observer = new MutationObserver(function () {
+          measureTabbarAndApply();
+        });
+        var rootNode = document.getElementById('root');
+        if (rootNode) {
+          observer.observe(rootNode, { childList: true, subtree: true });
         }
       })();
     </script>
