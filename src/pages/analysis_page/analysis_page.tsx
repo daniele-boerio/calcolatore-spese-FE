@@ -102,7 +102,7 @@ export default function AnalysisPage() {
             options={[
               { value: "month", label: t("analysis_scope_month") },
               { value: "year", label: t("analysis_scope_year") },
-              { value: "categories", label: t("analysis_scope_categories") },
+              { value: "categories", label: t("analysis_scope_charts") },
             ]}
           />
         </PageHeader>

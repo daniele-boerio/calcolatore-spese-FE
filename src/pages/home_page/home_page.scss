@@ -29,40 +29,17 @@
     text-transform: capitalize;
   }
 
-  &__actions {
-    flex: 0 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  &__icon-button,
+  // Le iniziali sono chi sei, non un bottone: il profilo si apre da qui solo
+  // quando ci sarà qualcosa da aprire.
   &__avatar {
+    flex: 0 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 38px;
     height: 38px;
+
     border-radius: v.$r-pill;
-    text-decoration: none;
-
-    &:active {
-      transform: scale(0.97);
-      transition: transform v.$dur-press;
-    }
-  }
-
-  &__icon-button {
-    background: v.$surface;
-    border: 1px solid v.$line;
-    color: v.$ink;
-
-    i {
-      font-size: 15px;
-    }
-  }
-
-  &__avatar {
     background: v.$accent-soft;
     color: v.$accent;
     font-size: 13px;

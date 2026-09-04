@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -77,6 +77,7 @@ const nameById = <T extends { id: string; nome: string }>(
 export default function TransactionPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const filters = useAppSelector(selectTransactionFilters);
@@ -174,16 +175,27 @@ export default function TransactionPage() {
         <div className="movements__top">
           <h1 className="page-title">{t("nav_movements")}</h1>
 
+          {/* Ricorrenze e debiti sono movimenti che si ripetono o che devi
+              ancora fare: stanno qui, non in un menu da un'altra parte. */}
           <div className="movements__actions">
             <button
               type="button"
               className="movements__icon-button"
-              aria-label={t("mov_refresh")}
-              onClick={() =>
-                dispatch(getTransactionsPaginated({ page: 1, size: PAGE_SIZE }))
-              }
+              aria-label={t("nav_recurrings")}
+              title={t("nav_recurrings")}
+              onClick={() => navigate("/recurrings")}
             >
               <i className="pi pi-refresh" aria-hidden="true" />
+            </button>
+
+            <button
+              type="button"
+              className="movements__icon-button"
+              aria-label={t("nav_debts")}
+              title={t("nav_debts")}
+              onClick={() => navigate("/debts")}
+            >
+              <i className="pi pi-receipt" aria-hidden="true" />
             </button>
 
             <button

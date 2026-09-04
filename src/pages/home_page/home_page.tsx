@@ -158,22 +158,9 @@ export default function HomePage() {
           </span>
         </div>
 
-        <div className="home-page__actions">
-          <Link
-            to="/analysis"
-            className="home-page__icon-button"
-            aria-label={t("nav_analysis")}
-          >
-            <i className="pi pi-calendar" aria-hidden="true" />
-          </Link>
-          <Link
-            to="/settings"
-            className="home-page__avatar"
-            aria-label={t("nav_settings")}
-          >
-            {initialsOf(username)}
-          </Link>
-        </div>
+        <span className="home-page__avatar" aria-hidden="true">
+          {initialsOf(username)}
+        </span>
       </PageHeader>
 
       <PageContent>

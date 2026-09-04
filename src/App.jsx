@@ -37,6 +37,7 @@ const RecurringsPage = lazy(
   () => import("./pages/recurrings_page/recurrings_page"),
 );
 const SettingsPage = lazy(() => import("./pages/settings_page/settings_page"));
+const AltroPage = lazy(() => import("./pages/altro_page/altro_page"));
 const InvestimentiPage = lazy(
   () => import("./pages/investimenti_page/investimenti_page"),
 );
@@ -98,13 +99,16 @@ function App() {
             <BankProposalsGate /> {/* Controllo automatico proposte bancarie */}
             <Suspense fallback={<RouteFallback />}>
               <Routes>
-                {/* I quattro slot della tab bar */}
+                {/* I sei slot della tab bar */}
                 <Route path="/" element={<HomePage />} />
                 <Route path="/transactions" element={<TransactionPage />} />
                 <Route path="/analysis" element={<AnalysisPage />} />
                 <Route path="/accounts" element={<ContiPage />} />
+                <Route path="/investments" element={<InvestimentiPage />} />
+                <Route path="/altro" element={<AltroPage />} />
 
-                {/* Destinazioni secondarie, raggiunte dalla lista in "Conti" */}
+                {/* Destinazioni secondarie: ricorrenze e debiti dai Movimenti,
+                    categorie e impostazioni da "Altro". */}
                 <Route path="/categories" element={<CategoryPage />} />
                 {/* Dettaglio di una categoria, aperto da Analisi. */}
                 <Route
@@ -118,7 +122,6 @@ function App() {
                 />
                 <Route path="/recurrings" element={<RecurringsPage />} />
                 <Route path="/debts" element={<DebitiPage />} />
-                <Route path="/investments" element={<InvestimentiPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
 
                 <Route path="/bank-callback" element={<BankCallbackPage />} />

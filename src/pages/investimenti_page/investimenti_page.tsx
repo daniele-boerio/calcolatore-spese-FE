@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -33,7 +32,6 @@ const formatQuantity = (value: number) =>
 export default function InvestimentiPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const investimenti = useAppSelector(selectInvestimenti);
   const loading = useAppSelector(selectInvestimentiLoading);
@@ -95,14 +93,6 @@ export default function InvestimentiPage() {
       <Page className="investments">
         <PageHeader className="investments__header">
           <div className="investments__top">
-            <button
-              type="button"
-              className="investments__back"
-              aria-label={t("back")}
-              onClick={() => navigate(-1)}
-            >
-              <i className="pi pi-arrow-left" aria-hidden="true" />
-            </button>
             <h1 className="page-title">{t("nav_investments")}</h1>
           </div>
 
