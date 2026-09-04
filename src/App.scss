@@ -90,8 +90,13 @@ body {
 // COMPATIBILITÀ — DA RIMUOVERE
 // La tab bar sta sopra il contenuto e le schermate non ancora convertite al
 // layout `.page` non lo sanno: lo spazio per non finirci sotto lo mettiamo qui.
+// Limitare l'altezza e rendere lo slot scrollabile evita che il padding-bottom
+// allarghi il documento oltre --app-height su iOS PWA.
 .App > *:not(.page):not(.tab-bar) {
   padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+  max-height: var(--app-height);
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
 // Ogni cifra è allineata in colonna: segno prima del numero, valuta dopo.
