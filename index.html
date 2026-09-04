@@ -120,6 +120,12 @@
             // Set token override to measured value
             document.documentElement.style.setProperty('--tabbar-h', tabH + 'px');
 
+            // Force the tab to sit at the visual bottom to avoid layout shifts
+            try {
+              tab.style.bottom = '0px';
+              tab.style.transform = tab.style.transform || 'translateX(-50%)';
+            } catch (e) {}
+
             // Also set explicit padding on the content area to guarantee no gap
             var content = document.querySelector('.page__content');
             if (content) {
@@ -173,17 +179,28 @@
 
         // Also ensure we measure again after DOMContentLoaded in case app mounts later
         document.addEventListener('DOMContentLoaded', function () {
-          requestAnimationFrame(measureTabbarAndApply);
+          requestAnimationFrame(function () {
+            measureTabbarAndApply();
+            // ensure overlay created after DOM is ready
+            try { createDebugOverlay(); } catch (e) {}
+          });
         });
 
         // If the SPA mounts after a delay (hot reload / dev), observe the root for the tab-bar
-        var observer = new MutationObserver(function () {
+        var observer = new MutationObserver(function (mutations) {
           measureTabbarAndApply();
+          // attempt to create overlay again when SPA injects content
+          try { createDebugOverlay(); } catch (e) {}
         });
         var rootNode = document.getElementById('root');
         if (rootNode) {
           observer.observe(rootNode, { childList: true, subtree: true });
         }
+
+        // Try to create debug overlay shortly after startup in case head-time creation
+        // failed because document.body wasn't yet available.
+        setTimeout(function () { try { createDebugOverlay(); } catch (e) {} }, 500);
+        setTimeout(function () { try { createDebugOverlay(); } catch (e) {} }, 1200);
 
         // Prevent body-level scrolling on iOS/Android: allow touchmove only when the
         // touched element is inside a scrollable container (e.g. .page__content).
