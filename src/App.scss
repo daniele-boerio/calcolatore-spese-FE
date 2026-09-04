@@ -86,6 +86,8 @@ body {
   margin-inline: auto;
   min-height: var(--app-height);
   position: relative;
+  /* Ensure the root app container doesn't cause page scrolling; content areas handle scrolling */
+  overflow: hidden;
 }
 
 // COMPATIBILITÀ — DA RIMUOVERE

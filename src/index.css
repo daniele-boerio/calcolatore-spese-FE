@@ -6,6 +6,8 @@ html, body, #root {
   min-height: var(--app-height);
   margin: 0;
   padding: 0;
+  /* Prevent the document from scrolling — only the content area should scroll */
+  overflow: hidden;
 }
 
 /* Ensure fixed elements (tab bar) are painted above the page content */
