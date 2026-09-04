@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
@@ -142,6 +142,38 @@ export default function TransactionPage() {
 
   const total = pagination.total ?? 0;
   const hasMore = transactions.length < total;
+
+  /**
+   * Scroll infinito: la pagina dopo parte quando il fondo della lista si
+   * avvicina. L'osservatore si ricrea a ogni caricamento, così se il fondo è
+   * ancora in vista (schermo alto, pagina corta) riparte da solo invece di
+   * aspettare un altro movimento del dito.
+   */
+  const bottom = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const node = bottom.current;
+    if (!node || !hasMore || loading) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+
+        dispatch(
+          getTransactionsPaginated({
+            page: (pagination.page ?? 1) + 1,
+            size: PAGE_SIZE,
+            append: true,
+          }),
+        );
+      },
+      // Un po' prima del fondo: i dati arrivano mentre stai ancora scorrendo.
+      { rootMargin: "400px" },
+    );
+
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [dispatch, hasMore, loading, pagination.page]);
 
   // Una query vuota descrive la vista di partenza: se produce qualcosa,
   // qualche filtro è acceso.
@@ -398,22 +430,11 @@ export default function TransactionPage() {
             ))}
 
             {hasMore && (
-              <Button
-                variant="neutral"
-                block
-                disabled={loading}
-                onClick={() =>
-                  dispatch(
-                    getTransactionsPaginated({
-                      page: (pagination.page ?? 1) + 1,
-                      size: PAGE_SIZE,
-                      append: true,
-                    }),
-                  )
-                }
-              >
-                {t("mov_load_more")}
-              </Button>
+              <div className="movements__more" ref={bottom}>
+                <Card>
+                  <SkeletonList rows={2} />
+                </Card>
+              </div>
             )}
           </>
         )}

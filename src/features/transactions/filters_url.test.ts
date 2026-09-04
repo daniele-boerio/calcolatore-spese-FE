@@ -4,9 +4,13 @@ import { periodRange } from "./period";
 
 describe("encodeFilters", () => {
   it("non scrive niente per la vista di partenza", () => {
-    // Mese corrente e nessun filtro: l'URL resta pulito.
-    expect(encodeFilters({ ...periodRange("month") }, "month").toString()).toBe(
-      "",
+    // Tutto il periodo e nessun filtro: l'URL resta pulito.
+    expect(encodeFilters({ ...periodRange("all") }, "all").toString()).toBe("");
+  });
+
+  it("scrive il mese corrente, che è una scelta come le altre", () => {
+    expect(encodeFilters({ ...periodRange("month") }, "month").get("periodo")).toBe(
+      "month",
     );
   });
 
@@ -54,11 +58,13 @@ describe("encodeFilters", () => {
 });
 
 describe("decodeFilters", () => {
-  it("parte dal mese corrente quando l'URL è vuoto", () => {
+  it("parte senza periodo quando l'URL è vuoto", () => {
     const { period, filters } = decodeFilters(new URLSearchParams());
 
-    expect(period).toBe("month");
-    expect(filters.data_inizio).toBe(periodRange("month").data_inizio);
+    expect(period).toBe("all");
+    // Nessuna data al BE: la lista non parte già tagliata.
+    expect(filters.data_inizio).toBeUndefined();
+    expect(filters.data_fine).toBeUndefined();
   });
 
   it("ricalcola le date del preset invece di fidarsi dell'URL", () => {
@@ -69,9 +75,9 @@ describe("decodeFilters", () => {
     expect(filters.data_inizio).toBe(periodRange("year").data_inizio);
   });
 
-  it("ricade sul mese corrente se il periodo non esiste", () => {
+  it("ricade sulla vista di partenza se il periodo non esiste", () => {
     expect(decodeFilters(new URLSearchParams("periodo=domani")).period).toBe(
-      "month",
+      "all",
     );
   });
 
@@ -111,12 +117,12 @@ describe("decodeFilters", () => {
 describe("filtro senza categoria", () => {
   it("finisce nell'URL solo quando è acceso", () => {
     expect(
-      encodeFilters({ senza_categoria: true }, "month").get("senza_categoria"),
+      encodeFilters({ senza_categoria: true }, "all").get("senza_categoria"),
     ).toBe("1");
 
-    expect(
-      encodeFilters({ senza_categoria: false }, "month").toString(),
-    ).toBe("");
+    expect(encodeFilters({ senza_categoria: false }, "all").toString()).toBe(
+      "",
+    );
   });
 
   it("torna indietro come booleano, o sparisce", () => {

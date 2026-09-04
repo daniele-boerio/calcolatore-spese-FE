@@ -3,8 +3,8 @@ import { PeriodPreset, periodRange } from "./period";
 
 /**
  * Filtri dei Movimenti ⇄ query string. Stanno nell'URL perché un refresh, un
- * link condiviso o il tasto indietro non devono riportare la lista al mese
- * corrente: la vista è quella che l'indirizzo descrive.
+ * link condiviso o il tasto indietro non devono riportare la lista al suo
+ * stato iniziale: la vista è quella che l'indirizzo descrive.
  *
  * Le chiavi sono quelle del dominio (in italiano, come le rotte del BE), non i
  * nomi dei campi interni: l'URL lo legge anche l'utente.
@@ -23,7 +23,11 @@ const KEYS = {
   uncategorized: "senza_categoria",
 } as const;
 
-export const DEFAULT_PERIOD: PeriodPreset = "month";
+/**
+ * I Movimenti aprono su tutto: un periodo preselezionato è un filtro che
+ * l'utente non ha chiesto e che nasconde metà della lista senza dirlo.
+ */
+export const DEFAULT_PERIOD: PeriodPreset = "all";
 
 const PERIODS: PeriodPreset[] = [
   "month",
