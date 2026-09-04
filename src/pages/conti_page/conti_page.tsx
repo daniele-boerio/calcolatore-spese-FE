@@ -18,6 +18,7 @@ import "./conti_page.scss";
 import {
   absorbVirtualConto,
   consolidateConti,
+  moveAllToVirtualConto,
   countContoTransactions,
   deleteConto,
   getConti,
@@ -75,6 +76,7 @@ export default function ContiPage() {
   const [bankAccount, setBankAccount] = useState<Conto | null>(null);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
   const [confirmingMerge, setConfirmingMerge] = useState(false);
+  const [confirmingGiveUp, setConfirmingGiveUp] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [orphans, setOrphans] = useState(0);
 
@@ -197,6 +199,18 @@ export default function ContiPage() {
       await dispatch(consolidateConti()).unwrap();
       await dispatch(getConti());
       dispatch(showToast({ variant: "success", title: t("accounts_merged") }));
+    } catch {
+      // L'errore arriva dal middleware.
+    }
+  };
+
+  const giveUp = async () => {
+    setConfirmingGiveUp(false);
+
+    try {
+      await dispatch(moveAllToVirtualConto()).unwrap();
+      await dispatch(getConti());
+      dispatch(showToast({ variant: "success", title: t("accounts_given_up") }));
     } catch {
       // L'errore arriva dal middleware.
     }
@@ -339,6 +353,19 @@ export default function ContiPage() {
               {t("accounts_merge")}
             </button>
           )}
+
+          {/* Il contrario di "Assegna": chi non vuole gestire i conti se li
+              toglie di torno e i movimenti restano, senza conto. */}
+          {visibili.length > 0 && (
+            <button
+              type="button"
+              className="accounts__merge"
+              onClick={() => setConfirmingGiveUp(true)}
+            >
+              <i className="pi pi-eye-slash" aria-hidden="true" />
+              {t("accounts_give_up")}
+            </button>
+          )}
         </PageContent>
       </Page>
 
@@ -394,6 +421,18 @@ export default function ContiPage() {
         cancelLabel={t("cancel")}
         onConfirm={merge}
         onCancel={() => setConfirmingMerge(false)}
+      />
+
+      <Alert
+        open={confirmingGiveUp}
+        tone="accent"
+        icon="pi pi-eye-slash"
+        title={t("accounts_give_up_title")}
+        description={t("accounts_give_up_text")}
+        confirmLabel={t("accounts_give_up_confirm")}
+        cancelLabel={t("cancel")}
+        onConfirm={giveUp}
+        onCancel={() => setConfirmingGiveUp(false)}
       />
     </>
   );

@@ -318,6 +318,28 @@ export const consolidateConti = createAsyncThunk<Conto, void>(
 );
 
 /**
+ * Porta *tutti* i movimenti sul conto invisibile e leva di mezzo i conti veri.
+ *
+ * Il verso opposto di `absorbVirtualConto`: per chi le spese vuole segnarle e
+ * basta, senza modellare da dove escono. Le transazioni non spariscono — cambia
+ * solo il conto a cui puntano — ma quale stava su quale conto non si ricostruisce.
+ */
+export const moveAllToVirtualConto = createAsyncThunk<Conto, void>(
+  "conti/moveAllToVirtualConto",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.post<Conto>("/conti/rinuncia");
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore spostamento dei movimenti",
+      );
+    }
+  },
+);
+
+/**
  * Porta su un conto vero i movimenti rimasti sul conto virtuale: è il seguito
  * di "ho aperto il mio primo conto" per chi aveva già registrato qualcosa.
  */

@@ -575,6 +575,33 @@
         ]
       }
     },
+    "/conti/rinuncia": {
+      "post": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Rinuncia Ai Conti",
+        "description": "Porta tutti i movimenti sul conto invisibile e leva di mezzo i conti veri.\n\nÈ il verso opposto di `assorbi`: là un conto vero si prende i movimenti\nrimasti senza conto, qui i movimenti tornano tutti a non averne uno. Serve a\nchi le spese vuole segnarle e basta, senza modellare da dove escono.\n\nNessuna transazione viene toccata nel merito: cambia solo il conto a cui\npunta. I conti veri vanno in soft-delete come in `consolida`, quindi niente\nè distrutto e restano ripristinabili con POST /conti/{id}/restore — quello\nche non si ricostruisce è *quale* movimento stava su quale conto.\n\nIdempotente: chi ha già solo il conto invisibile se lo ritrova identico.",
+        "operationId": "rinuncia_ai_conti_conti_rinuncia_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContoOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/conti/{conto_id}/assorbi": {
       "post": {
         "tags": [
