@@ -51,15 +51,26 @@ export const errorMiddleware: Middleware =
       );
 
       if (payload.status === 401 && !isCredentialCheck) {
+        // All'avvio l'app parte fidandosi del token salvato, quindi monta tutte
+        // le schermate e ognuna chiama il server: se quel token era vecchio,
+        // arrivano dieci 401 insieme. Non è una sessione scaduta sotto le mani
+        // dell'utente — è un tentativo di ripristino andato a vuoto, e la
+        // schermata di accesso che compare lo dice già da sola.
+        const restoring = store.getState().profile?.restoring;
+
         // Il refresh automatico ha già fallito (vedi services/api.js): la sessione
         // è finita davvero. Meglio dirlo che far sparire i dati senza spiegazioni.
         store.dispatch(setLogout());
-        store.dispatch(
-          showError({
-            title: t("error_title_session_expired"),
-            message: t("error_session_expired"),
-          }),
-        );
+
+        if (!restoring) {
+          store.dispatch(
+            showError({
+              title: t("error_title_session_expired"),
+              message: t("error_session_expired"),
+            }),
+          );
+        }
+
         return next(action);
       }
 

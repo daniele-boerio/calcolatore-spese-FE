@@ -69,7 +69,9 @@ function App() {
 
     if (token) {
       // L'access token può essere scaduto: ci pensa l'interceptor a rinnovarlo
-      // col cookie e a rigiocare questa chiamata.
+      // col cookie e a rigiocare questa chiamata. Se anche il cookie è finito
+      // si torna al login in silenzio: è un tentativo, non un'operazione
+      // dell'utente da commentare con un errore.
       dispatch(getProfile());
       return;
     }

@@ -23,6 +23,9 @@ const initialState: ProfileState = {
   username: savedUsername ? ({ username: savedUsername } as any) : null,
   email: null,
   isAuthenticated: !!savedToken,
+  // C'è un token da verificare: fino alla risposta del server non sappiamo
+  // ancora se vale.
+  restoring: !!savedToken,
   isOpenBankingAdmin: false,
   lastTagId: null,
 };
@@ -57,6 +60,7 @@ const profileSlice = createSlice({
       .addCase(
         login.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
+          state.restoring = false;
           state.token = action.payload.access_token;
           state.username = action.payload.username;
           state.isAuthenticated = true;
@@ -68,6 +72,7 @@ const profileSlice = createSlice({
       .addCase(
         register.fulfilled,
         (state, action: PayloadAction<AuthResponse>) => {
+          state.restoring = false;
           state.token = action.payload.access_token;
           state.username = action.payload.username;
           state.isAuthenticated = true;
@@ -84,9 +89,11 @@ const profileSlice = createSlice({
         localStorage.setItem("username", action.payload.username);
       })
 
+      // Il server ha risposto: il token salvato vale, la verifica è finita.
       .addCase(
         getProfile.fulfilled,
         (state, action: PayloadAction<ProfileResponse>) => {
+          state.restoring = false;
           state.isAuthenticated = true;
 
           state.username = action.payload.username;

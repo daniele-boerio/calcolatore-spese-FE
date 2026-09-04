@@ -8,6 +8,8 @@ import Amount from "../../components/amount/amount";
 import Alert from "../../components/alert/alert";
 import ProgressBar from "../../components/progress_bar/progress_bar";
 import SkeletonList from "../../components/skeleton/skeleton";
+import EmptyState from "../../components/empty_state/empty_state";
+import Button from "../../components/button/button";
 import PickerSheet from "../../components/picker_sheet/picker_sheet";
 import ThreeDotsActionsMenu from "../../components/three_dots_action_menu/three_dots_action_menu";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
@@ -251,6 +253,19 @@ export default function ContiPage() {
             <Card>
               <SkeletonList />
             </Card>
+          )}
+
+          {!loading && visibili.length === 0 && (
+            <EmptyState
+              icon="pi pi-wallet"
+              title={t("accounts_empty_title")}
+              description={t("accounts_empty_text")}
+              actions={
+                <Button size="sm" onClick={openCreate}>
+                  {t("add_account")}
+                </Button>
+              }
+            />
           )}
 
           {visibili.length > 0 && (

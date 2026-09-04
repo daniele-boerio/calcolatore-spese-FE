@@ -15,6 +15,12 @@ export interface RegisterParams extends LoginParams {
 }
 
 export interface ProfileState {
+  /**
+   * Il token salvato non è ancora stato verificato col server. Finché è vero
+   * l'app si comporta come se fossi dentro — evita di sfarfallare — ma un 401
+   * vuol dire solo "quel token era vecchio", non "sei stato buttato fuori".
+   */
+  restoring: boolean;
   loading: boolean;
   token: string | null;
   username: string | null;

@@ -498,7 +498,7 @@ export default function TransactionDialog({
 
               <PickerRow
                 icon="pi pi-wallet"
-                label={isRicarica ? t("source_account") : t("bank_account")}
+                label={isRicarica ? t("source_account") : t("account_type_bank")}
                 value={sourceLabel}
                 placeholder={t("bank_account_placeholder")}
                 onClick={() => setPicker("conto")}
@@ -621,7 +621,7 @@ export default function TransactionDialog({
       <PickerSheet
         open={picker === "conto"}
         onClose={() => setPicker(null)}
-        title={isRicarica ? t("source_account") : t("bank_account")}
+        title={isRicarica ? t("source_account") : t("account_type_bank")}
         options={asOptions(contiScegliibili)}
         value={contoId}
         onSelect={setContoId}
