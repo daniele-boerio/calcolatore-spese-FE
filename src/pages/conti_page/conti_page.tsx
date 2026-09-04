@@ -19,11 +19,13 @@ import {
   countContoTransactions,
   deleteConto,
   getConti,
+  getPatrimonio,
 } from "../../features/conti/api_calls";
 import { Conto } from "../../features/conti/interfaces";
 import {
   selectContiConti,
   selectContiLoading,
+  selectContiPatrimonio,
 } from "../../features/conti/conto_slice";
 import { selectIsOpenBankingAdmin } from "../../features/profile/profile_slice";
 import { getInvestimenti } from "../../features/investimenti/api_calls";
@@ -63,6 +65,7 @@ export default function ContiPage() {
   const conti = useAppSelector(selectContiConti);
   const loading = useAppSelector(selectContiLoading);
   const investimenti = useAppSelector(selectInvestimenti);
+  const patrimonio = useAppSelector(selectContiPatrimonio);
   const isOpenBankingAdmin = useAppSelector(selectIsOpenBankingAdmin);
 
   const [editing, setEditing] = useState<Conto | null>(null);
@@ -77,6 +80,8 @@ export default function ContiPage() {
     dispatch(getConti());
     // Il patrimonio conta anche il valore di mercato dei titoli.
     dispatch(getInvestimenti(undefined));
+    // Le foto dei mesi passati: senza almeno due non c'è confronto.
+    dispatch(getPatrimonio());
   }, [dispatch]);
 
   // Il conto che l'app ha aperto da sé non compare in elenco: esiste perché
@@ -124,6 +129,14 @@ export default function ContiPage() {
   );
 
   const netWorth = contiTotal + investimentiTotal;
+
+  // Il confronto esiste solo se il mese scorso è stato fotografato: prima
+  // niente badge, invece di una percentuale senza un "rispetto a cosa".
+  const precedente = patrimonio.at(-2)?.totale;
+  const growth =
+    precedente && precedente !== 0
+      ? ((netWorth - precedente) / Math.abs(precedente)) * 100
+      : null;
 
   const openCreate = () => {
     setEditing(null);
@@ -207,6 +220,20 @@ export default function ContiPage() {
           <div className="accounts__worth">
             <span className="accounts__eyebrow">{t("accounts_net_worth")}</span>
             <Amount className="accounts__worth-value" value={netWorth} />
+
+            {growth !== null && (
+              <span
+                className={`accounts__delta accounts__delta--${
+                  growth >= 0 ? "up" : "down"
+                }`}
+              >
+                <i
+                  className={`pi ${growth >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
+                  aria-hidden="true"
+                />
+                {`${Math.abs(growth).toFixed(1)}% ${t("accounts_vs_last_month")}`}
+              </span>
+            )}
           </div>
 
           <button

@@ -5,6 +5,8 @@ export interface Debito {
   residuo: number | null;
   descrizione: string | null;
   conto_id: string | null;
+  /** Mese in cui il debito si chiude al ritmo tenuto finora ("2027-06"). */
+  fine_stimata?: string | null;
   creationDate: string;
   lastUpdate: string;
 }

@@ -69,6 +69,25 @@ export const getLastTransactions = createAsyncThunk<
   }
 });
 
+/**
+ * Una transazione sola, con il saldo del conto subito dopo. Non passa dallo
+ * slice: la usa il foglio di dettaglio, e riguarda solo lui.
+ */
+export const getTransaction = createAsyncThunk<Transaction, { id: string }>(
+  "transazioni/getTransaction",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await api.get<Transaction>(`/transazioni/${id}`);
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore ricezione transazione",
+      );
+    }
+  },
+);
+
 export const getTransactionsPaginated = createAsyncThunk<
   PaginatedResponse,
   PaginationParams

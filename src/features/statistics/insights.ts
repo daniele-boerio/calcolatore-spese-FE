@@ -14,7 +14,9 @@ export type InsightKind =
   /** Il mese chiude in rosso. */
   | "overspent"
   /** Quota di entrate rimasta in tasca. */
-  | "saved_share";
+  | "saved_share"
+  /** Mesi di fila chiusi in positivo. */
+  | "streak";
 
 export interface Insight {
   kind: InsightKind;
@@ -22,6 +24,8 @@ export interface Insight {
   category?: string;
   /** Percentuale già arrotondata, sempre positiva. */
   percent?: number;
+  /** Mesi di fila, per la striscia. */
+  count?: number;
 }
 
 export interface InsightsInput {
@@ -32,6 +36,11 @@ export interface InsightsInput {
   /** Netto del mese: entrate − uscite − accantonamenti. */
   savings: number;
   income: number;
+  /**
+   * Risparmio dei mesi precedenti, dal più vecchio al più recente e senza il
+   * mese corrente: serve a contare da quanto va bene, non solo se va bene ora.
+   */
+  history?: number[];
 }
 
 // Sotto questi scarti non c'è niente da segnalare: è rumore di un mese.
@@ -39,8 +48,25 @@ const ABOVE_AVERAGE_MIN = 15;
 const CONCENTRATION_MIN = 35;
 const SAVED_SHARE_MIN = 20;
 
+// Sotto i tre mesi non è una striscia, è un caso.
+const STREAK_MIN = 3;
+
 // Due frasi bastano: la terza non la legge nessuno.
 const MAX_INSIGHTS = 2;
+
+/** Mesi di fila chiusi in positivo, contando all'indietro dal più recente. */
+function streakOf(history: number[], current: number): number {
+  if (current <= 0) return 0;
+
+  let months = 1;
+
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    if (history[index] <= 0) break;
+    months += 1;
+  }
+
+  return months;
+}
 
 const expensesOf = (categories: MonthlyDetailCategory[]) =>
   categories
@@ -56,6 +82,7 @@ export function buildInsights({
   averages,
   savings,
   income,
+  history = [],
 }: InsightsInput): Insight[] {
   const expenses = expensesOf(categories);
   const total = expenses.reduce((sum, entry) => sum + entry.totale, 0);
@@ -97,7 +124,16 @@ export function buildInsights({
     }
   }
 
-  // 3. Se resta posto: quanto pesa la categoria più grossa.
+  // 3. Una striscia lunga vale più di un mese buono isolato.
+  if (insights.length < MAX_INSIGHTS) {
+    const months = streakOf(history, savings);
+
+    if (months >= STREAK_MIN) {
+      insights.push({ kind: "streak", tone: "positive", count: months });
+    }
+  }
+
+  // 4. Se resta ancora posto: quanto pesa la categoria più grossa.
   if (insights.length < MAX_INSIGHTS && total > 0 && expenses.length > 1) {
     const share = Math.round((expenses[0].totale / total) * 100);
 

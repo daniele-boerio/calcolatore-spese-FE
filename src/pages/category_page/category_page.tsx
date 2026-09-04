@@ -187,6 +187,11 @@ export default function CategoryPage() {
                           onClick={() => openTag(tag)}
                         >
                           {`#${tag.nome}`}
+                          {tag.n_transazioni ? (
+                            <span className="tag-pill__count">
+                              {tag.n_transazioni}
+                            </span>
+                          ) : null}
                         </button>
 
                         <button

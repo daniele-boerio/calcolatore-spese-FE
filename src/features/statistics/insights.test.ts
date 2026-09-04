@@ -97,3 +97,61 @@ describe("buildInsights", () => {
     ).toEqual([]);
   });
 });
+
+describe("striscia di mesi in positivo", () => {
+  it("conta i mesi di fila chiusi in positivo, mese corrente incluso", () => {
+    const insights = buildInsights({
+      ...base,
+      savings: 100,
+      history: [200, 300, 400],
+    });
+
+    expect(insights).toContainEqual({
+      kind: "streak",
+      tone: "positive",
+      count: 4,
+    });
+  });
+
+  it("si ferma al primo mese in rosso, anche se prima andava bene", () => {
+    // Il 500 di quattro mesi fa non conta: la striscia parte dopo il mese in
+    // rosso, quindi sono tre e non cinque.
+    const insights = buildInsights({
+      ...base,
+      savings: 100,
+      history: [500, -50, 400, 300],
+    });
+
+    expect(insights).toContainEqual({
+      kind: "streak",
+      tone: "positive",
+      count: 3,
+    });
+  });
+
+  it("tace sotto i tre mesi: due di fila non sono una striscia", () => {
+    const insights = buildInsights({
+      ...base,
+      savings: 100,
+      history: [-10, 400],
+    });
+
+    expect(insights.some((i) => i.kind === "streak")).toBe(false);
+  });
+
+  it("non parla di strisce se il mese corrente è in rosso", () => {
+    const insights = buildInsights({
+      ...base,
+      savings: -10,
+      history: [400, 500, 600],
+    });
+
+    expect(insights.some((i) => i.kind === "streak")).toBe(false);
+  });
+
+  it("senza storico non inventa una striscia", () => {
+    const insights = buildInsights({ ...base, savings: 100 });
+
+    expect(insights.some((i) => i.kind === "streak")).toBe(false);
+  });
+});

@@ -34,6 +34,8 @@ export interface Transaction {
   sottocategoria_id: string;
   tag_id: string;
   parent_transaction_id: string;
+  /** Saldo del conto subito dopo: lo riempie solo `GET /transazioni/{id}`. */
+  saldo_dopo?: number | null;
   creationDate: string;
   lastUpdate: string;
 }

@@ -20,8 +20,14 @@ import {
   selectStatisticsLoading,
 } from "../../../features/statistics/statistics_slice";
 import { buildInsights, Insight } from "../../../features/statistics/insights";
-import { getExpenseCompositionChart } from "../../../features/charts/api_calls";
-import { selectChartsExpenseComposition } from "../../../features/charts/charts_slice";
+import {
+  getExpenseCompositionChart,
+  getSavingsChart,
+} from "../../../features/charts/api_calls";
+import {
+  selectChartsExpenseComposition,
+  selectChartsSavings,
+} from "../../../features/charts/charts_slice";
 import { getCategorie } from "../../../features/categorie/api_calls";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../services/dates";
@@ -36,6 +42,7 @@ const ICONS: Record<Insight["kind"], string> = {
   concentration: "pi pi-chart-pie",
   overspent: "pi pi-exclamation-circle",
   saved_share: "pi pi-check",
+  streak: "pi pi-star",
 };
 
 type MonthStatisticsProps = {
@@ -58,6 +65,7 @@ export default function MonthStatistics({
   const previous = useAppSelector(selectPreviousMonthSavings);
   const refunds = useAppSelector(selectMonthRefunds);
   const composition = useAppSelector(selectChartsExpenseComposition);
+  const savingsHistory = useAppSelector(selectChartsSavings);
   const categorie = useAppSelector(selectCategoriaCategorie);
   const loading = useAppSelector(selectStatisticsLoading);
 
@@ -73,6 +81,16 @@ export default function MonthStatistics({
     // Media per categoria dei mesi *precedenti*: il mese corrente è quello da
     // confrontare, includerlo appiattirebbe lo scostamento.
     const selected = new Date(year, month - 1, 1);
+
+    // Un anno di risparmi mensili: serve a dire da quanto va bene, non solo
+    // se va bene adesso.
+    dispatch(
+      getSavingsChart({
+        data_inizio: toIsoDate(startOfMonth(addMonths(selected, -12))),
+        data_fine: toIsoDate(endOfMonth(addMonths(selected, -1))),
+      }),
+    );
+
     dispatch(
       getExpenseCompositionChart({
         data_inizio: toIsoDate(startOfMonth(addMonths(selected, -AVERAGE_MONTHS))),
@@ -113,8 +131,9 @@ export default function MonthStatistics({
         averages,
         savings: totals.total,
         income: totals.incomes,
+        history: savingsHistory.map((entry) => Number(entry.risparmio)),
       }),
-    [data, averages, totals.total, totals.incomes],
+    [data, averages, totals.total, totals.incomes, savingsHistory],
   );
 
   const income = totals.incomes;
@@ -164,6 +183,11 @@ export default function MonthStatistics({
         return {
           strong: `${insight.percent}%`,
           rest: ` ${t("analysis_insight_saved_share")}`,
+        };
+      case "streak":
+        return {
+          strong: `${insight.count} ${t("home_months")}`,
+          rest: ` ${t("analysis_insight_streak")}`,
         };
     }
   };

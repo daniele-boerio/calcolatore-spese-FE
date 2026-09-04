@@ -220,3 +220,11 @@
   color: v.$negative;
   border-color: v.$negative-line;
 }
+
+// Quante transazioni usano il tag: un conteggio, non un importo.
+.tag-pill__count {
+  margin-left: 6px;
+  color: v.$muted;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}

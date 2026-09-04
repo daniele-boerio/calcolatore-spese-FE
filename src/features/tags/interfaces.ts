@@ -1,6 +1,8 @@
 export interface Tag {
   id: string;
   nome: string;
+  /** Quante transazioni lo usano: lo conta il BE a ogni GET. */
+  n_transazioni?: number;
 }
 
 // 2. Definiamo lo stato dello slice

@@ -1,3 +1,4 @@
+import { getPatrimonio } from "./api_calls";
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import {
   confirmBankSession,
@@ -44,6 +45,7 @@ const initialState: ContoState = {
     sort_by: ["saldo:desc"],
   },
   include_future_recurring: false,
+  patrimonio: [],
 };
 
 // --- HELPERS ---
@@ -95,6 +97,9 @@ const contoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getPatrimonio.fulfilled, (state, action) => {
+        state.patrimonio = action.payload;
+      })
       // currentMonthExpenses & updateBudget
       .addCase(
         getCurrentMonthExpenses.fulfilled,
@@ -289,6 +294,9 @@ export const selectContiMonthlyBudget = (state: RootState) =>
 export const selectContiMonthlyExpensesByCategory = (state: RootState) =>
   state.conto.monthlyExpensesByCategory;
 export const selectContiFilters = (state: RootState) => state.conto.filters;
+export const selectContiPatrimonio = (state: RootState) =>
+  state.conto.patrimonio;
+
 export const selectIncludeFutureRecurring = (state: RootState) =>
   state.conto.include_future_recurring;
 

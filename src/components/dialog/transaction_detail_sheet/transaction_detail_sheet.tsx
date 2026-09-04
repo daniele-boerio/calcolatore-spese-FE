@@ -1,4 +1,4 @@
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import Sheet from "../../sheet/sheet";
 import Alert from "../../alert/alert";
 import Amount from "../../amount/amount";
@@ -10,6 +10,7 @@ import { openSheet, showToast } from "../../../features/ui/ui_slice";
 import {
   createTransaction,
   deleteTransaction,
+  getTransaction,
 } from "../../../features/transactions/api_calls";
 import { Transaction } from "../../../features/transactions/interfaces";
 import {
@@ -36,9 +37,8 @@ type TransactionDetailSheetProps = {
  * Dettaglio di un movimento: quello che la riga della lista non ha spazio per
  * dire, più le tre azioni che lo riguardano.
  *
- * Nota e allegato del design non ci sono: sul BE una transazione ha solo la
- * descrizione, e "Saldo dopo" richiederebbe il saldo progressivo, che nessun
- * endpoint espone.
+ * Nota e allegato del design non ci sono: su una transazione non hanno senso,
+ * e il campo nota sul BE nemmeno esiste.
  */
 export default function TransactionDetailSheet({
   visible,
@@ -54,6 +54,23 @@ export default function TransactionDetailSheet({
   const tags = useAppSelector(selectTagTags);
 
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+
+  // Il saldo dopo non sta nella lista: sarebbe una somma progressiva per riga.
+  // Lo chiediamo qui, dove serve e per una riga sola.
+  const [saldoDopo, setSaldoDopo] = useState<number | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+
+    dispatch(getTransaction({ id: transaction.id }))
+      .unwrap()
+      .then((full) => alive && setSaldoDopo(full.saldo_dopo ?? null))
+      .catch(() => alive && setSaldoDopo(null));
+
+    return () => {
+      alive = false;
+    };
+  }, [dispatch, transaction.id]);
 
   const isIncome =
     transaction.tipo === "ENTRATA" || transaction.tipo === "RIMBORSO";
@@ -148,6 +165,12 @@ export default function TransactionDetailSheet({
           </Row>
 
           <Row label={t("tag")}>{tag ? `#${tag}` : "—"}</Row>
+
+          {saldoDopo !== null && (
+            <Row label={t("tx_balance_after")}>
+              <Amount value={saldoDopo} />
+            </Row>
+          )}
         </dl>
 
         <div className="tx-detail__actions">

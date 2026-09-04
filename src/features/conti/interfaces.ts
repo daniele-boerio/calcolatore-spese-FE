@@ -29,6 +29,14 @@ export interface Conto {
   bank_connector_last_error?: string | null;
 }
 
+/** Una foto mensile del patrimonio, come la manda il BE. */
+export interface PatrimonioPoint {
+  label: string;
+  conti: number;
+  titoli: number;
+  totale: number;
+}
+
 export interface ExpenseByCategory {
   label: string;
   value: number;
@@ -92,6 +100,8 @@ export interface ContoState {
   monthlyExpensesByCategory: ExpenseByCategory[];
   filters: ContoFilters;
   include_future_recurring: boolean;
+  /** Foto mensili del patrimonio, dalla più vecchia alla più recente. */
+  patrimonio: PatrimonioPoint[];
 }
 
 // Interfaccia per il payload di aggiornamento budget

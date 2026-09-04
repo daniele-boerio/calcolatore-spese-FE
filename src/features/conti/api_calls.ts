@@ -9,6 +9,7 @@ import {
   CreateContoParams,
   UpdateContoParams,
   AbsorbContoParams,
+  PatrimonioPoint,
   DeleteContoParams,
   ImportStatementParams,
   ImportStatementResponse,
@@ -256,6 +257,25 @@ export const countContoTransactions = createAsyncThunk<
  * saldi finiscono lì, gli altri conti vanno in soft-delete. Il server ritorna
  * il conto sopravvissuto.
  */
+/**
+ * Le foto mensili del patrimonio. La lista parte dal giorno in cui il BE ha
+ * iniziato a scattarle: con meno di due mesi non c'è confronto da mostrare.
+ */
+export const getPatrimonio = createAsyncThunk<PatrimonioPoint[], void>(
+  "conti/getPatrimonio",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get<PatrimonioPoint[]>("/conti/patrimonio");
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore ricezione patrimonio",
+      );
+    }
+  },
+);
+
 export const consolidateConti = createAsyncThunk<Conto, void>(
   "conti/consolidateConti",
   async (_, { rejectWithValue }) => {

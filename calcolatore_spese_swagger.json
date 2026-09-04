@@ -479,6 +479,61 @@
         }
       }
     },
+    "/conti/patrimonio": {
+      "get": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Get Patrimonio",
+        "description": "Le foto mensili del patrimonio, dalla più vecchia alla più recente.\n\nLa lista parte dal giorno in cui il job ha iniziato a scattarle: prima non\nc'è niente, e chi la legge deve mostrare un confronto solo quando ci sono\ndue foto — non inventarne uno.",
+        "operationId": "get_patrimonio_conti_patrimonio_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "mesi",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 60,
+              "minimum": 1,
+              "default": 12,
+              "title": "Mesi"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PatrimonioOut"
+                  },
+                  "title": "Response Get Patrimonio Conti Patrimonio Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/conti/consolida": {
       "post": {
         "tags": [
@@ -1884,6 +1939,52 @@
       }
     },
     "/transazioni/{transazione_id}": {
+      "get": {
+        "tags": [
+          "Transazioni"
+        ],
+        "summary": "Get Transazione",
+        "description": "Una transazione sola, col saldo del conto subito dopo.\n\nIl dettaglio di un movimento è l'unico posto in cui quel numero serve, ed\nè anche l'unico in cui si può calcolare senza far pagare a una lista una\nsomma progressiva per riga.",
+        "operationId": "get_transazione_transazioni__transazione_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "transazione_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Transazione Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransazioneOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "Transazioni"
@@ -6177,6 +6278,17 @@
             "type": "integer",
             "title": "Id"
           },
+          "fine_stimata": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fine Stimata"
+          },
           "creationDate": {
             "type": "string",
             "format": "date-time",
@@ -7380,6 +7492,11 @@
             "type": "integer",
             "title": "Id"
           },
+          "n_transazioni": {
+            "type": "integer",
+            "title": "N Transazioni",
+            "default": 0
+          },
           "creationDate": {
             "type": "string",
             "format": "date-time",
@@ -7569,7 +7686,7 @@
             "type": "string",
             "format": "date",
             "title": "Data",
-            "default": "2026-09-03"
+            "default": "2026-09-04"
           },
           "descrizione": {
             "anyOf": [
@@ -7688,6 +7805,18 @@
               }
             ],
             "title": "Split Group Id"
+          },
+          "saldo_dopo": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Saldo Dopo"
           }
         },
         "type": "object",
@@ -8120,6 +8249,38 @@
         ],
         "title": "UserUpdate",
         "description": "Quello che l'utente può cambiare di sé dal profilo.\n\nSolo lo username: l'email identifica l'account (ci arriva il link di reset\npassword) e cambiarla è un'altra cosa; la password si cambia dal flusso di\nreset, che passa dalla casella di posta."
+      },
+      "PatrimonioOut": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "conti": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Conti"
+          },
+          "titoli": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Titoli"
+          },
+          "totale": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Totale"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "conti",
+          "titoli",
+          "totale"
+        ],
+        "title": "PatrimonioOut",
+        "description": "Una foto mensile del patrimonio, come \"2026-09\"."
       }
     },
     "securitySchemes": {

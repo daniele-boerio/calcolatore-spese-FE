@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
+import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Page, PageContent, PageHeader } from "../../components/page/page";
 import { Card } from "../../components/card/card";
@@ -22,6 +23,8 @@ import { Debito } from "../../features/debiti/interfaces";
 import { getConti } from "../../features/conti/api_calls";
 import { selectContiConti } from "../../features/conti/conto_slice";
 import { showToast } from "../../features/ui/ui_slice";
+
+const localeTag = () => (getLocale() === "it" ? "it-IT" : "en-GB");
 
 /** Quanto resta da restituire: `residuo` a null vuol dire "tutto". */
 const residuoOf = (debito: Debito) =>
@@ -229,6 +232,21 @@ function DebitoCard({
   const residuo = residuoOf(debito);
   const ammontare = Number(debito.ammontare);
   const open = residuo > 0;
+
+  // "2027-06" scritto come lo direbbe una persona. Assente quando il ritmo
+  // dei pagamenti non basta a stimare niente.
+  const fine = debito.fine_stimata
+    ? new Intl.DateTimeFormat(localeTag(), {
+        month: "long",
+        year: "numeric",
+      }).format(
+        new Date(
+          Number(debito.fine_stimata.slice(0, 4)),
+          Number(debito.fine_stimata.slice(5, 7)) - 1,
+          1,
+        ),
+      )
+    : null;
   const repaid = ammontare > 0 ? (ammontare - residuo) / ammontare : 1;
 
   // Un debito chiuso non ha più niente da fare: resta come riga di storia.
@@ -276,6 +294,11 @@ function DebitoCard({
       <div className="debt__meta">
         {debito.descrizione && <span>{debito.descrizione}</span>}
         {conto && <span>{conto}</span>}
+        {fine && (
+          <span>
+            {`${t("debts_estimated_end")} ${fine}`}
+          </span>
+        )}
       </div>
 
       <div className="debt__actions">
