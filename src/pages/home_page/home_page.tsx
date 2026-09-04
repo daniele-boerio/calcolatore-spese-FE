@@ -207,7 +207,6 @@ export default function HomePage() {
           <SpendingCap
             spent={spending.spent}
             budget={spending.budget}
-            projected={spending.projected}
             remaining={spending.remaining}
             percentage={spending.percentage}
           />
@@ -439,7 +438,6 @@ function HeroCard({
 type SpendingCapProps = {
   spent: number;
   budget: number | null;
-  projected: number;
   remaining: number | null;
   percentage: number | null;
 };
@@ -451,7 +449,6 @@ type SpendingCapProps = {
 function SpendingCap({
   spent,
   budget,
-  projected,
   remaining,
   percentage,
 }: SpendingCapProps) {
@@ -468,10 +465,9 @@ function SpendingCap({
     ) : null;
   }
 
-  // Speso e previsto sono due segmenti della stessa barra: il secondo prende
-  // solo quello che avanza, altrimenti a budget sforato la barra deborda.
+  // Un colore solo: senza legenda una seconda tinta e' un indovinello. Le
+  // ricorrenze in arrivo le racconta la card "In arrivo", non questa barra.
   const spentRatio = Math.min(1, spent / budget);
-  const projectedRatio = Math.min(1 - spentRatio, projected / budget);
 
   const overBudget = remaining !== null && remaining < 0;
 
@@ -480,10 +476,7 @@ function SpendingCap({
       <ProgressBar
         height={8}
         label={t("home_of_budget")}
-        segments={[
-          { value: spentRatio, tone: "accent" },
-          { value: projectedRatio, tone: "accent-2" },
-        ]}
+        segments={[{ value: spentRatio, tone: "accent" }]}
       />
 
       <div className="spending-cap__legend">

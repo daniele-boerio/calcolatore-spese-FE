@@ -27,7 +27,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
 
@@ -61,86 +61,61 @@
       (function () {
         function applyHeights(h) {
           try {
-            document.documentElement.style.setProperty('--app-height', h + 'px');
+            document.documentElement.style.setProperty(
+              "--app-height",
+              h + "px",
+            );
             // Also set explicit heights to avoid initial paint issues where CSS
             // using the variable is not yet applied.
-            document.documentElement.style.height = h + 'px';
-            document.body.style.height = h + 'px';
-            var root = document.getElementById('root');
-            if (root) root.style.height = h + 'px';
+            document.documentElement.style.height = h + "px";
+            document.body.style.height = h + "px";
+            var root = document.getElementById("root");
+            if (root) root.style.height = h + "px";
           } catch (e) {}
         }
 
         function setAppHeight() {
-          var h = window.innerHeight || (window.visualViewport && window.visualViewport.height) || 0;
+          var h =
+            window.innerHeight ||
+            (window.visualViewport && window.visualViewport.height) ||
+            0;
           applyHeights(h);
-        }
-
-        // Debug overlay creation / update
-        function createDebugOverlay() {
-          try {
-            if (document.getElementById('debug-overlay')) return document.getElementById('debug-overlay');
-            var ov = document.createElement('div');
-            ov.id = 'debug-overlay';
-            ov.className = 'debug-overlay';
-            ov.innerHTML = '<div class="dbg-text">init…</div><button class="dbg-close">×</button>';
-            document.body.appendChild(ov);
-            ov.querySelector('.dbg-close').addEventListener('click', function (e) {
-              ov.style.display = 'none';
-              try { localStorage.setItem('debug_overlay', '0'); } catch (e) {}
-            });
-            return ov;
-          } catch (e) { return null; }
-        }
-
-        function updateDebugOverlay(data) {
-          try {
-            var ov = createDebugOverlay();
-            if (!ov) return;
-            var txt = ov.querySelector('.dbg-text');
-            if (!txt) return;
-            var rows = [];
-            rows.push('tabH: ' + (data.tabH ?? 'n/a'));
-            rows.push('innerH: ' + (data.innerH ?? window.innerHeight));
-            rows.push('visualH: ' + (data.visualH ?? (window.visualViewport && window.visualViewport.height)));
-            rows.push('appH: ' + (data.appH ?? getComputedStyle(document.documentElement).getPropertyValue('--app-height')));
-            rows.push('scrollable: ' + (data.scrollable ? 'yes' : 'no'));
-            txt.innerText = rows.join('\n');
-          } catch (e) {}
         }
 
         // Measure the actual tab bar after paint and apply its height to CSS
         // so padding-bottom matches the painted element (prevents initial gap).
         function measureTabbarAndApply() {
           try {
-            var tab = document.querySelector('.tab-bar');
+            var tab = document.querySelector(".tab-bar");
             if (!tab) return;
             var rect = tab.getBoundingClientRect();
             var tabH = Math.round(rect.height) || 0;
             // Set token override to measured value
-            document.documentElement.style.setProperty('--tabbar-h', tabH + 'px');
+            document.documentElement.style.setProperty(
+              "--tabbar-h",
+              tabH + "px",
+            );
 
             // Force the tab to sit at the visual bottom to avoid layout shifts
             try {
-              tab.style.bottom = '0px';
-              tab.style.transform = tab.style.transform || 'translateX(-50%)';
+              tab.style.bottom = "0px";
+              tab.style.transform = tab.style.transform || "translateX(-50%)";
             } catch (e) {}
 
             // Also set explicit padding on the content area to guarantee no gap
-            var content = document.querySelector('.page__content');
+            var content = document.querySelector(".page__content");
             if (content) {
               // Match SCSS: calc(var(--tabbar-h) - 18px + env(safe-area-inset-bottom))
               content.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
             }
 
             // For legacy slots (non .page) try to apply similar override
-            var legacySlots = document.querySelectorAll('.App > *:not(.page):not(.tab-bar)');
+            var legacySlots = document.querySelectorAll(
+              ".App > *:not(.page):not(.tab-bar)",
+            );
             legacySlots.forEach(function (el) {
               el.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
             });
-
-            // Update debug overlay with measured values
-            updateDebugOverlay({ tabH: tabH, innerH: window.innerHeight, visualH: window.visualViewport && window.visualViewport.height, appH: getComputedStyle(document.documentElement).getPropertyValue('--app-height'), scrollable: false });
           } catch (e) {}
         }
 
@@ -152,14 +127,14 @@
           measureTabbarAndApply();
         });
 
-        window.addEventListener('resize', function () {
+        window.addEventListener("resize", function () {
           setAppHeight();
           requestAnimationFrame(function () {
             setAppHeight();
             measureTabbarAndApply();
           });
         });
-        window.addEventListener('orientationchange', function () {
+        window.addEventListener("orientationchange", function () {
           setAppHeight();
           requestAnimationFrame(function () {
             setAppHeight();
@@ -168,7 +143,7 @@
         });
 
         if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', function () {
+          window.visualViewport.addEventListener("resize", function () {
             setAppHeight();
             requestAnimationFrame(function () {
               setAppHeight();
@@ -178,29 +153,16 @@
         }
 
         // Also ensure we measure again after DOMContentLoaded in case app mounts later
-        document.addEventListener('DOMContentLoaded', function () {
-          requestAnimationFrame(function () {
-            measureTabbarAndApply();
-            // ensure overlay created after DOM is ready
-            try { createDebugOverlay(); } catch (e) {}
-          });
+        document.addEventListener("DOMContentLoaded", function () {
+          requestAnimationFrame(measureTabbarAndApply);
         });
 
         // If the SPA mounts after a delay (hot reload / dev), observe the root for the tab-bar
-        var observer = new MutationObserver(function (mutations) {
-          measureTabbarAndApply();
-          // attempt to create overlay again when SPA injects content
-          try { createDebugOverlay(); } catch (e) {}
-        });
-        var rootNode = document.getElementById('root');
+        var observer = new MutationObserver(measureTabbarAndApply);
+        var rootNode = document.getElementById("root");
         if (rootNode) {
           observer.observe(rootNode, { childList: true, subtree: true });
         }
-
-        // Try to create debug overlay shortly after startup in case head-time creation
-        // failed because document.body wasn't yet available.
-        setTimeout(function () { try { createDebugOverlay(); } catch (e) {} }, 500);
-        setTimeout(function () { try { createDebugOverlay(); } catch (e) {} }, 1200);
 
         // Prevent body-level scrolling on iOS/Android: allow touchmove only when the
         // touched element is inside a scrollable container (e.g. .page__content).
@@ -208,32 +170,26 @@
           while (el && el !== document.body) {
             try {
               var s = window.getComputedStyle(el);
-              if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+              if (
+                (s.overflowY === "auto" || s.overflowY === "scroll") &&
+                el.scrollHeight > el.clientHeight
+              )
+                return true;
             } catch (e) {}
             el = el.parentElement;
           }
           return false;
         }
 
-        document.addEventListener('touchstart', function (e) {
-          // update overlay to show whether touchstart is in a scrollable element
-          var sc = isScrollable(e.target);
-          updateDebugOverlay({ tabH: getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h'), innerH: window.innerHeight, visualH: window.visualViewport && window.visualViewport.height, appH: getComputedStyle(document.documentElement).getPropertyValue('--app-height'), scrollable: sc });
-        }, { passive: true });
-
-        document.addEventListener('touchmove', function (e) {
-          var sc = isScrollable(e.target);
-          updateDebugOverlay({ tabH: getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h'), innerH: window.innerHeight, visualH: window.visualViewport && window.visualViewport.height, appH: getComputedStyle(document.documentElement).getPropertyValue('--app-height'), scrollable: sc });
-          if (!sc) {
-            e.preventDefault();
-          }
-        }, { passive: false });
-
-        // Optionally create overlay on startup (user asked to show it)
-        try {
-          var showDebug = true;
-          if (showDebug) createDebugOverlay();
-        } catch (e) {}
+        document.addEventListener(
+          "touchmove",
+          function (e) {
+            if (!isScrollable(e.target)) {
+              e.preventDefault();
+            }
+          },
+          { passive: false },
+        );
       })();
     </script>
   </head>

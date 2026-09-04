@@ -1,11 +1,6 @@
 import "./progress_bar.scss";
 
-export type SegmentTone =
-  | "accent"
-  /** Quota "prevista" / "accantonata": l'accento in tono più tenue. */
-  | "accent-2"
-  | "positive"
-  | "negative";
+export type SegmentTone = "accent" | "positive" | "negative";
 
 export type ProgressSegment = {
   /** Quota sul totale, da 0 a 1. */
@@ -22,8 +17,8 @@ type ProgressBarProps = {
 };
 
 /**
- * Barra a segmenti su track `--track`. Un solo segmento serve la percentuale
- * semplice; più segmenti impilano speso/previsto o uscite/accantonato/rimasto.
+ * Barra a segmenti su track `--track`. Più segmenti solo dove la schermata
+ * dice a parole che cosa è ciascun colore: senza legenda si usa un tono solo.
  */
 export default function ProgressBar({
   segments,

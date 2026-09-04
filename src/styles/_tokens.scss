@@ -83,8 +83,8 @@
   --font-ui:
     "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
-  // Nel tema chiaro il display è lo stesso font UI in peso 800; nel tema scuro
-  // diventa Instrument Serif. I componenti usano sempre questa terna.
+  // Titoli e numeroni: stesso font del resto dell'app, in peso più alto. Un
+  // solo carattere ovunque, in tutti e due i temi.
   --font-display: var(--font-ui);
   --fw-display: 800;
   --tracking-display: -0.03em;
@@ -184,18 +184,5 @@
   --overlay: rgba(3, 10, 20, 0.55);
   --overlay-strong: rgba(3, 10, 20, 0.62);
 
-  // I titoli passano al serif; il display perde il peso 800 (Instrument Serif
-  // ha un solo peso) e stringe meno.
-  --font-display: "Instrument Serif", Georgia, "Times New Roman", serif;
-  --fw-display: 400;
-  --tracking-display: -0.01em;
-
-  --fs-hero: 56px;
-  --lh-hero: 0.9;
-  --tracking-hero: -0.02em;
-  --fs-page-title: 28px;
-  --fs-card-title: 20px;
-  --fw-card-title: 400;
-  --fs-greeting: 26px;
-  --fw-greeting: 400;
+  // La tipografia non cambia col tema: cambia solo il colore.
 }

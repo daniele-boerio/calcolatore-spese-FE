@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
+import {
+  Action,
+  createSelector,
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import {
   createCategoria,
   createSottoCategorie,
@@ -160,8 +165,12 @@ export const selectCategoriaSelectedCategoria = (state: RootState) =>
   state.categoria.selectedCategoria;
 export const selectCategoriaSelectedSottoCategoria = (state: RootState) =>
   state.categoria.selectedSottoCategoria;
-export const selectCategoriaSottocategorie = (state: RootState) =>
-  state.categoria.categorie.flatMap((cat) => cat.sottocategorie || []);
+// Appiattire le sottocategorie crea un array nuovo a ogni chiamata: senza
+// memoizzazione react-redux vede un riferimento diverso e ridisegna a vuoto.
+export const selectCategoriaSottocategorie = createSelector(
+  [selectCategoriaCategorie],
+  (categorie) => categorie.flatMap((cat) => cat.sottocategorie || []),
+);
 export const selectCategoriaFilters = (state: RootState) =>
   state.categoria.filters;
 

@@ -20,34 +20,3 @@ html, body, #root {
   box-sizing: border-box;
 }
 
-/* Small helper to visibly mark debug overlay if present */
-.debug-overlay {
-  position: fixed;
-  left: 8px;
-  top: 8px;
-  background: rgba(0,0,0,0.6);
-  color: #fff;
-  padding: 8px 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  z-index: 99999;
-  pointer-events: auto;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-.debug-overlay .dbg-text {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.2;
-}
-.debug-overlay .dbg-close {
-  background: rgba(255,255,255,0.08);
-  border: 0;
-  color: #fff;
-  padding: 4px 6px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-}
-.debug-overlay .dbg-close:active { transform: scale(0.97); }
