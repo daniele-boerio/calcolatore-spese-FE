@@ -76,6 +76,39 @@
           applyHeights(h);
         }
 
+        // Debug overlay creation / update
+        function createDebugOverlay() {
+          try {
+            if (document.getElementById('debug-overlay')) return document.getElementById('debug-overlay');
+            var ov = document.createElement('div');
+            ov.id = 'debug-overlay';
+            ov.className = 'debug-overlay';
+            ov.innerHTML = '<div class="dbg-text">init…</div><button class="dbg-close">×</button>';
+            document.body.appendChild(ov);
+            ov.querySelector('.dbg-close').addEventListener('click', function (e) {
+              ov.style.display = 'none';
+              try { localStorage.setItem('debug_overlay', '0'); } catch (e) {}
+            });
+            return ov;
+          } catch (e) { return null; }
+        }
+
+        function updateDebugOverlay(data) {
+          try {
+            var ov = createDebugOverlay();
+            if (!ov) return;
+            var txt = ov.querySelector('.dbg-text');
+            if (!txt) return;
+            var rows = [];
+            rows.push('tabH: ' + (data.tabH ?? 'n/a'));
+            rows.push('innerH: ' + (data.innerH ?? window.innerHeight));
+            rows.push('visualH: ' + (data.visualH ?? (window.visualViewport && window.visualViewport.height)));
+            rows.push('appH: ' + (data.appH ?? getComputedStyle(document.documentElement).getPropertyValue('--app-height')));
+            rows.push('scrollable: ' + (data.scrollable ? 'yes' : 'no'));
+            txt.innerText = rows.join('\n');
+          } catch (e) {}
+        }
+
         // Measure the actual tab bar after paint and apply its height to CSS
         // so padding-bottom matches the painted element (prevents initial gap).
         function measureTabbarAndApply() {
@@ -99,6 +132,9 @@
             legacySlots.forEach(function (el) {
               el.style.paddingBottom = `calc(${tabH}px - 18px + env(safe-area-inset-bottom))`;
             });
+
+            // Update debug overlay with measured values
+            updateDebugOverlay({ tabH: tabH, innerH: window.innerHeight, visualH: window.visualViewport && window.visualViewport.height, appH: getComputedStyle(document.documentElement).getPropertyValue('--app-height'), scrollable: false });
           } catch (e) {}
         }
 
@@ -148,6 +184,39 @@
         if (rootNode) {
           observer.observe(rootNode, { childList: true, subtree: true });
         }
+
+        // Prevent body-level scrolling on iOS/Android: allow touchmove only when the
+        // touched element is inside a scrollable container (e.g. .page__content).
+        function isScrollable(el) {
+          while (el && el !== document.body) {
+            try {
+              var s = window.getComputedStyle(el);
+              if ((s.overflowY === 'auto' || s.overflowY === 'scroll') && el.scrollHeight > el.clientHeight) return true;
+            } catch (e) {}
+            el = el.parentElement;
+          }
+          return false;
+        }
+
+        document.addEventListener('touchstart', function (e) {
+          // update overlay to show whether touchstart is in a scrollable element
+          var sc = isScrollable(e.target);
+          updateDebugOverlay({ tabH: getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h'), innerH: window.innerHeight, visualH: window.visualViewport && window.visualViewport.height, appH: getComputedStyle(document.documentElement).getPropertyValue('--app-height'), scrollable: sc });
+        }, { passive: true });
+
+        document.addEventListener('touchmove', function (e) {
+          var sc = isScrollable(e.target);
+          updateDebugOverlay({ tabH: getComputedStyle(document.documentElement).getPropertyValue('--tabbar-h'), innerH: window.innerHeight, visualH: window.visualViewport && window.visualViewport.height, appH: getComputedStyle(document.documentElement).getPropertyValue('--app-height'), scrollable: sc });
+          if (!sc) {
+            e.preventDefault();
+          }
+        }, { passive: false });
+
+        // Optionally create overlay on startup (user asked to show it)
+        try {
+          var showDebug = true;
+          if (showDebug) createDebugOverlay();
+        } catch (e) {}
       })();
     </script>
   </head>

@@ -58,6 +58,9 @@ body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
     // Lo spazio in fondo mantiene l'ultima card sopra la tab bar.
     // Usare l'altezza dichiarata della tab bar ma ridurre leggermente il gap
     // per evitare spazio eccessivo sotto il menu su iOS PWA.
