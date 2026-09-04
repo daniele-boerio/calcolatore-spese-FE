@@ -113,6 +113,12 @@
   --gap-card: 14px;
   --pad-card: 20px;
   --tabbar-h: 82px;
+  // Altezza della finestra. Il valore buono lo scrive index.html misurando il
+  // viewport vero (su iOS 100dvh balla con le barre di sistema), ma il
+  // fallback deve stare qui: se lo script non gira, o gira mentre la webapp
+  // torna dallo sfondo e misura zero, senza questo l'app resta alta zero —
+  // cioè una schermata vuota.
+  --app-height: 100dvh;
   // Larghezza di riferimento del design; su desktop il contenuto resta
   // centrato in una colonna di questa misura.
   --app-max-width: 480px;

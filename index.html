@@ -55,31 +55,29 @@
         }
       })();
 
-      // Fix mobile viewport height (iOS Safari): set --app-height to window.innerHeight
-      // and update on resize/orientation changes. Also set element heights directly
-      // to avoid initial layout flashes that require the user to scroll.
+      // Altezza della finestra: su iOS 100dvh cambia con le barre di sistema,
+      // quindi il valore buono lo misura questo script e lo lascia in
+      // --app-height. Il CSS ci si appoggia (html, body, #root) e ha il suo
+      // 100dvh di riserva.
       (function () {
-        function applyHeights(h) {
+        function setAppHeight() {
           try {
+            var h =
+              window.innerHeight ||
+              (window.visualViewport && window.visualViewport.height) ||
+              0;
+
+            // Zero capita quando la webapp torna dallo sfondo prima che il
+            // viewport si sia assestato. Scriverlo vorrebbe dire un'app alta
+            // zero — schermata vuota — finché non arriva un resize: meglio
+            // tenersi la misura buona di prima, o il 100dvh del CSS.
+            if (!(h > 0)) return;
+
             document.documentElement.style.setProperty(
               "--app-height",
               h + "px",
             );
-            // Also set explicit heights to avoid initial paint issues where CSS
-            // using the variable is not yet applied.
-            document.documentElement.style.height = h + "px";
-            document.body.style.height = h + "px";
-            var root = document.getElementById("root");
-            if (root) root.style.height = h + "px";
           } catch (e) {}
-        }
-
-        function setAppHeight() {
-          var h =
-            window.innerHeight ||
-            (window.visualViewport && window.visualViewport.height) ||
-            0;
-          applyHeights(h);
         }
 
         // La tab bar dipinta è più bassa del valore dichiarato nei token:
@@ -132,6 +130,26 @@
             });
           });
         }
+
+        // Riapertura della webapp: bfcache, ripresa dallo sfondo, cambio di
+        // scheda. È il caso in cui la misura fatta all'avvio non vale più.
+        window.addEventListener("pageshow", function () {
+          setAppHeight();
+          requestAnimationFrame(function () {
+            setAppHeight();
+            measureTabbarAndApply();
+          });
+        });
+
+        document.addEventListener("visibilitychange", function () {
+          if (document.hidden) return;
+
+          setAppHeight();
+          requestAnimationFrame(function () {
+            setAppHeight();
+            measureTabbarAndApply();
+          });
+        });
 
         // Also ensure we measure again after DOMContentLoaded in case app mounts later
         document.addEventListener("DOMContentLoaded", function () {

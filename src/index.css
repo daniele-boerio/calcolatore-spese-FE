@@ -1,6 +1,6 @@
-/* Global reset for mobile fullscreen apps: use --app-height set by the inline script
-   to avoid document height larger than the visual viewport on iOS.
-*/
+/* Reset per l'app a tutto schermo: l'altezza viene da --app-height (token
+   100dvh, rifinito da index.html sul viewport vero), così il documento non
+   supera mai il viewport visibile su iOS. */
 html, body, #root {
   height: var(--app-height);
   min-height: var(--app-height);

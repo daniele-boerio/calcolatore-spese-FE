@@ -62,11 +62,10 @@ body {
     overscroll-behavior: contain;
     touch-action: pan-y;
     // Lo spazio in fondo mantiene l'ultima card sopra la tab bar, che è
-    // opaca e fissa: qui si riserva tutta la sua altezza — misurata da
-    // index.html su --tabbar-h — più un filo d'aria. Toglierne un pezzo
-    // faceva finire l'ultima card sotto la barra a fine scorrimento.
-    padding: 0 var(--gutter)
-      calc(var(--tabbar-h) + 12px + env(safe-area-inset-bottom));
+    // opaca e fissa: vale la sua altezza — misurata da index.html su
+    // --tabbar-h, che essendo presa sulla barra dipinta comprende già la
+    // safe area — più un filo d'aria.
+    padding: 0 var(--gutter) calc(var(--tabbar-h) + 8px);
     display: flex;
     flex-direction: column;
     gap: var(--gap-card);
@@ -103,7 +102,7 @@ body {
 // Solo dove la barra c'è davvero: sull'accesso non esiste, e riservarle
 // spazio lascerebbe un vuoto in fondo alla schermata.
 .App:has(.tab-bar) > *:not(.page):not(.tab-bar) {
-  padding-bottom: calc(var(--tabbar-h) + 12px + env(safe-area-inset-bottom));
+  padding-bottom: calc(var(--tabbar-h) + 8px);
   max-height: var(--app-height);
   overflow-y: auto;
   box-sizing: border-box;
