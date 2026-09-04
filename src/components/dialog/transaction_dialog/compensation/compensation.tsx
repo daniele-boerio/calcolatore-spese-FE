@@ -1,11 +1,14 @@
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import Stepper from "../../../stepper/stepper";
 import InputText from "../../../input_text/input_text";
 import Button from "../../../legacy_button/legacy_button";
 import Dropdown from "../../../dropdown/dropdown";
 import { useAppDispatch, useAppSelector } from "../../../../store/store";
 import "./compensation.scss";
-import { getTransactionsByCategory } from "../../../../features/transactions/api_calls";
+import {
+  getTransaction,
+  getTransactionsByCategory,
+} from "../../../../features/transactions/api_calls";
 import { Transaction } from "../../../../features/transactions/interfaces";
 import { useI18n } from "../../../../i18n/use-i18n";
 import Calendar from "../../../calendar/calendar";
@@ -71,9 +74,33 @@ export default function Compensation({
   const categorie = useAppSelector(selectCategoriaCategorie);
   const tags = useAppSelector(selectTagTags);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  // La spesa già rimborsata, caricata una volta sola per id.
+  const fetchedParentId = useRef<string | null>(null);
+
+  // In modifica il padre è già scelto, ma la lista dei candidati è vuota finché
+  // non si rifà il primo passo: il dropdown mostrava un campo bianco al posto
+  // della spesa rimborsata, e non c'era modo di sapere a cosa fosse agganciato
+  // il rimborso che si stava modificando. Lo carichiamo da solo.
+  useEffect(() => {
+    if (!transactionId) return;
+    if (fetchedParentId.current === String(transactionId)) return;
+    if (transactions.some((tx) => String(tx.id) === String(transactionId)))
+      return;
+
+    fetchedParentId.current = String(transactionId);
+
+    dispatch(getTransaction({ id: String(transactionId) }))
+      .unwrap()
+      .then((parent) => setTransactions((prima) => [parent, ...prima]))
+      // Il padre può non essere più raggiungibile (cancellato): la scelta resta
+      // com'è, senza far saltare il form.
+      .catch(() => {});
+  }, [transactionId, transactions, dispatch]);
 
   const filteredSottoCategorie = useMemo(() => {
-    const cat = categorie.find((c) => c.id === categoriaId);
+    const cat = categorie.find(
+      (categoria) => String(categoria.id) === String(categoriaId),
+    );
     return cat?.sottocategorie || [];
   }, [categoriaId, categorie]);
 

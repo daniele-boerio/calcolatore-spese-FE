@@ -126,12 +126,25 @@ export default function TransactionDialog({
         setNewCategoryName("");
         setNewSubCategoryName("");
         setNewTagName("");
-
-        const defaultConto = conti.find((c) => c.default === true);
-        setContoId(defaultConto ? defaultConto.id : null);
+        setContoId(null);
       }
     }
-  }, [visible, transaction, conti]);
+  }, [visible, transaction]);
+
+  // Il conto di default si può scegliere solo quando la lista è arrivata, e
+  // all'apertura può essere ancora in volo: perciò sta in un effetto suo.
+  //
+  // Prima `conti` era tra le dipendenze del reset qui sopra, e una lista che si
+  // ricaricava mentre l'utente compilava riazzerava il form — tipo compreso: un
+  // rimborso a metà stepper tornava "Uscita" e perdeva categoria, periodo e
+  // transazione scelta. Qui riempiamo solo un campo ancora vuoto, quindi
+  // ricaricare la lista non tocca più niente.
+  useEffect(() => {
+    if (!visible || transaction || contoId) return;
+
+    const defaultConto = conti.find((conto) => conto.default === true);
+    if (defaultConto) setContoId(defaultConto.id);
+  }, [visible, transaction, conti, contoId]);
 
   // Precompilazione del tag all'apertura del form di creazione, con l'ultimo
   // tag usato (ricordato sull'account). Volutamente in un effetto separato da
