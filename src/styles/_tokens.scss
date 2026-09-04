@@ -33,7 +33,13 @@
   // Bordo delle card di allerta (ricorrenze scadute, righe da rivedere).
   --negative-line: #eddcd4;
 
-  // Card "In arrivo" e toast di successo: superficie invertita.
+  // Il toast si legge da solo: fondo pieno in entrambi i temi, perché è
+  // l'unica cosa che compare sopra al contenuto senza un overlay dietro.
+  --toast-bg: #0f2e24;
+  --toast-ink: #eaf3ef;
+  --toast-meta: #9ed9c1;
+
+  // Card "In arrivo": superficie invertita.
   --invert-surface: #0f2e24;
   --invert-border: transparent;
   --invert-ink: #eaf3ef;
@@ -139,6 +145,10 @@
   --negative: #e4796b;
   --negative-soft: rgba(228, 121, 107, 0.16);
   --negative-line: rgba(228, 121, 107, 0.28);
+
+  --toast-bg: #16294a;
+  --toast-ink: #eaf0f8;
+  --toast-meta: #e2a44f;
 
   // Al buio la card "In arrivo" non ha fondo: la disegna solo il bordo.
   --invert-surface: transparent;

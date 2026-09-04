@@ -21,9 +21,11 @@ import {
   selectTransactionPagination,
   selectTransactionPeriod,
   selectTransactionTransactions,
+  setPeriod,
   updateFilters,
 } from "../../features/transactions/transaction_slice";
 import {
+  DEFAULT_PERIOD,
   decodeFilters,
   encodeFilters,
 } from "../../features/transactions/filters_url";
@@ -147,27 +149,76 @@ export default function TransactionPage() {
 
   const openFilters = () => dispatch(openSheet({ name: "filters" }));
 
-  const chipCount = (ids: string[] | undefined, names: Map<string, string>) => {
-    if (!ids?.length) return null;
-    if (ids.length === 1) return names.get(ids[0]) ?? null;
-
-    return String(ids.length);
-  };
-
-  const periodLabel =
-    period === "month"
-      ? new Intl.DateTimeFormat(localeTag(), { month: "long" }).format(
-          new Date(),
-        )
-      : t(PERIOD_LABEL_KEYS[period]);
-
   const typeLabel = filters.tipo
-    ? {
+    ? ({
         USCITA: t("expenses"),
         ENTRATA: t("income"),
-        RICARICA: t("transfer"),
-      }[filters.tipo] ?? filters.tipo
-    : t("mov_type_all");
+        RICARICA: t("tx_type_transfer"),
+      }[filters.tipo] ?? filters.tipo)
+    : null;
+
+  /**
+   * I filtri accesi, uno per pillola. Quelli spenti non hanno una pillola:
+   * una riga di chip che aprono tutti lo stesso foglio non dice niente, mentre
+   * una pillola presente dice "questo sta nascondendo qualcosa" e il tocco la
+   * toglie.
+   */
+  const activeChips: { key: string; label: string; clear: () => void }[] = [];
+
+  if (period !== DEFAULT_PERIOD) {
+    activeChips.push({
+      key: "period",
+      label: t(PERIOD_LABEL_KEYS[period]),
+      clear: () => dispatch(setPeriod(DEFAULT_PERIOD)),
+    });
+  }
+
+  if (typeLabel) {
+    activeChips.push({
+      key: "type",
+      label: typeLabel,
+      clear: () => dispatch(updateFilters({ tipo: undefined })),
+    });
+  }
+
+  const listChip = (
+    key: "conto_id" | "categoria_id" | "tag_id",
+    names: Map<string, string>,
+    fallback: string,
+  ) => {
+    const ids = filters[key];
+    if (!ids?.length) return;
+
+    activeChips.push({
+      key,
+      label:
+        ids.length === 1 ? (names.get(ids[0]) ?? fallback) : `${ids.length} ${fallback}`,
+      clear: () => dispatch(updateFilters({ [key]: undefined })),
+    });
+  };
+
+  listChip("conto_id", contoById, t("nav_accounts").toLowerCase());
+  listChip("categoria_id", categoriaById, t("nav_categories").toLowerCase());
+  listChip("tag_id", tagById, t("nav_tags").toLowerCase());
+
+  if (filters.importo_min !== undefined || filters.importo_max !== undefined) {
+    activeChips.push({
+      key: "amount",
+      label: t("amount"),
+      clear: () =>
+        dispatch(
+          updateFilters({ importo_min: undefined, importo_max: undefined }),
+        ),
+    });
+  }
+
+  if (filters.senza_categoria) {
+    activeChips.push({
+      key: "uncategorized",
+      label: t("mov_only_uncategorized"),
+      clear: () => dispatch(updateFilters({ senza_categoria: undefined })),
+    });
+  }
 
   return (
     <Page className="movements">
@@ -220,30 +271,19 @@ export default function TransactionPage() {
           />
         </div>
 
-        <div className="movements__chips">
-          <Chip label={periodLabel} variant="active" onClick={openFilters} />
-
-          <Chip
-            label={chipCount(filters.conto_id, contoById) ?? t("mov_all_accounts")}
-            variant={filters.conto_id?.length ? "active" : "outline"}
-            onClick={openFilters}
-          />
-
-          <Chip
-            label={typeLabel}
-            variant={filters.tipo ? "active" : "outline"}
-            onClick={openFilters}
-          />
-
-          <Chip
-            label={
-              chipCount(filters.categoria_id, categoriaById) ??
-              t("mov_categories_short")
-            }
-            variant={filters.categoria_id?.length ? "active" : "outline"}
-            onClick={openFilters}
-          />
-        </div>
+        {activeChips.length > 0 && (
+          <div className="movements__chips">
+            {activeChips.map((chip) => (
+              <Chip
+                key={chip.key}
+                label={chip.label}
+                icon="pi pi-times"
+                variant="active"
+                onClick={chip.clear}
+              />
+            ))}
+          </div>
+        )}
 
         <div className="movements__summary">
           <div className="movements__balance">

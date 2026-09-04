@@ -1,7 +1,6 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { AxiosError } from "axios";
 import api from "../../services/api";
-import { PaginatedResponse } from "../transactions/interfaces";
 import { MonthlyIncomeExpenseOut, ExpenseCompositionOut } from "../charts/interfaces";
 import { Recurring } from "../recurrings/interfaces";
 import {
@@ -9,48 +8,10 @@ import {
   GetUpcomingParams,
   UpcomingRecurrence,
 } from "./interfaces";
-import {
-  addMonths,
-  endOfMonth,
-  endOfWeek,
-  startOfMonth,
-  startOfWeek,
-  toIsoDate,
-} from "./derive";
+import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "./derive";
 
 // Nessuno di questi endpoint è nuovo: la Home ricompone dati che il BE espone
 // già, chiedendo a ciascuno la finestra temporale che le serve.
-
-// Una settimana di spese sta abbondantemente in una pagina sola.
-const WEEK_PAGE_SIZE = 500;
-
-export const getWeekSpending = createAsyncThunk<
-  { transactions: PaginatedResponse["data"]; weekStart: string },
-  void
->("home/getWeekSpending", async (_, { rejectWithValue }) => {
-  try {
-    const today = new Date();
-    const weekStart = toIsoDate(startOfWeek(today));
-
-    const params = new URLSearchParams();
-    params.append("page", "1");
-    params.append("size", String(WEEK_PAGE_SIZE));
-    params.append("tipo", "USCITA");
-    params.append("data_inizio", weekStart);
-    params.append("data_fine", toIsoDate(endOfWeek(today)));
-
-    const response = await api.get<PaginatedResponse>(
-      `/transazioni/paginated?${params.toString()}`,
-    );
-
-    return { transactions: response.data.data, weekStart };
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(
-      err.response?.data || "Errore ricezione spese della settimana",
-    );
-  }
-});
 
 export const getUpcomingRecurrences = createAsyncThunk<
   { items: UpcomingRecurrence[]; days: number },

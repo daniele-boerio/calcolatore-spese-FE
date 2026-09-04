@@ -167,53 +167,6 @@
   }
 }
 
-// ── Spesa per giorno della settimana corrente ──────────────────────────────
-.week-chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 10px;
-  height: 96px;
-
-  &__day {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 8px;
-    height: 100%;
-  }
-
-  &__bar {
-    width: 100%;
-    border-radius: 8px;
-
-    &--past {
-      background: v.$bar-past;
-    }
-
-    // Il giorno più caro della settimana è l'unico a pieno accento.
-    &--max {
-      background: v.$accent;
-    }
-
-    &--future {
-      background: v.$bar-idle;
-    }
-  }
-
-  &__label {
-    font-size: 11px;
-    color: v.$muted-2;
-    text-transform: uppercase;
-
-    &--max {
-      color: v.$accent;
-      font-weight: 700;
-    }
-  }
-}
-
 // ── Dove vanno i soldi ─────────────────────────────────────────────────────
 .category-list {
   display: flex;

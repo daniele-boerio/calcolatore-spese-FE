@@ -4,9 +4,6 @@
 // della Home, i periodi dei Movimenti, gli intervalli dell'Analisi): duplicarli
 // significherebbe farli divergere.
 
-/** Giorni in una settimana, con lunedì in prima posizione. */
-export const WEEK_LENGTH = 7;
-
 const MS_PER_DAY = 86_400_000;
 
 /** Le date viaggiano come "YYYY-MM-DD": la formattiamo senza passare da UTC. */
@@ -25,20 +22,6 @@ export function addDays(date: Date, days: number): Date {
   const shifted = startOfDay(date);
   shifted.setDate(shifted.getDate() + days);
   return shifted;
-}
-
-/** Lunedì della settimana che contiene `date`. */
-export function startOfWeek(date: Date): Date {
-  const start = startOfDay(date);
-  // getDay(): 0 = domenica. Con la settimana che parte di lunedì, la domenica
-  // è il settimo giorno, non il primo.
-  const offset = (start.getDay() + 6) % WEEK_LENGTH;
-  start.setDate(start.getDate() - offset);
-  return start;
-}
-
-export function endOfWeek(date: Date): Date {
-  return addDays(startOfWeek(date), WEEK_LENGTH - 1);
 }
 
 export function startOfMonth(date: Date): Date {

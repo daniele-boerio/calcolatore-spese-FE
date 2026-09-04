@@ -72,10 +72,9 @@
     font-weight: 600;
   }
 
-  &__orphans-value {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: -0.02em;
+  &__orphans-hint {
+    font-size: 12px;
+    color: v.$muted;
   }
 
   &__add {

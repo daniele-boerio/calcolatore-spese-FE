@@ -6,7 +6,6 @@ import { Page, PageContent, PageHeader } from "../../components/page/page";
 import { Card, CardTitle } from "../../components/card/card";
 import SegmentedControl from "../../components/segmented_control/segmented_control";
 import Chip from "../../components/chip/chip";
-import Amount from "../../components/amount/amount";
 import Alert from "../../components/alert/alert";
 import EmptyState from "../../components/empty_state/empty_state";
 import Button from "../../components/button/button";
@@ -221,10 +220,9 @@ export default function CategoryPage() {
                     <span className="taxonomy__orphans-title">
                       {t("taxonomy_uncategorized")}
                     </span>
-                    <Amount
-                      className="taxonomy__orphans-value"
-                      value={Math.abs(uncategorized.totale)}
-                    />
+                    <span className="taxonomy__orphans-hint">
+                      {t("taxonomy_uncategorized_hint")}
+                    </span>
                   </div>
 
                   <Button
@@ -250,7 +248,6 @@ export default function CategoryPage() {
                 />
               ) : (
                 visible.map((categoria) => {
-                  const detail = totals.get(categoria.nome);
                   const isOpen = expanded === categoria.id;
                   const children = categoria.sottocategorie ?? [];
 
@@ -274,26 +271,11 @@ export default function CategoryPage() {
                           <span className="category-card__name">
                             {categoria.nome}
                           </span>
-                          <span className="category-card__meta">
-                            {[
-                              children.length > 0
-                                ? `${children.length} ${t("taxonomy_subcategories")}`
-                                : null,
-                              detail ? (
-                                <Amount
-                                  key="amount"
-                                  value={Math.abs(detail.totale)}
-                                />
-                              ) : null,
-                            ]
-                              .filter(Boolean)
-                              .map((piece, index) => (
-                                <span key={index}>
-                                  {index > 0 && " · "}
-                                  {piece}
-                                </span>
-                              ))}
-                          </span>
+                          {children.length > 0 && (
+                            <span className="category-card__meta">
+                              {`${children.length} ${t("taxonomy_subcategories")}`}
+                            </span>
+                          )}
                         </span>
 
                         <i
@@ -304,28 +286,14 @@ export default function CategoryPage() {
 
                       {isOpen && (
                         <div className="category-card__children">
-                          {children.map((sub) => {
-                            const subTotal = detail?.sottocategorie.find(
-                              (item) => item.sottocategoria === sub.nome,
-                            );
-
-                            return (
-                              <Chip
-                                key={sub.id}
-                                variant="solid"
-                                label={sub.nome}
-                                meta={
-                                  subTotal ? (
-                                    <Amount
-                                      value={Math.abs(subTotal.totale)}
-                                      decimals={0}
-                                    />
-                                  ) : undefined
-                                }
-                                onClick={() => openCategory(categoria)}
-                              />
-                            );
-                          })}
+                          {children.map((sub) => (
+                            <Chip
+                              key={sub.id}
+                              variant="solid"
+                              label={sub.nome}
+                              onClick={() => openCategory(categoria)}
+                            />
+                          ))}
 
                           <Chip
                             variant="dashed"

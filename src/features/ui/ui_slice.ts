@@ -12,8 +12,9 @@ import { persistTheme, readStoredTheme, ThemePreference } from "./theme";
 
 const HIDE_AMOUNTS_STORAGE_KEY = "hideAmounts";
 
-// L'undo di un'eliminazione resta a disposizione cinque secondi.
-const DEFAULT_TOAST_DURATION = 5000;
+// Il tempo di leggere una conferma di due parole e non uno di più. I toast
+// con un'azione dentro passano una durata loro: quelli vanno letti davvero.
+const DEFAULT_TOAST_DURATION = 2500;
 
 const initialState: UiState = {
   theme: readStoredTheme(),

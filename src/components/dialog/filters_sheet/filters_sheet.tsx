@@ -201,7 +201,7 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
             { value: "", label: t("mov_type_all") },
             { value: "USCITA", label: t("expenses") },
             { value: "ENTRATA", label: t("income") },
-            { value: "RICARICA", label: t("transfer") },
+            { value: "RICARICA", label: t("tx_type_transfer") },
           ]}
           onChange={(value) =>
             dispatch(updateFilters({ tipo: value || undefined }))

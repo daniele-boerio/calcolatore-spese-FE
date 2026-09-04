@@ -9,10 +9,6 @@ export interface UpcomingRecurrence {
 
 export interface HomeState {
   loading: boolean;
-  /** Spesa per giorno della settimana corrente, lunedì → domenica. */
-  weekSpending: number[];
-  /** Lunedì della settimana coperta da `weekSpending`, come "YYYY-MM-DD". */
-  weekStart: string | null;
   upcoming: UpcomingRecurrence[];
   /** Giorni di orizzonte della card "In arrivo". */
   upcomingDays: number;

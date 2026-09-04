@@ -2,19 +2,15 @@ import { Action, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store/store";
 import { HomeState, UpcomingRecurrence } from "./interfaces";
 import { ExpenseCompositionOut } from "../charts/interfaces";
-import { PaginatedResponse } from "../transactions/interfaces";
-import { monthlyAverage, spendingByWeekday, WEEK_LENGTH } from "./derive";
+import { monthlyAverage } from "./derive";
 import {
   getCategoryAverages,
   getPreviousMonthExpenses,
   getUpcomingRecurrences,
-  getWeekSpending,
 } from "./api_calls";
 
 const initialState: HomeState = {
   loading: false,
-  weekSpending: new Array<number>(WEEK_LENGTH).fill(0),
-  weekStart: null,
   upcoming: [],
   upcomingDays: 0,
   previousMonthExpenses: null,
@@ -29,25 +25,6 @@ const homeSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(
-        getWeekSpending.fulfilled,
-        (
-          state,
-          action: PayloadAction<{
-            transactions: PaginatedResponse["data"];
-            weekStart: string;
-          }>,
-        ) => {
-          const { transactions, weekStart } = action.payload;
-
-          state.weekStart = weekStart;
-          state.weekSpending = spendingByWeekday(
-            transactions,
-            new Date(`${weekStart}T00:00:00`),
-          );
-        },
-      )
-
       .addCase(
         getUpcomingRecurrences.fulfilled,
         (
@@ -106,9 +83,6 @@ const homeSlice = createSlice({
 });
 
 export const selectHomeLoading = (state: RootState) => state.home.loading;
-
-export const selectHomeWeekSpending = (state: RootState) =>
-  state.home.weekSpending;
 
 export const selectHomeUpcoming = (state: RootState) => state.home.upcoming;
 

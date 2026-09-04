@@ -38,14 +38,12 @@ import {
   getCategoryAverages,
   getPreviousMonthExpenses,
   getUpcomingRecurrences,
-  getWeekSpending,
 } from "../../features/home/api_calls";
 import {
   selectHomeCategoryAverages,
   selectHomePreviousMonthExpenses,
   selectHomeUpcoming,
   selectHomeUpcomingDays,
-  selectHomeWeekSpending,
 } from "../../features/home/home_slice";
 import { percentDelta } from "../../features/home/derive";
 import { openSheet } from "../../features/ui/ui_slice";
@@ -60,7 +58,6 @@ const AVERAGE_MONTHS = 3;
 const ABOVE_AVERAGE_RATIO = 1.1;
 const TOP_CATEGORIES = 4;
 const LATEST_TRANSACTIONS = 3;
-const WEEK_LENGTH = 7;
 
 const localeTag = () => (getLocale() === "it" ? "it-IT" : "en-GB");
 
@@ -94,7 +91,6 @@ export default function HomePage() {
   const transactions = useAppSelector(selectTransactionTransactions);
   const transactionsLoading = useAppSelector(selectTransactionLoading);
 
-  const weekSpending = useAppSelector(selectHomeWeekSpending);
   const upcoming = useAppSelector(selectHomeUpcoming);
   const upcomingDays = useAppSelector(selectHomeUpcomingDays);
   const previousMonthExpenses = useAppSelector(selectHomePreviousMonthExpenses);
@@ -110,7 +106,6 @@ export default function HomePage() {
     dispatch(getLastTransactions({ n: LATEST_TRANSACTIONS }));
 
     // Dati che il BE non espone come tali: li ricompone lo slice `home`.
-    dispatch(getWeekSpending());
     dispatch(getUpcomingRecurrences({ days: UPCOMING_DAYS }));
     dispatch(getPreviousMonthExpenses());
     dispatch(getCategoryAverages({ months: AVERAGE_MONTHS }));
@@ -179,23 +174,19 @@ export default function HomePage() {
           stats={[
             {
               label: t("home_income"),
-              value: <Amount value={income} decimals={0} hideCurrency />,
+              value: <Amount value={income} decimals={0} />,
             },
             {
               label: t("home_savings"),
-              value: (
-                <Amount value={budget.remaining ?? 0} decimals={0} hideCurrency />
-              ),
+              value: <Amount value={budget.remaining ?? 0} decimals={0} />,
               tone: (budget.remaining ?? 0) >= 0 ? "positive" : "negative",
             },
             {
               label: t("home_net_worth"),
-              value: <Amount value={netWorth} decimals={0} hideCurrency />,
+              value: <Amount value={netWorth} decimals={0} />,
             },
           ]}
         />
-
-        <WeekCard spending={weekSpending} />
 
         <Card>
           <CardTitle
@@ -443,75 +434,6 @@ function HeroCard({
           <i className="pi pi-chevron-right" aria-hidden="true" />
         </Link>
       )}
-    </Card>
-  );
-}
-
-function WeekCard({ spending }: { spending: number[] }) {
-  const { t } = useI18n();
-
-  // getDay(): 0 = domenica. La settimana del design parte di lunedì.
-  const todayIndex = (new Date().getDay() + 6) % WEEK_LENGTH;
-
-  const max = Math.max(...spending, 0);
-  const total = spending.reduce((sum, value) => sum + value, 0);
-  // La media è sui giorni già trascorsi: dividere sempre per sette la farebbe
-  // sembrare bassa a metà settimana.
-  const average = total / (todayIndex + 1);
-
-  const labels = useMemo(() => {
-    const start = new Date();
-    start.setDate(start.getDate() - todayIndex);
-
-    return Array.from({ length: WEEK_LENGTH }, (_, index) => {
-      const day = new Date(start);
-      day.setDate(day.getDate() + index);
-      return new Intl.DateTimeFormat(localeTag(), { weekday: "narrow" }).format(
-        day,
-      );
-    });
-  }, [todayIndex]);
-
-  return (
-    <Card>
-      <CardTitle
-        aside={
-          <>
-            {`${t("home_average")} `}
-            <strong>
-              <Amount value={average} decimals={0} />
-            </strong>
-            {t("home_per_day")}
-          </>
-        }
-      >
-        {t("home_this_week")}
-      </CardTitle>
-
-      <div className="week-chart">
-        {spending.map((value, index) => {
-          const isFuture = index > todayIndex;
-          const isMax = max > 0 && value === max;
-          const height = max > 0 ? Math.round((value / max) * 100) : 0;
-
-          const variant = isFuture ? "future" : isMax ? "max" : "past";
-
-          return (
-            <div className="week-chart__day" key={index}>
-              <div
-                className={`week-chart__bar week-chart__bar--${variant}`}
-                // 8% è la soglia sotto cui una barra non si legge più.
-                style={{ height: `${Math.max(height, 8)}%` }}
-              />
-              <span
-                className={`week-chart__label${isMax ? " week-chart__label--max" : ""}`}
-              >
-                {labels[index]}
-              </span>
-            </div>
-          );
-        })}
-      </div>
     </Card>
   );
 }

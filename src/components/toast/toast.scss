@@ -33,20 +33,23 @@
 
   animation: toast-in v.$dur-sheet v.$ease-sheet;
 
+  // Fondo pieno, non la superficie invertita: al buio quella è trasparente e
+  // il toast finiva per leggersi attraverso la pagina.
   &--success {
-    background: v.$invert-surface;
-    border-color: v.$invert-border;
-    color: v.$invert-ink;
+    background: v.$toast-bg;
+    color: v.$toast-ink;
+    box-shadow: v.$shadow-sheet;
 
     .toast__icon,
     .toast__action {
-      color: v.$invert-meta;
+      color: v.$toast-meta;
     }
   }
 
   &--error {
     background: v.$surface;
     border-color: v.$negative-line;
+    box-shadow: v.$shadow-sheet;
 
     .toast__icon {
       color: v.$negative;
@@ -89,7 +92,7 @@
   }
 
   &--success &__meta {
-    color: v.$invert-meta;
+    color: v.$toast-meta;
   }
 
   &__action {

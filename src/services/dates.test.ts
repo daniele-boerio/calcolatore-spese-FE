@@ -3,10 +3,8 @@ import {
   addDays,
   daysBetweenIso,
   endOfMonth,
-  endOfWeek,
   relativeTime,
   startOfMonth,
-  startOfWeek,
   toIsoDate,
 } from "./dates";
 
@@ -21,13 +19,7 @@ describe("toIsoDate", () => {
   });
 });
 
-describe("confini di settimana e mese", () => {
-  it("la settimana parte di lunedì", () => {
-    // 2026-09-03 è un giovedì.
-    expect(toIsoDate(startOfWeek(new Date(2026, 8, 3)))).toBe("2026-08-31");
-    expect(toIsoDate(endOfWeek(new Date(2026, 8, 3)))).toBe("2026-09-06");
-  });
-
+describe("confini di mese", () => {
   it("il mese finisce sull'ultimo giorno vero", () => {
     expect(toIsoDate(endOfMonth(new Date(2028, 1, 10)))).toBe("2028-02-29");
     expect(toIsoDate(startOfMonth(new Date(2026, 8, 20)))).toBe("2026-09-01");
