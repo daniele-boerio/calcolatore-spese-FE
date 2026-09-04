@@ -56,16 +56,45 @@
       })();
 
       // Fix mobile viewport height (iOS Safari): set --app-height to window.innerHeight
-      // and update on resize/orientation changes. Used instead of relying solely on 100dvh.
+      // and update on resize/orientation changes. Also set element heights directly
+      // to avoid initial layout flashes that require the user to scroll.
       (function () {
-        function setAppHeight() {
-          document.documentElement.style.setProperty('--app-height', window.innerHeight + 'px');
+        function applyHeights(h) {
+          try {
+            document.documentElement.style.setProperty('--app-height', h + 'px');
+            // Also set explicit heights to avoid initial paint issues where CSS
+            // using the variable is not yet applied.
+            document.documentElement.style.height = h + 'px';
+            document.body.style.height = h + 'px';
+            var root = document.getElementById('root');
+            if (root) root.style.height = h + 'px';
+          } catch (e) {}
         }
+
+        function setAppHeight() {
+          var h = window.innerHeight || (window.visualViewport && window.visualViewport.height) || 0;
+          applyHeights(h);
+        }
+
+        // Run before paint if possible
         setAppHeight();
-        window.addEventListener('resize', setAppHeight);
-        window.addEventListener('orientationchange', setAppHeight);
+        // also schedule a rAF to ensure layout is stable
+        requestAnimationFrame(setAppHeight);
+
+        window.addEventListener('resize', function () {
+          setAppHeight();
+          requestAnimationFrame(setAppHeight);
+        });
+        window.addEventListener('orientationchange', function () {
+          setAppHeight();
+          requestAnimationFrame(setAppHeight);
+        });
+
         if (window.visualViewport) {
-          window.visualViewport.addEventListener('resize', setAppHeight);
+          window.visualViewport.addEventListener('resize', function () {
+            setAppHeight();
+            requestAnimationFrame(setAppHeight);
+          });
         }
       })();
     </script>

@@ -59,8 +59,9 @@ body {
     min-height: 0;
     overflow-y: auto;
     // Lo spazio in fondo mantiene l'ultima card sopra la tab bar.
-    // Usare l'altezza dichiarata della tab bar invece di un valore hard-coded.
-    padding: 0 var(--gutter) calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+    // Usare l'altezza dichiarata della tab bar ma ridurre leggermente il gap
+    // per evitare spazio eccessivo sotto il menu su iOS PWA.
+    padding: 0 var(--gutter) calc(var(--tabbar-h) - 18px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     gap: var(--gap-card);
@@ -93,7 +94,7 @@ body {
 // Limitare l'altezza e rendere lo slot scrollabile evita che il padding-bottom
 // allarghi il documento oltre --app-height su iOS PWA.
 .App > *:not(.page):not(.tab-bar) {
-  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom));
+padding-bottom: calc(var(--tabbar-h) - 18px + env(safe-area-inset-bottom));
   max-height: var(--app-height);
   overflow-y: auto;
   box-sizing: border-box;
