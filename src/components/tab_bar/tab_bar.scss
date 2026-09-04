@@ -9,7 +9,6 @@
 
   width: 100%;
   max-width: v.$app-max-width;
-  height: calc(v.$tabbar-h + env(safe-area-inset-bottom));
 
   display: flex;
   align-items: center;
@@ -24,7 +23,6 @@
     flex: 1;
     min-width: 0;
     min-height: v.$tap-target;
-    padding-top: 12px;
 
     display: flex;
     align-items: center;
