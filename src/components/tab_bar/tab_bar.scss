@@ -14,6 +14,11 @@
   align-items: center;
   justify-content: space-around;
 
+  // Sotto la barra c'è l'indicatore di sistema del telefono: senza questo
+  // margine le icone ci finiscono sopra e si toccano male.
+  min-height: v.$tabbar-h;
+  padding-bottom: env(safe-area-inset-bottom);
+
   background: v.$tabbar-bg;
   border-top: 1px solid v.$line;
   box-shadow: v.$shadow-tabbar;

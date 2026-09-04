@@ -1,18 +1,21 @@
-/* Reset per l'app a tutto schermo: l'altezza viene da --app-height (token
-   100dvh, rifinito da index.html sul viewport vero), così il documento non
-   supera mai il viewport visibile su iOS. */
-html, body, #root {
-  height: var(--app-height);
-  min-height: var(--app-height);
+/* A scorrere è il documento, non un riquadro dentro la pagina.
+   `dvh` è l'altezza che resta davvero visibile: su iOS `vh` conta anche la
+   fascia coperta dalle barre di sistema. La riga in `vh` resta come ripiego.
+   Nessuna altezza fissa: un'altezza calcolata può venire zero — e un'app alta
+   zero è una schermata vuota. */
+html,
+body,
+#root {
+  min-height: 100vh;
+  min-height: 100dvh;
   margin: 0;
   padding: 0;
-  /* Prevent the document from scrolling — only the content area should scroll */
-  overflow: hidden;
-  /* Disable overscroll/bounce at document level (iOS/Chromium)
-     and avoid scroll chaining to the viewport. */
-  overscroll-behavior: none;
-  overscroll-behavior-y: none;
-  -webkit-overflow-scrolling: auto;
+}
+
+body {
+  /* Toglie lo zoom da doppio tocco, e con lui i 300 ms di attesa prima che un
+     tocco diventi un clic. Il pinch resta: chi ha bisogno di ingrandire può. */
+  touch-action: manipulation;
 }
 
 /* Ensure fixed elements (tab bar) are painted above the page content */

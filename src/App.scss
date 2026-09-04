@@ -35,37 +35,39 @@ body {
   box-sizing: border-box;
 }
 
-// Layout comune a tutte le schermate principali: header fermo in alto,
-// contenuto che scorre sotto, tab bar fissa in fondo.
+// Layout comune a tutte le schermate principali: intestazione appiccicata in
+// cima, contenuto che scorre col documento, tab bar fissa in fondo.
+//
+// A scorrere è la pagina, non un riquadro interno: è il modello che regge
+// meglio sui telefoni, dove un contenitore con `overflow: auto` dentro un
+// documento a scroll bloccato litiga con le barre di sistema. La barra in
+// fondo è `fixed` e non occupa spazio nel flusso: glielo tiene il padding
+// di `__content`.
 .page {
   display: flex;
   flex-direction: column;
-  // Altezza definita, non `min-height`: serve perché l'area di contenuto
-  // scorra al suo interno lasciando fermo l'header.
-  // Usare la variabile --app-height impostata dallo script inline per evitare
-  // il comportamento dinamico di 100dvh su iOS (Dynamic Island / UI changes).
-  height: var(--app-height);
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
 
   &__header {
-    flex: 0 0 auto;
+    // Resta in vista mentre la pagina scorre: dentro ci sono la ricerca e i
+    // totali, che servono anche a metà lista. Sticky e non fixed: sta nel
+    // flusso, quindi non serve compensarne l'altezza da nessuna parte.
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--bg);
     /* Considera l'area superiore sicura (es. Dynamic Island) quando presente */
     padding: calc(20px + env(safe-area-inset-top)) var(--gutter) 14px;
   }
 
   &__content {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
-    touch-action: pan-y;
-    // Lo spazio in fondo mantiene l'ultima card sopra la tab bar, che è
-    // opaca e fissa: vale la sua altezza — misurata da index.html su
-    // --tabbar-h, che essendo presa sulla barra dipinta comprende già la
-    // safe area — più un filo d'aria.
-    padding: 0 var(--gutter) calc(var(--tabbar-h) + 8px);
+    // Lo spazio in fondo tiene il posto della tab bar, che è opaca, fissa e
+    // fuori dal flusso: l'altezza della barra più la safe area che la barra
+    // si aggiunge sotto, più un filo d'aria.
+    padding: 0 var(--gutter)
+      calc(var(--tabbar-h) + 8px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column;
     gap: var(--gap-card);
@@ -88,23 +90,18 @@ body {
   width: 100%;
   max-width: var(--app-max-width);
   margin-inline: auto;
-  min-height: var(--app-height);
+  min-height: 100vh;
+  min-height: 100dvh;
   position: relative;
-  /* Ensure the root app container doesn't cause page scrolling; content areas handle scrolling */
-  overflow: hidden;
 }
 
 // COMPATIBILITÀ — DA RIMUOVERE
 // La tab bar sta sopra il contenuto e le schermate non ancora convertite al
 // layout `.page` non lo sanno: lo spazio per non finirci sotto lo mettiamo qui.
-// Limitare l'altezza e rendere lo slot scrollabile evita che il padding-bottom
-// allarghi il documento oltre --app-height su iOS PWA.
 // Solo dove la barra c'è davvero: sull'accesso non esiste, e riservarle
 // spazio lascerebbe un vuoto in fondo alla schermata.
 .App:has(.tab-bar) > *:not(.page):not(.tab-bar) {
-  padding-bottom: calc(var(--tabbar-h) + 8px);
-  max-height: var(--app-height);
-  overflow-y: auto;
+  padding-bottom: calc(var(--tabbar-h) + 8px + env(safe-area-inset-bottom));
   box-sizing: border-box;
 }
 
