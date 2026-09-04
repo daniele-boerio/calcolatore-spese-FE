@@ -93,3 +93,37 @@ export const restoreSession = createAsyncThunk<AuthResponse | null, void>(
     }
   },
 );
+
+/**
+ * Cambia lo username. Il server ritorna il profilo aggiornato, con le stesse
+ * regole della registrazione: minuscolo e unico.
+ */
+export const updateUsername = createAsyncThunk<ProfileResponse, string>(
+  "profile/updateUsername",
+  async (username, { rejectWithValue }) => {
+    try {
+      const response = await api.put<ProfileResponse>("/me", { username });
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(err.response?.data || "Errore cambio username");
+    }
+  },
+);
+
+/**
+ * Chiede la mail per reimpostare la password: è lo stesso flusso della
+ * schermata di accesso, e il server risponde sempre allo stesso modo — non
+ * dice se l'indirizzo esiste.
+ */
+export const requestPasswordReset = createAsyncThunk<void, string>(
+  "profile/requestPasswordReset",
+  async (email, { rejectWithValue }) => {
+    try {
+      await api.post("/forgot-password", { email });
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(err.response?.data || "Errore invio email");
+    }
+  },
+);

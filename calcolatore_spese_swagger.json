@@ -117,6 +117,51 @@
             "HTTPBearer": []
           }
         ]
+      },
+      "put": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Update Me",
+        "description": "Cambia lo username dal profilo.\n\nLe stesse regole della registrazione: minuscolo e unico. Il token resta\nvalido — l'identità è l'id, non il nome.",
+        "operationId": "update_me_me_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/monthlyBudget": {
@@ -8061,6 +8106,20 @@
           "type"
         ],
         "title": "ValidationError"
+      },
+      "UserUpdate": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "title": "UserUpdate",
+        "description": "Quello che l'utente può cambiare di sé dal profilo.\n\nSolo lo username: l'email identifica l'account (ci arriva il link di reset\npassword) e cambiarla è un'altra cosa; la password si cambia dal flusso di\nreset, che passa dalla casella di posta."
       }
     },
     "securitySchemes": {

@@ -1,148 +1,181 @@
 @use "../../../styles/variables" as v;
 
-.account-dialog {
-  .p-dialog-content {
-    padding: 1.5rem;
-  }
-
-  &.p-dialog-maximized {
-    overflow: hidden;
-  }
-
-  .account-settings-dialog-content {
+.account-sheet {
+  &__section {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-
-    // Struttura a righe per i campi
-    .form-row {
-      display: flex;
-      flex-direction: row;
-      gap: 1.25rem;
-      width: 100%;
-
-      .field {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        min-width: 0; // Evita che i flex-item rompano il layout con contenuti lunghi
-        justify-content: center;
-
-        .field-label {
-          color: v.$text-main;
-          font-size: 0.85rem;
-          font-weight: 600;
-          margin-bottom: 4px;
-        }
-
-        // Stile per i componenti PrimeReact (Calendar e Dropdown interna)
-        .p-calendar,
-        .p-dropdown {
-          width: 100%;
-        }
-      }
-    }
-
-    // Sezione Ricarica Automatica
-    .recharge-section {
-      margin-top: 1rem;
-      padding: 1.25rem;
-      background-color: color-mix(in srgb, v.$text-main 3%, transparent);
-      border-radius: 8px;
-      border: 1px solid v.$border-color;
-
-      .switch-container {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 1rem;
-
-        label {
-          font-size: 0.85rem;
-          font-weight: 600;
-          color: v.$text-main;
-        }
-      }
-
-      .calendar-field {
-        .field-label {
-          color: v.$text-main;
-          font-size: 0.85rem;
-          font-weight: 600;
-        }
-      }
-
-      .recharge-details {
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        padding-top: 1rem;
-        border-top: 1px dashed v.$border-color;
-      }
-    }
+    gap: 10px;
   }
 
-  .buttons-footer-dialog {
+  &__label {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: v.$muted;
+  }
+
+  &__hint {
+    font-size: 12px;
+    font-weight: 400;
+    color: v.$muted;
+  }
+
+  // Quattro tipi in griglia: due colonne si leggono meglio di una fila di
+  // quattro pillole strette.
+  &__types {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  &__type {
     display: flex;
-    justify-content: flex-end;
-    gap: 0.75rem;
-    padding-top: 1rem;
+    align-items: center;
+    gap: 10px;
+    min-height: v.$tap-target;
+    padding: 15px 16px;
 
-    button {
-      min-width: 10rem;
+    border: 1.5px solid transparent;
+    border-radius: v.$r-field;
+    background: v.$bg;
+    color: v.$ink;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+
+    i {
+      font-size: 15px;
+      color: v.$muted;
     }
-  }
-}
 
-.p-colorpicker-panel {
-  touch-action: none;
-  position: fixed;
-  background-color: v.$bg-dialog;
-  border: 1px solid v.$border-dialog;
-}
+    &[aria-checked="true"] {
+      background: v.$accent-soft;
+      border-color: v.$accent;
+      color: v.$accent;
+      font-weight: 700;
 
-.color-picker-custom {
-  // PrimeReact usa un div con questa classe per l'anteprima del colore
-  input {
-    background-color: var(--selected-color) !important;
-    border: 1px solid v.$border-color;
-    border-radius: 4px;
-  }
-}
-
-// Animazione per l'apertura dei dettagli ricarica
-.animate-fade-in {
-  animation: fadeInDown 0.3s ease-out;
-}
-
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Mobile Responsive
-@media screen and (max-width: v.$mobile) {
-  .account-dialog {
-    .account-settings-dialog-content {
-      .form-row {
-        flex-direction: column; // I campi vanno uno sotto l'altro su mobile
-        gap: 1.5rem;
+      i {
+        color: v.$accent;
       }
     }
 
-    .buttons-footer-dialog {
-      flex-direction: column;
+    &:active {
+      transform: scale(0.98);
+      transition: transform v.$dur-press;
+    }
+  }
 
-      button {
-        width: 100%;
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  &__control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: v.$tap-target;
+    padding: 15px 16px;
+
+    box-sizing: border-box;
+    border-radius: v.$r-field;
+    background: v.$bg;
+
+    input {
+      flex: 1;
+      min-width: 0;
+      border: 0;
+      background: transparent;
+      color: v.$ink;
+      font-family: inherit;
+      font-size: 15px;
+
+      &::placeholder {
+        color: v.$muted-2;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &[type="date"] {
+        font-weight: 600;
+
+        &::-webkit-calendar-picker-indicator {
+          display: none;
+        }
       }
     }
+  }
+
+  &__suffix {
+    flex: 0 0 auto;
+    font-size: 15px;
+    color: v.$muted-2;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: v.$tap-target;
+    padding: 14px 16px;
+
+    border: 0;
+    border-radius: v.$r-field;
+    background: v.$bg;
+    color: inherit;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    i {
+      flex: 0 0 auto;
+      font-size: 12px;
+      color: v.$muted-2;
+    }
+  }
+
+  &__row-text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__value {
+    font-size: 14.5px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &--empty {
+      color: v.$muted-2;
+      font-weight: 500;
+    }
+  }
+
+  &__switch {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+
+    border-radius: v.$r-field;
+    background: v.$bg;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  &__switch-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
   }
 }

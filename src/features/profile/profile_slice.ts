@@ -5,6 +5,7 @@ import {
   logout,
   register,
   restoreSession,
+  updateUsername,
 } from "./api_calls";
 import { AuthResponse, ProfileResponse, ProfileState } from "./interfaces";
 import { RootState } from "../../store/store";
@@ -75,6 +76,13 @@ const profileSlice = createSlice({
           localStorage.setItem("username", action.payload.username);
         },
       )
+
+      // Lo username nuovo arriva col profilo aggiornato: stesso payload della
+      // GET, quindi lo stesso reducer.
+      .addCase(updateUsername.fulfilled, (state, action) => {
+        state.username = action.payload.username;
+        localStorage.setItem("username", action.payload.username);
+      })
 
       .addCase(
         getProfile.fulfilled,

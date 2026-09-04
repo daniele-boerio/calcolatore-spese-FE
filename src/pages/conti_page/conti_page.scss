@@ -231,3 +231,16 @@
     }
   }
 }
+
+// Carta senza obiettivo né banca: niente da raccontare sotto al nome.
+.account-card--compact {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  .account-card__compact-balance {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+}

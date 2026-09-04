@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
@@ -47,6 +47,7 @@ import {
 } from "../../features/home/home_slice";
 import { percentDelta } from "../../features/home/derive";
 import { openSheet } from "../../features/ui/ui_slice";
+import ProfileSheet from "../../components/dialog/profile_sheet/profile_sheet";
 import { selectProfileUsername } from "../../features/profile/profile_slice";
 import "./home_page.scss";
 
@@ -81,6 +82,8 @@ const initialsOf = (username: string | null) =>
 export default function HomePage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const spending = useAppSelector(selectContiMonthlySpending);
   const budget = useAppSelector(selectContiMonthlyBudget);
@@ -142,6 +145,7 @@ export default function HomePage() {
   const upcomingTotal = upcoming.reduce((sum, item) => sum + item.importo, 0);
 
   return (
+    <>
     <Page className="home-page">
       <PageHeader className="home-page__header">
         <div className="home-page__salute">
@@ -153,9 +157,14 @@ export default function HomePage() {
           </span>
         </div>
 
-        <span className="home-page__avatar" aria-hidden="true">
+        <button
+          type="button"
+          className="home-page__avatar"
+          aria-label={t("profile_title")}
+          onClick={() => setProfileOpen(true)}
+        >
           {initialsOf(username)}
-        </span>
+        </button>
       </PageHeader>
 
       <PageContent>
@@ -346,6 +355,11 @@ export default function HomePage() {
         </Card>
       </PageContent>
     </Page>
+
+      {profileOpen && (
+        <ProfileSheet open onClose={() => setProfileOpen(false)} />
+      )}
+    </>
   );
 }
 

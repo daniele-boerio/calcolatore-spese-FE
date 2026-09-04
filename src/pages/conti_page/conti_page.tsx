@@ -36,14 +36,25 @@ const localeTag = () => (getLocale() === "it" ? "it-IT" : "en-GB");
 /** Il conto in attesa di conferma di eliminazione, col suo conto transazioni. */
 type PendingDelete = { conto: Conto; transactions: number | null };
 
-const isSalvadanaio = (conto: Conto) => Boolean(conto.budget_obiettivo);
 const isCollegato = (conto: Conto) => Boolean(conto.bank_connector_account_id);
 
-const contoIcon = (conto: Conto) => {
-  if (isCollegato(conto)) return "pi pi-building-columns";
-  if (isSalvadanaio(conto)) return "pi pi-wallet";
-  return "pi pi-credit-card";
+// L'icona segue il tipo scelto; i conti aperti prima che i tipi esistessero si
+// riconoscono dai campi che hanno.
+const ICONE: Record<string, string> = {
+  conto: "pi pi-building-columns",
+  carta: "pi pi-credit-card",
+  salvadanaio: "pi pi-wallet",
+  contanti: "pi pi-money-bill",
 };
+
+const tipoOf = (conto: Conto) => {
+  if (conto.tipo) return conto.tipo;
+  if (conto.budget_obiettivo) return "salvadanaio";
+  if (conto.ricarica_automatica) return "carta";
+  return "conto";
+};
+
+const contoIcon = (conto: Conto) => ICONE[tipoOf(conto)] ?? ICONE.conto;
 
 export default function ContiPage() {
   const { t } = useI18n();
@@ -289,15 +300,19 @@ export default function ContiPage() {
         </PageContent>
       </Page>
 
-      <AccountDialog
-        visible={isAccountDialogVisible}
-        account={editing!}
-        onHide={() => {
-          setIsAccountDialogVisible(false);
-          setEditing(null);
-        }}
-        loading={loading}
-      />
+      {/* Montato solo da aperto: il form nasce già sul conto giusto, senza un
+          effetto che lo rimetta a posto a ogni apertura. */}
+      {isAccountDialogVisible && (
+        <AccountDialog
+          visible
+          account={editing}
+          onHide={() => {
+            setIsAccountDialogVisible(false);
+            setEditing(null);
+          }}
+          loading={loading}
+        />
+      )}
 
       <BankConnectDialog
         visible={Boolean(bankAccount)}
@@ -357,6 +372,24 @@ function ContoCard({
 
   const sync = relativeTime(conto.bank_connector_last_sync, localeTag());
   const syncFailed = Boolean(conto.bank_connector_last_error);
+
+  // Una carta non ha né obiettivo né sincronizzazione da raccontare: sta su
+  // una riga sola, come nel design.
+  if (tipoOf(conto) === "carta" && !isCollegato(conto)) {
+    return (
+      <Card className="account-card account-card--compact">
+        <span className="account-card__icon" aria-hidden="true">
+          <i className={contoIcon(conto)} />
+        </span>
+
+        <span className="account-card__name">{conto.nome}</span>
+
+        <Amount className="account-card__compact-balance" value={saldo} />
+
+        {actions}
+      </Card>
+    );
+  }
 
   return (
     <Card className="account-card">

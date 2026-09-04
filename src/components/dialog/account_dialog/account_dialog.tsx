@@ -1,17 +1,15 @@
-import { useState, useEffect } from "react";
-import { Dialog } from "primereact/dialog";
-import Calendar from "../../calendar/calendar";
-import Dropdown from "../../dropdown/dropdown";
-import InputText from "../../input_text/input_text";
-import Button from "../../legacy_button/legacy_button";
+import { ReactNode, useState } from "react";
+import Sheet from "../../sheet/sheet";
+import Button from "../../button/button";
+import Toggle from "../../toggle/toggle";
+import PickerSheet from "../../picker_sheet/picker_sheet";
 import "./account_dialog.scss";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { createConto, updateConto } from "../../../features/conti/api_calls";
 import { useI18n } from "../../../i18n/use-i18n";
 import { Conto } from "../../../features/conti/interfaces";
-import { ColorPicker } from "primereact/colorpicker";
-import Switch from "../../switch/switch";
 import { selectContiConti } from "../../../features/conti/conto_slice";
+import { toIsoDate } from "../../../services/dates";
 
 interface AccountDialogProps {
   visible: boolean;
@@ -20,298 +18,331 @@ interface AccountDialogProps {
   loading?: boolean;
 }
 
+/**
+ * I quattro tipi di conto del design. Non sono un'etichetta: decidono quali
+ * campi ha senso chiedere — un salvadanaio ha un obiettivo, una carta si
+ * ricarica, un conto e i contanti no.
+ */
+const TIPI = [
+  { value: "conto", icon: "pi pi-building-columns", labelKey: "account_type_bank" },
+  { value: "carta", icon: "pi pi-credit-card", labelKey: "account_type_card" },
+  { value: "salvadanaio", icon: "pi pi-wallet", labelKey: "account_type_goal" },
+  { value: "contanti", icon: "pi pi-money-bill", labelKey: "account_type_cash" },
+] as const;
+
+const DEFAULT_TIPO = "conto";
+
+/**
+ * Il tipo di un conto creato prima che i tipi esistessero si deduce dai campi
+ * che ha: chi ha un obiettivo è un salvadanaio, chi si ricarica una carta.
+ */
+const tipoOf = (account: Conto) => {
+  if (account.tipo) return account.tipo;
+  if (account.budget_obiettivo) return "salvadanaio";
+  if (account.ricarica_automatica) return "carta";
+  return DEFAULT_TIPO;
+};
+
 export default function AccountDialog({
   visible,
   onHide,
   account,
-  loading: externalLoading,
+  loading,
 }: AccountDialogProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const allAccounts = useAppSelector(selectContiConti);
+  const conti = useAppSelector(selectContiConti);
 
-  const [nome, setNome] = useState("");
-  const [saldo, setSaldo] = useState<string>("");
-  const [defaultAccount, setDefaultAccount] = useState<boolean>(false);
-  const [budgetObiettivo, setBudgetObiettivo] = useState<string>("");
-  const [ricaricaAutomatica, setRicaricaAutomatica] = useState(false);
-  const [sogliaMinima, setSogliaMinima] = useState<string>("");
-  const [contoSorgenteId, setContoSorgenteId] = useState<string | null>(null);
-  const [frequenzaControllo, setFrequenzaControllo] = useState<string | null>(
-    null,
+  const [tipo, setTipo] = useState(() =>
+    account ? tipoOf(account) : DEFAULT_TIPO,
   );
-  const [prossimoControllo, setProssimoControllo] = useState<Date | null>(null);
+  const [nome, setNome] = useState(account?.nome ?? "");
+  const [saldo, setSaldo] = useState(account?.saldo.toString() ?? "");
+  const [predefinito, setPredefinito] = useState(account?.default ?? false);
+  const [obiettivo, setObiettivo] = useState(
+    account?.budget_obiettivo?.toString() ?? "",
+  );
+  const [ricarica, setRicarica] = useState(
+    account?.ricarica_automatica ?? false,
+  );
+  const [soglia, setSoglia] = useState(account?.soglia_minima?.toString() ?? "");
+  const [sorgenteId, setSorgenteId] = useState<string | null>(
+    account?.conto_sorgente_id ?? null,
+  );
+  const [frequenza, setFrequenza] = useState<string | null>(
+    account?.frequenza_controllo ?? null,
+  );
+  const [prossimoControllo, setProssimoControllo] = useState<Date | null>(() =>
+    account?.prossimo_controllo ? new Date(account.prossimo_controllo) : null,
+  );
 
-  const [color, setColor] = useState("4b6cb7");
+  const [picker, setPicker] = useState<null | "sorgente" | "frequenza">(null);
 
-  useEffect(() => {
-    if (visible) {
-      if (account) {
-        setNome(account.nome);
-        setSaldo(account.saldo.toString());
-        setDefaultAccount(account.default);
-        setBudgetObiettivo(
-          account.budget_obiettivo ? account.budget_obiettivo.toString() : "",
-        );
-        setRicaricaAutomatica(account.ricarica_automatica);
-        setSogliaMinima(
-          account.soglia_minima ? account.soglia_minima.toString() : "",
-        );
-        setContoSorgenteId(account.conto_sorgente_id ?? null);
-        setFrequenzaControllo(account.frequenza_controllo ?? null);
-        setProssimoControllo(
-          account.prossimo_controllo
-            ? new Date(account.prossimo_controllo)
-            : null,
-        );
-        setColor(account.color ?? "4b6cb7");
-      } else {
-        setNome("");
-        setSaldo("");
-        setDefaultAccount(false);
-        setBudgetObiettivo("");
-        setRicaricaAutomatica(false);
-        setSogliaMinima("");
-        setContoSorgenteId(null);
-        setFrequenzaControllo(null);
-        setProssimoControllo(null);
-        setColor("4b6cb7");
-      }
-    }
-  }, [visible, account]);
+  const isSalvadanaio = tipo === "salvadanaio";
+  const isCarta = tipo === "carta";
 
-  const frequenzaOptions = [
-    { label: t("weekly"), value: "SETTIMANALE" },
-    { label: t("monthly"), value: "MENSILE" },
+  // Il saldo può essere negativo (una carta in rosso), l'obiettivo e la soglia no.
+  const onNumber =
+    (set: (value: string) => void, allowNegative = false) =>
+    (raw: string) => {
+      const cleaned = raw.replace(",", ".");
+      const pattern = allowNegative ? /^-?\d*\.?\d{0,2}$/ : /^\d*\.?\d{0,2}$/;
+
+      if (cleaned === "" || pattern.test(cleaned)) set(cleaned);
+    };
+
+  const numberOr = (value: string, fallback = 0) => {
+    const parsed = parseFloat(value);
+    return Number.isNaN(parsed) ? fallback : parsed;
+  };
+
+  const frequenze = [
+    { id: "SETTIMANALE", label: t("weekly") },
+    { id: "MENSILE", label: t("monthly") },
   ];
 
-  const handleConfirm = async () => {
+  const sorgenti = conti.filter(
+    (item) => !item.virtuale && String(item.id) !== String(account?.id),
+  );
+
+  const save = async () => {
     if (!nome.trim()) return;
 
-    const numericSaldo = parseFloat(saldo);
-    const numericBudget = parseFloat(budgetObiettivo);
-    const numericSogliaMinima = parseFloat(sogliaMinima);
+    // Ogni tipo porta con sé solo i suoi campi: un conto corrente non deve
+    // trascinarsi dietro la soglia di ricarica di quando era una carta.
+    const ricaricaAttiva = isCarta && ricarica;
 
     const payload = {
       nome: nome.trim(),
-      saldo: isNaN(numericSaldo) ? 0 : numericSaldo,
-      default: defaultAccount,
-      budget_obiettivo: isNaN(numericBudget) ? 0 : numericBudget,
-      ricarica_automatica: ricaricaAutomatica,
-      soglia_minima: ricaricaAutomatica
-        ? isNaN(numericSogliaMinima)
-          ? 0
-          : numericSogliaMinima
-        : 0,
-      conto_sorgente_id: ricaricaAutomatica
-        ? (contoSorgenteId ?? undefined)
-        : undefined,
-      frequenza_controllo: ricaricaAutomatica
-        ? (frequenzaControllo ?? undefined)
-        : undefined,
+      saldo: numberOr(saldo),
+      tipo,
+      default: predefinito,
+      budget_obiettivo: isSalvadanaio ? numberOr(obiettivo) : 0,
+      ricarica_automatica: ricaricaAttiva,
+      soglia_minima: ricaricaAttiva ? numberOr(soglia) : 0,
+      conto_sorgente_id: ricaricaAttiva ? (sorgenteId ?? undefined) : undefined,
+      frequenza_controllo: ricaricaAttiva ? (frequenza ?? undefined) : undefined,
       prossimo_controllo:
-        ricaricaAutomatica && prossimoControllo
-          ? prossimoControllo.toISOString().split("T")[0]
+        ricaricaAttiva && prossimoControllo
+          ? toIsoDate(prossimoControllo)
           : undefined,
-      color: color,
     };
 
-    if (account?.id) {
-      await dispatch(updateConto({ id: account.id, ...payload })).unwrap();
-    } else {
-      await dispatch(createConto(payload)).unwrap();
-    }
+    try {
+      if (account?.id) {
+        await dispatch(updateConto({ id: account.id, ...payload })).unwrap();
+      } else {
+        await dispatch(createConto(payload)).unwrap();
+      }
 
-    onHide();
-  };
-
-  const handleNumberChange = (
-    val: string,
-    fun: (value: string) => void,
-    allowNegative = false,
-  ) => {
-    const cleanedValue = val.replace(",", ".");
-    const pattern = allowNegative
-      ? /^-?\d*\.?\d{0,2}$/
-      : /^\d*\.?\d{0,2}$/;
-    if (cleanedValue === "" || pattern.test(cleanedValue)) {
-      fun(cleanedValue);
+      onHide();
+    } catch {
+      // L'errore arriva dal middleware.
     }
   };
 
   return (
-    <Dialog
-      header={account ? t("edit_account") : t("add_account")}
-      visible={visible}
-      className="dialog-custom account-dialog"
-      style={{ width: "95vw", maxWidth: "50rem" }}
-      onHide={onHide}
-      blockScroll={true}
-      footer={
-        <div className="buttons-footer-dialog">
-          <Button
-            label={t("cancel")}
-            className="reset-button"
-            onClick={onHide}
-          />
-          <Button
-            className="action-button"
-            label={account ? t("save_changes") : t("create_account")}
-            onClick={handleConfirm}
-            loading={externalLoading}
-            disabled={!nome.trim()}
-          />
-        </div>
-      }
-      draggable={false}
-      resizable={false}
-    >
-      <div className="account-settings-dialog-content">
-        <div className="form-row">
-          <div className="field">
-            <InputText
-              label={t("account_name")}
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              placeholder={t("account_placeholder")}
-              autoFocus
-            />
-          </div>
-        </div>
+    <>
+      <Sheet
+        open={visible}
+        onClose={onHide}
+        title={account ? t("edit_account") : t("add_account")}
+        className="account-sheet"
+        footer={
+          <Button block disabled={!nome.trim() || loading} onClick={save}>
+            {account ? t("save_changes") : t("create_account")}
+          </Button>
+        }
+      >
+        <section className="account-sheet__section">
+          <span className="account-sheet__label">{t("account_type")}</span>
 
-        <div className="form-row">
-          <div className="field">
-            <InputText
-              value={saldo}
-              onChange={(e) =>
-                handleNumberChange(e.target.value, setSaldo, true)
-              }
-              label={t("current_balance")}
-              icon="pi pi-euro"
-              iconPos="right"
-              keyfilter={/^-?\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact (saldo può essere negativo)
-              inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-              placeholder="0.00"
-            />
-          </div>
-          <div className="field">
-            <label className="field-label">{t("account_color")}</label>
-            <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-              <ColorPicker
-                className="color-picker-custom"
-                style={
-                  { "--selected-color": `#${color}` } as React.CSSProperties
-                }
-                value={color}
-                onChange={(e) => setColor(e.value as string)}
-                appendTo="self"
-              />
-              <span
-                style={{
-                  fontSize: "0.9rem",
-                  color: "var(--text-muted)",
-                  fontFamily: "monospace",
-                }}
+          <div
+            className="account-sheet__types"
+            role="radiogroup"
+            aria-label={t("account_type")}
+          >
+            {TIPI.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                role="radio"
+                aria-checked={option.value === tipo}
+                className="account-sheet__type"
+                onClick={() => setTipo(option.value)}
               >
-                #{color}
+                <i className={option.icon} aria-hidden="true" />
+                {t(option.labelKey)}
+              </button>
+            ))}
+          </div>
+        </section>
+
+        <Field label={t("account_name")}>
+          <input
+            value={nome}
+            placeholder={t("account_placeholder")}
+            aria-label={t("account_name")}
+            onChange={(event) => setNome(event.target.value)}
+          />
+        </Field>
+
+        <Field label={t("account_initial_balance")}>
+          <input
+            value={saldo}
+            inputMode="decimal"
+            placeholder="0,00"
+            aria-label={t("account_initial_balance")}
+            onChange={(event) => onNumber(setSaldo, true)(event.target.value)}
+          />
+          <span className="account-sheet__suffix">€</span>
+        </Field>
+
+        {isSalvadanaio && (
+          <Field label={t("target_budget")}>
+            <input
+              value={obiettivo}
+              inputMode="decimal"
+              placeholder="0,00"
+              aria-label={t("target_budget")}
+              onChange={(event) => onNumber(setObiettivo)(event.target.value)}
+            />
+            <span className="account-sheet__suffix">€</span>
+          </Field>
+        )}
+
+        <label className="account-sheet__switch">
+          <span className="account-sheet__switch-text">
+            <span>{t("account_default")}</span>
+            <span className="account-sheet__hint">
+              {t("account_default_hint")}
+            </span>
+          </span>
+          <Toggle checked={predefinito} onChange={setPredefinito} />
+        </label>
+
+        {isCarta && (
+          <>
+            <label className="account-sheet__switch">
+              <span className="account-sheet__switch-text">
+                <span>{t("automatic_recharge")}</span>
+                <span className="account-sheet__hint">
+                  {t("account_recharge_hint")}
+                </span>
               </span>
-            </div>
-          </div>
-          <div className="field">
-            <label className="field-label">{t("default")}</label>
-            <Switch
-              checked={defaultAccount}
-              onChange={(e) => setDefaultAccount(e.value)}
-            />
-          </div>
-        </div>
+              <Toggle checked={ricarica} onChange={setRicarica} />
+            </label>
 
-        <div className="recharge-section">
-          <div className="switch-container">
-            <label className="field-label">{t("automatic_recharge")}</label>
-
-            <Switch
-              checked={ricaricaAutomatica}
-              onChange={(e) => setRicaricaAutomatica(e.value)}
-            />
-          </div>
-
-          {ricaricaAutomatica && (
-            <div className="recharge-details animate-fade-in">
-              <div className="form-row">
-                <div className="field">
-                  <InputText
-                    value={budgetObiettivo}
-                    onChange={(e) =>
-                      handleNumberChange(e.target.value, setBudgetObiettivo)
+            {ricarica && (
+              <>
+                <Field label={t("minimum_threshold")}>
+                  <input
+                    value={soglia}
+                    inputMode="decimal"
+                    placeholder="0,00"
+                    aria-label={t("minimum_threshold")}
+                    onChange={(event) =>
+                      onNumber(setSoglia)(event.target.value)
                     }
-                    label={t("target_budget")}
-                    icon="pi pi-euro"
-                    iconPos="right"
-                    keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
-                    inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-                    placeholder="70.00"
                   />
-                </div>
-              </div>
-              <div className="form-row">
-                <div className="field">
-                  <InputText
-                    value={sogliaMinima}
-                    onChange={(e) =>
-                      handleNumberChange(e.target.value, setSogliaMinima)
-                    }
-                    label={t("minimum_threshold")}
-                    icon="pi pi-euro"
-                    iconPos="right"
-                    keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
-                    inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile
-                    placeholder="60.00"
-                  />
-                </div>
-                <div className="field">
-                  <Dropdown
-                    label={t("frequency")}
-                    value={frequenzaControllo}
-                    options={frequenzaOptions}
-                    onChange={(e) => setFrequenzaControllo(e.value)}
-                    placeholder={t("select_frequency")}
-                    showClear={false}
-                  />
-                </div>
-              </div>
+                  <span className="account-sheet__suffix">€</span>
+                </Field>
 
-              <div className="form-row">
-                <div className="field">
-                  <div className="field">
-                    <Calendar
-                      label={t("next_check")}
-                      value={prossimoControllo}
-                      onChange={(e) => setProssimoControllo(e.value as Date)}
-                      showIcon
-                      minDate={new Date()}
-                      inputClassName="p-inputtext" // Applica lo stile a linea inferiore
-                      showButtonBar
-                    />
-                  </div>
-                </div>
-                <div className="field">
-                  <Dropdown
-                    label={t("source_account")}
-                    value={contoSorgenteId}
-                    options={allAccounts.filter((a) => a.id !== account?.id)}
-                    onChange={(e) => setContoSorgenteId(e.value)}
-                    optionLabel="nome"
-                    optionValue="id"
-                    placeholder={t("select_source")}
-                    showClear={false}
+                <Row
+                  label={t("source_account")}
+                  value={
+                    sorgenti.find(
+                      (item) => String(item.id) === String(sorgenteId),
+                    )?.nome
+                  }
+                  placeholder={t("select_source")}
+                  onClick={() => setPicker("sorgente")}
+                />
+
+                <Row
+                  label={t("frequency")}
+                  value={
+                    frequenze.find((item) => item.id === frequenza)?.label
+                  }
+                  placeholder={t("select_frequency")}
+                  onClick={() => setPicker("frequenza")}
+                />
+
+                <Field label={t("next_check")}>
+                  <input
+                    type="date"
+                    value={prossimoControllo ? toIsoDate(prossimoControllo) : ""}
+                    aria-label={t("next_check")}
+                    onChange={(event) => {
+                      const [year, month, day] = event.target.value
+                        .split("-")
+                        .map(Number);
+
+                      setProssimoControllo(
+                        year ? new Date(year, month - 1, day) : null,
+                      );
+                    }}
                   />
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </Dialog>
+                </Field>
+              </>
+            )}
+          </>
+        )}
+      </Sheet>
+
+      <PickerSheet
+        open={picker === "sorgente"}
+        onClose={() => setPicker(null)}
+        title={t("source_account")}
+        options={sorgenti.map((item) => ({ id: item.id, label: item.nome }))}
+        value={sorgenteId}
+        onSelect={setSorgenteId}
+      />
+
+      <PickerSheet
+        open={picker === "frequenza"}
+        onClose={() => setPicker(null)}
+        title={t("frequency")}
+        options={frequenze}
+        value={frequenza}
+        onSelect={setFrequenza}
+      />
+    </>
+  );
+}
+
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <label className="account-sheet__field">
+      <span className="account-sheet__label">{label}</span>
+      <span className="account-sheet__control">{children}</span>
+    </label>
+  );
+}
+
+function Row({
+  label,
+  value,
+  placeholder,
+  onClick,
+}: {
+  label: string;
+  value?: string;
+  placeholder: string;
+  onClick: () => void;
+}) {
+  return (
+    <button type="button" className="account-sheet__row" onClick={onClick}>
+      <span className="account-sheet__row-text">
+        <span className="account-sheet__label">{label}</span>
+        <span
+          className={`account-sheet__value${value ? "" : " account-sheet__value--empty"}`}
+        >
+          {value ?? placeholder}
+        </span>
+      </span>
+
+      <i className="pi pi-chevron-right" aria-hidden="true" />
+    </button>
   );
 }

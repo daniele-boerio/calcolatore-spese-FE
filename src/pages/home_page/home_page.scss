@@ -29,8 +29,7 @@
     text-transform: capitalize;
   }
 
-  // Le iniziali sono chi sei, non un bottone: il profilo si apre da qui solo
-  // quando ci sarà qualcosa da aprire.
+  // Le iniziali sono chi sei, e sono la porta del profilo.
   &__avatar {
     flex: 0 0 auto;
     display: flex;
@@ -45,6 +44,15 @@
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.01em;
+
+    border: 0;
+    font-family: inherit;
+    cursor: pointer;
+
+    &:active {
+      transform: scale(0.97);
+      transition: transform v.$dur-press;
+    }
   }
 
   &__link {
