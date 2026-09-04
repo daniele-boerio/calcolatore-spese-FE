@@ -434,6 +434,81 @@
         }
       }
     },
+    "/conti/consolida": {
+      "post": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Consolida Conti",
+        "description": "Unisce tutti i conti in quello di default.\n\nPer chi tiene i soldi in un posto solo e non vuole rincorrere il saldo di\ntre conti: movimenti, ricorrenze, debiti e saldi finiscono sul conto di\ndefault, gli altri vanno in soft-delete.\n\nIdempotente: con un conto solo non fa niente e ritorna quello.",
+        "operationId": "consolida_conti_conti_consolida_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContoOut"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/conti/{conto_id}/assorbi": {
+      "post": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Assorbi Conto Virtuale",
+        "description": "Porta su questo conto i movimenti rimasti sul conto virtuale.\n\nÈ il seguito naturale di \"ho aperto un conto vero\": i movimenti registrati\nprima, quando un conto non c'era, si leggono come \"senza conto\" e da qui si\nassegnano a quello giusto.",
+        "operationId": "assorbi_conto_virtuale_conti__conto_id__assorbi_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Conto Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContoOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/conti/{conto_id}/restore": {
       "post": {
         "tags": [
@@ -2985,55 +3060,7 @@
         }
       }
     },
-    "/ricorrenze/{ricorrenza_id}/esegui": {
-    "post": {
-      "tags": [
-        "Ricorrenze"
-      ],
-      "summary": "Esegui Ricorrenza Ora",
-      "description": "Registra adesso una ricorrenza già scaduta.\n\nServe quando lo scheduler notturno non è passato (macchina spenta, deploy\na cavallo di mezzanotte): la ricorrenza resta indietro e da qui la si\nsblocca a mano. Non anticipa niente — una ricorrenza non ancora scaduta\nviene rifiutata — quindi non può fare doppioni con il task.",
-      "operationId": "esegui_ricorrenza_ora_ricorrenze__ricorrenza_id__esegui_post",
-      "security": [
-        {
-          "HTTPBearer": []
-        }
-      ],
-      "parameters": [
-        {
-          "name": "ricorrenza_id",
-          "in": "path",
-          "required": true,
-          "schema": {
-            "type": "integer",
-            "title": "Ricorrenza Id"
-          }
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "Successful Response",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/RicorrenzaOut"
-              }
-            }
-          }
-        },
-        "422": {
-          "description": "Validation Error",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/HTTPValidationError"
-              }
-            }
-          }
-        }
-      }
-    }
-  },
-  "/ricorrenze/{ricorrenza_id}": {
+    "/ricorrenze/{ricorrenza_id}": {
       "put": {
         "tags": [
           "Ricorrenze"
@@ -3114,6 +3141,54 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/ricorrenze/{ricorrenza_id}/esegui": {
+      "post": {
+        "tags": [
+          "Ricorrenze"
+        ],
+        "summary": "Esegui Ricorrenza Ora",
+        "description": "Registra adesso una ricorrenza già scaduta.\n\nServe quando lo scheduler notturno non è passato (macchina spenta, deploy\na cavallo di mezzanotte): la ricorrenza resta indietro e da qui la si\nsblocca a mano. Non anticipa niente — una ricorrenza non ancora scaduta\nviene rifiutata — quindi non può fare doppioni con il task.",
+        "operationId": "esegui_ricorrenza_ora_ricorrenze__ricorrenza_id__esegui_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "ricorrenza_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Ricorrenza Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RicorrenzaOut"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -5464,6 +5539,17 @@
             "title": "Default",
             "default": false
           },
+          "tipo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo"
+          },
           "bank_connector_provider": {
             "anyOf": [
               {
@@ -5618,6 +5704,17 @@
             "title": "Default",
             "default": false
           },
+          "tipo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo"
+          },
           "bank_connector_provider": {
             "anyOf": [
               {
@@ -5677,6 +5774,11 @@
           "id": {
             "type": "integer",
             "title": "Id"
+          },
+          "virtuale": {
+            "type": "boolean",
+            "title": "Virtuale",
+            "default": false
           },
           "creationDate": {
             "type": "string",
@@ -5829,6 +5931,17 @@
               }
             ],
             "title": "Default"
+          },
+          "tipo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tipo"
           },
           "bank_connector_provider": {
             "anyOf": [
@@ -6495,7 +6608,7 @@
           "accantonamento": {
             "type": "number",
             "title": "Accantonamento",
-            "default": 0.0
+            "default": 0
           }
         },
         "type": "object",

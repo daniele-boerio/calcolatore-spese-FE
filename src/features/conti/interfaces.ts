@@ -14,6 +14,13 @@ export interface Conto {
   lastUpdate: string;
   color: string;
   default: boolean;
+  /**
+   * Conto aperto dall'app, non dall'utente. Resta fuori dagli elenchi finché
+   * è l'unico, e i movimenti che ci stanno sopra si leggono come "senza conto".
+   */
+  virtuale: boolean;
+  /** corrente / salvadanaio / prepagata: decide la forma della card. */
+  tipo?: string | null;
   // Open Banking: collegato quando bank_connector_account_id è valorizzato
   bank_connector_provider?: string | null;
   bank_connector_account_id?: string | null;
@@ -120,6 +127,11 @@ export interface UpdateContoParams {
   conto_sorgente_id?: string;
   frequenza_controllo?: string;
   prossimo_controllo?: string;
+}
+
+export interface AbsorbContoParams {
+  /** Il conto vero su cui portare i movimenti rimasti sul virtuale. */
+  id: string;
 }
 
 export interface DeleteContoParams {

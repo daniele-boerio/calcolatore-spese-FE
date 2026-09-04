@@ -8,6 +8,7 @@ import {
   UpdateBudgetParams,
   CreateContoParams,
   UpdateContoParams,
+  AbsorbContoParams,
   DeleteContoParams,
   ImportStatementParams,
   ImportStatementResponse,
@@ -249,6 +250,45 @@ export const countContoTransactions = createAsyncThunk<
     );
   }
 });
+
+/**
+ * Unisce tutti i conti in quello di default: movimenti, ricorrenze, debiti e
+ * saldi finiscono lì, gli altri conti vanno in soft-delete. Il server ritorna
+ * il conto sopravvissuto.
+ */
+export const consolidateConti = createAsyncThunk<Conto, void>(
+  "conti/consolidateConti",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.post<Conto>("/conti/consolida");
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore unione dei conti",
+      );
+    }
+  },
+);
+
+/**
+ * Porta su un conto vero i movimenti rimasti sul conto virtuale: è il seguito
+ * di "ho aperto il mio primo conto" per chi aveva già registrato qualcosa.
+ */
+export const absorbVirtualConto = createAsyncThunk<Conto, AbsorbContoParams>(
+  "conti/absorbVirtualConto",
+  async (params, { rejectWithValue }) => {
+    try {
+      const response = await api.post<Conto>(`/conti/${params.id}/assorbi`);
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore spostamento dei movimenti",
+      );
+    }
+  },
+);
 
 export const deleteConto = createAsyncThunk<string, DeleteContoParams>(
   "conti/deleteConto",

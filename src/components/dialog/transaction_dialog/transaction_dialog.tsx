@@ -300,10 +300,18 @@ export default function TransactionDialog({
     }
   };
 
+  // Il conto che l'app ha aperto da sé non si sceglie: è il posto dove
+  // finisce una transazione quando l'utente non ha voluto dire da dove esce.
+  const contiScegliibili = useMemo(
+    () => conti.filter((conto) => !conto.virtuale),
+    [conti],
+  );
+
   // Conti selezionabili come destinazione: tutti tranne la sorgente
   const contiDestinazione = useMemo(
-    () => conti.filter((conto) => String(conto.id) !== String(contoId)),
-    [conti, contoId],
+    () =>
+      contiScegliibili.filter((conto) => String(conto.id) !== String(contoId)),
+    [contiScegliibili, contoId],
   );
 
   const handleImportoChange = (val: string) => {
@@ -358,6 +366,10 @@ export default function TransactionDialog({
   const sourceConto = conti.find(
     (conto) => String(conto.id) === String(contoId),
   );
+
+  // Un movimento sul conto invisibile si legge come "senza conto": mostrarne
+  // il nome vorrebbe dire spiegare all'utente un conto che non ha creato.
+  const sourceLabel = sourceConto?.virtuale ? undefined : sourceConto?.nome;
 
   // Effetto della transazione sul conto di partenza: un'entrata lo alza, tutto
   // il resto (uscita, accantonamento, giro in uscita) lo abbassa.
@@ -457,7 +469,7 @@ export default function TransactionDialog({
 
               {sourceConto && balanceAfter !== null && (
                 <span className="tx-sheet__hint">
-                  {`${sourceConto.nome} · ${t("tx_balance_after")}: `}
+                  {`${sourceLabel ? `${sourceLabel} · ` : ""}${t("tx_balance_after")}: `}
                   <Amount value={balanceAfter} />
                 </span>
               )}
@@ -487,7 +499,7 @@ export default function TransactionDialog({
               <PickerRow
                 icon="pi pi-wallet"
                 label={isRicarica ? t("source_account") : t("bank_account")}
-                value={labelOf(conti, contoId)}
+                value={sourceLabel}
                 placeholder={t("bank_account_placeholder")}
                 onClick={() => setPicker("conto")}
               />
@@ -610,7 +622,7 @@ export default function TransactionDialog({
         open={picker === "conto"}
         onClose={() => setPicker(null)}
         title={isRicarica ? t("source_account") : t("bank_account")}
-        options={asOptions(conti)}
+        options={asOptions(contiScegliibili)}
         value={contoId}
         onSelect={setContoId}
       />

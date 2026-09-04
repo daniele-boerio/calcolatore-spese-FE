@@ -1,40 +1,33 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Page, PageContent, PageHeader } from "../../components/page/page";
 import { Card } from "../../components/card/card";
-import ListRow, { List } from "../../components/list_row/list_row";
 import Amount from "../../components/amount/amount";
 import Alert from "../../components/alert/alert";
 import ProgressBar from "../../components/progress_bar/progress_bar";
-import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
-import Button from "../../components/button/button";
+import PickerSheet from "../../components/picker_sheet/picker_sheet";
 import ThreeDotsActionsMenu from "../../components/three_dots_action_menu/three_dots_action_menu";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
 import BankConnectDialog from "../../components/dialog/bank_connect_dialog/bank_connect_dialog";
 import "./conti_page.scss";
 import {
+  absorbVirtualConto,
+  consolidateConti,
   countContoTransactions,
   deleteConto,
   getConti,
-  getCurrentMonthExpenses,
 } from "../../features/conti/api_calls";
 import { Conto } from "../../features/conti/interfaces";
 import {
   selectContiConti,
   selectContiLoading,
-  selectContiMonthlyBudget,
 } from "../../features/conti/conto_slice";
 import { selectIsOpenBankingAdmin } from "../../features/profile/profile_slice";
 import { getInvestimenti } from "../../features/investimenti/api_calls";
 import { selectInvestimenti } from "../../features/investimenti/investimento_slice";
-import { getDebiti } from "../../features/debiti/api_calls";
-import { selectDebitiDebiti } from "../../features/debiti/debito_slice";
-import { getRecurrings } from "../../features/recurrings/api_calls";
-import { selectRecurringRecurrings } from "../../features/recurrings/recurring_slice";
 import { showToast } from "../../features/ui/ui_slice";
 import { relativeTime } from "../../services/dates";
 
@@ -55,30 +48,55 @@ const contoIcon = (conto: Conto) => {
 export default function ContiPage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   const conti = useAppSelector(selectContiConti);
   const loading = useAppSelector(selectContiLoading);
-  const budget = useAppSelector(selectContiMonthlyBudget);
   const investimenti = useAppSelector(selectInvestimenti);
-  const debiti = useAppSelector(selectDebitiDebiti);
-  const recurrings = useAppSelector(selectRecurringRecurrings);
   const isOpenBankingAdmin = useAppSelector(selectIsOpenBankingAdmin);
 
   const [editing, setEditing] = useState<Conto | null>(null);
   const [isAccountDialogVisible, setIsAccountDialogVisible] = useState(false);
   const [bankAccount, setBankAccount] = useState<Conto | null>(null);
   const [pendingDelete, setPendingDelete] = useState<PendingDelete | null>(null);
+  const [confirmingMerge, setConfirmingMerge] = useState(false);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [orphans, setOrphans] = useState(0);
 
   useEffect(() => {
     dispatch(getConti());
-    dispatch(getCurrentMonthExpenses());
-    // Le tre voci della lista qui sotto mostrano un valore: senza questi dati
-    // la card sarebbe un menu di etichette vuote.
+    // Il patrimonio conta anche il valore di mercato dei titoli.
     dispatch(getInvestimenti(undefined));
-    dispatch(getDebiti());
-    dispatch(getRecurrings(undefined));
   }, [dispatch]);
+
+  // Il conto che l'app ha aperto da sé non compare in elenco: esiste perché
+  // una transazione deve pur appoggiarsi da qualche parte, non perché
+  // l'utente abbia deciso di avere un conto.
+  const virtuale = conti.find((conto) => conto.virtuale);
+  const visibili = useMemo(
+    () => conti.filter((conto) => !conto.virtuale),
+    [conti],
+  );
+
+  // Quanti movimenti sono rimasti sul conto invisibile. Finché non esiste un
+  // conto vero non interessa a nessuno: è la condizione qui sotto a decidere
+  // se il conteggio si vede, non il conteggio stesso.
+  useEffect(() => {
+    if (!virtuale || visibili.length === 0) return;
+
+    let alive = true;
+
+    dispatch(countContoTransactions({ id: virtuale.id }))
+      .unwrap()
+      .then((total) => alive && setOrphans(total))
+      .catch(() => alive && setOrphans(0));
+
+    return () => {
+      alive = false;
+    };
+  }, [dispatch, virtuale, visibili.length]);
+
+  const showOrphans =
+    Boolean(virtuale) && visibili.length > 0 && orphans > 0;
 
   const contiTotal = useMemo(
     () => conti.reduce((sum, conto) => sum + Number(conto.saldo), 0),
@@ -94,31 +112,7 @@ export default function ContiPage() {
     [investimenti],
   );
 
-  const debitiAperti = useMemo(
-    () => debiti.filter((debito) => Number(debito.residuo ?? 0) > 0),
-    [debiti],
-  );
-
-  const debitiTotal = useMemo(
-    () => debitiAperti.reduce((sum, debito) => sum + Number(debito.residuo), 0),
-    [debitiAperti],
-  );
-
-  const ricorrenzeAttive = recurrings.filter(
-    (recurring) => recurring.attiva,
-  ).length;
-
-  // Patrimonio: quello che c'è sui conti più il valore di mercato dei titoli.
   const netWorth = contiTotal + investimentiTotal;
-
-  // Quanto è cresciuto questo mese. Il patrimonio storico non esiste da
-  // nessuna parte: l'unico riferimento onesto è il risparmio del mese, che è
-  // per definizione quanto il patrimonio si è mosso da inizio mese.
-  const saved = budget.remaining;
-  const growth =
-    saved !== null && netWorth - saved > 0
-      ? (saved / (netWorth - saved)) * 100
-      : null;
 
   const openCreate = () => {
     setEditing(null);
@@ -170,6 +164,31 @@ export default function ContiPage() {
     return t("delete_conto_message").replace("{count}", String(transactions));
   };
 
+  const merge = async () => {
+    setConfirmingMerge(false);
+
+    try {
+      await dispatch(consolidateConti()).unwrap();
+      await dispatch(getConti());
+      dispatch(showToast({ variant: "success", title: t("accounts_merged") }));
+    } catch {
+      // L'errore arriva dal middleware.
+    }
+  };
+
+  const assign = async (contoId: string | null) => {
+    setAssignOpen(false);
+    if (!contoId) return;
+
+    try {
+      await dispatch(absorbVirtualConto({ id: contoId })).unwrap();
+      await dispatch(getConti());
+      dispatch(showToast({ variant: "success", title: t("accounts_assigned") }));
+    } catch {
+      // L'errore arriva dal middleware.
+    }
+  };
+
   return (
     <>
       <Page className="accounts">
@@ -179,40 +198,26 @@ export default function ContiPage() {
             <Amount className="accounts__worth-value" value={netWorth} />
           </div>
 
-          {growth !== null && (
-            <span
-              className={`accounts__delta accounts__delta--${
-                growth >= 0 ? "up" : "down"
-              }`}
-            >
-              <i
-                className={`pi ${growth >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
-                aria-hidden="true"
-              />
-              {`${Math.abs(growth).toFixed(1)}%`}
-            </span>
-          )}
+          <button
+            type="button"
+            className="accounts__add"
+            aria-label={t("add_account")}
+            onClick={openCreate}
+          >
+            <i className="pi pi-plus" aria-hidden="true" />
+          </button>
         </PageHeader>
 
         <PageContent>
-          {loading && conti.length === 0 ? (
+          {loading && conti.length === 0 && (
             <Card>
               <SkeletonList />
             </Card>
-          ) : conti.length === 0 ? (
-            <EmptyState
-              icon="pi pi-wallet"
-              title={t("accounts_empty_title")}
-              description={t("accounts_empty_text")}
-              actions={
-                <Button size="sm" onClick={openCreate}>
-                  {t("add_account")}
-                </Button>
-              }
-            />
-          ) : (
+          )}
+
+          {visibili.length > 0 && (
             <div className="accounts__cards">
-              {conti.map((conto) => (
+              {visibili.map((conto) => (
                 <ContoCard
                   key={conto.id}
                   conto={conto}
@@ -250,85 +255,37 @@ export default function ContiPage() {
             </div>
           )}
 
-          {/* Le destinazioni ex-hamburger: da qui si raggiunge il resto dell'app. */}
-          <Card className="accounts__menu">
-            <List>
-              <ListRow
-                icon="pi pi-chart-line"
-                iconShape="square"
-                title={t("nav_investments")}
-                meta={
-                  investimenti.length > 0
-                    ? `${investimenti.length} ${t("accounts_holdings")}`
-                    : undefined
-                }
-                trailing={<Amount value={investimentiTotal} hideCurrency />}
-                chevron
-                onClick={() => navigate("/investments")}
-              />
+          {showOrphans && (
+            <Card className="accounts__orphans">
+              <div className="accounts__orphans-text">
+                <span className="accounts__orphans-title">
+                  {`${orphans} ${t("accounts_orphans")}`}
+                </span>
+                <span className="accounts__orphans-hint">
+                  {t("accounts_orphans_hint")}
+                </span>
+              </div>
 
-              <ListRow
-                icon="pi pi-receipt"
-                iconShape="square"
-                iconTone={debitiAperti.length > 0 ? "negative" : "neutral"}
-                title={t("nav_debts")}
-                meta={
-                  debitiAperti.length > 0
-                    ? `${debitiAperti.length} ${t("accounts_open_debts")}`
-                    : undefined
-                }
-                trailing={
-                  <Amount
-                    value={-debitiTotal}
-                    tone={debitiTotal > 0 ? "negative" : "neutral"}
-                    hideCurrency
-                  />
-                }
-                chevron
-                onClick={() => navigate("/debts")}
-              />
+              <button
+                type="button"
+                className="accounts__orphans-action"
+                onClick={() => setAssignOpen(true)}
+              >
+                {t("accounts_assign")}
+              </button>
+            </Card>
+          )}
 
-              <ListRow
-                icon="pi pi-tags"
-                iconShape="square"
-                title={t("taxonomy_title")}
-                chevron
-                onClick={() => navigate("/categories")}
-              />
-
-              <ListRow
-                icon="pi pi-refresh"
-                iconShape="square"
-                title={t("nav_recurrings")}
-                trailing={
-                  ricorrenzeAttive > 0 ? (
-                    <span className="accounts__count">
-                      {`${ricorrenzeAttive} ${t("accounts_active")}`}
-                    </span>
-                  ) : undefined
-                }
-                chevron
-                onClick={() => navigate("/recurrings")}
-              />
-
-              <ListRow
-                icon="pi pi-cog"
-                iconShape="square"
-                title={t("nav_settings")}
-                chevron
-                onClick={() => navigate("/settings")}
-              />
-            </List>
-          </Card>
-
-          <button
-            type="button"
-            className="accounts__add"
-            onClick={openCreate}
-          >
-            <i className="pi pi-plus" aria-hidden="true" />
-            {t("add_account")}
-          </button>
+          {conti.length > 1 && (
+            <button
+              type="button"
+              className="accounts__merge"
+              onClick={() => setConfirmingMerge(true)}
+            >
+              <i className="pi pi-arrow-right-arrow-left" aria-hidden="true" />
+              {t("accounts_merge")}
+            </button>
+          )}
         </PageContent>
       </Page>
 
@@ -348,6 +305,18 @@ export default function ContiPage() {
         onHide={() => setBankAccount(null)}
       />
 
+      <PickerSheet
+        open={assignOpen}
+        onClose={() => setAssignOpen(false)}
+        title={t("accounts_assign_title")}
+        options={visibili.map((conto) => ({
+          id: conto.id,
+          label: conto.nome,
+        }))}
+        value={null}
+        onSelect={assign}
+      />
+
       <Alert
         open={Boolean(pendingDelete)}
         title={t("accounts_delete_title")}
@@ -356,6 +325,18 @@ export default function ContiPage() {
         cancelLabel={t("cancel")}
         onConfirm={confirmDelete}
         onCancel={() => setPendingDelete(null)}
+      />
+
+      <Alert
+        open={confirmingMerge}
+        tone="accent"
+        icon="pi pi-arrow-right-arrow-left"
+        title={t("accounts_merge_title")}
+        description={t("accounts_merge_text")}
+        confirmLabel={t("accounts_merge_confirm")}
+        cancelLabel={t("cancel")}
+        onConfirm={merge}
+        onCancel={() => setConfirmingMerge(false)}
       />
     </>
   );

@@ -109,6 +109,10 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
     dispatch(updateFilters({ [key]: next.length > 0 ? next : undefined }));
   };
 
+  // Il conto virtuale non si filtra: chi non ha conti non ha niente da
+  // distinguere, e chi ne ha vede solo i suoi.
+  const contiScegliibili = conti.filter((conto) => !conto.virtuale);
+
   const total = pagination.total ?? 0;
 
   return (
@@ -205,10 +209,10 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
         />
       </Section>
 
-      {conti.length > 0 && (
+      {contiScegliibili.length > 0 && (
         <Section label={t("nav_accounts")}>
           <div className="filters-sheet__chips">
-            {conti.map((conto) => (
+            {contiScegliibili.map((conto) => (
               <Chip
                 key={conto.id}
                 label={conto.nome}

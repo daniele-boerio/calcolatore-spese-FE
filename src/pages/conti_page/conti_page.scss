@@ -35,44 +35,10 @@
     }
   }
 
-  &__delta {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    margin-bottom: 4px;
-    padding: 6px 10px;
-
-    border-radius: v.$r-pill;
-    font-size: 12px;
-    font-weight: 700;
-    white-space: nowrap;
-
-    i {
-      font-size: 10px;
-    }
-
-    &--up {
-      background: v.$accent-soft;
-      color: v.$accent;
-    }
-
-    &--down {
-      background: v.$negative-soft;
-      color: v.$negative;
-    }
-  }
-
   &__cards {
     display: flex;
     flex-direction: column;
     gap: 12px;
-  }
-
-  // La card-lista assorbe il vecchio menu laterale: il padding verticale lo
-  // mettono le righe.
-  &__menu {
-    gap: 0;
-    padding: 6px 20px;
   }
 
   &__menu-button {
@@ -89,13 +55,71 @@
     }
   }
 
-  &__count {
-    font-size: 12px;
+  &__add {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 4px;
+
+    border: 1px solid v.$line;
+    border-radius: v.$r-pill;
+    background: v.$surface;
+    color: v.$ink;
+    cursor: pointer;
+
+    i {
+      font-size: 14px;
+    }
+
+    &:active {
+      transform: scale(0.97);
+      transition: transform v.$dur-press;
+    }
+  }
+
+  // Movimenti rimasti sul conto invisibile dopo che ne è nato uno vero.
+  &__orphans {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__orphans-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__orphans-title {
+    font-size: 14.5px;
     font-weight: 600;
+  }
+
+  &__orphans-hint {
+    font-size: 12px;
     color: v.$muted;
   }
 
-  &__add {
+  &__orphans-action {
+    flex: 0 0 auto;
+    padding: 9px 13px;
+
+    border: 0;
+    border-radius: v.$r-pill;
+    background: v.$surface-2;
+    color: v.$ink;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  // Azione tranquilla, in fondo: non è quello che si viene a fare qui.
+  &__merge {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -105,14 +129,14 @@
     border: 1px dashed v.$line;
     border-radius: 18px;
     background: transparent;
-    color: v.$accent;
+    color: v.$muted;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 13.5px;
     font-weight: 700;
     cursor: pointer;
 
     i {
-      font-size: 13px;
+      font-size: 12px;
     }
 
     &:active {
