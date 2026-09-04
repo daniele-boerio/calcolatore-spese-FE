@@ -31,6 +31,8 @@ const TREND_BOX = {
 
 type YearStatisticsProps = {
   year: number;
+  categoriaId: string | null;
+  sottocategoriaId: string | null;
   tagId: string | null;
 };
 
@@ -59,7 +61,12 @@ const totalsOf = (row: YearDetailsStatRow): MonthTotals => {
   return { month: Number(row.month), entrate, uscite };
 };
 
-export default function YearStatistics({ year, tagId }: YearStatisticsProps) {
+export default function YearStatistics({
+  year,
+  categoriaId,
+  sottocategoriaId,
+  tagId,
+}: YearStatisticsProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
@@ -68,8 +75,15 @@ export default function YearStatistics({ year, tagId }: YearStatisticsProps) {
   const loading = useAppSelector(selectStatisticsLoading);
 
   useEffect(() => {
-    dispatch(getYearDetailsStatistics({ year, tag_id: tagId }));
-  }, [dispatch, year, tagId]);
+    dispatch(
+      getYearDetailsStatistics({
+        year,
+        categoria_id: categoriaId,
+        sottocategoria_id: sottocategoriaId,
+        tag_id: tagId,
+      }),
+    );
+  }, [dispatch, year, categoriaId, sottocategoriaId, tagId]);
 
   const today = new Date();
   // Nell'anno in corso la finestra finisce sul mese corrente; negli anni

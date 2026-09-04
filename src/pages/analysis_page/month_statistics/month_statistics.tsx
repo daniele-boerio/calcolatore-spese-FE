@@ -28,7 +28,6 @@ import {
   selectChartsExpenseComposition,
   selectChartsSavings,
 } from "../../../features/charts/charts_slice";
-import { getCategorie } from "../../../features/categorie/api_calls";
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../services/dates";
 
@@ -48,12 +47,16 @@ const ICONS: Record<Insight["kind"], string> = {
 type MonthStatisticsProps = {
   year: number;
   month: number;
+  categoriaId: string | null;
+  sottocategoriaId: string | null;
   tagId: string | null;
 };
 
 export default function MonthStatistics({
   year,
   month,
+  categoriaId,
+  sottocategoriaId,
   tagId,
 }: MonthStatisticsProps) {
   const { t } = useI18n();
@@ -70,13 +73,17 @@ export default function MonthStatistics({
   const loading = useAppSelector(selectStatisticsLoading);
 
   useEffect(() => {
-    dispatch(getCategorie());
-  }, [dispatch]);
+    const filtri = {
+      year,
+      month,
+      categoria_id: categoriaId,
+      sottocategoria_id: sottocategoriaId,
+      tag_id: tagId,
+    };
 
-  useEffect(() => {
-    dispatch(getMonthlyDetailsStatistics({ year, month, tag_id: tagId }));
-    dispatch(getPreviousMonthSavings({ year, month, tag_id: tagId }));
-    dispatch(getMonthRefunds({ year, month, tag_id: tagId }));
+    dispatch(getMonthlyDetailsStatistics(filtri));
+    dispatch(getPreviousMonthSavings(filtri));
+    dispatch(getMonthRefunds(filtri));
 
     // Media per categoria dei mesi *precedenti*: il mese corrente è quello da
     // confrontare, includerlo appiattirebbe lo scostamento.
@@ -97,7 +104,7 @@ export default function MonthStatistics({
         data_fine: toIsoDate(endOfMonth(addMonths(selected, -1))),
       }),
     );
-  }, [dispatch, year, month, tagId]);
+  }, [dispatch, year, month, categoriaId, sottocategoriaId, tagId]);
 
   const averages = useMemo(
     () =>
@@ -160,6 +167,7 @@ export default function MonthStatistics({
       anno: String(year),
       mese: String(month),
     });
+    if (sottocategoriaId) query.set("sotto", sottocategoriaId);
     if (tagId) query.set("tag", tagId);
 
     navigate(`/categories/${categoria.id}?${query.toString()}`);

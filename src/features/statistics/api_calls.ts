@@ -24,6 +24,7 @@ export const getYearDetailsStatistics = createAsyncThunk<
         params: {
           year: params.year,
           categoria_id: params.categoria_id || undefined,
+          sottocategoria_id: params.sottocategoria_id || undefined,
           tag_id: params.tag_id || undefined,
         },
       },
@@ -49,6 +50,7 @@ export const getMonthlyDetailsStatistics = createAsyncThunk<
           month: params.month,
           year: params.year,
           categoria_id: params.categoria_id || undefined,
+          sottocategoria_id: params.sottocategoria_id || undefined,
           tag_id: params.tag_id || undefined,
         },
       },
@@ -84,6 +86,7 @@ export const getPreviousMonthSavings = createAsyncThunk<
           month,
           year,
           categoria_id: params.categoria_id || undefined,
+          sottocategoria_id: params.sottocategoria_id || undefined,
           tag_id: params.tag_id || undefined,
         },
       },
@@ -120,6 +123,10 @@ export const getMonthRefunds = createAsyncThunk<
       data_fine: toIsoDate(end),
     });
 
+    if (params.categoria_id)
+      query.append("categoria_id", params.categoria_id);
+    if (params.sottocategoria_id)
+      query.append("sottocategoria_id", params.sottocategoria_id);
     if (params.tag_id) query.append("tag_id", params.tag_id);
 
     const response = await api.get<{ total_rimborsi: number }>(

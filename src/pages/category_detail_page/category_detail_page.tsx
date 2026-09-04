@@ -10,7 +10,9 @@ import SectionHeader from "../../components/section_header/section_header";
 import Amount from "../../components/amount/amount";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
-import PeriodSheet from "../../components/dialog/period_sheet/period_sheet";
+import AnalysisFiltersSheet, {
+  AnalysisFiltersPatch,
+} from "../../components/dialog/analysis_filters_sheet/analysis_filters_sheet";
 import "./category_detail_page.scss";
 import { getCategoryTrendChart } from "../../features/charts/api_calls";
 import { selectChartsCategoryTrend } from "../../features/charts/charts_slice";
@@ -339,13 +341,18 @@ export default function CategoryDetailPage() {
         </PageContent>
       </Page>
 
-      <PeriodSheet
+      <AnalysisFiltersSheet
         open={periodOpen}
         onClose={() => setPeriodOpen(false)}
         year={year}
         month={month}
+        // La categoria è quella della pagina: qui si filtra solo il periodo
+        // e il tag.
+        showTaxonomy={false}
+        categoriaId={null}
+        sottocategoriaId={null}
         tagId={tagId}
-        onChange={(patch) => {
+        onChange={(patch: AnalysisFiltersPatch) => {
           const next = new URLSearchParams(searchParams);
 
           if (patch.year !== undefined) next.set("anno", String(patch.year));

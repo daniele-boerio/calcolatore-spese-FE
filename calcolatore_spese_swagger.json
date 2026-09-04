@@ -3392,6 +3392,24 @@
             "description": "Filtra per categoria padre"
           },
           {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per sottocategoria",
+              "title": "Sottocategoria Id"
+            },
+            "description": "Filtra per sottocategoria"
+          },
+          {
             "name": "tag_id",
             "in": "query",
             "required": false,
@@ -3484,6 +3502,24 @@
               "title": "Categoria Id"
             },
             "description": "Filtra per categoria padre"
+          },
+          {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per sottocategoria",
+              "title": "Sottocategoria Id"
+            },
+            "description": "Filtra per sottocategoria"
           },
           {
             "name": "tag_id",

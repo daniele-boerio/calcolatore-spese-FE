@@ -15,6 +15,7 @@ export interface YearDetailsResponse {
 export interface FetchYearStatisticsParams {
   year: number;
   categoria_id?: string | null;
+  sottocategoria_id?: string | null;
   tag_id?: string | null;
 }
 
@@ -42,5 +43,6 @@ export interface FetchMonthStatisticsParams {
   year: number;
   month: number;
   categoria_id?: string | null;
+  sottocategoria_id?: string | null;
   tag_id?: string | null;
 }
