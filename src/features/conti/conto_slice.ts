@@ -22,6 +22,10 @@ import { RootState } from "../../store/store";
 import { createTransaction } from "../transactions/api_calls";
 import { Transaction } from "../transactions/interfaces";
 
+// "Includi le ricorrenti future nel calcolo del budget": preferenza locale,
+// senza controparte sul BE, che ogni chiamata alla card del mese ripassa.
+const INCLUDE_FUTURE_RECURRING_STORAGE_KEY = "includeFutureRecurring";
+
 const initialState: ContoState = {
   loading: false,
   conti: [],
@@ -44,7 +48,8 @@ const initialState: ContoState = {
   filters: {
     sort_by: ["saldo:desc"],
   },
-  include_future_recurring: false,
+  include_future_recurring:
+    localStorage.getItem(INCLUDE_FUTURE_RECURRING_STORAGE_KEY) === "true",
   patrimonio: [],
 };
 
@@ -93,6 +98,10 @@ const contoSlice = createSlice({
   reducers: {
     setIncludeFutureRecurring: (state, action: PayloadAction<boolean>) => {
       state.include_future_recurring = action.payload;
+      localStorage.setItem(
+        INCLUDE_FUTURE_RECURRING_STORAGE_KEY,
+        String(action.payload),
+      );
     },
   },
   extraReducers: (builder) => {

@@ -171,6 +171,20 @@
         ],
         "summary": "Update Monthly Budget",
         "operationId": "update_monthly_budget_monthlyBudget_put",
+        "parameters": [
+          {
+            "name": "include_future_recurring",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "description": "Include future active recurring expenses within the current month",
+              "default": false,
+              "title": "Include Future Recurring"
+            },
+            "description": "Include future active recurring expenses within the current month"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

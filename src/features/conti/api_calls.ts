@@ -24,35 +24,52 @@ import {
 } from "./interfaces";
 import { RootState } from "../../store/store";
 
+/**
+ * Il totale del mese, con o senza le ricorrenti future.
+ *
+ * Il flag non è un parametro come gli altri: è una preferenza dell'utente che
+ * vive nello store. Chi non lo passa non sta chiedendo il default del BE
+ * (`false`) — non gli interessa, e basta. Se lo lasciassimo cadere, ogni
+ * schermata che ricarica la card del mese senza ripassarlo riporterebbe il
+ * conto a "senza ricorrenti", con la spunta in Impostazioni ancora accesa:
+ * era esattamente il sintomo. Perciò il valore di riserva lo prendiamo da qui.
+ */
 export const getCurrentMonthExpenses = createAsyncThunk<
   MonthlyBudgetResponse,
-  GetMonthExpensesParams | undefined
->("conti/getCurrentMonthExpenses", async (params = {}, { rejectWithValue }) => {
-  try {
-    const queryParams = new URLSearchParams();
-    if (params?.include_future_recurring !== undefined) {
+  GetMonthExpensesParams | undefined,
+  { state: RootState }
+>(
+  "conti/getCurrentMonthExpenses",
+  async (params = {}, { getState, rejectWithValue }) => {
+    try {
+      const includeFutureRecurring =
+        params?.include_future_recurring ??
+        getState().conto.include_future_recurring;
+
+      const queryParams = new URLSearchParams();
       queryParams.append(
         "include_future_recurring",
-        params.include_future_recurring.toString(),
+        String(includeFutureRecurring),
+      );
+
+      const response = await api.get<MonthlyBudgetResponse>(
+        `/conti/currentMonthExpenses?${queryParams.toString()}`,
+      );
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore ricezione spese mensili",
       );
     }
-
-    const response = await api.get<MonthlyBudgetResponse>(
-      `/conti/currentMonthExpenses${queryParams.toString() ? "?" + queryParams.toString() : ""}`,
-    );
-    return response.data;
-  } catch (error) {
-    const err = error as AxiosError;
-    return rejectWithValue(
-      err.response?.data || "Errore ricezione spese mensili",
-    );
-  }
-});
+  },
+);
 
 export const updateBudget = createAsyncThunk<
   MonthlyBudgetResponse,
-  UpdateBudgetParams
->("conti/monthlyBudget", async (params, { rejectWithValue }) => {
+  UpdateBudgetParams,
+  { state: RootState }
+>("conti/monthlyBudget", async (params, { getState, rejectWithValue }) => {
   try {
     // Aggiornamento parziale: obiettivo di risparmio e tetto di spesa si
     // impostano da due controlli separati e il BE legge solo i campi presenti,
@@ -62,8 +79,17 @@ export const updateBudget = createAsyncThunk<
     if ("monthly_spending_budget" in params)
       body.monthly_spending_budget = params.monthly_spending_budget;
 
+    // La risposta è la card del mese ricalcolata e va a sostituire quella nello
+    // store: senza il flag tornerebbe indietro il risparmio, come se la spunta
+    // fosse spenta. Stessa preferenza di getCurrentMonthExpenses.
+    const queryParams = new URLSearchParams({
+      include_future_recurring: String(
+        getState().conto.include_future_recurring,
+      ),
+    });
+
     const response = await api.put<MonthlyBudgetResponse>(
-      `/monthlyBudget`,
+      `/monthlyBudget?${queryParams.toString()}`,
       body,
     );
 

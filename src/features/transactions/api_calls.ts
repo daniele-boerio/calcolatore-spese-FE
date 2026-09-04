@@ -24,20 +24,13 @@ import {
 /**
  * Ricarica budget e grafico del mese dopo una scrittura sulle transazioni.
  *
- * Il flag "includi ricorrenti futuri" vive nello store: rifetchare il budget
- * senza ripassarlo faceva ricadere il BE sul default (`false`), e il risparmio
- * calava di colpo dopo ogni salvataggio pur avendo la checkbox attiva.
+ * Il flag "includi ricorrenti future" non serve passarlo: `getCurrentMonthExpenses`
+ * lo prende dallo store quando il chiamante non ne impone uno.
  */
 const refreshMonthlyTotals = async (
   dispatch: ThunkDispatch<RootState, unknown, UnknownAction>,
-  getState: () => RootState,
 ) => {
-  const includeFutureRecurring = getState().conto.include_future_recurring;
-  await dispatch(
-    getCurrentMonthExpenses({
-      include_future_recurring: includeFutureRecurring,
-    }),
-  );
+  await dispatch(getCurrentMonthExpenses());
   await dispatch(getCurrentMonthExpensesByCategory());
 };
 
@@ -196,7 +189,7 @@ export const createTransaction = createAsyncThunk<
       } as Transaction;
 
       // Aggiorniamo i dati del budget e del grafico dopo la creazione
-      await refreshMonthlyTotals(dispatch, getState);
+      await refreshMonthlyTotals(dispatch);
 
       return enrichedTx;
     } catch (error) {
@@ -214,14 +207,14 @@ export const updateTransaction = createAsyncThunk<
   { state: RootState }
 >(
   "transazioni/updateTransazione",
-  async (params, { dispatch, getState, rejectWithValue }) => {
+  async (params, { dispatch, rejectWithValue }) => {
     try {
       // Estraiamo l'id e raccogliamo tutto il resto in 'body'
       const { id, ...body } = params;
 
       const response = await api.put<Transaction>(`/transazioni/${id}`, body);
 
-      await refreshMonthlyTotals(dispatch, getState);
+      await refreshMonthlyTotals(dispatch);
 
       return response.data;
     } catch (error) {
@@ -237,11 +230,11 @@ export const deleteTransaction = createAsyncThunk<
   { state: RootState }
 >(
   "transazioni/deleteTransaction",
-  async (params, { dispatch, getState, rejectWithValue }) => {
+  async (params, { dispatch, rejectWithValue }) => {
     try {
       await api.delete<void>(`/transazioni/${params.id}`);
 
-      await refreshMonthlyTotals(dispatch, getState);
+      await refreshMonthlyTotals(dispatch);
 
       return params.id;
     } catch (error) {
@@ -269,7 +262,7 @@ export const splitTransaction = createAsyncThunk<
   { state: RootState }
 >(
   "transazioni/splitTransazione",
-  async ({ id, parts }, { dispatch, getState, rejectWithValue }) => {
+  async ({ id, parts }, { dispatch, rejectWithValue }) => {
     try {
       const response = await api.post<Transaction[]>(
         `/transazioni/${id}/split`,
@@ -278,7 +271,7 @@ export const splitTransaction = createAsyncThunk<
 
       // Refresh key data
       await dispatch(getConti());
-      await refreshMonthlyTotals(dispatch, getState);
+      await refreshMonthlyTotals(dispatch);
 
       return { sourceId: id, parts: response.data };
     } catch (error) {
