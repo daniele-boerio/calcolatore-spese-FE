@@ -39,6 +39,14 @@
     &.active {
       color: v.$accent;
     }
+
+    &:first-child {
+      padding-left: 8px;
+    }
+
+    &:last-child {
+      padding-right: 8px;
+    }
   }
 
   // Sollevato sopra la barra: è l'azione principale dell'app.
