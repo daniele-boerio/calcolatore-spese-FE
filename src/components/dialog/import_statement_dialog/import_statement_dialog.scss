@@ -7,13 +7,13 @@
 
   .import-statement-subtitle {
     margin: 0 0 1rem;
-    color: var(--text-muted);
+    color: var(--muted);
     font-size: 0.9rem;
   }
 
   .field-label {
     font-size: 0.85rem;
-    color: var(--text-muted);
+    color: var(--muted);
     margin-bottom: 0.35rem;
     display: block;
   }
@@ -21,10 +21,10 @@
   .import-statement-file {
     width: 100%;
     padding: 0.6rem;
-    border: 1px dashed var(--surface-border, #c9c9c9);
+    border: 1px dashed var(--line);
     border-radius: 8px;
     background: transparent;
-    color: var(--text-main);
+    color: var(--ink);
     cursor: pointer;
     font-size: 0.9rem;
   }
@@ -32,7 +32,7 @@
   .import-statement-hint {
     display: block;
     margin-top: 0.35rem;
-    color: var(--text-muted);
+    color: var(--muted);
     font-size: 0.78rem;
   }
 
@@ -44,7 +44,7 @@
     label {
       cursor: pointer;
       font-size: 0.9rem;
-      color: var(--text-main);
+      color: var(--ink);
     }
   }
 
@@ -53,11 +53,11 @@
     padding: 0.6rem 0.8rem;
     border-radius: 8px;
     font-size: 0.9rem;
-    background: rgba(0, 128, 0, 0.08);
-    color: var(--text-main);
+    background: var(--positive-soft);
+    color: var(--ink);
 
     &.is-error {
-      background: rgba(200, 0, 0, 0.08);
+      background: var(--negative-soft);
     }
   }
 }

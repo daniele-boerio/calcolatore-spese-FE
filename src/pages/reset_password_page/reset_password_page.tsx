@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
     >
       <div
         style={{
-          background: "var(--bg-card)",
+          background: "var(--surface)",
           padding: "2rem",
           borderRadius: "16px",
           width: "100%",
@@ -91,7 +91,7 @@ export default function ResetPasswordPage() {
         }}
       >
         <h2
-          style={{ margin: 0, textAlign: "center", color: "var(--text-main)" }}
+          style={{ margin: 0, textAlign: "center", color: "var(--ink)" }}
         >
           {t("new_password")}
         </h2>
@@ -107,8 +107,8 @@ export default function ResetPasswordPage() {
                   : "rgba(34, 197, 94, 0.1)",
               color:
                 message.type === "error"
-                  ? "var(--red-500)"
-                  : "var(--green-500)",
+                  ? "var(--negative)"
+                  : "var(--positive)",
               textAlign: "center",
             }}
           >

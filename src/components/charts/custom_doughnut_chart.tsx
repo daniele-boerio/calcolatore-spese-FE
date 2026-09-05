@@ -78,10 +78,14 @@ export default function CustomDoughnutChart({
   data,
   showTotalText = true, // Di default mostra sempre il totale
   fontSize = 25,
-  textColor = "var(--text-main)",
+  textColor = "var(--ink)",
   aspectRatio = 0.5,
 }: DoughnutChartProps) {
   const resolvedTextColor = useResolvedThemeColor(textColor);
+  // Il bordo fra due spicchi è la superficie della card su cui il grafico
+  // poggia: nel canvas la custom property non esiste, va risolta prima.
+  const resolvedSurface = useResolvedThemeColor("var(--surface)");
+  const resolvedEmpty = useResolvedThemeColor("var(--surface-2)");
 
   // CALCOLO AUTOMATICO DEL TOTALE INTERNO
   const totalText = useMemo(() => {
@@ -103,7 +107,7 @@ export default function CustomDoughnutChart({
         datasets: [
           {
             data: [1],
-            backgroundColor: ["#e0e0e0"],
+            backgroundColor: [resolvedEmpty],
             borderWidth: 0,
             cutout: "75%",
           },
@@ -120,13 +124,13 @@ export default function CustomDoughnutChart({
             const hue = (index * (360 / data.length)) % 360;
             return `hsl(${hue}, 75%, 60%)`;
           }),
-          borderColor: "var(--bg-card)",
+          borderColor: resolvedSurface,
           borderWidth: 2,
           cutout: "75%",
         },
       ],
     };
-  }, [data]);
+  }, [data, resolvedSurface, resolvedEmpty]);
 
   const options: ChartOptions<"doughnut"> = useMemo(
     () => ({

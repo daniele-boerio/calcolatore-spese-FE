@@ -25,8 +25,8 @@ export default function CustomBarChart({
 
   // Colori dalle CSS variable, risolti in modo reattivo al tema (vedi hook):
   // evita label scure illeggibili in dark mode su mobile.
-  const textColor = useResolvedThemeColor("var(--text-main)");
-  const gridColor = useResolvedThemeColor("var(--border-color)");
+  const textColor = useResolvedThemeColor("var(--ink)");
+  const gridColor = useResolvedThemeColor("var(--line)");
 
   // Avvolgiamo le opzioni in useMemo per ottimizzare le performance di React
   const chartOptions = useMemo(

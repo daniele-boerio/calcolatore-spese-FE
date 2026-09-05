@@ -64,7 +64,7 @@ export default function ForgotPasswordDialog({
           <div
             style={{
               textAlign: "center",
-              color: "var(--green-500)",
+              color: "var(--positive)",
               lineHeight: "1.5",
             }}
           >
@@ -78,7 +78,7 @@ export default function ForgotPasswordDialog({
           <>
             <p
               style={{
-                color: "var(--text-color-secondary)",
+                color: "var(--muted)",
                 fontSize: "0.9rem",
                 lineHeight: "1.4",
                 margin: 0,
@@ -95,7 +95,7 @@ export default function ForgotPasswordDialog({
             />
 
             {error && (
-              <small style={{ color: "var(--red-500)" }}>{error}</small>
+              <small style={{ color: "var(--negative)" }}>{error}</small>
             )}
 
             <Button

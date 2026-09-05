@@ -48,7 +48,7 @@
 /* Chip degli elementi selezionati */
 .p-multiselect-token {
   background-color: v.$bg-button-primary !important; // Usiamo il primario per coerenza
-  color: #ffffff !important;
+  color: v.$text-on-button !important;
   border-radius: 4px;
   padding: 0.125rem 0.5rem;
   display: inline-flex;

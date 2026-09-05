@@ -5,7 +5,7 @@
 
   .bank-connect-subtitle {
     margin: 0;
-    color: var(--text-muted);
+    color: var(--muted);
     font-size: 0.9rem;
   }
 
@@ -16,7 +16,7 @@
     justify-content: center;
     gap: 1rem;
     padding: 2rem 0;
-    color: var(--text-muted);
+    color: var(--muted);
   }
 
   // --- Vista conto già collegato ---
@@ -29,13 +29,13 @@
 
     &__icon {
       font-size: 2.75rem;
-      color: #22c55e;
+      color: var(--positive);
     }
 
     &__title {
       font-size: 1.1rem;
       font-weight: 700;
-      color: var(--text-main);
+      color: var(--ink);
     }
 
     &__row {
@@ -43,10 +43,10 @@
       gap: 0.4rem;
       align-items: baseline;
       font-size: 0.9rem;
-      color: var(--text-muted);
+      color: var(--muted);
 
       strong {
-        color: var(--text-main);
+        color: var(--ink);
       }
     }
 
@@ -54,8 +54,8 @@
       width: 100%;
       padding: 0.6rem 0.85rem;
       border-radius: 8px;
-      background: rgba(231, 76, 60, 0.1);
-      color: #e74c3c;
+      background: var(--negative-soft);
+      color: var(--negative);
       font-size: 0.85rem;
     }
 
@@ -84,17 +84,17 @@
       align-items: center;
       gap: 0.75rem;
       padding: 0.65rem 0.85rem;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--line);
       border-radius: 10px;
-      background: var(--bg-card);
-      color: var(--text-main);
+      background: var(--surface);
+      color: var(--ink);
       cursor: pointer;
       transition:
         border-color 0.15s ease,
         transform 0.1s ease;
 
       &:hover {
-        border-color: #3498db;
+        border-color: var(--accent);
         transform: translateY(-1px);
       }
     }
@@ -113,7 +113,7 @@
       align-items: center;
       justify-content: center;
       font-size: 1.1rem;
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
     &__name {
@@ -124,14 +124,14 @@
     }
 
     &__chevron {
-      color: var(--text-muted);
+      color: var(--muted);
       font-size: 0.8rem;
     }
   }
 
   .no-data {
     text-align: center;
-    color: var(--text-muted);
+    color: var(--muted);
     padding: 1.5rem 0;
   }
 }
