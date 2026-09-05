@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import {
   closeToast,
@@ -50,17 +51,28 @@ function Toast({ toast }: { toast: ToastItem }) {
   );
 }
 
-/** Impila i toast sopra la tab bar, dentro la colonna dell'app. */
+/**
+ * Impila i toast sopra la tab bar, dentro la colonna dell'app.
+ *
+ * Va in un portale su <body>, come gli sheet, e non è un dettaglio: dentro
+ * `.App` lo prendeva in pieno la regola di compatibilità di App.scss
+ * (`.App:has(.tab-bar) > *:not(.page):not(.tab-bar)`), pensata per dare spazio
+ * alle schermate non ancora convertite. Quel `padding-bottom` su un elemento
+ * ancorato in basso non sposta il bordo inferiore: spinge in su il contenuto,
+ * e il toast se ne andava a mezza altezza. Fuori da `.App` nessuna regola
+ * degli antenati — padding, transform o altro — può più spostarlo.
+ */
 export default function ToastHost() {
   const toasts = useAppSelector(selectToasts);
 
   if (toasts.length === 0) return null;
 
-  return (
+  return createPortal(
     <div className="toast-host">
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} />
       ))}
-    </div>
+    </div>,
+    document.body,
   );
 }
