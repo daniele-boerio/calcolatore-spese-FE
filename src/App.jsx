@@ -9,7 +9,7 @@ import {
 } from "react-router-dom";
 import "./App.scss";
 import { useAppDispatch } from "./store/store";
-import { lazy, Suspense, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { getProfile, restoreSession } from "./features/profile/api_calls";
 import { ProgressSpinner } from "primereact/progressspinner";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
@@ -18,33 +18,43 @@ import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_g
 import SheetHost from "./components/sheet_host/sheet_host";
 import ToastHost from "./components/toast/toast";
 import { useThemeSync } from "./features/ui/use_theme";
+import { lazyWithRetry } from "./services/lazy_with_retry";
 
 // Code-splitting per route: ogni pagina è un chunk separato caricato solo
-// quando ci si naviga. Le pagine pesanti (analisi, che porta chart.js +
-// @mui/x-charts) non gravano più sul bundle iniziale.
-const HomePage = lazy(() => import("./pages/home_page/home_page"));
-const TransactionPage = lazy(
+// quando ci si naviga, così non gravano sul bundle iniziale.
+//
+// `lazyWithRetry` e non `lazy`: il chunk della home viene chiesto
+// all'avvio, cioè nel momento in cui la rete di un telefono è meno
+// affidabile (vedi services/lazy_with_retry).
+const HomePage = lazyWithRetry(() => import("./pages/home_page/home_page"));
+const TransactionPage = lazyWithRetry(
   () => import("./pages/transaction_page/transaction_page"),
 );
-const CategoryPage = lazy(() => import("./pages/category_page/category_page"));
-const CategoryDetailPage = lazy(
+const CategoryPage = lazyWithRetry(
+  () => import("./pages/category_page/category_page"),
+);
+const CategoryDetailPage = lazyWithRetry(
   () => import("./pages/category_detail_page/category_detail_page"),
 );
-const ContiPage = lazy(() => import("./pages/conti_page/conti_page"));
-const DebitiPage = lazy(() => import("./pages/debiti_page/debiti_page"));
-const AnalysisPage = lazy(() => import("./pages/analysis_page/analysis_page"));
-const RecurringsPage = lazy(
+const ContiPage = lazyWithRetry(() => import("./pages/conti_page/conti_page"));
+const DebitiPage = lazyWithRetry(() => import("./pages/debiti_page/debiti_page"));
+const AnalysisPage = lazyWithRetry(
+  () => import("./pages/analysis_page/analysis_page"),
+);
+const RecurringsPage = lazyWithRetry(
   () => import("./pages/recurrings_page/recurrings_page"),
 );
-const SettingsPage = lazy(() => import("./pages/settings_page/settings_page"));
-const AltroPage = lazy(() => import("./pages/altro_page/altro_page"));
-const InvestimentiPage = lazy(
+const SettingsPage = lazyWithRetry(
+  () => import("./pages/settings_page/settings_page"),
+);
+const AltroPage = lazyWithRetry(() => import("./pages/altro_page/altro_page"));
+const InvestimentiPage = lazyWithRetry(
   () => import("./pages/investimenti_page/investimenti_page"),
 );
-const ResetPasswordPage = lazy(
+const ResetPasswordPage = lazyWithRetry(
   () => import("./pages/reset_password_page/reset_password_page"),
 );
-const BankCallbackPage = lazy(
+const BankCallbackPage = lazyWithRetry(
   () => import("./pages/bank_callback_page/bank_callback_page"),
 );
 

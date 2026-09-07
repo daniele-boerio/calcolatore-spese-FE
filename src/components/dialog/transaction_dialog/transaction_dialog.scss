@@ -11,21 +11,31 @@
     white-space: nowrap;
   }
 
+  // L'importo sta a destra e ci resta. Centrato, la cifra si spostava a
+  // ogni tasto — il campo cresceva con il testo e il gruppo si
+  // ricentrava sotto le dita. Ancorato a destra il simbolo di valuta è un
+  // punto fermo e le cifre crescono verso sinistra, come su una
+  // calcolatrice.
   &__hero {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     gap: 6px;
     padding: 8px 0 4px;
+    text-align: right;
   }
 
   &__amount {
     display: flex;
     align-items: baseline;
+    justify-content: flex-end;
     gap: 6px;
     max-width: 100%;
 
     input {
+      // Il campo occupa tutta la riga: è il testo allineato a destra a
+      // muoversi dentro un campo fermo, non il campo dentro la riga.
+      flex: 1;
       min-width: 0;
       padding: 0;
       border: 0;

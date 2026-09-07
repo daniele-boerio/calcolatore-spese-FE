@@ -23,9 +23,7 @@ vi.hoisted(() => {
 import reducer, {
   dismissToast,
   pushToast,
-  setHideAmounts,
   setTheme,
-  toggleHideAmounts,
 } from "./ui_slice";
 import { THEME_STORAGE_KEY } from "./theme";
 
@@ -38,7 +36,6 @@ describe("ui_slice", () => {
 
   it("parte da 'system' quando localStorage non ha una preferenza valida", () => {
     expect(initial.theme).toBe("system");
-    expect(initial.hideAmounts).toBe(false);
   });
 
   it("salva la preferenza di tema scelta dall'utente", () => {
@@ -53,23 +50,6 @@ describe("ui_slice", () => {
 
     expect(state.theme).toBe("system");
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe("system");
-  });
-
-  it("alterna e persiste il mascheramento degli importi", () => {
-    const hidden = reducer(initial, toggleHideAmounts());
-    expect(hidden.hideAmounts).toBe(true);
-    expect(localStorage.getItem("hideAmounts")).toBe("true");
-
-    const shown = reducer(hidden, toggleHideAmounts());
-    expect(shown.hideAmounts).toBe(false);
-    expect(localStorage.getItem("hideAmounts")).toBe("false");
-  });
-
-  it("imposta il mascheramento a un valore esplicito", () => {
-    const state = reducer(initial, setHideAmounts(true));
-
-    expect(state.hideAmounts).toBe(true);
-    expect(localStorage.getItem("hideAmounts")).toBe("true");
   });
 });
 

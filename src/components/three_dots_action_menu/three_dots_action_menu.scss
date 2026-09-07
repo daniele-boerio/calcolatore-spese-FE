@@ -1,5 +1,25 @@
 @use "../../styles/variables" as v;
 
+/* Il trigger.
+
+   Il bottone contiene la sola icona, e finché è un `inline-block` la sua
+   base poggia sulla riga di testo del contenitore: sotto resta lo spazio
+   della discesa del carattere, che rende il wrapper qualche pixel più alto
+   del bottone. Chi centra la riga centra quel wrapper, non il bottone, e
+   i tre puntini si vedono spostati verso l'alto. Flex sui due livelli
+   toglie la riga di testo di mezzo: il bottone è il wrapper, e l'icona sta
+   al centro del bottone in entrambe le direzioni. */
+.three-dots {
+  display: flex;
+  align-items: center;
+
+  .p-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
 /* Voce di menu "Danger" (es. Elimina) */
 .p-menu .menu-item-danger {
   div a span {

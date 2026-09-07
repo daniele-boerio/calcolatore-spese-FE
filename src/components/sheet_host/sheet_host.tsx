@@ -1,16 +1,19 @@
-import { lazy, Suspense } from "react";
+import { Suspense } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { closeSheet, selectActiveSheet } from "../../features/ui/ui_slice";
 import { selectTransactionTransactions } from "../../features/transactions/transaction_slice";
+import { lazyWithRetry } from "../../services/lazy_with_retry";
 
 // Pesa quanto tutto il form di inserimento: resta fuori dal bundle iniziale.
-const TransactionDialog = lazy(
+const TransactionDialog = lazyWithRetry(
   () => import("../dialog/transaction_dialog/transaction_dialog"),
 );
-const TransactionDetailSheet = lazy(
+const TransactionDetailSheet = lazyWithRetry(
   () => import("../dialog/transaction_detail_sheet/transaction_detail_sheet"),
 );
-const FiltersSheet = lazy(() => import("../dialog/filters_sheet/filters_sheet"));
+const FiltersSheet = lazyWithRetry(
+  () => import("../dialog/filters_sheet/filters_sheet"),
+);
 
 /**
  * Punto unico di montaggio degli sheet globali. Il FAB della tab bar è

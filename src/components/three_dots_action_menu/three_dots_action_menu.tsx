@@ -67,7 +67,7 @@ export default function ThreeDotsActionsMenu(props: ThreeDotsActionsMenuProps) {
   }, [props.items]);
 
   return (
-    <div className={props.className}>
+    <div className={`three-dots ${props.className ?? ""}`}>
       <button
         ref={buttonRef}
         className="p-button p-button-text"

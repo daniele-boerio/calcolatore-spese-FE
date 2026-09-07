@@ -163,6 +163,12 @@
 }
 
 // ── Sottocategorie ──────────────────────────────────────────────────────────
+// Pillola sotto l'intestazione dei movimenti: dice su quale sottocategoria
+// è ristretta la lista, e toccarla la allarga di nuovo.
+.category-detail__filter {
+  display: flex;
+  margin-bottom: 8px;
+}
 .sub-bars {
   display: flex;
   flex-direction: column;
@@ -172,6 +178,38 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+
+    // Le righe con un id dietro sono bottoni: filtrano i movimenti qui
+    // sotto. Restano visivamente identiche a quelle che non lo sono —
+    // quello che le distingue è il tocco, e la riga accesa lo dice da sé.
+    &--tappable {
+      padding: 6px 8px;
+      margin: -6px -8px;
+      width: calc(100% + 16px);
+      box-sizing: border-box;
+
+      border: 0;
+      border-radius: v.$r-field;
+      background: transparent;
+      color: inherit;
+      font-family: inherit;
+      text-align: left;
+      cursor: pointer;
+
+      &:active {
+        transform: scale(0.99);
+        transition: transform v.$dur-press;
+      }
+    }
+
+    &--on {
+      background: v.$accent-soft;
+
+      .sub-bars__name,
+      .sub-bars__value {
+        color: v.$accent;
+      }
+    }
   }
 
   &__line {

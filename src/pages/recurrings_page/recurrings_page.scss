@@ -107,10 +107,12 @@
 
   &__menu {
     flex: 0 0 auto;
-    margin-right: -12px;
+    // Il bersaglio è largo 44px come negli altri elenchi; il margine
+    // negativo lo riporta a filo del padding della card, senza uscirne.
+    margin-right: -14px;
 
     .p-button {
-      width: 36px;
+      width: v.$tap-target;
       height: v.$tap-target;
       padding: 0;
       background: transparent;

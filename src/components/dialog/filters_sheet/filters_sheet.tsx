@@ -3,7 +3,6 @@ import Sheet from "../../sheet/sheet";
 import Chip from "../../chip/chip";
 import Button from "../../button/button";
 import Calendar from "../../calendar/calendar";
-import SegmentedControl from "../../segmented_control/segmented_control";
 import RangeSlider from "../../range_slider/range_slider";
 import Toggle from "../../toggle/toggle";
 import { useI18n } from "../../../i18n/use-i18n";
@@ -40,7 +39,25 @@ type FiltersSheetProps = {
   onHide: () => void;
 };
 
-type ListKey = "conto_id" | "categoria_id" | "tag_id";
+type ListKey =
+  | "conto_id"
+  | "categoria_id"
+  | "sottocategoria_id"
+  | "tag_id";
+
+// I cinque tipi del BE più "tutte". Erano tre in una pillola segmentata:
+// rimborsi e accantonamenti restavano fuori, e chi li cercava non poteva
+// isolarli. In sei non ci stanno in una pillola sola, quindi diventano chip
+// come ogni altro filtro del foglio — a selezione singola, perché `tipo` sul
+// BE è un campo solo.
+const TYPES: { value: string; labelKey: string }[] = [
+  { value: "", labelKey: "mov_type_all" },
+  { value: "USCITA", labelKey: "expenses" },
+  { value: "ENTRATA", labelKey: "income" },
+  { value: "RICARICA", labelKey: "tx_type_transfer" },
+  { value: "RIMBORSO", labelKey: "compensations" },
+  { value: "ACCANTONAMENTO", labelKey: "mov_type_set_aside" },
+];
 
 const parseDate = (value?: string): Date | null => {
   if (!value) return null;
@@ -98,15 +115,64 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
 
   const selected = (key: ListKey) => filters[key] ?? [];
 
-  const isOn = (key: ListKey, id: string) => selected(key).includes(id);
+  // Gli id girano ora come numeri (arrivano così dal BE) ora come stringhe
+  // (l'URL non sa fare altro): il confronto passa sempre da `String`, e nella
+  // lista dei filtri ci finisce la stringa. Senza, dopo un refresh la spunta
+  // sui chip spariva e ritoccarli aggiungeva un doppione.
+  const isOn = (key: ListKey, id: string) =>
+    selected(key).some((item) => String(item) === String(id));
 
   const toggleIn = (key: ListKey, id: string) => {
-    const current = selected(key);
-    const next = current.includes(id)
-      ? current.filter((item) => item !== id)
-      : [...current, id];
+    const next = isOn(key, id)
+      ? selected(key).filter((item) => String(item) !== String(id))
+      : [...selected(key), String(id)];
 
     dispatch(updateFilters({ [key]: next.length > 0 ? next : undefined }));
+  };
+
+  // Le sottocategorie scegliibili sono quelle delle categorie accese. Fuori da
+  // una categoria sarebbero un elenco lungo e senza contesto — è la stessa
+  // regola del foglio dei filtri dell'Analisi.
+  const sottocategorieScegliibili = useMemo(
+    () =>
+      categorie
+        .filter((categoria) =>
+          (filters.categoria_id ?? []).some(
+            (item) => String(item) === String(categoria.id),
+          ),
+        )
+        .flatMap((categoria) => categoria.sottocategorie ?? []),
+    [categorie, filters.categoria_id],
+  );
+
+  // Spegnere una categoria porta via anche le sue sottocategorie: lasciarle
+  // accese vorrebbe dire continuare a filtrare su un ramo che il foglio non
+  // mostra più, cioè una lista corta senza un motivo visibile.
+  const toggleCategoria = (id: string) => {
+    const next = isOn("categoria_id", id)
+      ? selected("categoria_id").filter((item) => String(item) !== String(id))
+      : [...selected("categoria_id"), String(id)];
+
+    const superstiti = new Set(
+      categorie
+        .filter((categoria) =>
+          next.some((item) => String(item) === String(categoria.id)),
+        )
+        .flatMap((categoria) => categoria.sottocategorie ?? [])
+        .map((sotto) => String(sotto.id)),
+    );
+
+    const sottocategorie = selected("sottocategoria_id").filter((item) =>
+      superstiti.has(String(item)),
+    );
+
+    dispatch(
+      updateFilters({
+        categoria_id: next.length > 0 ? next : undefined,
+        sottocategoria_id:
+          sottocategorie.length > 0 ? sottocategorie : undefined,
+      }),
+    );
   };
 
   // Il conto virtuale non si filtra: chi non ha conti non ha niente da
@@ -194,19 +260,20 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
       </Section>
 
       <Section label={t("mov_type")}>
-        <SegmentedControl
-          ariaLabel={t("mov_type")}
-          value={filters.tipo ?? ""}
-          options={[
-            { value: "", label: t("mov_type_all") },
-            { value: "USCITA", label: t("expenses") },
-            { value: "ENTRATA", label: t("income") },
-            { value: "RICARICA", label: t("tx_type_transfer") },
-          ]}
-          onChange={(value) =>
-            dispatch(updateFilters({ tipo: value || undefined }))
-          }
-        />
+        <div className="filters-sheet__chips">
+          {TYPES.map((type) => (
+            <Chip
+              key={type.value || "all"}
+              label={t(type.labelKey)}
+              variant={
+                (filters.tipo ?? "") === type.value ? "accent" : "solid"
+              }
+              onClick={() =>
+                dispatch(updateFilters({ tipo: type.value || undefined }))
+              }
+            />
+          ))}
+        </div>
       </Section>
 
       {contiScegliibili.length > 0 && (
@@ -236,7 +303,27 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
                   isOn("categoria_id", categoria.id) ? "pi pi-check" : undefined
                 }
                 variant={isOn("categoria_id", categoria.id) ? "accent" : "solid"}
-                onClick={() => toggleIn("categoria_id", categoria.id)}
+                onClick={() => toggleCategoria(categoria.id)}
+              />
+            ))}
+          </div>
+        </Section>
+      )}
+
+      {sottocategorieScegliibili.length > 0 && (
+        <Section label={t("sub_categories")}>
+          <div className="filters-sheet__chips">
+            {sottocategorieScegliibili.map((sotto) => (
+              <Chip
+                key={sotto.id}
+                label={sotto.nome}
+                icon={
+                  isOn("sottocategoria_id", sotto.id) ? "pi pi-check" : undefined
+                }
+                variant={
+                  isOn("sottocategoria_id", sotto.id) ? "accent" : "solid"
+                }
+                onClick={() => toggleIn("sottocategoria_id", sotto.id)}
               />
             ))}
           </div>

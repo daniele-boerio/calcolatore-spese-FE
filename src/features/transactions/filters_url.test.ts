@@ -38,6 +38,7 @@ describe("encodeFilters", () => {
       {
         conto_id: ["1", "2"],
         categoria_id: ["7"],
+        sottocategoria_id: ["71", "72"],
         tag_id: ["3"],
         tipo: "USCITA",
         importo_min: 0,
@@ -49,6 +50,7 @@ describe("encodeFilters", () => {
 
     expect(params.get("conti")).toBe("1,2");
     expect(params.get("categorie")).toBe("7");
+    expect(params.get("sottocategorie")).toBe("71,72");
     expect(params.get("tag")).toBe("3");
     expect(params.get("tipo")).toBe("USCITA");
     expect(params.get("min")).toBe("0");
@@ -111,6 +113,27 @@ describe("decodeFilters", () => {
 
     expect(period).toBe("custom");
     expect(filters).toMatchObject(original);
+  });
+});
+
+// Il filtro per sottocategoria è arrivato dopo gli altri: sta nell'URL come
+// loro, altrimenti un refresh sui Movimenti riporterebbe indietro solo lui.
+describe("filtro per sottocategoria", () => {
+  it("fa il giro completo insieme alla sua categoria", () => {
+    const original = {
+      categoria_id: ["7"],
+      sottocategoria_id: ["71"],
+    };
+
+    const { filters } = decodeFilters(encodeFilters(original, "all"));
+
+    expect(filters).toMatchObject(original);
+  });
+
+  it("resta fuori dall'URL finché nessuna è scelta", () => {
+    expect(
+      encodeFilters({ categoria_id: ["7"] }, "all").get("sottocategorie"),
+    ).toBeNull();
   });
 });
 

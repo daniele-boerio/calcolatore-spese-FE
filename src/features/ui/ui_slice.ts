@@ -10,15 +10,12 @@ import {
 } from "./toast";
 import { persistTheme, readStoredTheme, ThemePreference } from "./theme";
 
-const HIDE_AMOUNTS_STORAGE_KEY = "hideAmounts";
-
 // Il tempo di leggere una conferma di due parole e non uno di più. I toast
 // con un'azione dentro passano una durata loro: quelli vanno letti davvero.
 const DEFAULT_TOAST_DURATION = 2500;
 
 const initialState: UiState = {
   theme: readStoredTheme(),
-  hideAmounts: localStorage.getItem(HIDE_AMOUNTS_STORAGE_KEY) === "true",
   sheet: null,
   toasts: [],
 };
@@ -33,14 +30,6 @@ const uiSlice = createSlice({
     setTheme: (state, action: PayloadAction<ThemePreference>) => {
       state.theme = action.payload;
       persistTheme(action.payload);
-    },
-    setHideAmounts: (state, action: PayloadAction<boolean>) => {
-      state.hideAmounts = action.payload;
-      localStorage.setItem(HIDE_AMOUNTS_STORAGE_KEY, String(action.payload));
-    },
-    toggleHideAmounts: (state) => {
-      state.hideAmounts = !state.hideAmounts;
-      localStorage.setItem(HIDE_AMOUNTS_STORAGE_KEY, String(state.hideAmounts));
     },
     openSheet: (state, action: PayloadAction<ActiveSheet>) => {
       state.sheet = action.payload;
@@ -61,8 +50,6 @@ const uiSlice = createSlice({
 
 export const {
   setTheme,
-  setHideAmounts,
-  toggleHideAmounts,
   openSheet,
   closeSheet,
   pushToast,
@@ -121,7 +108,6 @@ export const closeToast =
 
 export const selectTheme = (state: RootState) => state.ui.theme;
 
-export const selectHideAmounts = (state: RootState) => state.ui.hideAmounts;
 
 export const selectActiveSheet = (state: RootState) => state.ui.sheet;
 

@@ -45,9 +45,6 @@ type PickerName =
   | "destinazione"
   | "tag";
 
-// Larghezza minima del campo importo: sotto i tre caratteri il cursore
-// finirebbe appiccicato al simbolo di valuta.
-const MIN_AMOUNT_WIDTH = 3;
 
 const parseAmount = (value: string) => {
   const parsed = parseFloat(value);
@@ -473,9 +470,6 @@ export default function TransactionDialog({
                   inputMode="decimal"
                   placeholder="0"
                   aria-label={t("amount")}
-                  style={{
-                    width: `${Math.max(importo.length, MIN_AMOUNT_WIDTH)}ch`,
-                  }}
                 />
                 <span className="tx-sheet__currency">€</span>
               </div>

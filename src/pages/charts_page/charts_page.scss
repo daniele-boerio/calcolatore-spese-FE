@@ -1,115 +1,309 @@
 @use "../../styles/variables" as v;
 
-.charts-page {
-  padding: 1.5rem;
+// Vista "Grafici" dell'Analisi. Le card, i titoli e le spaziature vengono da
+// `Card`/`CardTitle`: qui c'è solo la geometria dei quattro grafici.
+
+// ── Colonne dell'anno ─────────────────────────────────────────────────────
+// Dodici mesi affiancati: entrate a sinistra, uscite (con l'accantonamento
+// impilato sopra) a destra. L'altezza è fissa perché l'asse resti alla stessa
+// quota anche nei mesi vuoti.
+.year-columns {
   display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  animation: fadeIn 0.3s ease-in;
+  align-items: flex-end;
+  gap: 3px;
 
-  .charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 2rem;
+  &__group {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
 
-    .chart-card {
-      background: v.$card-gradient;
-      border: 1px solid v.$border-card;
-      border-radius: v.$radius-lg;
-      padding: 1.5rem;
-      box-shadow: v.$shadow-sm;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      cursor: grab;
-      transition:
-        transform v.$transition-base,
-        box-shadow v.$transition-base;
+  // Altezza fissa e non `flex: 1`: le barre dentro sono in percentuale, e
+  // una percentuale vuole un'altezza definita da cui partire.
+  &__pair {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    height: 150px;
+  }
 
-      &:hover {
-        box-shadow: v.$shadow-md;
-      }
+  // La colonna delle uscite: accantonamento in cima, uscite sotto.
+  &__stack {
+    flex: 1;
+    max-width: 9px;
+    height: 100%;
 
-      &:active {
-        cursor: grabbing;
-      }
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
 
-      &.dragging {
-        opacity: 0.5;
-        transform: scale(0.98);
-        border-color: var(--accent);
-        box-shadow: v.$shadow-lg;
-      }
+  &__bar {
+    display: block;
+    border-radius: 5px;
+    // Una barra a zero deve restare visibile come "zero", non sparire.
+    min-height: 2px;
 
-      .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 1rem;
+    &--in {
+      flex: 1;
+      max-width: 9px;
+      background: v.$positive;
+    }
 
-        &.column {
-          flex-direction: column;
-          align-items: flex-start;
-        }
+    // Le due barre della pila si toccano: arrotonda solo il lato esterno.
+    &--out {
+      background: v.$negative;
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+    }
 
-        h2 {
-          margin: 0;
-          font-size: 1.2rem;
-          font-weight: 600;
-          color: v.$text-main;
-        }
-
-        .card-filters {
-          display: flex;
-          align-items: center;
-          gap: 0.5rem;
-
-          .date-separator {
-            color: v.$text-muted;
-            font-weight: bold;
-          }
-
-          .compact-calendar {
-            padding: 0.4rem 0.6rem;
-            font-size: 0.85rem;
-            width: 100px;
-          }
-
-          .compact-dropdown {
-            .p-dropdown-label {
-              padding: 0.4rem 0.6rem;
-              font-size: 0.85rem;
-            }
-            width: 150px;
-          }
-        }
-      }
-
-      .chart-content {
-        flex: 1;
-        min-height: 350px;
-      }
+    &--aside {
+      background: v.$accent-2;
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
+      margin-bottom: 1px;
     }
   }
 
-  @media (max-width: v.$mobile) {
-    padding: 1rem;
-
-    .charts-grid {
-      grid-template-columns: 1fr;
-    }
-
+  &__label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: v.$muted-2;
   }
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+// ── Grafico a linea ───────────────────────────────────────────────────────
+.chart-trend {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+
+  &__area {
+    fill: v.$accent-soft;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  &__line {
+    fill: none;
+    stroke: v.$accent;
+    stroke-width: 2.5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  // La tendenza è una lettura, non un dato: tratteggiata e più smorta della
+  // linea vera, così non si confondono.
+  &__guide {
+    stroke: v.$muted-2;
+    stroke-width: 1.5;
+    stroke-dasharray: 4 5;
+    stroke-linecap: round;
+  }
+
+  &__dot {
+    fill: v.$accent;
+    stroke: v.$surface;
+    stroke-width: 3;
+  }
+}
+
+// Etichette sotto un grafico a linea: una per punto, alle stesse distanze.
+.chart-axis {
+  display: flex;
+  justify-content: space-between;
+
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: v.$muted-2;
+}
+
+// ── Legenda ───────────────────────────────────────────────────────────────
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+
+  font-size: 12px;
+  color: v.$muted;
+
+  &__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &--in {
+      background: v.$positive;
+    }
+
+    &--out {
+      background: v.$negative;
+    }
+
+    &--aside {
+      background: v.$accent-2;
+    }
+
+    &--line {
+      background: v.$accent;
+    }
+
+    // Il tratteggio della tendenza, ridotto a pastiglia.
+    &--guide {
+      width: 12px;
+      height: 2px;
+      border-radius: v.$r-pill;
+      background: v.$muted-2;
+    }
+  }
+}
+
+.chart-badge {
+  font-size: 11.5px;
+  font-weight: 700;
+
+  &--up {
+    color: v.$positive;
+  }
+
+  &--down {
+    color: v.$negative;
+  }
+}
+
+// Il posto della linea quando la linea non c'è: nessuna categoria scelta, o
+// nessun movimento nel periodo.
+.chart-hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: v.$muted;
+}
+
+// ── Composizione: ciambella e legenda ─────────────────────────────────────
+.donut {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  &__chart {
+    flex: 0 0 auto;
+    width: 132px;
+    height: 132px;
+  }
+
+  &__arc {
+    fill: none;
+    // La fetta si disegna dal punto in cima, in senso orario.
+    stroke-linecap: butt;
+
+    &--1 {
+      stroke: v.$series-1;
+    }
+    &--2 {
+      stroke: v.$series-2;
+    }
+    &--3 {
+      stroke: v.$series-3;
+    }
+    &--4 {
+      stroke: v.$series-4;
+    }
+    &--5 {
+      stroke: v.$series-5;
+    }
+    // Tutto quello che sta sotto le prime cinque: una tinta che non compete.
+    &--rest {
+      stroke: v.$surface-2;
+    }
+  }
+
+  &__legend {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 12.5px;
+  }
+
+  &__dot {
+    flex: 0 0 auto;
+    align-self: center;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    &--1 {
+      background: v.$series-1;
+    }
+    &--2 {
+      background: v.$series-2;
+    }
+    &--3 {
+      background: v.$series-3;
+    }
+    &--4 {
+      background: v.$series-4;
+    }
+    &--5 {
+      background: v.$series-5;
+    }
+    &--rest {
+      background: v.$surface-2;
+    }
+  }
+
+  &__name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__share {
+    flex: 0 0 auto;
+    color: v.$muted;
+  }
+
+  &__value {
+    flex: 0 0 auto;
+    font-weight: 700;
+  }
+}
+
+// Sotto una certa larghezza la ciambella e la sua legenda non stanno in fila.
+@media (max-width: 380px) {
+  .donut {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+
+    &__chart {
+      align-self: center;
+    }
   }
 }

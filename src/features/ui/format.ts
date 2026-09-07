@@ -36,11 +36,3 @@ export function formatAmount(
 
   return digits;
 }
-
-/**
- * Maschera per "Nascondi importi": stessa lunghezza del testo originale, così
- * la riga non cambia larghezza quando l'utente accende l'interruttore.
- */
-export function maskAmount(formatted: string): string {
-  return formatted.replace(/\d/g, "\u2022");
-}

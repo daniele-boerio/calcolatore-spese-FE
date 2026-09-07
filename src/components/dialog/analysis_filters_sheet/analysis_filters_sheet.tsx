@@ -134,6 +134,19 @@ export default function AnalysisFiltersSheet({
         </section>
       )}
 
+      {/* La sezione compare solo dopo aver scelto una categoria: le
+          sottocategorie di tutte insieme sarebbero un elenco senza contesto.
+          Se quella scelta non ne ha, lo diciamo — prima non compariva niente,
+          e da fuori sembrava che il filtro mancasse. */}
+      {showTaxonomy && categoriaId && sottocategorie.length === 0 && (
+        <section className="analysis-filters__section">
+          <span className="analysis-filters__label">{t("sub_category")}</span>
+          <p className="analysis-filters__empty">
+            {t("filters_no_subcategories")}
+          </p>
+        </section>
+      )}
+
       {showTaxonomy && sottocategorie.length > 0 && (
         <section className="analysis-filters__section">
           <span className="analysis-filters__label">{t("sub_category")}</span>

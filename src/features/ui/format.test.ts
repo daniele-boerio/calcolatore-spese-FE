@@ -6,10 +6,9 @@ vi.hoisted(() => {
   vi.stubGlobal("navigator", { languages: ["it-IT"], language: "it-IT" });
 });
 
-import { formatAmount, formatNumber, maskAmount } from "./format";
+import { formatAmount, formatNumber } from "./format";
 
 const MINUS = "\u2212";
-const BULLET = "\u2022";
 
 describe("formatAmount", () => {
   it("mette il segno meno matematico prima del numero", () => {
@@ -41,15 +40,5 @@ describe("formatAmount", () => {
 describe("formatNumber", () => {
   it("ignora il segno: lo aggiunge chi formatta l'importo", () => {
     expect(formatNumber(-1234.5)).toBe("1.234,50");
-  });
-});
-
-describe("maskAmount", () => {
-  it("sostituisce ogni cifra mantenendo la lunghezza", () => {
-    const formatted = formatAmount(-42.3);
-    const masked = maskAmount(formatted);
-
-    expect(masked).toBe(`${MINUS}${BULLET}${BULLET},${BULLET}${BULLET}`);
-    expect(masked).toHaveLength(formatted.length);
   });
 });

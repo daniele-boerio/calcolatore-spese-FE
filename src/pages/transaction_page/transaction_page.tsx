@@ -181,11 +181,15 @@ export default function TransactionPage() {
 
   const openFilters = () => dispatch(openSheet({ name: "filters" }));
 
+  // Le stesse etichette dei chip del foglio dei filtri: la pillola che resta
+  // in testa alla lista deve dire la parola che l'utente ha toccato.
   const typeLabel = filters.tipo
     ? ({
         USCITA: t("expenses"),
         ENTRATA: t("income"),
         RICARICA: t("tx_type_transfer"),
+        RIMBORSO: t("compensations"),
+        ACCANTONAMENTO: t("mov_type_set_aside"),
       }[filters.tipo] ?? filters.tipo)
     : null;
 
@@ -214,9 +218,11 @@ export default function TransactionPage() {
   }
 
   const listChip = (
-    key: "conto_id" | "categoria_id" | "tag_id",
+    key: "conto_id" | "categoria_id" | "sottocategoria_id" | "tag_id",
     names: Map<string, string>,
     fallback: string,
+    /** Filtri che senza questo non stanno più in piedi. */
+    alsoClears?: Partial<Record<"sottocategoria_id", undefined>>,
   ) => {
     const ids = filters[key];
     if (!ids?.length) return;
@@ -225,12 +231,22 @@ export default function TransactionPage() {
       key,
       label:
         ids.length === 1 ? (names.get(ids[0]) ?? fallback) : `${ids.length} ${fallback}`,
-      clear: () => dispatch(updateFilters({ [key]: undefined })),
+      clear: () =>
+        dispatch(updateFilters({ [key]: undefined, ...alsoClears })),
     });
   };
 
   listChip("conto_id", contoById, t("nav_accounts").toLowerCase());
-  listChip("categoria_id", categoriaById, t("nav_categories").toLowerCase());
+  // Togliere la categoria porta via anche le sottocategorie: erano un
+  // sottoinsieme suo, e da sole filtrerebbero senza che si veda perché.
+  listChip("categoria_id", categoriaById, t("nav_categories").toLowerCase(), {
+    sottocategoria_id: undefined,
+  });
+  listChip(
+    "sottocategoria_id",
+    sottocategoriaById,
+    t("sub_categories").toLowerCase(),
+  );
   listChip("tag_id", tagById, t("nav_tags").toLowerCase());
 
   if (filters.importo_min !== undefined || filters.importo_max !== undefined) {

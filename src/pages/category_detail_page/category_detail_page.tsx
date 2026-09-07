@@ -8,6 +8,7 @@ import { Card, CardTitle } from "../../components/card/card";
 import ListRow, { List } from "../../components/list_row/list_row";
 import SectionHeader from "../../components/section_header/section_header";
 import Amount from "../../components/amount/amount";
+import Chip from "../../components/chip/chip";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
 import AnalysisFiltersSheet, {
@@ -65,6 +66,9 @@ export default function CategoryDetailPage() {
   const year = Number(searchParams.get("anno")) || today.getFullYear();
   const month = Number(searchParams.get("mese")) || today.getMonth() + 1;
   const tagId = searchParams.get("tag");
+  // Arriva già dall'Analisi (`openCategory` la mette nel link) e la scrive il
+  // tocco su una barra qui sotto: in entrambi i casi restringe i movimenti.
+  const sottocategoriaId = searchParams.get("sotto");
 
   const categorie = useAppSelector(selectCategoriaCategorie);
   const monthlyData = useAppSelector(selectMonthlyStatisticsData);
@@ -107,6 +111,7 @@ export default function CategoryDetailPage() {
     dispatch(
       getTransactionsByCategory({
         categoria_id: id,
+        sottocategoria_id: sottocategoriaId,
         tag_id: tagId,
         data_inizio: toIsoDate(new Date(year, month - 1, 1)),
         data_fine: toIsoDate(new Date(year, month, 0)),
@@ -121,24 +126,47 @@ export default function CategoryDetailPage() {
     return () => {
       alive = false;
     };
-  }, [dispatch, id, year, month, tagId]);
+  }, [dispatch, id, year, month, sottocategoriaId, tagId]);
 
   // `monthDetails` filtrato su una categoria torna quella sola riga, con le
   // sue sottocategorie.
   const detail = monthlyData[0];
   const monthTotal = Math.abs(detail?.totale ?? 0);
 
+  // Le statistiche danno il nome della sottocategoria, non il suo id: per
+  // poterci filtrare i movimenti lo ripeschiamo dalla categoria. Una riga senza
+  // corrispondenza (le transazioni senza sottocategoria finiscono qui) resta
+  // in elenco ma non si tocca: non c'è niente su cui filtrare.
   const subcategories = useMemo(
     () =>
       (detail?.sottocategorie ?? [])
         .map((sub) => ({
           nome: sub.sottocategoria,
           totale: Math.abs(sub.totale),
+          id:
+            categoria?.sottocategorie?.find(
+              (item) => item.nome === sub.sottocategoria,
+            )?.id ?? null,
         }))
         .filter((sub) => sub.totale > 0)
         .sort((a, b) => b.totale - a.totale),
-    [detail],
+    [detail, categoria],
   );
+
+  // Toccare la barra già accesa la spegne: è l'unico modo di tornare a vedere
+  // tutti i movimenti della categoria senza uscire dalla schermata.
+  const toggleSottocategoria = (subId: string) => {
+    const next = new URLSearchParams(searchParams);
+
+    if (sottocategoriaId === String(subId)) next.delete("sotto");
+    else next.set("sotto", String(subId));
+
+    setSearchParams(next, { replace: true });
+  };
+
+  const sottocategoriaNome = subcategories.find(
+    (sub) => sub.id !== null && String(sub.id) === sottocategoriaId,
+  )?.nome;
 
   const series = trendData.map((entry) => Math.abs(Number(entry.spesa)));
   const average =
@@ -264,31 +292,76 @@ export default function CategoryDetailPage() {
               <CardTitle>{t("sub_categories")}</CardTitle>
 
               <div className="sub-bars">
-                {subcategories.map((sub, index) => (
-                  <div className="sub-bars__row" key={sub.nome}>
-                    <div className="sub-bars__line">
-                      <span className="sub-bars__name">{sub.nome}</span>
-                      <Amount className="sub-bars__value" value={sub.totale} />
-                    </div>
+                {subcategories.map((sub, index) => {
+                  const selezionata =
+                    sub.id !== null && String(sub.id) === sottocategoriaId;
 
-                    <span className="sub-bars__track">
-                      <span
-                        className={`sub-bars__fill sub-bars__fill--${(index % 5) + 1}`}
-                        style={{
-                          width: `${monthTotal > 0 ? (sub.totale / monthTotal) * 100 : 0}%`,
-                        }}
-                      />
-                    </span>
-                  </div>
-                ))}
+                  const contenuto = (
+                    <>
+                      <span className="sub-bars__line">
+                        <span className="sub-bars__name">{sub.nome}</span>
+                        <Amount
+                          className="sub-bars__value"
+                          value={sub.totale}
+                        />
+                      </span>
+
+                      <span className="sub-bars__track">
+                        <span
+                          className={`sub-bars__fill sub-bars__fill--${(index % 5) + 1}`}
+                          style={{
+                            width: `${monthTotal > 0 ? (sub.totale / monthTotal) * 100 : 0}%`,
+                          }}
+                        />
+                      </span>
+                    </>
+                  );
+
+                  if (sub.id === null) {
+                    return (
+                      <div className="sub-bars__row" key={sub.nome}>
+                        {contenuto}
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <button
+                      type="button"
+                      key={sub.nome}
+                      className={`sub-bars__row sub-bars__row--tappable${
+                        selezionata ? " sub-bars__row--on" : ""
+                      }`}
+                      aria-pressed={selezionata}
+                      onClick={() => toggleSottocategoria(String(sub.id))}
+                    >
+                      {contenuto}
+                    </button>
+                  );
+                })}
               </div>
             </Card>
           )}
 
           <section className="category-detail__movements">
             <SectionHeader>
-              {`${t("category_detail_movements")} · ${transactions.length}`}
+              {`${sottocategoriaNome ?? t("category_detail_movements")} · ${transactions.length}`}
             </SectionHeader>
+
+            {sottocategoriaNome && (
+              <div className="category-detail__filter">
+                <Chip
+                  label={sottocategoriaNome}
+                  icon="pi pi-times"
+                  variant="active"
+                  onClick={() => {
+                    const next = new URLSearchParams(searchParams);
+                    next.delete("sotto");
+                    setSearchParams(next, { replace: true });
+                  }}
+                />
+              </div>
+            )}
 
             {loading && transactions.length === 0 ? (
               <Card>

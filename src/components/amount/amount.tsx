@@ -1,10 +1,4 @@
-import { useAppSelector } from "../../store/store";
-import { selectHideAmounts } from "../../features/ui/ui_slice";
-import {
-  AmountSign,
-  formatAmount,
-  maskAmount,
-} from "../../features/ui/format";
+import { AmountSign, formatAmount } from "../../features/ui/format";
 import "./amount.scss";
 
 type AmountProps = {
@@ -33,14 +27,11 @@ export default function Amount({
   hideCurrency = false,
   className,
 }: AmountProps) {
-  const hidden = useAppSelector(selectHideAmounts);
   const formatted = formatAmount(value, { sign, decimals });
 
   return (
     <span className={`amount amount--${tone} ${className ?? ""}`}>
-      <span className="amount__value">
-        {hidden ? maskAmount(formatted) : formatted}
-      </span>
+      <span className="amount__value">{formatted}</span>
       {!hideCurrency && <span className="amount__currency">{currency}</span>}
     </span>
   );

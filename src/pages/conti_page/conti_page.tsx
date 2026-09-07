@@ -11,6 +11,7 @@ import SkeletonList from "../../components/skeleton/skeleton";
 import EmptyState from "../../components/empty_state/empty_state";
 import Button from "../../components/button/button";
 import PickerSheet from "../../components/picker_sheet/picker_sheet";
+import Sheet from "../../components/sheet/sheet";
 import ThreeDotsActionsMenu from "../../components/three_dots_action_menu/three_dots_action_menu";
 import AccountDialog from "../../components/dialog/account_dialog/account_dialog";
 import BankConnectDialog from "../../components/dialog/bank_connect_dialog/bank_connect_dialog";
@@ -23,6 +24,7 @@ import {
   deleteConto,
   getConti,
   getPatrimonio,
+  updateConto,
 } from "../../features/conti/api_calls";
 import { Conto } from "../../features/conti/interfaces";
 import {
@@ -79,6 +81,9 @@ export default function ContiPage() {
   const [confirmingGiveUp, setConfirmingGiveUp] = useState(false);
   const [assignOpen, setAssignOpen] = useState(false);
   const [orphans, setOrphans] = useState(0);
+  const [worthOpen, setWorthOpen] = useState(false);
+  const [worthDraft, setWorthDraft] = useState("");
+  const [worthInvalid, setWorthInvalid] = useState(false);
 
   useEffect(() => {
     dispatch(getConti());
@@ -141,6 +146,43 @@ export default function ContiPage() {
     precedente && precedente !== 0
       ? ((netWorth - precedente) / Math.abs(precedente)) * 100
       : null;
+
+  // Senza un conto proprio non c'è nessuna card da aprire: i soldi stanno sul
+  // conto che l'app tiene da parte, che in elenco non compare. Il patrimonio in
+  // testata diventa allora l'unico punto da cui correggerlo — prima era un
+  // numero e basta, e la cifra restava quella per sempre.
+  const worthEditable = Boolean(virtuale) && visibili.length === 0;
+
+  const openWorth = () => {
+    setWorthDraft(netWorth ? String(netWorth) : "");
+    setWorthInvalid(false);
+    setWorthOpen(true);
+  };
+
+  const saveWorth = async () => {
+    if (!virtuale) return;
+
+    const parsed = Number(worthDraft.trim().replace(",", "."));
+
+    if (worthDraft.trim() === "" || Number.isNaN(parsed)) {
+      setWorthInvalid(true);
+      return;
+    }
+
+    // L'utente scrive il patrimonio, non il saldo: quello che sta nei titoli
+    // non è sul conto, e va tolto prima di scriverci sopra.
+    const saldo = parsed - investimentiTotal;
+
+    setWorthOpen(false);
+
+    try {
+      await dispatch(updateConto({ id: virtuale.id, saldo })).unwrap();
+      await dispatch(getConti());
+      dispatch(showToast({ variant: "success", title: t("accounts_net_worth_saved") }));
+    } catch {
+      // L'errore arriva dal middleware.
+    }
+  };
 
   const openCreate = () => {
     setEditing(null);
@@ -233,8 +275,30 @@ export default function ContiPage() {
     <>
       <Page className="accounts">
         <PageHeader className="accounts__header">
-          <div className="accounts__worth">
-            <span className="accounts__eyebrow">{t("accounts_net_worth")}</span>
+          <div
+            className={`accounts__worth${
+              worthEditable ? " accounts__worth--editable" : ""
+            }`}
+            {...(worthEditable
+              ? {
+                  role: "button",
+                  tabIndex: 0,
+                  onClick: openWorth,
+                  onKeyDown: (event: React.KeyboardEvent) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      openWorth();
+                    }
+                  },
+                }
+              : {})}
+          >
+            <span className="accounts__eyebrow">
+              {t("accounts_net_worth")}
+              {worthEditable && (
+                <i className="pi pi-pencil" aria-hidden="true" />
+              )}
+            </span>
             <Amount className="accounts__worth-value" value={netWorth} />
 
             {growth !== null && (
@@ -388,6 +452,50 @@ export default function ContiPage() {
         conto={bankAccount}
         onHide={() => setBankAccount(null)}
       />
+
+      <Sheet
+        open={worthOpen}
+        onClose={() => setWorthOpen(false)}
+        title={t("accounts_net_worth")}
+        footer={
+          <>
+            <Button variant="neutral" block onClick={() => setWorthOpen(false)}>
+              {t("cancel")}
+            </Button>
+            <Button block onClick={saveWorth}>
+              {t("save")}
+            </Button>
+          </>
+        }
+      >
+        <label className="accounts__worth-field">
+          <input
+            type="text"
+            inputMode="decimal"
+            autoFocus
+            value={worthDraft}
+            aria-label={t("accounts_net_worth")}
+            aria-invalid={worthInvalid}
+            onChange={(event) => {
+              setWorthDraft(event.target.value);
+              setWorthInvalid(false);
+            }}
+          />
+          <span className="accounts__worth-field-currency">€</span>
+        </label>
+
+        <p
+          className={`accounts__worth-hint${
+            worthInvalid ? " accounts__worth-hint--error" : ""
+          }`}
+        >
+          {worthInvalid
+            ? t("accounts_net_worth_invalid")
+            : investimentiTotal !== 0
+              ? t("accounts_net_worth_hint_investments")
+              : t("accounts_net_worth_hint")}
+        </p>
+      </Sheet>
 
       <PickerSheet
         open={assignOpen}

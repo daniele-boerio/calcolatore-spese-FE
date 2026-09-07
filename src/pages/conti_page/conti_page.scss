@@ -13,14 +13,83 @@
     flex-direction: column;
     gap: 3px;
     min-width: 0;
+
+    // Toccabile solo quando c'è davvero qualcosa da toccare: senza conti
+    // propri è l'unico punto da cui correggere la cifra. La matita accanto
+    // all'occhiello è il solo segno che lo dice — un bottone pieno intorno
+    // a un numero da 34px sarebbe più rumoroso di quanto serva.
+    &--editable {
+      cursor: pointer;
+
+      &:active {
+        transform: scale(0.99);
+        transition: transform v.$dur-press;
+      }
+    }
+  }
+
+  // Campo del foglio "Patrimonio netto": stessa forma dell'importo negli
+  // altri fogli, cifra grande e valuta appesa a destra.
+  &__worth-field {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 14px 16px;
+    border-radius: v.$r-field;
+    background: v.$bg;
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: v.$ink;
+
+      font-family: inherit;
+      font-size: 30px;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      font-variant-numeric: tabular-nums;
+      text-align: right;
+
+      &:focus {
+        outline: none;
+      }
+    }
+  }
+
+  &__worth-field-currency {
+    font-size: 18px;
+    font-weight: 700;
+    color: v.$muted-2;
+  }
+
+  &__worth-hint {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: v.$muted;
+
+    &--error {
+      color: v.$negative;
+    }
   }
 
   &__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: v.$muted;
+
+    i {
+      font-size: 10px;
+    }
   }
 
   &__worth-value {

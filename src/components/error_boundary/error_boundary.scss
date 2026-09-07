@@ -1,0 +1,73 @@
+@use "../../styles/variables" as v;
+
+// Schermata a tutta pagina: quando compare, è l'unica cosa rimasta in piedi.
+// Niente `Page`/`Card` di libreria — se a rompersi è stato il caricamento di un
+// chunk, meno dipendenze ha questa schermata e meglio è.
+.error-boundary {
+  min-height: 100dvh;
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  text-align: center;
+
+  padding: 32px 26px calc(32px + env(safe-area-inset-bottom));
+  background: v.$bg;
+  color: v.$ink;
+
+  &__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 20px;
+    background: v.$accent-soft;
+    color: v.$accent;
+
+    i {
+      font-size: 22px;
+    }
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  &__title {
+    margin: 0;
+    font-family: v.$font-display;
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  &__message {
+    margin: 0;
+    max-width: 32ch;
+    font-size: 14px;
+    line-height: 1.5;
+    color: v.$muted;
+  }
+
+  &__action {
+    appearance: none;
+    border: 0;
+    cursor: pointer;
+
+    min-height: 50px;
+    padding: 0 28px;
+    border-radius: v.$r-field;
+
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+
+    background: v.$accent;
+    color: v.$on-accent;
+  }
+}

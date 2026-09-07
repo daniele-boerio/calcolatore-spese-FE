@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
@@ -14,16 +14,17 @@ import { selectTagTags } from "../../features/tags/tag_slice";
 import { getCategorie } from "../../features/categorie/api_calls";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
 import "./analysis_page.scss";
+import { lazyWithRetry } from "../../services/lazy_with_retry";
 
 // Statistiche e Grafici erano due voci di menu distinte: ora sono tre viste
 // della stessa schermata.
-const MonthStatistics = lazy(
+const MonthStatistics = lazyWithRetry(
   () => import("./month_statistics/month_statistics"),
 );
-const YearStatistics = lazy(
+const YearStatistics = lazyWithRetry(
   () => import("./year_statistics/year_statistics"),
 );
-const ChartsPage = lazy(() => import("../charts_page/charts_page"));
+const ChartsPage = lazyWithRetry(() => import("../charts_page/charts_page"));
 
 type Scope = "month" | "year" | "categories";
 
@@ -150,7 +151,10 @@ export default function AnalysisPage() {
           />
         );
       case "categories":
-        return <ChartsPage />;
+        // Gli endpoint dei grafici prendono solo un intervallo di date, non
+        // categoria e tag: qui passa quello che sanno usare — l'anno, e la
+        // categoria per il suo andamento.
+        return <ChartsPage year={year} categoriaId={categoriaId} />;
     }
   };
 

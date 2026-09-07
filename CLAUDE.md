@@ -1,7 +1,9 @@
 # FE — React 19 + TypeScript + Vite
 
-SPA for the Calcolatore Spese app. Redux Toolkit state, MUI 7 + PrimeReact UI,
-Axios for I/O, SCSS for styling, i18n (it/en), charts via chart.js + @mui/x-charts.
+SPA for the Calcolatore Spese app. Redux Toolkit state, PrimeReact UI, Axios for
+I/O, SCSS for styling, i18n (it/en). Charts are hand-drawn SVG/CSS on the design
+tokens (see `pages/charts_page`, `features/statistics/trend.ts`) — no chart
+library: inside a canvas the theme custom properties do not resolve.
 
 ## Anatomy of a domain (`src/features/<dominio>/`)
 

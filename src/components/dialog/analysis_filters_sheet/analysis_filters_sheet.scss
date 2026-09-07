@@ -15,6 +15,11 @@
     color: v.$muted;
   }
 
+  &__empty {
+    margin: 0;
+    font-size: 13px;
+    color: v.$muted;
+  }
   &__chips {
     display: flex;
     flex-wrap: wrap;

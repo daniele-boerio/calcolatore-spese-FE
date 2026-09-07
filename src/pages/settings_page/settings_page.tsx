@@ -9,11 +9,9 @@ import Button from "../../components/button/button";
 import Amount from "../../components/amount/amount";
 import ImportStatementDialog from "../../components/dialog/import_statement_dialog/import_statement_dialog";
 import {
-  selectHideAmounts,
   selectTheme,
   setTheme,
   showToast,
-  toggleHideAmounts,
 } from "../../features/ui/ui_slice";
 import type { ThemePreference } from "../../features/ui/theme";
 import {
@@ -50,7 +48,6 @@ export default function SettingsPage() {
   const navigate = useNavigate();
 
   const theme = useAppSelector(selectTheme);
-  const hideAmounts = useAppSelector(selectHideAmounts);
   const username = useAppSelector(selectProfileUsername);
   const email = useAppSelector(selectProfileEmail);
   const spending = useAppSelector(selectContiMonthlySpending);
@@ -237,28 +234,6 @@ export default function SettingsPage() {
               </span>
               <i className="pi pi-chevron-right" aria-hidden="true" />
             </button>
-          </div>
-        </section>
-
-        <section className="settings-group">
-          <h2 className="settings-group__title">{t("settings_privacy")}</h2>
-
-          <div className="settings-card">
-            <label className="settings-row">
-              <span className="settings-row__text">
-                <span className="settings-row__label">
-                  {t("settings_hide_amounts")}
-                </span>
-                <span className="settings-row__hint">
-                  {t("settings_hide_amounts_hint")}
-                </span>
-              </span>
-
-              <Toggle
-                checked={hideAmounts}
-                onChange={() => dispatch(toggleHideAmounts())}
-              />
-            </label>
           </div>
         </section>
 

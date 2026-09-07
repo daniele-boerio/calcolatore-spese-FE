@@ -42,11 +42,25 @@ import App from "./App";
 
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
+import ErrorBoundary from "./components/error_boundary/error_boundary";
 
+// L'ErrorBoundary sta il più in alto possibile, fuori da App: un errore in
+// fase di render — tipicamente un chunk di pagina che non si scarica — senza
+// nessuno che lo catturi fa smontare a React l'intera radice, e `#root` resta
+// un div vuoto. Cioè la schermata bianca da cui, con l'app in home su iPhone,
+// si esce solo chiudendo e riaprendo.
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
     </Provider>
   </React.StrictMode>,
 );
+
+// `createRoot` svuota già #root al primo render, e con lui la schermata
+// d'avvio di index.html. Questa riga è la cintura di sicurezza: se quel
+// comportamento cambiasse, #boot — che è `position: fixed; inset: 0` —
+// resterebbe sopra a tutta l'app. Dopo il primo frame, quindi senza buchi.
+requestAnimationFrame(() => document.getElementById("boot")?.remove());

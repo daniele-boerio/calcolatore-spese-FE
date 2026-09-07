@@ -16,6 +16,7 @@ const KEYS = {
   type: "tipo",
   accounts: "conti",
   categories: "categorie",
+  subcategories: "sottocategorie",
   tags: "tag",
   min: "min",
   max: "max",
@@ -79,6 +80,8 @@ export function encodeFilters(
     params.set(KEYS.accounts, filters.conto_id.join(","));
   if (filters.categoria_id?.length)
     params.set(KEYS.categories, filters.categoria_id.join(","));
+  if (filters.sottocategoria_id?.length)
+    params.set(KEYS.subcategories, filters.sottocategoria_id.join(","));
   if (filters.tag_id?.length) params.set(KEYS.tags, filters.tag_id.join(","));
   if (filters.importo_min !== undefined)
     params.set(KEYS.min, String(filters.importo_min));
@@ -110,6 +113,7 @@ export function decodeFilters(params: URLSearchParams): UrlFilters {
       tipo: params.get(KEYS.type) ?? undefined,
       conto_id: list(params.get(KEYS.accounts)),
       categoria_id: list(params.get(KEYS.categories)),
+      sottocategoria_id: list(params.get(KEYS.subcategories)),
       tag_id: list(params.get(KEYS.tags)),
       importo_min: number(params.get(KEYS.min)),
       importo_max: number(params.get(KEYS.max)),

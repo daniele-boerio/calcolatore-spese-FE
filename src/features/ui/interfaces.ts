@@ -15,8 +15,6 @@ export type ActiveSheet =
 export interface UiState {
   /** Preferenza di tema dell'utente, persistita in localStorage. */
   theme: ThemePreference;
-  /** Nasconde ogni cifra dietro a "••••" mantenendo la larghezza. */
-  hideAmounts: boolean;
   /** Sheet attualmente aperto, `null` se nessuno. */
   sheet: ActiveSheet | null;
   /** Coda dei toast visibili, dal più vecchio al più recente. */
