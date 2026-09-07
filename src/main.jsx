@@ -43,6 +43,13 @@ import App from "./App";
 import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 import ErrorBoundary from "./components/error_boundary/error_boundary";
+import { installErrorLog } from "./services/error_log";
+
+// Prima di ogni altra cosa: da qui in poi console.error, gli errori non
+// catturati e le promise rifiutate finiscono anche in un registro che la
+// schermata di errore sa copiare negli appunti. Su un iPhone in standalone
+// è l'unico modo di far uscire uno stack senza collegare il telefono.
+installErrorLog();
 
 // L'ErrorBoundary sta il più in alto possibile, fuori da App: un errore in
 // fase di render — tipicamente un chunk di pagina che non si scarica — senza

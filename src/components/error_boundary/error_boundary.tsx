@@ -1,5 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from "react";
 import { t } from "../../i18n";
+import { buildErrorReport, copyToClipboard } from "../../services/error_log";
 import "./error_boundary.scss";
 
 /**
@@ -15,6 +16,10 @@ import "./error_boundary.scss";
  * pagina che non si scarica (vedi `services/lazy_with_retry`), quindi lo
  * distinguiamo: lì il messaggio giusto parla di connessione, non di errore
  * dell'app.
+ *
+ * Sotto ai due bottoni c'è il motivo per cui questa schermata esiste anche
+ * dopo il "Riprova": su un telefono la console non si apre, e senza un modo di
+ * portare fuori lo stack un errore visto una volta sola non si ripara.
  */
 
 // I motori scrivono questo errore ognuno a modo suo: WebKit "Importing a module
@@ -34,19 +39,26 @@ const isChunkError = (error: Error | null): boolean => {
 };
 
 type Props = { children: ReactNode };
-type State = { error: Error | null };
+type State = {
+  error: Error | null;
+  componentStack: string | null;
+  /** `manual` = gli appunti non erano disponibili, il testo si copia a mano. */
+  copied: "no" | "yes" | "manual";
+};
 
 export default class ErrorBoundary extends Component<Props, State> {
-  state: State = { error: null };
+  state: State = { error: null, componentStack: null, copied: "no" };
 
-  static getDerivedStateFromError(error: Error): State {
+  static getDerivedStateFromError(error: Error): Partial<State> {
     return { error };
   }
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     // Non c'è raccolta errori lato server: la console resta l'unico posto dove
-    // ritrovare lo stack collegando l'iPhone al Web Inspector.
+    // ritrovare lo stack collegando l'iPhone al Web Inspector — e il bottone
+    // qui sotto l'unico modo di leggerlo senza cavo.
     console.error("[ErrorBoundary]", error, info.componentStack);
+    this.setState({ componentStack: info.componentStack ?? null });
   }
 
   // Un reload e non un `setState({error: null})`: `React.lazy` si ricorda per
@@ -57,8 +69,16 @@ export default class ErrorBoundary extends Component<Props, State> {
     window.location.reload();
   };
 
+  private report = () =>
+    buildErrorReport(this.state.error, this.state.componentStack);
+
+  private copy = async () => {
+    const ok = await copyToClipboard(this.report());
+    this.setState({ copied: ok ? "yes" : "manual" });
+  };
+
   render() {
-    const { error } = this.state;
+    const { error, copied } = this.state;
     if (!error) return this.props.children;
 
     const offline = isChunkError(error);
@@ -66,11 +86,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="error-boundary" role="alert">
         <span className="error-boundary__icon" aria-hidden="true">
-          <i
-            className={
-              offline ? "pi pi-wifi" : "pi pi-exclamation-triangle"
-            }
-          />
+          <i className={offline ? "pi pi-wifi" : "pi pi-exclamation-triangle"} />
         </span>
 
         <div className="error-boundary__text">
@@ -89,6 +105,35 @@ export default class ErrorBoundary extends Component<Props, State> {
         >
           {t("error_retry")}
         </button>
+
+        <button
+          type="button"
+          className="error-boundary__copy"
+          onClick={this.copy}
+        >
+          <i
+            className={copied === "yes" ? "pi pi-check" : "pi pi-copy"}
+            aria-hidden="true"
+          />
+          {copied === "yes" ? t("error_copied") : t("error_copy")}
+        </button>
+
+        {/* Gli appunti hanno detto di no (succede fuori da https, o se il
+            permesso è negato): il testo si seleziona a mano. */}
+        {copied === "manual" && (
+          <div className="error-boundary__manual">
+            <p className="error-boundary__manual-hint">
+              {t("error_copy_manual")}
+            </p>
+            <textarea
+              className="error-boundary__report"
+              readOnly
+              rows={10}
+              value={this.report()}
+              onFocus={(event) => event.currentTarget.select()}
+            />
+          </div>
+        )}
       </div>
     );
   }
