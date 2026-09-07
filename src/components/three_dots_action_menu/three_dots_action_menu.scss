@@ -18,6 +18,39 @@
     align-items: center;
     justify-content: center;
   }
+
+  /* Niente alone al tocco.
+
+     `styles/_primereact.scss` accende `--accent-soft` dietro ai bottoni di
+     testo al passaggio del mouse. Su un telefono il mouse non c'è: il
+     `:hover` che un tocco lascia acceso ci resta finché non se ne prende un
+     altro da qualche parte, e quel quadrato colorato (ambra nel tema scuro)
+     dietro ai tre puntini sembra un menù rimasto aperto.
+
+     Il `:root` davanti è lo stesso accorgimento di `styles/_primereact.scss`,
+     e per lo stesso motivo: quella regola è già prefissata così, quindi senza
+     vinceremmo solo perché il nostro foglio arriva dopo — e l'ordine di
+     caricamento di un chunk pigro non è una cosa su cui appoggiarsi. */
+  :root & .p-button.p-button-text {
+    &:enabled:hover,
+    &:enabled:active,
+    &:focus {
+      background: transparent;
+      border-color: transparent;
+      box-shadow: none;
+      // Stessa tinta di riposo — è quella che entrambe le pagine danno al
+      // trigger — così l'icona non si accende sotto il dito.
+      color: v.$muted-2;
+    }
+
+    // Da tastiera un segno serve, ma `:focus-visible` non scatta su un tocco:
+    // l'alone di prima non torna.
+    &:focus-visible {
+      outline: 2px solid v.$accent;
+      outline-offset: -4px;
+      border-radius: v.$r-field;
+    }
+  }
 }
 
 /* Voce di menu "Danger" (es. Elimina) */

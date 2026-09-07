@@ -21,6 +21,7 @@ import {
 } from "../../features/charts/charts_slice";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
 import { buildTrend, Trend } from "../../features/statistics/trend";
+import { monthOfLabel } from "../../features/charts/labels";
 import { endOfMonth, toIsoDate } from "../../services/dates";
 import "./charts_page.scss";
 
@@ -50,6 +51,21 @@ const monthInitial = (year: number, month: number) =>
   new Intl.DateTimeFormat(localeTag(), { month: "narrow" }).format(
     new Date(year, month - 1, 1),
   );
+
+/**
+ * Le tre serie a mesi, ripulite: `charts_slice` è un secchio unico riempito
+ * anche dalla vista Mese, con finestre che scavalcano l'anno. Quello che non
+ * appartiene all'anno a schermo esce di qui (vedi features/charts/labels).
+ */
+const byMonth = <T, R>(
+  rows: (T & { label: string })[],
+  year: number,
+  map: (row: T, month: number) => R,
+): R[] =>
+  rows.flatMap((row) => {
+    const month = monthOfLabel(row.label, year);
+    return month === null ? [] : [map(row, month)];
+  });
 
 type ChartsProps = {
   year: number;
@@ -111,13 +127,13 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
   // all'altro.
   const months = useMemo(
     () =>
-      incomeExpense.map((row) => ({
-        month: Number(row.label),
+      byMonth(incomeExpense, year, (row, month) => ({
+        month,
         entrate: Math.abs(row.entrate),
         uscite: Math.abs(row.uscite),
         accantonamento: Math.abs(row.accantonamento ?? 0),
       })),
-    [incomeExpense],
+    [incomeExpense, year],
   );
 
   // La colonna delle uscite è impilata con l'accantonamento: sono due modi di
@@ -130,8 +146,19 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
     0,
   );
 
-  const savingsSeries = savings.map((row) => Number(row.risparmio));
-  const savingsTrend = buildTrend(savingsSeries, TREND_BOX);
+  const savingsPoints = useMemo(
+    () =>
+      byMonth(savings, year, (row, month) => ({
+        month,
+        risparmio: Number(row.risparmio),
+      })),
+    [savings, year],
+  );
+
+  const savingsTrend = buildTrend(
+    savingsPoints.map((point) => point.risparmio),
+    TREND_BOX,
+  );
 
   const slices = useMemo(() => {
     const sorted = composition
@@ -182,7 +209,16 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
     });
   }, [slices, compositionTotal, circumference]);
 
-  const trendSeries = categoryTrend.map((row) => Math.abs(Number(row.spesa)));
+  const trendPoints = useMemo(
+    () =>
+      byMonth(categoryTrend, year, (row, month) => ({
+        month,
+        spesa: Math.abs(Number(row.spesa)),
+      })),
+    [categoryTrend, year],
+  );
+
+  const trendSeries = trendPoints.map((point) => point.spesa);
   const categoryChart = categoriaId ? buildTrend(trendSeries, TREND_BOX) : null;
   const categoriaNome = categorie.find(
     (item) => String(item.id) === String(categoriaId),
@@ -287,10 +323,8 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
           <TrendChart trend={savingsTrend} label={t("analysis_savings_trend")} />
 
           <div className="chart-axis">
-            {savings.map((row) => (
-              <span key={row.label}>
-                {monthInitial(year, Number(row.label))}
-              </span>
+            {savingsPoints.map((point) => (
+              <span key={point.month}>{monthInitial(year, point.month)}</span>
             ))}
           </div>
 
@@ -365,10 +399,8 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
             <TrendChart trend={categoryChart} label={t("category_trend")} />
 
             <div className="chart-axis">
-              {categoryTrend.map((row) => (
-                <span key={row.label}>
-                  {monthInitial(year, Number(row.label))}
-                </span>
+              {trendPoints.map((point) => (
+                <span key={point.month}>{monthInitial(year, point.month)}</span>
               ))}
             </div>
           </>
