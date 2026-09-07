@@ -136,9 +136,11 @@ export default function TransactionPage() {
   const contoById = useMemo(() => nameById(conti), [conti]);
 
   const incomes = pagination.total_incomes ?? 0;
+  // Uscite al netto dei rimborsi ricevuti, come ovunque nell'app: una spesa da
+  // 100 rimborsata di 30 pesa 70. Il rimborso è già dentro a questa cifra,
+  // quindi il saldo NON lo rimette: sommarlo lo conterebbe due volte.
   const expenses = pagination.total_expenses ?? 0;
-  const compensations = pagination.total_compensation ?? 0;
-  const balance = incomes + compensations - expenses;
+  const balance = incomes - expenses;
 
   const total = pagination.total ?? 0;
   const hasMore = transactions.length < total;
