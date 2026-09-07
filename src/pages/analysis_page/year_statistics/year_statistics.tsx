@@ -13,21 +13,13 @@ import {
   selectYearlyStatisticsData,
   selectYearlyTotals,
 } from "../../../features/statistics/statistics_slice";
-import { buildTrend } from "../../../features/statistics/trend";
+import { linearRegression } from "../../../features/statistics/trend";
+import TrendChart from "../../../components/charts/trend_chart/trend_chart";
 import { YearDetailsStatRow } from "../../../features/statistics/interfaces";
 
 // Il design mostra una finestra di sei mesi: dodici barre appaiate non si
 // leggono su 430px.
 const WINDOW = 6;
-
-// Coordinate del grafico di tendenza, nelle unità del `viewBox`.
-const TREND_BOX = {
-  width: 360,
-  padX: 8,
-  top: 20,
-  bottom: 126,
-  baseline: 142,
-};
 
 type YearStatisticsProps = {
   year: number;
@@ -110,7 +102,9 @@ export default function YearStatistics({
       ? savings.reduce((sum, value) => sum + value, 0) / savings.length
       : 0;
 
-  const trend = buildTrend(savings, TREND_BOX);
+  // La pendenza serve solo al badge: il disegno lo fa `TrendChart`, che si
+  // ricalcola la sua geometria dai punti che gli passiamo.
+  const slope = linearRegression(savings).slope;
 
   const monthLabel = (month: number) =>
     new Intl.DateTimeFormat(getLocale() === "it" ? "it-IT" : "en-GB", {
@@ -187,16 +181,16 @@ export default function YearStatistics({
         </div>
       </Card>
 
-      {trend && (
+      {months.length > 1 && (
         <Card>
           <CardTitle
             aside={
               <span
                 className={`year-trend__badge year-trend__badge--${
-                  trend.slope >= 0 ? "up" : "down"
+                  slope >= 0 ? "up" : "down"
                 }`}
               >
-                {trend.slope >= 0
+                {slope >= 0
                   ? t("analysis_trend_up")
                   : t("analysis_trend_down")}
               </span>
@@ -205,38 +199,14 @@ export default function YearStatistics({
             {t("analysis_savings_trend")}
           </CardTitle>
 
-          <svg
-            className="year-trend__chart"
-            viewBox={`0 0 ${TREND_BOX.width} 150`}
-            role="img"
-            aria-label={t("analysis_savings_trend")}
-          >
-            <polygon className="year-trend__area" points={trend.area} />
-            <polyline className="year-trend__line" points={trend.line} />
-
-            {trend.guide && (
-              <line
-                className="year-trend__guide"
-                x1={trend.guide.x1}
-                y1={trend.guide.y1}
-                x2={trend.guide.x2}
-                y2={trend.guide.y2}
-              />
-            )}
-
-            <circle
-              className="year-trend__dot"
-              cx={trend.points[trend.points.length - 1].x}
-              cy={trend.points[trend.points.length - 1].y}
-              r={5.5}
-            />
-          </svg>
-
-          <div className="year-trend__labels">
-            {months.map((month) => (
-              <span key={month.month}>{monthLabel(month.month)}</span>
-            ))}
-          </div>
+          <TrendChart
+            points={months.map((month, index) => ({
+              label: monthLabel(month.month),
+              value: savings[index],
+            }))}
+            ariaLabel={t("analysis_savings_trend")}
+            showGuide
+          />
         </Card>
       )}
 

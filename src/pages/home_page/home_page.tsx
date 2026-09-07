@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
@@ -82,6 +82,7 @@ const initialsOf = (username: string | null) =>
 export default function HomePage() {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const [profileOpen, setProfileOpen] = useState(false);
 
@@ -147,6 +148,13 @@ export default function HomePage() {
 
   const upcomingTotal = upcoming.reduce((sum, item) => sum + item.importo, 0);
 
+  // Le due cifre sotto l'hero sono somme del mese per tipo (`currentMonthExpenses`
+  // le calcola così): toccarle apre i Movimenti sullo stesso taglio, cioè
+  // sull'elenco che compone il numero appena letto. I filtri viaggiano
+  // nell'indirizzo, che è da dove la lista si ricostruisce.
+  const openMonth = (tipo: "ENTRATA" | "USCITA") =>
+    navigate(`/transactions?periodo=month&tipo=${tipo}`);
+
   return (
     <>
     <Page className="home-page">
@@ -185,10 +193,12 @@ export default function HomePage() {
               label: t("income"),
               value: <Amount value={income} decimals={0} />,
               tone: "positive",
+              onClick: () => openMonth("ENTRATA"),
             },
             {
               label: t("expenses"),
               value: <Amount value={spending.spent} decimals={0} />,
+              onClick: () => openMonth("USCITA"),
             },
           ]}
         />

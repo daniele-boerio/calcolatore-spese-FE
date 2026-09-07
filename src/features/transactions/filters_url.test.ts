@@ -118,6 +118,30 @@ describe("decodeFilters", () => {
 
 // Il filtro per sottocategoria è arrivato dopo gli altri: sta nell'URL come
 // loro, altrimenti un refresh sui Movimenti riporterebbe indietro solo lui.
+// La Home apre i Movimenti con questo indirizzo quando si tocca "Entrate" o
+// "Uscite" (vedi pages/home_page). È un contratto fra due schermate che non si
+// parlano: se una chiave cambiasse da una parte sola il tocco aprirebbe la
+// lista senza filtri, e nessuno se ne accorgerebbe.
+describe("il link delle metriche della Home", () => {
+  it("apre i Movimenti sul mese corrente e sul tipo scelto", () => {
+    const { period, filters } = decodeFilters(
+      new URLSearchParams("periodo=month&tipo=ENTRATA"),
+    );
+
+    expect(period).toBe("month");
+    expect(filters.tipo).toBe("ENTRATA");
+    expect(filters.data_inizio).toBe(periodRange("month").data_inizio);
+    expect(filters.data_fine).toBe(periodRange("month").data_fine);
+  });
+
+  it("vale allo stesso modo per le uscite", () => {
+    expect(
+      decodeFilters(new URLSearchParams("periodo=month&tipo=USCITA")).filters
+        .tipo,
+    ).toBe("USCITA");
+  });
+});
+
 describe("filtro per sottocategoria", () => {
   it("fa il giro completo insieme alla sua categoria", () => {
     const original = {

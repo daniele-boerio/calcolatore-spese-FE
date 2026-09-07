@@ -442,6 +442,7 @@
   "income_vs_expenses": "Income vs Expenses",
   "monthly_savings": "Monthly Savings Trend",
   "expense_composition": "Expense Composition",
+  "charts_touch_for_values": "touch and hold for values",
   "charts_pick_category": "Pick a category from the filters above to see how it moved over the year.",
   "category_trend": "Category Trend",
   "trendline": "Trend line",

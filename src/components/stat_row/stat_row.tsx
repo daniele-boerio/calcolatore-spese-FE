@@ -5,6 +5,11 @@ export type Stat = {
   label: string;
   value: ReactNode;
   tone?: "neutral" | "positive" | "negative";
+  /**
+   * Rende la colonna toccabile: una metrica è la somma di qualcosa, e da qui
+   * si va a vedere di cosa. Senza, la colonna resta un numero e basta.
+   */
+  onClick?: () => void;
 };
 
 /**
@@ -21,18 +26,44 @@ export default function StatRow({
 }) {
   return (
     <div className={`stat-row ${className ?? ""}`}>
-      {stats.map((stat) => (
-        <div key={stat.label} className="stat-row__cell">
-          <span className="stat-row__label">{stat.label}</span>
-          <span
-            className={`stat-row__value stat-row__value--${
-              stat.tone ?? "neutral"
-            }`}
+      {stats.map((stat) => {
+        const content = (
+          <>
+            <span className="stat-row__label">
+              {stat.label}
+              {stat.onClick && (
+                <i className="pi pi-chevron-right" aria-hidden="true" />
+              )}
+            </span>
+            <span
+              className={`stat-row__value stat-row__value--${
+                stat.tone ?? "neutral"
+              }`}
+            >
+              {stat.value}
+            </span>
+          </>
+        );
+
+        if (!stat.onClick) {
+          return (
+            <div key={stat.label} className="stat-row__cell">
+              {content}
+            </div>
+          );
+        }
+
+        return (
+          <button
+            key={stat.label}
+            type="button"
+            className="stat-row__cell stat-row__cell--tappable"
+            onClick={stat.onClick}
           >
-            {stat.value}
-          </span>
-        </div>
-      ))}
+            {content}
+          </button>
+        );
+      })}
     </div>
   );
 }

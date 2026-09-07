@@ -6,6 +6,8 @@ import { Card, CardTitle } from "../../components/card/card";
 import Amount from "../../components/amount/amount";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
+import MonthColumns from "../../components/charts/month_columns/month_columns";
+import TrendChart from "../../components/charts/trend_chart/trend_chart";
 import {
   getCategoryTrendChart,
   getExpenseCompositionChart,
@@ -20,21 +22,10 @@ import {
   selectChartsSavings,
 } from "../../features/charts/charts_slice";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
-import { buildTrend, Trend } from "../../features/statistics/trend";
+import { linearRegression } from "../../features/statistics/trend";
 import { monthOfLabel } from "../../features/charts/labels";
 import { endOfMonth, toIsoDate } from "../../services/dates";
 import "./charts_page.scss";
-
-// Coordinate dei grafici a linea, nelle unità del `viewBox`. Sono le stesse
-// della vista Anno: le due schermate stanno nella stessa pillola, a un tocco
-// di distanza, e due grafici alti diversi si notano.
-const TREND_BOX = {
-  width: 360,
-  padX: 8,
-  top: 18,
-  bottom: 108,
-  baseline: 124,
-};
 
 // Ciambella: diametro e spessore dell'anello, in unità del `viewBox`.
 const DONUT_SIZE = 132;
@@ -52,9 +43,15 @@ const monthInitial = (year: number, month: number) =>
     new Date(year, month - 1, 1),
   );
 
+/** Nome breve: nel riquadro che compare al tocco lo spazio c'è. */
+const monthShort = (year: number, month: number) =>
+  new Intl.DateTimeFormat(localeTag(), { month: "short" }).format(
+    new Date(year, month - 1, 1),
+  );
+
 /**
- * Le tre serie a mesi, ripulite: `charts_slice` è un secchio unico riempito
- * anche dalla vista Mese, con finestre che scavalcano l'anno. Quello che non
+ * Le serie a mesi, ripulite: `charts_slice` è un secchio unico riempito anche
+ * dalla vista Mese, con finestre che scavalcano l'anno. Quello che non
  * appartiene all'anno a schermo esce di qui (vedi features/charts/labels).
  */
 const byMonth = <T, R>(
@@ -81,10 +78,12 @@ type ChartsProps = {
  * tendina suo: quattro periodi diversi nella stessa schermata, e nessuno dei
  * quattro era quello scritto in cima.
  *
- * I grafici sono disegnati a mano in SVG come il resto dell'Analisi, non con
- * una libreria: è l'unico modo perché prendano i colori dai token del tema
- * (dentro un canvas le custom property non esistono) e perché al buio si
- * leggano senza doverli ridipingere da JavaScript.
+ * I grafici sono disegnati a mano come il resto dell'Analisi, non con una
+ * libreria: è l'unico modo perché prendano i colori dai token del tema (dentro
+ * un canvas le custom property non esistono) e perché al buio si leggano senza
+ * doverli ridipingere da JavaScript. I numeri si leggono tenendo il dito sul
+ * grafico — è lì che `MonthColumns` e `TrendChart` si guadagnano il posto di
+ * componenti invece di essere due SVG scritti qui dentro.
  */
 export default function ChartsPage({ year, categoriaId }: ChartsProps) {
   const { t } = useI18n();
@@ -128,7 +127,8 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
   const months = useMemo(
     () =>
       byMonth(incomeExpense, year, (row, month) => ({
-        month,
+        label: monthInitial(year, month),
+        title: monthShort(year, month),
         entrate: Math.abs(row.entrate),
         uscite: Math.abs(row.uscite),
         accantonamento: Math.abs(row.accantonamento ?? 0),
@@ -136,29 +136,19 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
     [incomeExpense, year],
   );
 
-  // La colonna delle uscite è impilata con l'accantonamento: sono due modi di
-  // far uscire soldi dal portafoglio, e una terza barra appaiata avrebbe dato
-  // trentasei barre in trecento pixel.
-  const peak = Math.max(
-    ...months.map((entry) =>
-      Math.max(entry.entrate, entry.uscite + entry.accantonamento),
-    ),
-    0,
-  );
-
   const savingsPoints = useMemo(
     () =>
       byMonth(savings, year, (row, month) => ({
-        month,
-        risparmio: Number(row.risparmio),
+        label: monthInitial(year, month),
+        title: monthShort(year, month),
+        value: Number(row.risparmio),
       })),
     [savings, year],
   );
 
-  const savingsTrend = buildTrend(
-    savingsPoints.map((point) => point.risparmio),
-    TREND_BOX,
-  );
+  const savingsSlope = linearRegression(
+    savingsPoints.map((point) => point.value),
+  ).slope;
 
   const slices = useMemo(() => {
     const sorted = composition
@@ -212,14 +202,13 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
   const trendPoints = useMemo(
     () =>
       byMonth(categoryTrend, year, (row, month) => ({
-        month,
-        spesa: Math.abs(Number(row.spesa)),
+        label: monthInitial(year, month),
+        title: monthShort(year, month),
+        value: Math.abs(Number(row.spesa)),
       })),
     [categoryTrend, year],
   );
 
-  const trendSeries = trendPoints.map((point) => point.spesa);
-  const categoryChart = categoriaId ? buildTrend(trendSeries, TREND_BOX) : null;
   const categoriaNome = categorie.find(
     (item) => String(item.id) === String(categoriaId),
   )?.nome;
@@ -253,65 +242,31 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
   return (
     <>
       <Card>
-        <CardTitle aside={String(year)}>{t("analysis_in_and_out")}</CardTitle>
+        <CardTitle aside={t("charts_touch_for_values")}>
+          {t("analysis_in_and_out")}
+        </CardTitle>
 
-        <div
-          className="year-columns"
-          role="img"
-          aria-label={t("analysis_in_and_out")}
-        >
-          {months.map((entry) => (
-            <div className="year-columns__group" key={entry.month}>
-              <div className="year-columns__pair">
-                <span
-                  className="year-columns__bar year-columns__bar--in"
-                  style={{
-                    height: `${peak > 0 ? (entry.entrate / peak) * 100 : 0}%`,
-                  }}
-                />
-
-                <span className="year-columns__stack">
-                  <span
-                    className="year-columns__bar year-columns__bar--aside"
-                    style={{
-                      height: `${
-                        peak > 0 ? (entry.accantonamento / peak) * 100 : 0
-                      }%`,
-                    }}
-                  />
-                  <span
-                    className="year-columns__bar year-columns__bar--out"
-                    style={{
-                      height: `${peak > 0 ? (entry.uscite / peak) * 100 : 0}%`,
-                    }}
-                  />
-                </span>
-              </div>
-
-              <span className="year-columns__label">
-                {monthInitial(year, entry.month)}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        <div className="chart-legend">
-          <LegendDot variant="in" label={t("income")} />
-          <LegendDot variant="out" label={t("expenses")} />
-          <LegendDot variant="aside" label={t("set_aside")} />
-        </div>
+        <MonthColumns
+          months={months}
+          ariaLabel={t("analysis_in_and_out")}
+          labels={{
+            entrate: t("income"),
+            uscite: t("expenses"),
+            accantonamento: t("set_aside"),
+          }}
+        />
       </Card>
 
-      {savingsTrend && (
+      {savingsPoints.length > 1 && (
         <Card>
           <CardTitle
             aside={
               <span
                 className={`chart-badge chart-badge--${
-                  savingsTrend.slope >= 0 ? "up" : "down"
+                  savingsSlope >= 0 ? "up" : "down"
                 }`}
               >
-                {savingsTrend.slope >= 0
+                {savingsSlope >= 0
                   ? t("analysis_trend_up")
                   : t("analysis_trend_down")}
               </span>
@@ -320,13 +275,11 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
             {t("analysis_savings_trend")}
           </CardTitle>
 
-          <TrendChart trend={savingsTrend} label={t("analysis_savings_trend")} />
-
-          <div className="chart-axis">
-            {savingsPoints.map((point) => (
-              <span key={point.month}>{monthInitial(year, point.month)}</span>
-            ))}
-          </div>
+          <TrendChart
+            points={savingsPoints}
+            ariaLabel={t("analysis_savings_trend")}
+            showGuide
+          />
 
           <div className="chart-legend">
             <LegendDot variant="line" label={t("savings")} />
@@ -392,50 +345,14 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
 
         {!categoriaId ? (
           <p className="chart-hint">{t("charts_pick_category")}</p>
-        ) : !categoryChart || trendSeries.every((value) => value === 0) ? (
+        ) : trendPoints.length < 2 ||
+          trendPoints.every((point) => point.value === 0) ? (
           <p className="chart-hint">{t("no_data")}</p>
         ) : (
-          <>
-            <TrendChart trend={categoryChart} label={t("category_trend")} />
-
-            <div className="chart-axis">
-              {trendPoints.map((point) => (
-                <span key={point.month}>{monthInitial(year, point.month)}</span>
-              ))}
-            </div>
-          </>
+          <TrendChart points={trendPoints} ariaLabel={t("category_trend")} />
         )}
       </Card>
     </>
-  );
-}
-
-/** Linea, area sotto e retta di tendenza: la stessa forma della vista Anno. */
-function TrendChart({ trend, label }: { trend: Trend; label: string }) {
-  const last = trend.points[trend.points.length - 1];
-
-  return (
-    <svg
-      className="chart-trend"
-      viewBox={`0 0 ${TREND_BOX.width} ${TREND_BOX.baseline + 8}`}
-      role="img"
-      aria-label={label}
-    >
-      <polygon className="chart-trend__area" points={trend.area} />
-      <polyline className="chart-trend__line" points={trend.line} />
-
-      {trend.guide && (
-        <line
-          className="chart-trend__guide"
-          x1={trend.guide.x1}
-          y1={trend.guide.y1}
-          x2={trend.guide.x2}
-          y2={trend.guide.y2}
-        />
-      )}
-
-      <circle className="chart-trend__dot" cx={last.x} cy={last.y} r={5.5} />
-    </svg>
   );
 }
 

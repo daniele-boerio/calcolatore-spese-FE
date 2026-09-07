@@ -116,62 +116,21 @@
 }
 
 // ── Trend del risparmio ─────────────────────────────────────────────────────
+// Del grafico della tendenza resta qui solo il gagliardetto accanto al
+// titolo: linea, area, etichette e lettura al tocco stanno in
+// `components/charts/trend_chart`, condiviso con la vista Grafici.
 .year-trend {
   &__badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 5px 9px;
-    border-radius: v.$r-pill;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 700;
 
     &--up {
-      background: v.$accent-soft;
-      color: v.$accent;
+      color: v.$positive;
     }
 
     &--down {
-      background: v.$negative-soft;
       color: v.$negative;
     }
-  }
-
-  &__chart {
-    display: block;
-    width: 100%;
-    height: 150px;
-  }
-
-  &__area {
-    fill: v.$accent-soft;
-  }
-
-  &__line {
-    fill: none;
-    stroke: v.$accent;
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  // Tendenza: tratteggiata, perché è una lettura, non un dato.
-  &__guide {
-    stroke: v.$muted-2;
-    stroke-width: 1.5;
-    stroke-dasharray: 5 5;
-  }
-
-  &__dot {
-    fill: v.$accent;
-  }
-
-  &__labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10.5px;
-    font-weight: 600;
-    color: v.$muted-2;
-    text-transform: capitalize;
   }
 }
 
