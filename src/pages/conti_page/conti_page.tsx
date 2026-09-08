@@ -562,24 +562,9 @@ function ContoCard({
   const sync = relativeTime(conto.bank_connector_last_sync, localeTag());
   const syncFailed = Boolean(conto.bank_connector_last_error);
 
-  // Una carta non ha né obiettivo né sincronizzazione da raccontare: sta su
-  // una riga sola, come nel design.
-  if (tipoOf(conto) === "carta" && !isCollegato(conto)) {
-    return (
-      <Card className="account-card account-card--compact">
-        <span className="account-card__icon" aria-hidden="true">
-          <i className={contoIcon(conto)} />
-        </span>
-
-        <span className="account-card__name">{conto.nome}</span>
-
-        <Amount className="account-card__compact-balance" value={saldo} />
-
-        {actions}
-      </Card>
-    );
-  }
-
+  // Una sola forma per tutti i tipi: il tipo si legge dall'icona, non dalla
+  // sagoma della card. Le righe in più (obiettivo, sincronizzazione) compaiono
+  // se il conto ha qualcosa da dire, non perché è di una certa specie.
   return (
     <Card className="account-card">
       <div className="account-card__top">
