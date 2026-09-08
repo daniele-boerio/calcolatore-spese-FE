@@ -1,4 +1,9 @@
-import { PointerEvent as ReactPointerEvent, useRef, useState } from "react";
+import {
+  MouseEvent as ReactMouseEvent,
+  PointerEvent as ReactPointerEvent,
+  useRef,
+  useState,
+} from "react";
 import Amount from "../../amount/amount";
 import "./month_columns.scss";
 
@@ -29,10 +34,11 @@ type MonthColumnsProps = {
  * trecento pixel.
  *
  * Dodici mesi per tre serie non stanno scritti da nessuna parte, quindi i
- * numeri si leggono tenendo il dito su un mese. La riga sopra al grafico è la
- * legenda finché nessuno tocca e diventa la lettura del mese toccato: così i
- * valori non coprono le barre che si sta guardando, e nessuna riga compare dal
- * nulla facendo saltare il resto della card.
+ * numeri si leggono toccando un mese, e restano finché non se ne tocca un
+ * altro. La riga sopra al grafico è la legenda finché nessuno tocca e diventa
+ * la lettura del mese scelto: così i valori non coprono le barre che si sta
+ * guardando, e nessuna riga compare dal nulla facendo saltare il resto della
+ * card.
  */
 export default function MonthColumns({
   months,
@@ -40,7 +46,12 @@ export default function MonthColumns({
   labels,
 }: MonthColumnsProps) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const [active, setActive] = useState<number | null>(null);
+  // Due stati e non uno: il mese fermato con un tocco resta lì, quello sotto
+  // il mouse è di passaggio e se ne va quando il puntatore esce.
+  const [pinned, setPinned] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  const active = hovered ?? pinned;
 
   // L'altezza è comune a tutte le colonne, o i mesi non si confrontano.
   const peak = Math.max(
@@ -50,21 +61,34 @@ export default function MonthColumns({
     0,
   );
 
+  /** L'indice del mese sotto una x dello schermo. */
   const pick = (clientX: number) => {
     const rect = trackRef.current?.getBoundingClientRect();
-    if (!rect || rect.width === 0 || months.length === 0) return;
+    if (!rect || rect.width === 0 || months.length === 0) return null;
 
     const share = (clientX - rect.left) / rect.width;
     const index = Math.floor(share * months.length);
 
-    setActive(Math.min(Math.max(index, 0), months.length - 1));
+    return Math.min(Math.max(index, 0), months.length - 1);
   };
 
-  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    // Con la cattura il dito continua a comandare anche uscendo dal riquadro,
-    // invece di lasciare la colonna accesa a metà strada.
-    event.currentTarget.setPointerCapture(event.pointerId);
-    pick(event.clientX);
+  // Il tocco accende un mese invece di trascinarsi da uno all'altro: sul
+  // telefono il trascinamento faceva selezionare il grafico, e al dito alzato
+  // i valori sparivano prima di poterli leggere. Ritoccare lo stesso mese lo
+  // spegne.
+  const onClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    const index = pick(event.clientX);
+    if (index === null) return;
+
+    setPinned((current) => (current === index ? null : index));
+  };
+
+  // Col mouse la lettura segue il puntatore come prima. Il dito qui non entra,
+  // o sarebbe di nuovo il trascinamento, da un'altra porta.
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse") return;
+
+    setHovered(pick(event.clientX));
   };
 
   const height = (value: number) => `${peak > 0 ? (value / peak) * 100 : 0}%`;
@@ -100,11 +124,9 @@ export default function MonthColumns({
         className="month-columns__track"
         role="img"
         aria-label={ariaLabel}
-        onPointerDown={onPointerDown}
-        onPointerMove={(event) => pick(event.clientX)}
-        onPointerUp={() => setActive(null)}
-        onPointerCancel={() => setActive(null)}
-        onPointerLeave={() => setActive(null)}
+        onClick={onClick}
+        onPointerMove={onPointerMove}
+        onPointerLeave={() => setHovered(null)}
       >
         {months.map((month, index) => (
           <div

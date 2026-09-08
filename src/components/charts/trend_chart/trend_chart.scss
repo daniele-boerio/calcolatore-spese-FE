@@ -9,10 +9,15 @@
   // l'ancoraggio, e niente lo taglia.
   &__plot {
     position: relative;
-    // Il trascinamento orizzontale è nostro, quello verticale resta della
-    // pagina: chi scorre non deve restare incastrato sul grafico.
-    touch-action: pan-y;
-    cursor: crosshair;
+    cursor: pointer;
+
+    // Il grafico si legge con un tocco, non trascinando: lo scorrimento della
+    // pagina resta tutto della pagina, e il dito fermo sul grafico non ne
+    // seleziona più un pezzo come faceva su iPhone.
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   &__svg {

@@ -5,9 +5,9 @@
   flex-direction: column;
   gap: 12px;
 
-  // Legenda a riposo, valori del mese sotto il dito. È la stessa riga per
-  // tutti e due i casi: cambia il contenuto, non l'ingombro, quindi la card
-  // non si allunga di colpo mentre si trascina.
+  // Legenda a riposo, valori del mese toccato. È la stessa riga per tutti e
+  // due i casi: cambia il contenuto, non l'ingombro, quindi la card non si
+  // allunga di colpo a ogni tocco.
   &__readout {
     display: flex;
     flex-wrap: wrap;
@@ -66,10 +66,15 @@
     align-items: flex-end;
     gap: 3px;
 
-    // Il trascinamento orizzontale è nostro, quello verticale resta della
-    // pagina: chi scorre non deve restare incastrato sul grafico.
-    touch-action: pan-y;
-    cursor: crosshair;
+    cursor: pointer;
+
+    // Le colonne si leggono con un tocco, non trascinando: lo scorrimento
+    // della pagina resta tutto della pagina, e il dito fermo sul grafico non
+    // ne seleziona più un pezzo come faceva su iPhone.
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
   &__group {

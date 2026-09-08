@@ -1,4 +1,9 @@
-import { PointerEvent as ReactPointerEvent, useRef, useState } from "react";
+import {
+  MouseEvent as ReactMouseEvent,
+  PointerEvent as ReactPointerEvent,
+  useRef,
+  useState,
+} from "react";
 import Amount from "../../amount/amount";
 import { buildTrend } from "../../../features/statistics/trend";
 import "./trend_chart.scss";
@@ -37,10 +42,10 @@ type TrendChartProps = {
  *
  * I valori sull'asse verticale non sono scritti tutti — su 360 unità di
  * larghezza una scala completa mangerebbe il grafico. Ci sono i due estremi,
- * che dicono dove sta la linea, e il resto si legge trascinando il dito: il
- * puntino segue il tocco e accanto compare il valore di quel mese. È il motivo
- * per cui questo componente esiste invece di essere due volte lo stesso SVG
- * dentro le pagine che lo usano.
+ * che dicono dove sta la linea, e il resto si legge toccando un punto: il
+ * valore resta lì finché non se ne tocca un altro. È il motivo per cui questo
+ * componente esiste invece di essere due volte lo stesso SVG dentro le pagine
+ * che lo usano.
  */
 export default function TrendChart({
   points,
@@ -49,7 +54,12 @@ export default function TrendChart({
   className,
 }: TrendChartProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [active, setActive] = useState<number | null>(null);
+  // Due stati e non uno: il punto fermato con un tocco resta lì, quello sotto
+  // il mouse è di passaggio e se ne va quando il puntatore esce.
+  const [pinned, setPinned] = useState<number | null>(null);
+  const [hovered, setHovered] = useState<number | null>(null);
+
+  const active = hovered ?? pinned;
 
   const values = points.map((point) => point.value);
   const trend = buildTrend(values, BOX);
@@ -63,22 +73,33 @@ export default function TrendChart({
 
   const step = (BOX.width - BOX.padX * 2) / (points.length - 1);
 
-  /** Il punto più vicino al dito, in coordinate del `viewBox`. */
+  /** L'indice del punto più vicino a una x dello schermo. */
   const pick = (clientX: number) => {
     const rect = svgRef.current?.getBoundingClientRect();
-    if (!rect || rect.width === 0) return;
+    if (!rect || rect.width === 0) return null;
 
     const x = ((clientX - rect.left) / rect.width) * BOX.width;
     const index = Math.round((x - BOX.padX) / step);
 
-    setActive(Math.min(Math.max(index, 0), points.length - 1));
+    return Math.min(Math.max(index, 0), points.length - 1);
   };
 
-  const onPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
-    // Con la cattura il dito continua a comandare anche uscendo dal riquadro,
-    // invece di lasciare il puntino fermo a metà.
-    event.currentTarget.setPointerCapture(event.pointerId);
-    pick(event.clientX);
+  // Il tocco ferma un punto invece di trascinarlo lungo la linea: sul telefono
+  // il trascinamento faceva selezionare il grafico, e al dito alzato il valore
+  // spariva prima di poterlo leggere. Ritoccare lo stesso punto lo libera.
+  const onClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    const index = pick(event.clientX);
+    if (index === null) return;
+
+    setPinned((current) => (current === index ? null : index));
+  };
+
+  // Col mouse il valore segue il puntatore come prima. Il dito qui non entra,
+  // o sarebbe di nuovo il trascinamento, da un'altra porta.
+  const onPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType !== "mouse") return;
+
+    setHovered(pick(event.clientX));
   };
 
   const current = active !== null ? points[active] : null;
@@ -88,11 +109,9 @@ export default function TrendChart({
     <div className={`trend-chart ${className ?? ""}`}>
       <div
         className="trend-chart__plot"
-        onPointerDown={onPointerDown}
-        onPointerMove={(event) => pick(event.clientX)}
-        onPointerUp={() => setActive(null)}
-        onPointerCancel={() => setActive(null)}
-        onPointerLeave={() => setActive(null)}
+        onClick={onClick}
+        onPointerMove={onPointerMove}
+        onPointerLeave={() => setHovered(null)}
       >
         <svg
           ref={svgRef}
