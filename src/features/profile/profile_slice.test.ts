@@ -4,6 +4,9 @@ import { describe, it, expect, vi } from "vitest";
 // va stubbato PRIMA degli import (vedi store/error_middleware.test.ts).
 vi.hoisted(() => {
   const values = new Map<string, string>();
+  // Sessione già salvata sul dispositivo: è lo stato da cui l'app riparte al
+  // secondo avvio, e quello in cui il bug dello username si vedeva.
+  values.set("username", "mario.rossi");
   globalThis.localStorage = {
     getItem: (key: string) => values.get(key) ?? null,
     setItem: (key: string, value: string) => {
@@ -145,5 +148,22 @@ describe("profile_slice — il default segue le transazioni create", () => {
     );
 
     expect(state.lastTagId).toBe("7");
+  });
+});
+
+// Lo username in stato iniziale viene da localStorage e deve essere la stringa
+// nuda: la HomePage lo monta prima che /me risponda (il token salvato basta a
+// dirla autenticata) e ne ricava le iniziali con uno `split`. Quando qui c'era
+// un oggetto, l'avvio con sessione salvata moriva nell'ErrorBoundary.
+
+describe("profile_slice — sessione ripresa da localStorage", () => {
+  it("parte con lo username salvato come stringa", () => {
+    expect(initial.username).toBe("mario.rossi");
+  });
+
+  it("lo username resta una stringa dopo la risposta del server", () => {
+    const state = reducer(initial, profileFromServer(null));
+
+    expect(state.username).toBe("mario");
   });
 });

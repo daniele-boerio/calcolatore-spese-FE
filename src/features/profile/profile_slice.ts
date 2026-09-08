@@ -20,7 +20,7 @@ const savedUsername = localStorage.getItem("username");
 const initialState: ProfileState = {
   loading: false,
   token: localStorage.getItem("token") || null,
-  username: savedUsername ? ({ username: savedUsername } as any) : null,
+  username: savedUsername,
   email: null,
   isAuthenticated: !!savedToken,
   // C'è un token da verificare: fino alla risposta del server non sappiamo
