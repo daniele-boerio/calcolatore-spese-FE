@@ -216,8 +216,8 @@
     overflow: hidden;
   }
 
-  // Le righe prendono la serie grafici nell'ordine: il colore dice la
-  // posizione in classifica, non la categoria.
+  // Le righe prendono la serie grafici nell'ordine e la riciclano ogni
+  // cinque: il colore dice la posizione in classifica, non la categoria.
   &__fill {
     display: block;
     height: 100%;

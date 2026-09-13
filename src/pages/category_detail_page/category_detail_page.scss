@@ -64,56 +64,6 @@
     }
   }
 
-  &__summary {
-    gap: 16px;
-  }
-
-  &__figures {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 12px;
-  }
-
-  &__current {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    min-width: 0;
-  }
-
-  &__eyebrow {
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: v.$muted;
-  }
-
-  &__value {
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: -0.035em;
-  }
-
-  &__average {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 3px;
-    text-align: right;
-
-    .amount {
-      font-size: 14px;
-      font-weight: 700;
-    }
-  }
-
-  &__average-label {
-    font-size: 12px;
-    color: v.$muted;
-  }
-
   &__movements {
     display: flex;
     flex-direction: column;
@@ -127,137 +77,22 @@
   }
 }
 
-// ── Sparkline della categoria ───────────────────────────────────────────────
-.spark {
-  display: block;
-  width: 100%;
-  height: 120px;
-
-  &__line {
-    fill: none;
-    stroke: v.$accent;
-    stroke-width: 3;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-
-  // La media dei mesi è una riga di riferimento, non un dato: tratteggiata.
-  &__average {
-    stroke: v.$muted-2;
-    stroke-width: 1.5;
-    stroke-dasharray: 4 5;
-  }
-
-  &__dot {
-    fill: v.$accent;
-  }
-
-  &__labels {
-    display: flex;
-    justify-content: space-between;
-    font-size: 10.5px;
-    font-weight: 600;
-    color: v.$muted-2;
-    text-transform: capitalize;
-  }
-}
-
-// ── Sottocategorie ──────────────────────────────────────────────────────────
-// Pillola sotto l'intestazione dei movimenti: dice su quale sottocategoria
-// è ristretta la lista, e toccarla la allarga di nuovo.
+// ── Filtro sottocategorie ───────────────────────────────────────────────────
+// Le pillole stanno su una riga sola che scorre, come i filtri dei
+// Movimenti: venti sottocategorie non devono sfondare la pagina.
 .category-detail__filter {
   display: flex;
-  margin-bottom: 8px;
-}
-.sub-bars {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  gap: 8px;
+  margin: 0 calc(-1 * v.$gutter);
+  padding: 2px v.$gutter 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
 
-  &__row {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-
-    // Le righe con un id dietro sono bottoni: filtrano i movimenti qui
-    // sotto. Restano visivamente identiche a quelle che non lo sono —
-    // quello che le distingue è il tocco, e la riga accesa lo dice da sé.
-    &--tappable {
-      padding: 6px 8px;
-      margin: -6px -8px;
-      width: calc(100% + 16px);
-      box-sizing: border-box;
-
-      border: 0;
-      border-radius: v.$r-field;
-      background: transparent;
-      color: inherit;
-      font-family: inherit;
-      text-align: left;
-      cursor: pointer;
-
-      &:active {
-        transform: scale(0.99);
-        transition: transform v.$dur-press;
-      }
-    }
-
-    &--on {
-      background: v.$accent-soft;
-
-      .sub-bars__name,
-      .sub-bars__value {
-        color: v.$accent;
-      }
-    }
+  &::-webkit-scrollbar {
+    display: none;
   }
 
-  &__line {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 10px;
-    font-size: 13.5px;
-  }
-
-  &__name {
-    font-weight: 600;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  &__value {
-    font-weight: 700;
-  }
-
-  &__track {
-    display: block;
-    height: 6px;
-    border-radius: v.$r-pill;
-    background: v.$surface-2;
-    overflow: hidden;
-  }
-
-  &__fill {
-    display: block;
-    height: 100%;
-    border-radius: v.$r-pill;
-
-    &--1 {
-      background: v.$series-1;
-    }
-    &--2 {
-      background: v.$series-2;
-    }
-    &--3 {
-      background: v.$series-3;
-    }
-    &--4 {
-      background: v.$series-4;
-    }
-    &--5 {
-      background: v.$series-5;
-    }
+  .chip {
+    flex: 0 0 auto;
   }
 }

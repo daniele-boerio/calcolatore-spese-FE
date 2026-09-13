@@ -31,10 +31,11 @@ import {
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../services/dates";
 
-// Mesi su cui si misura il "sopra media" e categorie mostrate: entrambi dal
-// design, e le tinte della serie grafici sono cinque.
+// Mesi su cui si misura il "sopra media": dal design. Le categorie si mostrano
+// tutte, e le tinte della serie grafici sono cinque: dalla sesta in giù si
+// ricomincia dalla prima.
 const AVERAGE_MONTHS = 3;
-const TOP_CATEGORIES = 5;
+const SERIES_TINTS = 5;
 
 const ICONS: Record<Insight["kind"], string> = {
   above_average: "pi pi-arrow-up-right",
@@ -306,7 +307,7 @@ export default function MonthStatistics({
           <p className="analysis-muted">{t("no_data")}</p>
         ) : (
           <div className="category-bars">
-            {expenses.slice(0, TOP_CATEGORIES).map((category, index) => {
+            {expenses.map((category, index) => {
               const percent = spent > 0 ? (category.totale / spent) * 100 : 0;
 
               return (
@@ -331,7 +332,7 @@ export default function MonthStatistics({
 
                     <span className="category-bars__track">
                       <span
-                        className={`category-bars__fill category-bars__fill--${index + 1}`}
+                        className={`category-bars__fill category-bars__fill--${(index % SERIES_TINTS) + 1}`}
                         style={{ width: `${percent}%` }}
                       />
                     </span>

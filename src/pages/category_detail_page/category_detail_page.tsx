@@ -4,7 +4,7 @@ import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
 import { Page, PageContent, PageHeader } from "../../components/page/page";
-import { Card, CardTitle } from "../../components/card/card";
+import { Card } from "../../components/card/card";
 import ListRow, { List } from "../../components/list_row/list_row";
 import SectionHeader from "../../components/section_header/section_header";
 import Amount from "../../components/amount/amount";
@@ -15,42 +15,28 @@ import AnalysisFiltersSheet, {
   AnalysisFiltersPatch,
 } from "../../components/dialog/analysis_filters_sheet/analysis_filters_sheet";
 import "./category_detail_page.scss";
-import { getCategoryTrendChart } from "../../features/charts/api_calls";
-import { selectChartsCategoryTrend } from "../../features/charts/charts_slice";
 import { getMonthlyDetailsStatistics } from "../../features/statistics/api_calls";
 import {
   selectMonthlyStatisticsData,
   selectStatisticsLoading,
 } from "../../features/statistics/statistics_slice";
-import { buildTrend } from "../../features/statistics/trend";
 import { getCategorie } from "../../features/categorie/api_calls";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
 import { getTags } from "../../features/tags/api_calls";
 import { getTransactionsByCategory } from "../../features/transactions/api_calls";
 import { Transaction } from "../../features/transactions/interfaces";
 import { mapTransaction } from "../../features/transactions/transaction_slice";
-import { displayAmount } from "../../features/transactions/group";
+import { displayAmount, signedAmount } from "../../features/transactions/group";
 import { transactionIcon } from "../../features/transactions/icons";
 import { openSheet } from "../../features/ui/ui_slice";
-import { addMonths, startOfMonth, toIsoDate } from "../../services/dates";
-
-// Finestra dello sparkline: il mese corrente più i cinque precedenti.
-const TREND_MONTHS = 6;
-
-const SPARK_BOX = {
-  width: 360,
-  padX: 10,
-  top: 18,
-  bottom: 96,
-  baseline: 110,
-};
+import { toIsoDate } from "../../services/dates";
 
 const localeTag = () => (getLocale() === "it" ? "it-IT" : "en-GB");
 
 /**
- * Una categoria vista da sola: quanto è costata questo mese contro la media
- * dei sei, come si divide fra sottocategorie, e i movimenti che la compongono.
- * Prima era un dialog aperto dalle statistiche.
+ * Una categoria vista da sola: i movimenti del mese e nient'altro, con una
+ * riga di pillole in cima per restringerli a una sottocategoria. Niente
+ * grafici — l'andamento nel tempo si guarda dalla pagina Grafici.
  */
 export default function CategoryDetailPage() {
   const { t } = useI18n();
@@ -67,12 +53,11 @@ export default function CategoryDetailPage() {
   const month = Number(searchParams.get("mese")) || today.getMonth() + 1;
   const tagId = searchParams.get("tag");
   // Arriva già dall'Analisi (`openCategory` la mette nel link) e la scrive il
-  // tocco su una barra qui sotto: in entrambi i casi restringe i movimenti.
+  // tocco su una pillola qui sotto: in entrambi i casi restringe i movimenti.
   const sottocategoriaId = searchParams.get("sotto");
 
   const categorie = useAppSelector(selectCategoriaCategorie);
   const monthlyData = useAppSelector(selectMonthlyStatisticsData);
-  const trendData = useAppSelector(selectChartsCategoryTrend);
   const loading = useAppSelector(selectStatisticsLoading);
 
   const categoria = categorie.find((item) => String(item.id) === String(id));
@@ -82,25 +67,16 @@ export default function CategoryDetailPage() {
     dispatch(getTags());
   }, [dispatch]);
 
+  // Le statistiche del mese servono solo a sapere quali sottocategorie hanno
+  // movimenti e per quanto: sono le pillole del filtro. Si chiedono senza
+  // `sottocategoria_id`, così la riga resta intera anche a filtro acceso.
   useEffect(() => {
-    const selected = new Date(year, month - 1, 1);
-
     dispatch(
       getMonthlyDetailsStatistics({
         year,
         month,
         categoria_id: id,
         tag_id: tagId,
-      }),
-    );
-
-    dispatch(
-      getCategoryTrendChart({
-        categoria_id: id,
-        data_inizio: toIsoDate(
-          startOfMonth(addMonths(selected, -(TREND_MONTHS - 1))),
-        ),
-        data_fine: toIsoDate(new Date(year, month, 0)),
       }),
     );
   }, [dispatch, id, year, month, tagId]);
@@ -131,7 +107,6 @@ export default function CategoryDetailPage() {
   // `monthDetails` filtrato su una categoria torna quella sola riga, con le
   // sue sottocategorie.
   const detail = monthlyData[0];
-  const monthTotal = Math.abs(detail?.totale ?? 0);
 
   // Le statistiche danno il nome della sottocategoria, non il suo id: per
   // poterci filtrare i movimenti lo ripeschiamo dalla categoria. Una riga senza
@@ -153,28 +128,20 @@ export default function CategoryDetailPage() {
     [detail, categoria],
   );
 
-  // Toccare la barra già accesa la spegne: è l'unico modo di tornare a vedere
-  // tutti i movimenti della categoria senza uscire dalla schermata.
-  const toggleSottocategoria = (subId: string) => {
+  // Toccare la pillola già accesa la spegne, e "Tutte" la spegne comunque: è
+  // il modo di tornare a vedere l'intera categoria senza uscire dalla pagina.
+  const filterBy = (subId: string | null) => {
     const next = new URLSearchParams(searchParams);
 
-    if (sottocategoriaId === String(subId)) next.delete("sotto");
-    else next.set("sotto", String(subId));
+    if (subId === null || subId === sottocategoriaId) next.delete("sotto");
+    else next.set("sotto", subId);
 
     setSearchParams(next, { replace: true });
   };
 
-  const sottocategoriaNome = subcategories.find(
-    (sub) => sub.id !== null && String(sub.id) === sottocategoriaId,
-  )?.nome;
-
-  const series = trendData.map((entry) => Math.abs(Number(entry.spesa)));
-  const average =
-    series.length > 0
-      ? series.reduce((sum, value) => sum + value, 0) / series.length
-      : 0;
-
-  const spark = buildTrend(series, SPARK_BOX);
+  // Somma con segno di quello che è a schermo: si muove con il filtro, così la
+  // riga dice sempre quanto vale la lista che le sta sotto.
+  const total = transactions.reduce((sum, row) => sum + signedAmount(row), 0);
 
   const monthName = (value: number) =>
     new Intl.DateTimeFormat(localeTag(), { month: "short" }).format(
@@ -186,15 +153,6 @@ export default function CategoryDetailPage() {
       day: "numeric",
       month: "short",
     }).format(new Date(`${iso.slice(0, 10)}T00:00:00`));
-
-  // Le etichette sotto lo sparkline sono i mesi della finestra, in ordine.
-  const trendMonths = Array.from({ length: series.length }, (_, index) => {
-    const shifted = addMonths(
-      new Date(year, month - 1, 1),
-      -(series.length - 1 - index),
-    );
-    return shifted;
-  });
 
   return (
     <>
@@ -226,142 +184,49 @@ export default function CategoryDetailPage() {
         </PageHeader>
 
         <PageContent>
-          <Card className="category-detail__summary">
-            <div className="category-detail__figures">
-              <div className="category-detail__current">
-                <span className="category-detail__eyebrow">
-                  {new Intl.DateTimeFormat(localeTag(), {
-                    month: "long",
-                  }).format(new Date(year, month - 1, 1))}
-                </span>
-                <Amount
-                  className="category-detail__value"
-                  value={monthTotal}
+          <section className="category-detail__movements">
+            {subcategories.length > 0 && (
+              <div className="category-detail__filter">
+                <Chip
+                  label={t("category_detail_all")}
+                  variant={sottocategoriaId ? "outline" : "active"}
+                  onClick={() => filterBy(null)}
                 />
-              </div>
 
-              <div className="category-detail__average">
-                <span className="category-detail__average-label">
-                  {`${t("category_detail_average")} ${series.length} ${t("home_months")}`}
-                </span>
-                <Amount value={average} />
-              </div>
-            </div>
-
-            {spark && series.length > 1 && (
-              <>
-                <svg
-                  className="spark"
-                  viewBox={`0 0 ${SPARK_BOX.width} 120`}
-                  role="img"
-                  aria-label={t("category_detail_trend")}
-                >
-                  <polyline className="spark__line" points={spark.line} />
-
-                  <line
-                    className="spark__average"
-                    x1={SPARK_BOX.padX}
-                    y1={spark.scaleY(average)}
-                    x2={SPARK_BOX.width - SPARK_BOX.padX}
-                    y2={spark.scaleY(average)}
-                  />
-
-                  <circle
-                    className="spark__dot"
-                    cx={spark.points[spark.points.length - 1].x}
-                    cy={spark.points[spark.points.length - 1].y}
-                    r={5}
-                  />
-                </svg>
-
-                <div className="spark__labels">
-                  {trendMonths.map((date) => (
-                    <span key={date.toISOString()}>
-                      {new Intl.DateTimeFormat(localeTag(), {
-                        month: "short",
-                      }).format(date)}
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </Card>
-
-          {subcategories.length > 0 && (
-            <Card>
-              <CardTitle>{t("sub_categories")}</CardTitle>
-
-              <div className="sub-bars">
-                {subcategories.map((sub, index) => {
-                  const selezionata =
-                    sub.id !== null && String(sub.id) === sottocategoriaId;
-
-                  const contenuto = (
-                    <>
-                      <span className="sub-bars__line">
-                        <span className="sub-bars__name">{sub.nome}</span>
-                        <Amount
-                          className="sub-bars__value"
-                          value={sub.totale}
-                        />
-                      </span>
-
-                      <span className="sub-bars__track">
-                        <span
-                          className={`sub-bars__fill sub-bars__fill--${(index % 5) + 1}`}
-                          style={{
-                            width: `${monthTotal > 0 ? (sub.totale / monthTotal) * 100 : 0}%`,
-                          }}
-                        />
-                      </span>
-                    </>
+                {subcategories.map((sub) => {
+                  const meta = (
+                    <Amount value={sub.totale} decimals={0} hideCurrency />
                   );
 
                   if (sub.id === null) {
                     return (
-                      <div className="sub-bars__row" key={sub.nome}>
-                        {contenuto}
-                      </div>
+                      <Chip
+                        key={sub.nome}
+                        label={sub.nome}
+                        variant="solid"
+                        meta={meta}
+                      />
                     );
                   }
 
+                  const selezionata = String(sub.id) === sottocategoriaId;
+
                   return (
-                    <button
-                      type="button"
+                    <Chip
                       key={sub.nome}
-                      className={`sub-bars__row sub-bars__row--tappable${
-                        selezionata ? " sub-bars__row--on" : ""
-                      }`}
-                      aria-pressed={selezionata}
-                      onClick={() => toggleSottocategoria(String(sub.id))}
-                    >
-                      {contenuto}
-                    </button>
+                      label={sub.nome}
+                      variant={selezionata ? "active" : "outline"}
+                      meta={meta}
+                      onClick={() => filterBy(String(sub.id))}
+                    />
                   );
                 })}
               </div>
-            </Card>
-          )}
-
-          <section className="category-detail__movements">
-            <SectionHeader>
-              {`${sottocategoriaNome ?? t("category_detail_movements")} · ${transactions.length}`}
-            </SectionHeader>
-
-            {sottocategoriaNome && (
-              <div className="category-detail__filter">
-                <Chip
-                  label={sottocategoriaNome}
-                  icon="pi pi-times"
-                  variant="active"
-                  onClick={() => {
-                    const next = new URLSearchParams(searchParams);
-                    next.delete("sotto");
-                    setSearchParams(next, { replace: true });
-                  }}
-                />
-              </div>
             )}
+
+            <SectionHeader aside={<Amount value={total} sign="always" />}>
+              {`${t("category_detail_movements")} · ${transactions.length}`}
+            </SectionHeader>
 
             {loading && transactions.length === 0 ? (
               <Card>
