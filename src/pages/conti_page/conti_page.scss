@@ -301,3 +301,22 @@
   }
 }
 
+
+// ── Desktop ─────────────────────────────────────────────────────────────────
+// I conti sono card piccole: in colonna singola su 1180px sarebbero una fila
+// di francobolli larghi quanto la pagina. Qui si affiancano, e il patrimonio
+// in cima cresce come l'hero della Home.
+@media (min-width: v.$bp-desktop) {
+  .accounts {
+    &__cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: v.$gap-col;
+      align-items: start;
+    }
+
+    &__worth-value {
+      font-size: 34px;
+    }
+  }
+}

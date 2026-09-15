@@ -88,6 +88,20 @@ $pad-card: var(--pad-card);
 $tabbar-h: var(--tabbar-h);
 $app-max-width: var(--app-max-width);
 $tap-target: var(--tap-target);
+$fs-hero-desktop: var(--fs-hero-desktop);
+$rail-w: var(--rail-w);
+$desktop-max: var(--desktop-max);
+$desktop-gutter: var(--desktop-gutter);
+$gap-col: var(--gap-col);
+
+// ── Soglie ────────────────────────────────────────────────────────────────
+// `$bp-desktop` è il confine fra le due app: sotto c'è il telefono con la tab
+// bar, sopra il rail. `$bp-wide` è dove l'area contenuto ha spazio per la
+// seconda colonna; in mezzo il rail resta e le colonne si impilano.
+//
+// Sono numeri e non custom property perché `@media` non legge `var()`.
+$bp-desktop: 900px;
+$bp-wide: 1180px;
 
 // ── Movimento ─────────────────────────────────────────────────────────────
 // Curva e durata dello slide-up degli sheet.

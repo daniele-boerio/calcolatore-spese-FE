@@ -52,3 +52,30 @@
     cursor: pointer;
   }
 }
+
+// ── Pannello (desktop) ──────────────────────────────────────────────────────
+// Stesso contenuto del foglio, ma sempre aperto nella colonna di destra: qui i
+// filtri non coprono la lista, le stanno accanto, e non serve un bottone per
+// confermare — la lista si aggiorna sotto le mani.
+.filters-panel {
+  gap: 22px;
+  align-self: start;
+  // Il pannello segue la lista mentre scorre invece di uscire dallo schermo.
+  position: sticky;
+  top: 20px;
+  max-height: calc(100dvh - 40px);
+  overflow-y: auto;
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  &__title {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+}

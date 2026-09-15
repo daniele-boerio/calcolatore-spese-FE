@@ -31,3 +31,32 @@ export function PageContent({ children, className }: SlotProps) {
     </div>
   );
 }
+
+/**
+ * Le due colonne del desktop.
+ *
+ * `split` sceglie le proporzioni che il design dà alla schermata: `hero` per
+ * la Home (1.6fr / 1fr), `balanced` per i Conti (1.5fr / 1fr), `filters` per i
+ * Movimenti (la lista, e 296px fissi di pannello filtri).
+ *
+ * Sotto i 1180px il contenitore e le colonne sono `display: contents`: i loro
+ * figli si appiattiscono nella colonna singola di `PageContent` esattamente
+ * come se questi wrapper non ci fossero. È per questo che il mobile non si
+ * accorge di niente — non è un secondo layout, è lo stesso DOM che sopra la
+ * soglia si dispone in griglia.
+ */
+export function PageColumns({
+  children,
+  split = "hero",
+  className,
+}: SlotProps & { split?: "hero" | "balanced" | "filters" }) {
+  return (
+    <div className={`page__columns page__columns--${split} ${className ?? ""}`}>
+      {children}
+    </div>
+  );
+}
+
+export function PageColumn({ children, className }: SlotProps) {
+  return <div className={`page__col ${className ?? ""}`}>{children}</div>;
+}

@@ -3,8 +3,20 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { useAppDispatch, useAppSelector } from "../../store/store";
-import { Page, PageContent, PageHeader } from "../../components/page/page";
+import {
+  Page,
+  PageColumn,
+  PageColumns,
+  PageContent,
+  PageHeader,
+} from "../../components/page/page";
 import { Card } from "../../components/card/card";
+import {
+  TransactionTableHeader,
+  TransactionTableRow,
+} from "../../components/transaction_table/transaction_table";
+import FiltersSheet from "../../components/dialog/filters_sheet/filters_sheet";
+import { useIsDesktop } from "../../features/ui/use_media_query";
 import ListRow, { List } from "../../components/list_row/list_row";
 import SectionHeader from "../../components/section_header/section_header";
 import Amount from "../../components/amount/amount";
@@ -81,6 +93,11 @@ export default function TransactionPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Da 900px in su la riga diventa una riga di tabella a cinque colonne. È
+  // l'unico posto dove il DOM del desktop è proprio un altro: renderizzarle
+  // entrambe e nasconderne una vorrebbe dire scrivere ogni movimento due volte.
+  const isDesktop = useIsDesktop();
 
   const filters = useAppSelector(selectTransactionFilters);
   const period = useAppSelector(selectTransactionPeriod);
@@ -317,7 +334,7 @@ export default function TransactionPage() {
 
             <button
               type="button"
-              className="movements__icon-button"
+              className="movements__icon-button movements__icon-button--filters"
               aria-label={t("filters")}
               onClick={openFilters}
             >
@@ -376,102 +393,109 @@ export default function TransactionPage() {
       </PageHeader>
 
       <PageContent className="movements__list">
-        {loading && transactions.length === 0 ? (
-          <Card>
-            <SkeletonList />
-          </Card>
-        ) : groups.length === 0 ? (
-          filtered ? (
-            <EmptyState
-              variant="search"
-              icon="pi pi-search"
-              title={t("mov_empty_filtered_title")}
-              description={t("mov_empty_filtered_text")}
-              actions={
-                <Button
-                  variant="neutral"
-                  size="sm"
-                  onClick={() => {
-                    setQuery("");
-                    dispatch(resetFilters());
-                  }}
-                >
-                  {t("mov_clear_filters")}
-                </Button>
-              }
-            />
-          ) : (
-            <EmptyState
-              icon="pi pi-list"
-              title={t("home_empty_title")}
-              description={t("home_empty_text")}
-              actions={
-                <Button
-                  size="sm"
-                  onClick={() => dispatch(openSheet({ name: "newTransaction" }))}
-                >
-                  {t("home_empty_action")}
-                </Button>
-              }
-            />
-          )
-        ) : (
-          <>
-            {groups.map((group) => (
-              <section className="movements__group" key={group.day}>
-                <SectionHeader
-                  aside={
-                    <Amount
-                      value={group.total}
-                      sign="always"
-                      tone={group.total >= 0 ? "positive" : "neutral"}
-                    />
+        <PageColumns split="filters">
+          <PageColumn>
+            {loading && transactions.length === 0 ? (
+              <Card>
+                <SkeletonList />
+              </Card>
+            ) : groups.length === 0 ? (
+              filtered ? (
+                <EmptyState
+                  variant="search"
+                  icon="pi pi-search"
+                  title={t("mov_empty_filtered_title")}
+                  description={t("mov_empty_filtered_text")}
+                  actions={
+                    <Button
+                      variant="neutral"
+                      size="sm"
+                      onClick={() => {
+                        setQuery("");
+                        dispatch(resetFilters());
+                      }}
+                    >
+                      {t("mov_clear_filters")}
+                    </Button>
                   }
-                >
-                  {groupLabel(group.day, t)}
-                </SectionHeader>
+                />
+              ) : (
+                <EmptyState
+                  icon="pi pi-list"
+                  title={t("home_empty_title")}
+                  description={t("home_empty_text")}
+                  actions={
+                    <Button
+                      size="sm"
+                      onClick={() => dispatch(openSheet({ name: "newTransaction" }))}
+                    >
+                      {t("home_empty_action")}
+                    </Button>
+                  }
+                />
+              )
+            ) : (
+              <>
+                {groups.map((group, index) => (
+                  <section className="movements__group" key={group.day}>
+                    <SectionHeader
+                      aside={
+                        <Amount
+                          value={group.total}
+                          sign="always"
+                          tone={group.total >= 0 ? "positive" : "neutral"}
+                        />
+                      }
+                    >
+                      {groupLabel(group.day, t)}
+                    </SectionHeader>
 
-                <Card className="movements__card">
-                  <List>
-                    {group.transactions.map((transaction) => (
-                      <Row
-                        key={transaction.id}
-                        transaction={transaction}
-                        categoria={categoriaById.get(
-                          String(transaction.categoria_id),
-                        )}
-                        sottocategoria={sottocategoriaById.get(
-                          String(transaction.sottocategoria_id),
-                        )}
-                        tag={tagById.get(String(transaction.tag_id))}
-                        conto={contoById.get(String(transaction.conto_id))}
-                        contoDestinazione={contoById.get(
-                          String(transaction.conto_destinazione_id),
-                        )}
-                        onOpen={() =>
+                    <Card className="movements__card">
+                      {/* L'intestazione delle colonne si scrive una volta sola, in
+                          cima al primo giorno: le card sotto hanno la stessa
+                          griglia, quindi le colonne restano incolonnate. */}
+                      {isDesktop && index === 0 && <TransactionTableHeader />}
+
+                      <TransactionRows
+                        transactions={group.transactions}
+                        desktop={isDesktop}
+                        categoriaById={categoriaById}
+                        sottocategoriaById={sottocategoriaById}
+                        tagById={tagById}
+                        contoById={contoById}
+                        onOpen={(id) =>
                           dispatch(
                             openSheet({
                               name: "transactionDetail",
-                              transactionId: transaction.id,
+                              transactionId: id,
                             }),
                           )
                         }
                       />
-                    ))}
-                  </List>
-                </Card>
-              </section>
-            ))}
+                    </Card>
+                  </section>
+                ))}
 
-            {hasMore && (
-              <div className="movements__more" ref={bottom}>
-                <Card>
-                  <SkeletonList rows={2} />
-                </Card>
-              </div>
+                {hasMore && (
+                  <div className="movements__more" ref={bottom}>
+                    <Card>
+                      <SkeletonList rows={2} />
+                    </Card>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
+          </PageColumn>
+
+          <PageColumn>
+            {/* Il pannello sta in colonna solo da schermo largo: sul telefono
+                gli stessi filtri sono il foglio che sale dal fondo, aperto dal
+                bottone in cima. */}
+            {isDesktop && (
+              <FiltersSheet variant="panel" visible onHide={() => {}} />
+            )}
+          </PageColumn>
+        </PageColumns>
       </PageContent>
     </Page>
   );
@@ -524,5 +548,70 @@ function Row({
         />
       }
     />
+  );
+}
+
+type TransactionRowsProps = {
+  transactions: Transaction[];
+  /** Vero da 900px in su: righe di tabella invece delle righe di elenco. */
+  desktop: boolean;
+  categoriaById: Map<string, string>;
+  sottocategoriaById: Map<string, string>;
+  tagById: Map<string, string>;
+  contoById: Map<string, string>;
+  onOpen: (id: string) => void;
+};
+
+/**
+ * I movimenti di un giorno, nella forma che lo schermo permette.
+ *
+ * La risoluzione della tassonomia è la stessa nelle due forme e sta qui, una
+ * volta sola: cambia come si dispone, non cosa si legge.
+ */
+function TransactionRows({
+  transactions,
+  desktop,
+  categoriaById,
+  sottocategoriaById,
+  tagById,
+  contoById,
+  onOpen,
+}: TransactionRowsProps) {
+  const rows = transactions.map((transaction) => ({
+    transaction,
+    categoria: categoriaById.get(String(transaction.categoria_id)),
+    sottocategoria: sottocategoriaById.get(
+      String(transaction.sottocategoria_id),
+    ),
+    tag: tagById.get(String(transaction.tag_id)),
+    conto: contoById.get(String(transaction.conto_id)),
+    contoDestinazione: contoById.get(
+      String(transaction.conto_destinazione_id),
+    ),
+  }));
+
+  if (desktop)
+    return (
+      <>
+        {rows.map((row) => (
+          <TransactionTableRow
+            key={row.transaction.id}
+            {...row}
+            onOpen={() => onOpen(row.transaction.id)}
+          />
+        ))}
+      </>
+    );
+
+  return (
+    <List>
+      {rows.map((row) => (
+        <Row
+          key={row.transaction.id}
+          {...row}
+          onOpen={() => onOpen(row.transaction.id)}
+        />
+      ))}
+    </List>
   );
 }

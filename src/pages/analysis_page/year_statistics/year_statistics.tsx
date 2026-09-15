@@ -2,6 +2,10 @@ import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { Card, CardTitle } from "../../../components/card/card";
+import {
+  PageColumn,
+  PageColumns,
+} from "../../../components/page/page";
 import Amount from "../../../components/amount/amount";
 import EmptyState from "../../../components/empty_state/empty_state";
 import SkeletonList from "../../../components/skeleton/skeleton";
@@ -190,7 +194,8 @@ export default function YearStatistics({
   }
 
   return (
-    <>
+    <PageColumns split="balanced">
+      <PageColumn>
       <Card className="year-card">
         <div className="year-card__heading">
           <span className="year-card__title">{t("analysis_in_and_out")}</span>
@@ -289,6 +294,9 @@ export default function YearStatistics({
         />
       </Card>
 
+      </PageColumn>
+
+      <PageColumn>
       <Card className="year-totals">
         <TotalRow label={`${t("income")} ${year}`} value={incomes} />
         <TotalRow label={`${t("expenses")} ${year}`} value={expenses} />
@@ -304,7 +312,8 @@ export default function YearStatistics({
           />
         </div>
       </Card>
-    </>
+      </PageColumn>
+    </PageColumns>
   );
 }
 

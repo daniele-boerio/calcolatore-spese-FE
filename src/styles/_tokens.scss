@@ -123,10 +123,22 @@
   // prende come altezza minima, e il contenuto, che le tiene il posto. Prima
   // la misurava uno script a runtime, e le due formule si erano scollate.
   --tabbar-h: 66px;
-  // Larghezza di riferimento del design; su desktop il contenuto resta
-  // centrato in una colonna di questa misura.
+  // Larghezza di riferimento del design; sotto la soglia desktop il contenuto
+  // resta centrato in una colonna di questa misura.
   --app-max-width: 480px;
   --tap-target: 44px;
+
+  // ── Desktop ───────────────────────────────────────────────────────────────
+  // Da 900px in su la tab bar diventa un rail laterale e i contenuti si
+  // dispongono su due colonne. Sotto, l'app è quella di sempre: stessi token,
+  // stessi componenti, nessuna densità da back-office.
+  --rail-w: 248px;
+  // Larghezza massima dell'area contenuto, rail escluso.
+  --desktop-max: 1180px;
+  --desktop-gutter: 32px;
+  --gap-col: 20px;
+  // Il numero protagonista cresce con lo spazio che c'è.
+  --fs-hero-desktop: 58px;
 
   // PrimeReact legge queste due dal proprio tema: le riportiamo sui nostri
   // token. Funziona perché il tema lara è importato prima di App.scss.

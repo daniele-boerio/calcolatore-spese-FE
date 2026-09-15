@@ -273,3 +273,26 @@
     }
   }
 }
+
+// ── Desktop ─────────────────────────────────────────────────────────────────
+// Il numero protagonista cresce con lo spazio che c'è, e il saluto diventa la
+// riga della top bar. Nient'altro cambia: stessi colori, stesse card.
+@media (min-width: v.$bp-desktop) {
+  .home-page {
+    &__month {
+      font-size: 26px;
+    }
+
+    // Su desktop il profilo si apre dal rail, in fondo: un secondo bersaglio
+    // in cima direbbe la stessa cosa due volte.
+    &__avatar {
+      display: none;
+    }
+  }
+
+  .hero {
+    &__number {
+      font-size: v.$fs-hero-desktop;
+    }
+  }
+}

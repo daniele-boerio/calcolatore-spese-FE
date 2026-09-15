@@ -171,3 +171,21 @@
     border-radius: v.$r-inner;
   }
 }
+
+// ── Desktop ─────────────────────────────────────────────────────────────────
+@media (min-width: v.$bp-desktop) {
+  .movements {
+    // I filtri sono il pannello in colonna: il bottone che apriva il foglio
+    // aprirebbe la stessa cosa una seconda volta.
+    &__icon-button--filters {
+      display: none;
+    }
+
+    // La riga tabellare arriva fino al bordo della card: il respiro glielo
+    // dà il padding della card, non un secondo margine interno.
+    &__card {
+      padding-top: 4px;
+      padding-bottom: 10px;
+    }
+  }
+}

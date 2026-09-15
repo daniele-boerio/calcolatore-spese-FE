@@ -6,6 +6,9 @@
 // Layer di override di PrimeReact sui token: emesso una volta sola, dopo il
 // tema lara importato da main.jsx.
 @use "./styles/primereact";
+// Solo alias: non emette niente. Serve alla sezione desktop in fondo, che ha
+// bisogno delle soglie — `@media` non sa leggere una custom property.
+@use "./styles/variables" as v;
 
 html {
   // Il tema è già su <html> allo script inline di index.html.
@@ -152,4 +155,101 @@ select {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DESKTOP
+//
+// Dai 900px in su l'app cambia guscio: la tab bar diventa il rail laterale, la
+// colonna da 480px si apre sull'intera larghezza, e il contenuto si dispone su
+// due colonne. Sotto la soglia non cambia niente — è la stessa app di prima,
+// stessi token e stessi componenti: qui non si ridefinisce nessun colore.
+// ─────────────────────────────────────────────────────────────────────────────
+@media (min-width: v.$bp-desktop) {
+  // In riga solo dove il rail c'è davvero: sull'accesso non esiste, e senza
+  // questa guardia la schermata diventerebbe un elemento flex che non si
+  // allarga.
+  .App:has(.nav-rail) {
+    max-width: none;
+    display: flex;
+    align-items: flex-start;
+  }
+
+  // Il rail è `sticky` e alto quanto lo schermo: a scorrere è la pagina, e la
+  // navigazione deve restare ferma accanto.
+  .tab-bar {
+    display: none;
+  }
+
+  // Lo spazio che le schermate non convertite tenevano alla tab bar qui non
+  // serve più: la barra non c'è.
+  .App:has(.tab-bar) > *:not(.page):not(.tab-bar) {
+    padding-bottom: 0;
+  }
+
+  .page {
+    flex: 1;
+    min-width: 0;
+
+    &__header {
+      // Niente safe area: non c'è nessuna tacca da scansare su un desktop.
+      padding: 26px v.$desktop-gutter 0;
+      // Intestazione e contenuto sono la stessa colonna e si allineano.
+      max-width: calc(#{v.$desktop-max} + 2 * #{v.$desktop-gutter});
+      margin-inline: auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    &__content {
+      padding: 20px v.$desktop-gutter v.$desktop-gutter;
+      max-width: calc(#{v.$desktop-max} + 2 * #{v.$desktop-gutter});
+      margin-inline: auto;
+      width: 100%;
+      box-sizing: border-box;
+      gap: v.$gap-col;
+    }
+  }
+
+  .page-title {
+    font-size: 26px;
+  }
+}
+
+// Le due colonne. Il contenitore e le colonne spariscono sotto la soglia
+// larga — `display: contents` lascia passare i figli al flusso di sopra — così
+// sul telefono, e sul desktop stretto, le card restano la pila di sempre.
+.page__columns,
+.page__col {
+  display: contents;
+}
+
+@media (min-width: v.$bp-wide) {
+  .page__columns {
+    display: grid;
+    gap: v.$gap-col;
+    align-items: start;
+    min-width: 0;
+
+    &--hero {
+      grid-template-columns: minmax(0, 1.6fr) minmax(320px, 1fr);
+    }
+
+    &--balanced {
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    }
+
+    // I filtri non sono contenuto: hanno una larghezza loro e non si allargano
+    // con la lista.
+    &--filters {
+      grid-template-columns: minmax(0, 1fr) 296px;
+    }
+  }
+
+  .page__col {
+    display: flex;
+    flex-direction: column;
+    gap: v.$gap-col;
+    min-width: 0;
+  }
 }

@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "../../store/store";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
 import { Card, CardTitle } from "../../components/card/card";
+import { PageColumn, PageColumns } from "../../components/page/page";
 import Amount from "../../components/amount/amount";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
@@ -266,7 +267,8 @@ export default function ChartsPage({
     index < TOP_SLICES ? String(index + 1) : "rest";
 
   return (
-    <>
+    <PageColumns split="balanced">
+      <PageColumn>
       <Card>
         <CardTitle aside={t("charts_touch_for_values")}>
           {t("analysis_in_and_out")}
@@ -314,6 +316,9 @@ export default function ChartsPage({
         </Card>
       )}
 
+      </PageColumn>
+
+      <PageColumn>
       {slices.length > 0 && (
         <Card>
           <CardTitle>
@@ -382,7 +387,8 @@ export default function ChartsPage({
           <TrendChart points={trendPoints} ariaLabel={t("category_trend")} />
         )}
       </Card>
-    </>
+      </PageColumn>
+    </PageColumns>
   );
 }
 

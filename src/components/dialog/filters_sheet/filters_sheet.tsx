@@ -1,5 +1,6 @@
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import Sheet from "../../sheet/sheet";
+import { Card } from "../../card/card";
 import Chip from "../../chip/chip";
 import Button from "../../button/button";
 import Calendar from "../../calendar/calendar";
@@ -37,6 +38,12 @@ const RANGE_DEBOUNCE = 250;
 type FiltersSheetProps = {
   visible: boolean;
   onHide: () => void;
+  /**
+   * `sheet` è il foglio che sale dal fondo, sul telefono. `panel` è lo stesso
+   * contenuto sempre aperto nella colonna di destra del desktop: lì i filtri
+   * non coprono la lista, le stanno accanto e la lista si aggiorna sotto.
+   */
+  variant?: "sheet" | "panel";
 };
 
 type ListKey =
@@ -75,7 +82,11 @@ const parseDate = (value?: string): Date | null => {
  * aperto, e il bottone in fondo non conferma niente — dice quanti movimenti
  * restano e chiude. È l'unico modo perché quel numero sia vero.
  */
-export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
+export default function FiltersSheet({
+  visible,
+  onHide,
+  variant = "sheet",
+}: FiltersSheetProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
@@ -95,13 +106,29 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
     [transactions, filters.importo_max],
   );
 
-  const [range, setRange] = useState<[number, number]>([
-    filters.importo_min ?? 0,
-    filters.importo_max ?? ceiling,
-  ]);
-  const settledRange = useDebouncedValue(range, RANGE_DEBOUNCE);
+  // `null` finché il cursore non l'ha toccato nessuno: in quel caso le due
+  // maniglie non sono uno stato ma il riflesso dei filtri e del tetto.
+  //
+  // Il tetto si conosce solo quando i movimenti sono arrivati, e come pannello
+  // fisso della colonna destra questo componente è montato da prima. Con le
+  // maniglie congelate al primo tetto provvisorio, il cursore scriveva da solo
+  // un massimo che nessuno aveva chiesto, il massimo riabbassava il tetto, il
+  // tetto cancellava il massimo: due richieste che si rincorrevano all'infinito.
+  const [range, setRange] = useState<[number, number] | null>(null);
+
+  const shown = useMemo<[number, number]>(
+    () =>
+      range ?? [filters.importo_min ?? 0, filters.importo_max ?? ceiling],
+    [range, filters.importo_min, filters.importo_max, ceiling],
+  );
+
+  const settledRange = useDebouncedValue(shown, RANGE_DEBOUNCE);
 
   useEffect(() => {
+    // Nessuno ha trascinato niente: non c'è nessun filtro da scrivere, e
+    // scriverlo vorrebbe dire filtrare di sua iniziativa.
+    if (range === null) return;
+
     const [low, high] = settledRange;
 
     // Agli estremi il filtro sparisce: "da zero a tutto" non è un filtro.
@@ -111,7 +138,7 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
         importo_max: high < ceiling ? high : undefined,
       }),
     );
-  }, [dispatch, settledRange, ceiling]);
+  }, [dispatch, range, settledRange, ceiling]);
 
   const selected = (key: ListKey) => filters[key] ?? [];
 
@@ -181,30 +208,21 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
 
   const total = pagination.total ?? 0;
 
-  return (
-    <Sheet
-      open={visible}
-      onClose={onHide}
-      title={t("filters")}
-      className="filters-sheet"
-      action={
-        <button
-          type="button"
-          className="filters-sheet__reset"
-          onClick={() => {
-            dispatch(resetFilters());
-            setRange([0, ceiling]);
-          }}
-        >
-          {t("mov_clear")}
-        </button>
-      }
-      footer={
-        <Button block onClick={onHide}>
-          {`${t("mov_show")} ${total} ${t("nav_movements").toLowerCase()}`}
-        </Button>
-      }
+  const reset = (
+    <button
+      type="button"
+      className="filters-sheet__reset"
+      onClick={() => {
+        dispatch(resetFilters());
+        setRange(null);
+      }}
     >
+      {t("mov_clear")}
+    </button>
+  );
+
+  const body = (
+    <>
       <Section label={t("mov_period")}>
         <div className="filters-sheet__chips">
           {PERIOD_PRESETS.map((preset) => (
@@ -361,12 +379,41 @@ export default function FiltersSheet({ visible, onHide }: FiltersSheetProps) {
         min={0}
         max={ceiling}
         step={Math.max(1, Math.round(ceiling / STEP_RATIO))}
-        value={range}
+        value={shown}
         onChange={setRange}
-        caption={`${formatNumber(range[0], 0)} – ${formatNumber(range[1], 0)}${
-          range[1] >= ceiling ? "+" : ""
+        caption={`${formatNumber(shown[0], 0)} – ${formatNumber(shown[1], 0)}${
+          shown[1] >= ceiling ? "+" : ""
         } €`}
       />
+    </>
+  );
+
+  if (variant === "panel") {
+    return (
+      <Card className="filters-panel">
+        <div className="filters-panel__head">
+          <span className="filters-panel__title">{t("filters")}</span>
+          {reset}
+        </div>
+        {body}
+      </Card>
+    );
+  }
+
+  return (
+    <Sheet
+      open={visible}
+      onClose={onHide}
+      title={t("filters")}
+      className="filters-sheet"
+      action={reset}
+      footer={
+        <Button block onClick={onHide}>
+          {`${t("mov_show")} ${total} ${t("nav_movements").toLowerCase()}`}
+        </Button>
+      }
+    >
+      {body}
     </Sheet>
   );
 }

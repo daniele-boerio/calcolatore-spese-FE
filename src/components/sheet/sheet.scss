@@ -149,3 +149,57 @@
     animation: none;
   }
 }
+
+// ── Desktop ─────────────────────────────────────────────────────────────────
+// Lo sheet che sale dal fondo è una cosa da pollice: su desktop il posto giusto
+// è il centro dello schermo, e il pannello diventa un dialog da 520px. Sotto la
+// soglia non cambia nulla — animazione, maniglia e trascinamento restano.
+@media (min-width: v.$bp-desktop) {
+  .sheet {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &__panel {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      transform: none;
+
+      width: 520px;
+      max-width: calc(100vw - 48px);
+      max-height: min(86vh, 760px);
+
+      padding: 28px;
+      border-radius: v.$r-alert;
+
+      animation: dialog-in v.$dur-sheet v.$ease-sheet;
+
+      // La maniglia serve a trascinare col dito: con il mouse non si trascina
+      // niente, e resterebbe un trattino senza funzione.
+      &--keyboard {
+        padding-bottom: 28px;
+        max-height: min(86vh, 760px);
+      }
+    }
+
+    &__handle {
+      display: none;
+    }
+
+    &__body {
+      gap: 16px;
+    }
+  }
+}
+
+@keyframes dialog-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import AuthPage from "./pages/auth_page/auth_page";
 import TabBar from "./components/tab_bar/tab_bar";
+import NavRail from "./components/nav_rail/nav_rail";
 import {
   BrowserRouter as Router,
   Routes,
@@ -109,6 +110,10 @@ function App() {
         ) : (
           <>
             <BankProposalsGate /> {/* Controllo automatico proposte bancarie */}
+            {/* Le due navigazioni non convivono mai: il CSS accende il rail
+                da 900px in su e la tab bar sotto. Il rail sta prima delle
+                rotte perché in riga va a sinistra della pagina. */}
+            <NavRail />
             <Suspense fallback={<RouteFallback />}>
               <Routes>
                 {/* I sei slot della tab bar */}

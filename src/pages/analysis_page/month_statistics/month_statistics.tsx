@@ -2,6 +2,10 @@ import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { Card, CardTitle } from "../../../components/card/card";
+import {
+  PageColumn,
+  PageColumns,
+} from "../../../components/page/page";
 import Amount from "../../../components/amount/amount";
 import EmptyState from "../../../components/empty_state/empty_state";
 import SkeletonList from "../../../components/skeleton/skeleton";
@@ -224,7 +228,8 @@ export default function MonthStatistics({
   }
 
   return (
-    <>
+    <PageColumns split="hero">
+      <PageColumn>
       <Card className="savings-card">
         <div className="savings-card__top">
           <div className="savings-card__headline">
@@ -321,6 +326,9 @@ export default function MonthStatistics({
         />
       </Card>
 
+      </PageColumn>
+
+      <PageColumn>
       {insights.length > 0 && (
         <Card>
           <CardTitle>{t("analysis_notable")}</CardTitle>
@@ -346,8 +354,8 @@ export default function MonthStatistics({
           })}
         </Card>
       )}
-
-    </>
+      </PageColumn>
+    </PageColumns>
   );
 }
 
