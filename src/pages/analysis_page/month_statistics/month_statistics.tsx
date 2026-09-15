@@ -23,8 +23,8 @@ import { buildInsights, Insight } from "../../../features/statistics/insights";
 import {
   expenseRows,
   ExpenseRow,
-  UNCATEGORIZED,
 } from "../../../features/statistics/expenses";
+import CategoryBars from "../../../components/category_bars/category_bars";
 import {
   getExpenseCompositionChart,
   getSavingsChart,
@@ -36,11 +36,8 @@ import {
 import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
 import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../services/dates";
 
-// Mesi su cui si misura il "sopra media": dal design. Le categorie si mostrano
-// tutte, e le tinte della serie grafici sono cinque: dalla sesta in giù si
-// ricomincia dalla prima.
+// Mesi su cui si misura il "sopra media": dal design.
 const AVERAGE_MONTHS = 3;
-const SERIES_TINTS = 5;
 
 const ICONS: Record<Insight["kind"], string> = {
   above_average: "pi pi-arrow-up-right",
@@ -132,16 +129,6 @@ export default function MonthStatistics({
   const expenses = useMemo(
     () => expenseRows(data, categoriaSelezionata),
     [data, categoriaSelezionata],
-  );
-
-  // Denominatore delle percentuali: la somma di quello che è a schermo, non il
-  // totale del mese. I due coincidono quando i dati sono quelli del filtro
-  // corrente, ma finché la risposta nuova non arriva lo store ha ancora i
-  // totali di prima, e le barre direbbero quote di un totale che non è il
-  // loro — somme del 110%.
-  const barsTotal = useMemo(
-    () => expenses.reduce((sum, row) => sum + row.totale, 0),
-    [expenses],
   );
 
   const insights = useMemo(
@@ -322,57 +309,16 @@ export default function MonthStatistics({
             : t("analysis_expenses_by_category")}
         </CardTitle>
 
-        {expenses.length === 0 ? (
-          <p className="analysis-muted">{t("no_data")}</p>
-        ) : (
-          <div className="category-bars">
-            {expenses.map((category, index) => {
-              const percent =
-                barsTotal > 0 ? (category.totale / barsTotal) * 100 : 0;
-
-              return (
-                <button
-                  type="button"
-                  className="category-bars__row"
-                  key={category.nome}
-                  onClick={() => openRow(category)}
-                >
-                  <span className="category-bars__body">
-                    <span className="category-bars__line">
-                      <span className="category-bars__name">
-                        {category.nome === UNCATEGORIZED
-                          ? t(
-                              categoriaSelezionata
-                                ? "taxonomy_no_subcategory"
-                                : "taxonomy_uncategorized",
-                            )
-                          : category.nome}
-                      </span>
-                      <span className="category-bars__figure">
-                        {`${Math.round(percent)}% · `}
-                        <strong>
-                          <Amount value={category.totale} />
-                        </strong>
-                      </span>
-                    </span>
-
-                    <span className="category-bars__track">
-                      <span
-                        className={`category-bars__fill category-bars__fill--${(index % SERIES_TINTS) + 1}`}
-                        style={{ width: `${percent}%` }}
-                      />
-                    </span>
-                  </span>
-
-                  <i
-                    className="pi pi-chevron-right category-bars__chevron"
-                    aria-hidden="true"
-                  />
-                </button>
-              );
-            })}
-          </div>
-        )}
+        <CategoryBars
+          rows={expenses}
+          missingLabel={t(
+            categoriaSelezionata
+              ? "taxonomy_no_subcategory"
+              : "taxonomy_uncategorized",
+          )}
+          emptyText={t("no_data")}
+          onSelect={openRow}
+        />
       </Card>
 
       {insights.length > 0 && (

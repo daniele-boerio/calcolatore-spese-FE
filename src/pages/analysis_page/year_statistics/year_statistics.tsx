@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "../../../store/store";
 import { Card, CardTitle } from "../../../components/card/card";
 import Amount from "../../../components/amount/amount";
@@ -16,6 +17,14 @@ import {
 import { linearRegression } from "../../../features/statistics/trend";
 import TrendChart from "../../../components/charts/trend_chart/trend_chart";
 import { YearDetailsStatRow } from "../../../features/statistics/interfaces";
+import {
+  ExpenseRow,
+  yearExpenseRows,
+} from "../../../features/statistics/expenses";
+import CategoryBars from "../../../components/category_bars/category_bars";
+import { selectCategoriaCategorie } from "../../../features/categorie/categoria_slice";
+import { encodeFilters } from "../../../features/transactions/filters_url";
+import { endOfYear, startOfYear, toIsoDate } from "../../../services/dates";
 
 // Il design mostra una finestra di sei mesi: dodici barre appaiate non si
 // leggono su 430px.
@@ -62,8 +71,11 @@ export default function YearStatistics({
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
+  const navigate = useNavigate();
+
   const rows = useAppSelector(selectYearlyStatisticsData);
   const totals = useAppSelector(selectYearlyTotals);
+  const categorie = useAppSelector(selectCategoriaCategorie);
   const loading = useAppSelector(selectStatisticsLoading);
 
   useEffect(() => {
@@ -105,6 +117,49 @@ export default function YearStatistics({
   // La pendenza serve solo al badge: il disegno lo fa `TrendChart`, che si
   // ricalcola la sua geometria dai punti che gli passiamo.
   const slope = linearRegression(savings).slope;
+
+  const categoriaSelezionata = useMemo(
+    () =>
+      categorie.find((item) => String(item.id) === String(categoriaId)) ?? null,
+    [categorie, categoriaId],
+  );
+
+  const expenseBars = useMemo(
+    () => yearExpenseRows(rows, categoriaSelezionata),
+    [rows, categoriaSelezionata],
+  );
+
+  /**
+   * I movimenti di una riga, su tutto l'anno che si sta guardando.
+   *
+   * Non la pagina di dettaglio della categoria come nella vista Mese: quella
+   * ragiona su un mese solo. Qui la lista giusta è quella dei Movimenti, che
+   * i filtri se li legge dall'indirizzo — periodo compreso.
+   */
+  const openRow = (row: ExpenseRow) => {
+    const categoria =
+      categoriaSelezionata ?? categorie.find((item) => item.nome === row.nome);
+
+    const primo = new Date(year, 0, 1);
+    const query = encodeFilters(
+      {
+        data_inizio: toIsoDate(startOfYear(primo)),
+        data_fine: toIsoDate(endOfYear(primo)),
+        // Senza categoria non c'è un id da passare: si chiedono proprio le
+        // transazioni a cui la categoria manca, che è quello che dice la riga.
+        ...(categoria
+          ? { categoria_id: [categoria.id] }
+          : { senza_categoria: true }),
+        ...(row.sottocategoriaId
+          ? { sottocategoria_id: [row.sottocategoriaId] }
+          : {}),
+        ...(tagId ? { tag_id: [tagId] } : {}),
+      },
+      "custom",
+    );
+
+    navigate(`/transactions?${query.toString()}`);
+  };
 
   const monthLabel = (month: number) =>
     new Intl.DateTimeFormat(getLocale() === "it" ? "it-IT" : "en-GB", {
@@ -209,6 +264,25 @@ export default function YearStatistics({
           />
         </Card>
       )}
+
+      <Card>
+        <CardTitle aside={t("analysis_tap_for_transactions")}>
+          {categoriaSelezionata
+            ? `${t("analysis_expenses_by_category")} - ${categoriaSelezionata.nome}`
+            : t("analysis_expenses_by_category")}
+        </CardTitle>
+
+        <CategoryBars
+          rows={expenseBars}
+          missingLabel={t(
+            categoriaSelezionata
+              ? "taxonomy_no_subcategory"
+              : "taxonomy_uncategorized",
+          )}
+          emptyText={t("no_data")}
+          onSelect={openRow}
+        />
+      </Card>
 
       <Card className="year-totals">
         <TotalRow label={`${t("income")} ${year}`} value={incomes} />
