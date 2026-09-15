@@ -81,6 +81,20 @@
       font-weight: 700;
     }
   }
+
+  // Da nove mesi in su: con le spaziature piene le dodici coppie di barre
+  // escono dalla card, e le sigle dei mesi si toccano.
+  &--dense {
+    gap: 5px;
+
+    .year-bars__pair {
+      gap: 2px;
+    }
+
+    .year-bars__label {
+      font-size: 9.5px;
+    }
+  }
 }
 
 .year-legend {

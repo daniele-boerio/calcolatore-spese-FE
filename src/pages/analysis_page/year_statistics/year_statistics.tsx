@@ -26,9 +26,9 @@ import { selectCategoriaCategorie } from "../../../features/categorie/categoria_
 import { encodeFilters } from "../../../features/transactions/filters_url";
 import { endOfYear, startOfYear, toIsoDate } from "../../../services/dates";
 
-// Il design mostra una finestra di sei mesi: dodici barre appaiate non si
-// leggono su 430px.
-const WINDOW = 6;
+// Da nove mesi in su le colonne si stringono: a spaziature piene dodici
+// coppie di barre non entrano nella card su 430px.
+const DENSE_MONTHS = 9;
 
 type YearStatisticsProps = {
   year: number;
@@ -90,16 +90,17 @@ export default function YearStatistics({
   }, [dispatch, year, categoriaId, sottocategoriaIds, tagId]);
 
   const today = new Date();
-  // Nell'anno in corso la finestra finisce sul mese corrente; negli anni
-  // passati sull'ultimo mese, che c'è tutto.
+  // Nell'anno in corso si arriva al mese corrente; negli anni passati
+  // all'ultimo mese, che c'è tutto.
   const lastMonth = year === today.getFullYear() ? today.getMonth() + 1 : 12;
 
+  // Tutto l'anno fin qui, da gennaio: è l'anno che si sta guardando, e una
+  // finestra più corta ne nascondeva l'inizio senza dirlo.
   const months = useMemo(() => {
     const all = rows.map(totalsOf).sort((a, b) => a.month - b.month);
     const end = all.findIndex((entry) => entry.month === lastMonth);
 
-    const window = end >= 0 ? all.slice(0, end + 1) : all;
-    return window.slice(-WINDOW);
+    return end >= 0 ? all.slice(0, end + 1) : all;
   }, [rows, lastMonth]);
 
   const savings = months.map((month) => month.entrate - month.uscite);
@@ -202,7 +203,11 @@ export default function YearStatistics({
           </span>
         </div>
 
-        <div className="year-bars">
+        <div
+          className={`year-bars${
+            months.length >= DENSE_MONTHS ? " year-bars--dense" : ""
+          }`}
+        >
           {months.map((month) => (
             <div className="year-bars__group" key={month.month}>
               <div className="year-bars__pair">
