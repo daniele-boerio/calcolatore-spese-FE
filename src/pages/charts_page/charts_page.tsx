@@ -22,6 +22,7 @@ import {
   selectChartsSavings,
 } from "../../features/charts/charts_slice";
 import { selectCategoriaCategorie } from "../../features/categorie/categoria_slice";
+import { UNCATEGORIZED } from "../../features/statistics/expenses";
 import { linearRegression } from "../../features/statistics/trend";
 import { monthOfLabel } from "../../features/charts/labels";
 import { endOfMonth, toIsoDate } from "../../services/dates";
@@ -66,8 +67,13 @@ const byMonth = <T, R>(
 
 type ChartsProps = {
   year: number;
-  /** Dai filtri della schermata: decide di quale categoria è l'andamento. */
+  /**
+   * Dai filtri della schermata: restringe tutti e quattro i grafici, e decide
+   * di quale categoria è l'andamento dell'ultima card.
+   */
   categoriaId: string | null;
+  sottocategoriaIds: string[];
+  tagId: string | null;
 };
 
 /**
@@ -85,7 +91,12 @@ type ChartsProps = {
  * grafico — è lì che `MonthColumns` e `TrendChart` si guadagnano il posto di
  * componenti invece di essere due SVG scritti qui dentro.
  */
-export default function ChartsPage({ year, categoriaId }: ChartsProps) {
+export default function ChartsPage({
+  year,
+  categoriaId,
+  sottocategoriaIds,
+  tagId,
+}: ChartsProps) {
   const { t } = useI18n();
   const dispatch = useAppDispatch();
 
@@ -99,27 +110,32 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
   // Nell'anno in corso la finestra si ferma al mese corrente: i mesi che non
   // sono ancora successi tornano a zero dal BE, e uno zero in fondo alla linea
   // del risparmio si legge come un crollo.
-  const range = useMemo(() => {
+  const filtri = useMemo(() => {
     const today = new Date();
     const last = year === today.getFullYear() ? today : new Date(year, 11, 1);
 
     return {
       data_inizio: toIsoDate(new Date(year, 0, 1)),
       data_fine: toIsoDate(endOfMonth(last)),
+      categoria_id: categoriaId,
+      sottocategoria_id: sottocategoriaIds,
+      tag_id: tagId,
     };
-  }, [year]);
+  }, [year, categoriaId, sottocategoriaIds, tagId]);
 
   useEffect(() => {
-    dispatch(getIncomeExpenseChart(range));
-    dispatch(getSavingsChart(range));
-    dispatch(getExpenseCompositionChart(range));
-  }, [dispatch, range]);
+    dispatch(getIncomeExpenseChart(filtri));
+    dispatch(getSavingsChart(filtri));
+    dispatch(getExpenseCompositionChart(filtri));
+  }, [dispatch, filtri]);
 
   useEffect(() => {
     if (!categoriaId) return;
 
-    dispatch(getCategoryTrendChart({ categoria_id: categoriaId, ...range }));
-  }, [dispatch, categoriaId, range]);
+    // Qui la categoria non è un filtro ma il soggetto: la card dice il suo
+    // andamento nei mesi, e `filtri` la porta già dentro.
+    dispatch(getCategoryTrendChart({ ...filtri, categoria_id: categoriaId }));
+  }, [dispatch, categoriaId, filtri]);
 
   // Il BE riempie di zeri i mesi senza movimenti: l'asse c'è tutto anche
   // quando i dati no, e le colonne restano nella stessa posizione da un anno
@@ -152,7 +168,17 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
 
   const slices = useMemo(() => {
     const sorted = composition
-      .map((row) => ({ nome: row.categoria, totale: Math.abs(row.totale) }))
+      .map((row) => ({
+        nome:
+          row.categoria === UNCATEGORIZED
+            ? t(
+                categoriaId
+                  ? "taxonomy_no_subcategory"
+                  : "taxonomy_uncategorized",
+              )
+            : row.categoria,
+        totale: Math.abs(row.totale),
+      }))
       .filter((row) => row.totale > 0)
       .sort((a, b) => b.totale - a.totale);
 
@@ -167,7 +193,7 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
     }
 
     return top;
-  }, [composition, t]);
+  }, [composition, categoriaId, t]);
 
   const compositionTotal = slices.reduce((sum, slice) => sum + slice.totale, 0);
 
@@ -290,7 +316,11 @@ export default function ChartsPage({ year, categoriaId }: ChartsProps) {
 
       {slices.length > 0 && (
         <Card>
-          <CardTitle>{t("expense_composition")}</CardTitle>
+          <CardTitle>
+            {categoriaNome
+              ? `${t("expense_composition")} - ${categoriaNome}`
+              : t("expense_composition")}
+          </CardTitle>
 
           <div className="donut">
             <svg

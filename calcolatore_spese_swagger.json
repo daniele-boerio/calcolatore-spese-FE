@@ -3659,6 +3659,63 @@
               "title": "Data Fine"
             },
             "description": "Data fine (es: 2026-12-31)"
+          },
+          {
+            "name": "categoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per categoria padre",
+              "title": "Categoria Id"
+            },
+            "description": "Filtra per categoria padre"
+          },
+          {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per sottocategoria (ripetibile)",
+              "title": "Sottocategoria Id"
+            },
+            "description": "Filtra per sottocategoria (ripetibile)"
+          },
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per tag",
+              "title": "Tag Id"
+            },
+            "description": "Filtra per tag"
           }
         ],
         "responses": {
@@ -3739,6 +3796,63 @@
               "title": "Data Fine"
             },
             "description": "Data fine (es: 2026-12-31)"
+          },
+          {
+            "name": "categoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per categoria padre",
+              "title": "Categoria Id"
+            },
+            "description": "Filtra per categoria padre"
+          },
+          {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per sottocategoria (ripetibile)",
+              "title": "Sottocategoria Id"
+            },
+            "description": "Filtra per sottocategoria (ripetibile)"
+          },
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per tag",
+              "title": "Tag Id"
+            },
+            "description": "Filtra per tag"
           }
         ],
         "responses": {
@@ -3819,6 +3933,63 @@
               "title": "Data Fine"
             },
             "description": "Data fine (es: 2026-12-31)"
+          },
+          {
+            "name": "categoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per categoria padre",
+              "title": "Categoria Id"
+            },
+            "description": "Filtra per categoria padre"
+          },
+          {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per sottocategoria (ripetibile)",
+              "title": "Sottocategoria Id"
+            },
+            "description": "Filtra per sottocategoria (ripetibile)"
+          },
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per tag",
+              "title": "Tag Id"
+            },
+            "description": "Filtra per tag"
           }
         ],
         "responses": {
@@ -3910,6 +4081,45 @@
               "title": "Data Fine"
             },
             "description": "Data fine (es: 2026-12-31)"
+          },
+          {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per sottocategoria (ripetibile)",
+              "title": "Sottocategoria Id"
+            },
+            "description": "Filtra per sottocategoria (ripetibile)"
+          },
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filtra per tag",
+              "title": "Tag Id"
+            },
+            "description": "Filtra per tag"
           }
         ],
         "responses": {

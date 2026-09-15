@@ -175,10 +175,14 @@ export default function AnalysisPage() {
           />
         );
       case "categories":
-        // Gli endpoint dei grafici prendono solo un intervallo di date, non
-        // categoria e tag: qui passa quello che sanno usare — l'anno, e la
-        // categoria per il suo andamento.
-        return <ChartsPage year={year} categoriaId={categoriaId} />;
+        return (
+          <ChartsPage
+            year={year}
+            categoriaId={categoriaId}
+            sottocategoriaIds={sottocategoriaIds}
+            tagId={tagId}
+          />
+        );
     }
   };
 

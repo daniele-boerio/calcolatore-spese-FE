@@ -10,7 +10,30 @@ import {
   GetSavingsParams,
   MonthlyIncomeExpenseOut,
   MonthlySavingsOut,
+  ChartFilters,
 } from "./interfaces";
+
+/**
+ * Periodo e filtri in query string.
+ *
+ * Le sottocategorie sono più d'una: axios serializzerebbe l'array come
+ * `sottocategoria_id[]=1`, che FastAPI non riconosce — il parametro va
+ * ripetuto, come già fanno statistiche e Movimenti.
+ */
+const chartQuery = (params: ChartFilters): URLSearchParams => {
+  const query = new URLSearchParams();
+
+  if (params.data_inizio) query.append("data_inizio", params.data_inizio);
+  if (params.data_fine) query.append("data_fine", params.data_fine);
+  if (params.categoria_id) query.append("categoria_id", params.categoria_id);
+
+  for (const id of params.sottocategoria_id ?? [])
+    query.append("sottocategoria_id", id);
+
+  if (params.tag_id) query.append("tag_id", params.tag_id);
+
+  return query;
+};
 
 // --- API CALLS ---
 
@@ -20,13 +43,7 @@ export const getIncomeExpenseChart = createAsyncThunk<
 >("charts/getIncomeExpenseChart", async (params, { rejectWithValue }) => {
   try {
     const response = await api.get<MonthlyIncomeExpenseOut[]>(
-      "/charts/income-expense",
-      {
-        params: {
-          data_inizio: params.data_inizio,
-          data_fine: params.data_fine,
-        },
-      },
+      `/charts/income-expense?${chartQuery(params).toString()}`,
     );
     return response.data;
   } catch (error) {
@@ -40,12 +57,9 @@ export const getSavingsChart = createAsyncThunk<
   GetSavingsParams
 >("charts/getSavingsChart", async (params, { rejectWithValue }) => {
   try {
-    const response = await api.get<MonthlySavingsOut[]>("/charts/savings", {
-      params: {
-        data_inizio: params.data_inizio,
-        data_fine: params.data_fine,
-      },
-    });
+    const response = await api.get<MonthlySavingsOut[]>(
+      `/charts/savings?${chartQuery(params).toString()}`,
+    );
     return response.data;
   } catch (error) {
     const err = error as AxiosError;
@@ -59,13 +73,7 @@ export const getExpenseCompositionChart = createAsyncThunk<
 >("charts/getExpenseCompositionChart", async (params, { rejectWithValue }) => {
   try {
     const response = await api.get<ExpenseCompositionOut[]>(
-      "/charts/expense-composition",
-      {
-        params: {
-          data_inizio: params.data_inizio,
-          data_fine: params.data_fine,
-        },
-      },
+      `/charts/expense-composition?${chartQuery(params).toString()}`,
     );
     return response.data;
   } catch (error) {
@@ -80,14 +88,7 @@ export const getCategoryTrendChart = createAsyncThunk<
 >("charts/getCategoryTrendChart", async (params, { rejectWithValue }) => {
   try {
     const response = await api.get<CategoryTrendOut[]>(
-      "/charts/category-trend",
-      {
-        params: {
-          categoria_id: params.categoria_id,
-          data_inizio: params.data_inizio,
-          data_fine: params.data_fine,
-        },
-      },
+      `/charts/category-trend?${chartQuery(params).toString()}`,
     );
     return response.data;
   } catch (error) {
