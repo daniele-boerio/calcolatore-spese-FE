@@ -100,7 +100,18 @@ export default function TransactionPage() {
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const settledQuery = useDebouncedValue(query, SEARCH_DEBOUNCE);
 
+  // Alzata quando i filtri li ha appena dettati l'indirizzo, e abbassata dal
+  // primo giro dell'effetto che fa il percorso inverso. Serve perché i due
+  // effetti girano nello stesso commit: quando il secondo parte, `filters` è
+  // ancora quello del render di prima, cioè di prima che il primo lo
+  // sostituisse. Senza la guardia riscriverebbe nell'indirizzo lo stato
+  // vecchio, il primo effetto lo rileggerebbe, e i due si rimbalzerebbero
+  // addosso una richiesta a testa senza fermarsi mai — si vedeva arrivando
+  // qui da un link con i filtri dentro, come quello dell'Analisi.
+  const fromUrl = useRef(false);
+
   useEffect(() => {
+    fromUrl.current = true;
     dispatch(applyFilters(decodeFilters(new URLSearchParams(search))));
     // I dispatch di Redux sono sincroni: il thunk legge i filtri appena
     // applicati, non quelli di prima.
@@ -111,6 +122,11 @@ export default function TransactionPage() {
   // quando la query string cambia davvero, quindi un tocco che non sposta
   // niente non ricarica niente.
   useEffect(() => {
+    if (fromUrl.current) {
+      fromUrl.current = false;
+      return;
+    }
+
     const next = encodeFilters(filters, period).toString();
     if (next !== search) setSearchParams(next, { replace: true });
   }, [filters, period, search, setSearchParams]);

@@ -183,3 +183,39 @@ describe("filtro senza categoria", () => {
     ).toBeUndefined();
   });
 });
+
+describe("andata e ritorno", () => {
+  // La pagina Movimenti decodifica la query string nello store e poi
+  // ricodifica lo store nella query string. Se il secondo passaggio non
+  // restituisse la stessa stringa, i due effetti che chiudono il cerchio si
+  // rimbalzerebbero addosso una richiesta a testa senza fermarsi.
+  const stabile = (search: string) => {
+    const { filters, period } = decodeFilters(new URLSearchParams(search));
+    return encodeFilters(filters, period).toString();
+  };
+
+  it("un link con categoria, sottocategoria e anno resta sé stesso", () => {
+    // È il link che l'Analisi costruisce toccando una riga delle uscite.
+    const link = encodeFilters(
+      {
+        data_inizio: "2026-01-01",
+        data_fine: "2026-12-31",
+        categoria_id: ["14"],
+        sottocategoria_id: ["49"],
+      },
+      "custom",
+    ).toString();
+
+    expect(stabile(link)).toBe(link);
+  });
+
+  it("vale anche per il link senza categoria e per quello vuoto", () => {
+    const link = encodeFilters(
+      { data_inizio: "2026-01-01", data_fine: "2026-12-31", senza_categoria: true },
+      "custom",
+    ).toString();
+
+    expect(stabile(link)).toBe(link);
+    expect(stabile("")).toBe("");
+  });
+});
