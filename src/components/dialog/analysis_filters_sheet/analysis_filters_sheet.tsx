@@ -15,7 +15,8 @@ export type AnalysisFilters = {
   /** Assente quando il periodo è un anno intero (viste Anno e Grafici). */
   month?: number;
   categoriaId: string | null;
-  sottocategoriaId: string | null;
+  /** Più d'una: le sottocategorie si accendono a piacere, non a turno. */
+  sottocategoriaIds: string[];
   tagId: string | null;
 };
 
@@ -23,7 +24,8 @@ export type AnalysisFiltersPatch = {
   year?: number;
   month?: number;
   categoria?: string | null;
-  sottocategoria?: string | null;
+  /** L'elenco intero dopo il tocco, non il singolo id: vuoto vuol dire tutte. */
+  sottocategorie?: string[];
   tag?: string | null;
 };
 
@@ -49,7 +51,7 @@ export default function AnalysisFiltersSheet({
   year,
   month,
   categoriaId,
-  sottocategoriaId,
+  sottocategoriaIds,
   tagId,
   showTaxonomy = true,
   onChange,
@@ -74,6 +76,18 @@ export default function AnalysisFiltersSheet({
   const sottocategorie =
     categorie.find((cat) => String(cat.id) === String(categoriaId))
       ?.sottocategorie ?? [];
+
+  const isOn = (id: string) =>
+    sottocategoriaIds.some((item) => String(item) === String(id));
+
+  // Toccare una sottocategoria accesa la spegne: è l'unico modo di togliere
+  // una voce da una selezione multipla senza azzerarla tutta.
+  const toggle = (id: string) =>
+    onChange({
+      sottocategorie: isOn(id)
+        ? sottocategoriaIds.filter((item) => String(item) !== String(id))
+        : [...sottocategoriaIds, String(id)],
+    });
 
   return (
     <Sheet open={open} onClose={onClose} title={t("filters")}>
@@ -153,20 +167,17 @@ export default function AnalysisFiltersSheet({
           <div className="analysis-filters__chips">
             <Chip
               label={t("mov_type_all")}
-              variant={sottocategoriaId ? "solid" : "accent"}
-              onClick={() => onChange({ sottocategoria: null })}
+              variant={sottocategoriaIds.length > 0 ? "solid" : "accent"}
+              onClick={() => onChange({ sottocategorie: [] })}
             />
 
             {sottocategorie.map((sotto) => (
               <Chip
                 key={sotto.id}
                 label={sotto.nome}
-                variant={
-                  String(sotto.id) === String(sottocategoriaId)
-                    ? "accent"
-                    : "solid"
-                }
-                onClick={() => onChange({ sottocategoria: sotto.id })}
+                icon={isOn(sotto.id) ? "pi pi-check" : undefined}
+                variant={isOn(sotto.id) ? "accent" : "solid"}
+                onClick={() => toggle(sotto.id)}
               />
             ))}
           </div>

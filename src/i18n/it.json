@@ -277,6 +277,7 @@
   "taxonomy_tags": "Tag più usati",
   "taxonomy_no_tags": "Nessun tag ancora.",
   "taxonomy_uncategorized": "Senza categoria",
+  "taxonomy_no_subcategory": "Senza sottocategoria",
   "taxonomy_assign": "Assegna",
   "taxonomy_subcategories": "sottocategorie",
   "taxonomy_empty_title": "Nessuna categoria",

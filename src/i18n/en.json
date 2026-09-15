@@ -277,6 +277,7 @@
   "taxonomy_tags": "Most used tags",
   "taxonomy_no_tags": "No tags yet.",
   "taxonomy_uncategorized": "Uncategorized",
+  "taxonomy_no_subcategory": "No subcategory",
   "taxonomy_assign": "Assign",
   "taxonomy_subcategories": "subcategories",
   "taxonomy_empty_title": "No categories",

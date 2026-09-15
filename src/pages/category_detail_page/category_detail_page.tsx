@@ -288,7 +288,7 @@ export default function CategoryDetailPage() {
         // e il tag.
         showTaxonomy={false}
         categoriaId={null}
-        sottocategoriaId={null}
+        sottocategoriaIds={[]}
         tagId={tagId}
         onChange={(patch: AnalysisFiltersPatch) => {
           const next = new URLSearchParams(searchParams);

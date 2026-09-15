@@ -3439,16 +3439,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "integer"
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Filtra per sottocategoria",
+              "description": "Filtra per sottocategoria (ripetibile)",
               "title": "Sottocategoria Id"
             },
-            "description": "Filtra per sottocategoria"
+            "description": "Filtra per sottocategoria (ripetibile)"
           },
           {
             "name": "tag_id",
@@ -3551,16 +3554,19 @@
             "schema": {
               "anyOf": [
                 {
-                  "type": "integer"
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
                 },
                 {
                   "type": "null"
                 }
               ],
-              "description": "Filtra per sottocategoria",
+              "description": "Filtra per sottocategoria (ripetibile)",
               "title": "Sottocategoria Id"
             },
-            "description": "Filtra per sottocategoria"
+            "description": "Filtra per sottocategoria (ripetibile)"
           },
           {
             "name": "tag_id",

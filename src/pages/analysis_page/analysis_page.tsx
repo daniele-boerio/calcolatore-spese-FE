@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useI18n } from "../../i18n/use-i18n";
 import { getLocale } from "../../i18n";
@@ -52,7 +52,21 @@ export default function AnalysisPage() {
   const year = Number(searchParams.get("anno")) || today.getFullYear();
   const month = Number(searchParams.get("mese")) || today.getMonth() + 1;
   const categoriaId = searchParams.get("categoria");
-  const sottocategoriaId = searchParams.get("sotto");
+  // Più sottocategorie in un parametro solo, separate da virgola: la stessa
+  // forma che usano i filtri dei Movimenti, così l'URL resta leggibile.
+  //
+  // Memoizzato sulla stringa grezza: le viste lo mettono fra le dipendenze di
+  // un `useEffect`, e un array nuovo a ogni render rifarebbe la chiamata in
+  // continuazione.
+  const sottoParam = searchParams.get("sotto") ?? "";
+  const sottocategoriaIds = useMemo(
+    () =>
+      sottoParam
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean),
+    [sottoParam],
+  );
   const tagId = searchParams.get("tag");
 
   // Il foglio dei filtri elenca categorie e tag: qui è l'unico posto che li
@@ -77,12 +91,17 @@ export default function AnalysisPage() {
     update({
       ...(patch.year !== undefined ? { anno: String(patch.year) } : {}),
       ...(patch.month !== undefined ? { mese: String(patch.month) } : {}),
-      // Cambiare categoria butta via la sottocategoria: apparteneva all'altra.
+      // Cambiare categoria butta via le sottocategorie: appartenevano all'altra.
       ...(patch.categoria !== undefined
         ? { categoria: patch.categoria, sotto: null }
         : {}),
-      ...(patch.sottocategoria !== undefined
-        ? { sotto: patch.sottocategoria }
+      ...(patch.sottocategorie !== undefined
+        ? {
+            sotto:
+              patch.sottocategorie.length > 0
+                ? patch.sottocategorie.join(",")
+                : null,
+          }
         : {}),
       ...(patch.tag !== undefined ? { tag: patch.tag } : {}),
     });
@@ -105,11 +124,16 @@ export default function AnalysisPage() {
     });
   }
 
-  if (sottocategoriaId) {
+  // Una pillola per sottocategoria accesa: toglierne una non deve spegnere
+  // anche le altre.
+  for (const id of sottocategoriaIds) {
     activeChips.push({
-      key: "sotto",
-      label: nameOf(sottocategoriaId, sottocategorie) ?? t("sub_category"),
-      clear: () => update({ sotto: null }),
+      key: `sotto-${id}`,
+      label: nameOf(id, sottocategorie) ?? t("sub_category"),
+      clear: () => {
+        const rimaste = sottocategoriaIds.filter((item) => item !== id);
+        update({ sotto: rimaste.length > 0 ? rimaste.join(",") : null });
+      },
     });
   }
 
@@ -137,7 +161,7 @@ export default function AnalysisPage() {
             year={year}
             month={month}
             categoriaId={categoriaId}
-            sottocategoriaId={sottocategoriaId}
+            sottocategoriaIds={sottocategoriaIds}
             tagId={tagId}
           />
         );
@@ -146,7 +170,7 @@ export default function AnalysisPage() {
           <YearStatistics
             year={year}
             categoriaId={categoriaId}
-            sottocategoriaId={sottocategoriaId}
+            sottocategoriaIds={sottocategoriaIds}
             tagId={tagId}
           />
         );
@@ -213,7 +237,7 @@ export default function AnalysisPage() {
         year={year}
         month={scope === "month" ? month : undefined}
         categoriaId={categoriaId}
-        sottocategoriaId={sottocategoriaId}
+        sottocategoriaIds={sottocategoriaIds}
         tagId={tagId}
         onChange={applyFilters}
       />

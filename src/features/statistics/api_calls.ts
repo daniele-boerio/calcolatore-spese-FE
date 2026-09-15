@@ -9,6 +9,28 @@ import {
 } from "./interfaces";
 import { toIsoDate } from "../../services/dates";
 
+/**
+ * Categoria, sottocategorie e tag in query string.
+ *
+ * Le sottocategorie sono più d'una: axios serializzerebbe l'array come
+ * `sottocategoria_id[]=1`, che FastAPI non riconosce — il parametro va
+ * ripetuto, come già fanno i filtri dei Movimenti.
+ */
+const tassonomiaQuery = (
+  params: FetchYearStatisticsParams | FetchMonthStatisticsParams,
+): URLSearchParams => {
+  const query = new URLSearchParams();
+
+  if (params.categoria_id) query.append("categoria_id", params.categoria_id);
+
+  for (const id of params.sottocategoria_id ?? [])
+    query.append("sottocategoria_id", id);
+
+  if (params.tag_id) query.append("tag_id", params.tag_id);
+
+  return query;
+};
+
 // --- API CALLS ---
 
 export const getYearDetailsStatistics = createAsyncThunk<
@@ -18,16 +40,11 @@ export const getYearDetailsStatistics = createAsyncThunk<
   try {
     // La risposta porta anche i totali dell'anno: servono alla tabella in
     // fondo alla vista Anno, e prima venivano buttati via.
+    const query = tassonomiaQuery(params);
+    query.append("year", String(params.year));
+
     const response = await api.get<YearDetailsResponse>(
-      "/statistics/yearDetails",
-      {
-        params: {
-          year: params.year,
-          categoria_id: params.categoria_id || undefined,
-          sottocategoria_id: params.sottocategoria_id || undefined,
-          tag_id: params.tag_id || undefined,
-        },
-      },
+      `/statistics/yearDetails?${query.toString()}`,
     );
     return response.data;
   } catch (error) {
@@ -43,17 +60,12 @@ export const getMonthlyDetailsStatistics = createAsyncThunk<
   FetchMonthStatisticsParams
 >("statistics/monthDetails", async (params, { rejectWithValue }) => {
   try {
+    const query = tassonomiaQuery(params);
+    query.append("year", String(params.year));
+    query.append("month", String(params.month));
+
     const response = await api.get<MonthlyDetailResponse>(
-      "/statistics/monthDetails",
-      {
-        params: {
-          month: params.month,
-          year: params.year,
-          categoria_id: params.categoria_id || undefined,
-          sottocategoria_id: params.sottocategoria_id || undefined,
-          tag_id: params.tag_id || undefined,
-        },
-      },
+      `/statistics/monthDetails?${query.toString()}`,
     );
     return response.data;
   } catch (error) {
@@ -79,17 +91,12 @@ export const getPreviousMonthSavings = createAsyncThunk<
     const month = params.month === 1 ? 12 : params.month - 1;
     const year = params.month === 1 ? params.year - 1 : params.year;
 
+    const query = tassonomiaQuery(params);
+    query.append("year", String(year));
+    query.append("month", String(month));
+
     const response = await api.get<MonthlyDetailResponse>(
-      "/statistics/monthDetails",
-      {
-        params: {
-          month,
-          year,
-          categoria_id: params.categoria_id || undefined,
-          sottocategoria_id: params.sottocategoria_id || undefined,
-          tag_id: params.tag_id || undefined,
-        },
-      },
+      `/statistics/monthDetails?${query.toString()}`,
     );
 
     return Number(response.data.totale ?? 0);
@@ -123,11 +130,8 @@ export const getMonthRefunds = createAsyncThunk<
       data_fine: toIsoDate(end),
     });
 
-    if (params.categoria_id)
-      query.append("categoria_id", params.categoria_id);
-    if (params.sottocategoria_id)
-      query.append("sottocategoria_id", params.sottocategoria_id);
-    if (params.tag_id) query.append("tag_id", params.tag_id);
+    for (const [key, value] of tassonomiaQuery(params))
+      query.append(key, value);
 
     const response = await api.get<{ total_rimborsi: number }>(
       `/transazioni/paginated?${query.toString()}`,

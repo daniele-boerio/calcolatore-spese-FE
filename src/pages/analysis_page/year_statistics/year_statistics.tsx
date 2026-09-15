@@ -24,7 +24,7 @@ const WINDOW = 6;
 type YearStatisticsProps = {
   year: number;
   categoriaId: string | null;
-  sottocategoriaId: string | null;
+  sottocategoriaIds: string[];
   tagId: string | null;
 };
 
@@ -56,7 +56,7 @@ const totalsOf = (row: YearDetailsStatRow): MonthTotals => {
 export default function YearStatistics({
   year,
   categoriaId,
-  sottocategoriaId,
+  sottocategoriaIds,
   tagId,
 }: YearStatisticsProps) {
   const { t } = useI18n();
@@ -71,11 +71,11 @@ export default function YearStatistics({
       getYearDetailsStatistics({
         year,
         categoria_id: categoriaId,
-        sottocategoria_id: sottocategoriaId,
+        sottocategoria_id: sottocategoriaIds,
         tag_id: tagId,
       }),
     );
-  }, [dispatch, year, categoriaId, sottocategoriaId, tagId]);
+  }, [dispatch, year, categoriaId, sottocategoriaIds, tagId]);
 
   const today = new Date();
   // Nell'anno in corso la finestra finisce sul mese corrente; negli anni

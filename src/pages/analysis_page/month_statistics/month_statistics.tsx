@@ -21,6 +21,11 @@ import {
 } from "../../../features/statistics/statistics_slice";
 import { buildInsights, Insight } from "../../../features/statistics/insights";
 import {
+  expenseRows,
+  ExpenseRow,
+  UNCATEGORIZED,
+} from "../../../features/statistics/expenses";
+import {
   getExpenseCompositionChart,
   getSavingsChart,
 } from "../../../features/charts/api_calls";
@@ -49,7 +54,7 @@ type MonthStatisticsProps = {
   year: number;
   month: number;
   categoriaId: string | null;
-  sottocategoriaId: string | null;
+  sottocategoriaIds: string[];
   tagId: string | null;
 };
 
@@ -57,7 +62,7 @@ export default function MonthStatistics({
   year,
   month,
   categoriaId,
-  sottocategoriaId,
+  sottocategoriaIds,
   tagId,
 }: MonthStatisticsProps) {
   const { t } = useI18n();
@@ -78,7 +83,7 @@ export default function MonthStatistics({
       year,
       month,
       categoria_id: categoriaId,
-      sottocategoria_id: sottocategoriaId,
+      sottocategoria_id: sottocategoriaIds,
       tag_id: tagId,
     };
 
@@ -105,7 +110,7 @@ export default function MonthStatistics({
         data_fine: toIsoDate(endOfMonth(addMonths(selected, -1))),
       }),
     );
-  }, [dispatch, year, month, categoriaId, sottocategoriaId, tagId]);
+  }, [dispatch, year, month, categoriaId, sottocategoriaIds, tagId]);
 
   const averages = useMemo(
     () =>
@@ -118,18 +123,25 @@ export default function MonthStatistics({
     [composition],
   );
 
-  // `monthDetails` manda le uscite col segno meno: qui si ragiona in valore
-  // assoluto, il segno lo rimette la scrittura.
-  const expenses = useMemo(
+  const categoriaSelezionata = useMemo(
     () =>
-      data
-        .filter((category) => category.totale < 0)
-        .map((category) => ({
-          nome: category.categoria,
-          totale: Math.abs(category.totale),
-        }))
-        .sort((a, b) => b.totale - a.totale),
-    [data],
+      categorie.find((item) => String(item.id) === String(categoriaId)) ?? null,
+    [categorie, categoriaId],
+  );
+
+  const expenses = useMemo(
+    () => expenseRows(data, categoriaSelezionata),
+    [data, categoriaSelezionata],
+  );
+
+  // Denominatore delle percentuali: la somma di quello che è a schermo, non il
+  // totale del mese. I due coincidono quando i dati sono quelli del filtro
+  // corrente, ma finché la risposta nuova non arriva lo store ha ancora i
+  // totali di prima, e le barre direbbero quote di un totale che non è il
+  // loro — somme del 110%.
+  const barsTotal = useMemo(
+    () => expenses.reduce((sum, row) => sum + row.totale, 0),
+    [expenses],
   );
 
   const insights = useMemo(
@@ -158,8 +170,11 @@ export default function MonthStatistics({
       ? Math.round(((savings - previous) / Math.abs(previous)) * 100)
       : null;
 
-  const openCategory = (nome: string) => {
-    const categoria = categorie.find((item) => item.nome === nome);
+  const openRow = (row: ExpenseRow) => {
+    // La pagina di dettaglio è sempre quella di una categoria: quando la riga
+    // è una sottocategoria, si apre la categoria scelta ristretta a quella.
+    const categoria =
+      categoriaSelezionata ?? categorie.find((item) => item.nome === row.nome);
     if (!categoria) return;
 
     // Il periodo viaggia con il link: la pagina di dettaglio apre sullo stesso
@@ -168,7 +183,9 @@ export default function MonthStatistics({
       anno: String(year),
       mese: String(month),
     });
-    if (sottocategoriaId) query.set("sotto", sottocategoriaId);
+    // Una sottocategoria senza id (le uscite che non ne hanno) non si può
+    // filtrare: il link apre la categoria intera.
+    if (row.sottocategoriaId) query.set("sotto", row.sottocategoriaId);
     if (tagId) query.set("tag", tagId);
 
     navigate(`/categories/${categoria.id}?${query.toString()}`);
@@ -300,7 +317,9 @@ export default function MonthStatistics({
 
       <Card>
         <CardTitle aside={t("analysis_tap_for_transactions")}>
-          {t("analysis_expenses_by_category")}
+          {categoriaSelezionata
+            ? `${t("analysis_expenses_by_category")} - ${categoriaSelezionata.nome}`
+            : t("analysis_expenses_by_category")}
         </CardTitle>
 
         {expenses.length === 0 ? (
@@ -308,19 +327,26 @@ export default function MonthStatistics({
         ) : (
           <div className="category-bars">
             {expenses.map((category, index) => {
-              const percent = spent > 0 ? (category.totale / spent) * 100 : 0;
+              const percent =
+                barsTotal > 0 ? (category.totale / barsTotal) * 100 : 0;
 
               return (
                 <button
                   type="button"
                   className="category-bars__row"
                   key={category.nome}
-                  onClick={() => openCategory(category.nome)}
+                  onClick={() => openRow(category)}
                 >
                   <span className="category-bars__body">
                     <span className="category-bars__line">
                       <span className="category-bars__name">
-                        {category.nome}
+                        {category.nome === UNCATEGORIZED
+                          ? t(
+                              categoriaSelezionata
+                                ? "taxonomy_no_subcategory"
+                                : "taxonomy_uncategorized",
+                            )
+                          : category.nome}
                       </span>
                       <span className="category-bars__figure">
                         {`${Math.round(percent)}% · `}
