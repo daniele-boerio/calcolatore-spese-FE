@@ -21,6 +21,22 @@ import {
 } from "./interfaces";
 import { RootState } from "../../store/store";
 
+/**
+ * Il budget arriva come stringa — è un `Decimal` sul BE — e alla UI serve un
+ * numero. È l'unico campo di denaro della categoria, e la conversione sta qui
+ * come per le transazioni: dopo lo slice nessuno deve più fare `Number()`.
+ *
+ * `null` resta `null`: è "nessun budget deciso", e non va confuso con zero.
+ */
+export const mapCategoria = (categoria: Categoria): Categoria => ({
+  ...categoria,
+  budget_mensile:
+    categoria.budget_mensile === null || categoria.budget_mensile === undefined
+      ? null
+      : Number(categoria.budget_mensile),
+  sottocategorie: categoria.sottocategorie ?? [],
+});
+
 const initialState: CategorieState = {
   loading: false,
   categorie: [],
@@ -50,7 +66,7 @@ const categorieSlice = createSlice({
       .addCase(
         getCategorie.fulfilled,
         (state, action: PayloadAction<Categoria[]>) => {
-          state.categorie = action.payload;
+          state.categorie = action.payload.map(mapCategoria);
         },
       )
 
@@ -58,11 +74,7 @@ const categorieSlice = createSlice({
       .addCase(
         createCategoria.fulfilled,
         (state, action: PayloadAction<Categoria>) => {
-          const newCat = {
-            ...action.payload,
-            sottocategorie: action.payload.sottocategorie || [],
-          };
-          state.categorie.push(newCat);
+          state.categorie.push(mapCategoria(action.payload));
         },
       )
 
@@ -76,7 +88,7 @@ const categorieSlice = createSlice({
           if (index !== -1) {
             state.categorie[index] = {
               ...state.categorie[index],
-              ...action.payload,
+              ...mapCategoria(action.payload),
             };
           }
         },

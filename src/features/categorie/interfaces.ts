@@ -13,6 +13,14 @@ export interface Categoria {
   nome: string;
   solo_entrata: boolean;
   solo_uscita: boolean;
+  /**
+   * Quanto si vorrebbe spendere in un mese su questa categoria.
+   *
+   * `null` è "nessun budget deciso", che non è come `0`: zero è un budget vero
+   * e vuol dire "non spenderci niente". Arriva come stringa dal BE e lo
+   * converte `mapCategoria`.
+   */
+  budget_mensile: number | null;
   sottocategorie?: SottoCategoria[];
   creationDate: string;
   lastUpdate: string;
@@ -32,6 +40,7 @@ export interface CreateCategoriaParams {
   nome: string;
   solo_entrata: boolean;
   solo_uscita: boolean;
+  budget_mensile?: number | null;
   sottocategorie?: {
     nome: string;
     solo_entrata: boolean;
@@ -45,6 +54,8 @@ export interface UpdateCategoriaParams {
   nome?: string;
   solo_entrata?: boolean;
   solo_uscita?: boolean;
+  /** `null` toglie il budget; assente lo lascia com'è. */
+  budget_mensile?: number | null;
 }
 
 export interface DeleteCategoriaParams {

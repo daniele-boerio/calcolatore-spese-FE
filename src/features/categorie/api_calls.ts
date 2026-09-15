@@ -57,7 +57,7 @@ export const createCategoria = createAsyncThunk<
 >(
   "categorie/createCategoria",
   async (
-    { nome, solo_entrata, solo_uscita, sottocategorie },
+    { nome, solo_entrata, solo_uscita, budget_mensile, sottocategorie },
     { rejectWithValue },
   ) => {
     try {
@@ -65,6 +65,7 @@ export const createCategoria = createAsyncThunk<
         nome,
         solo_entrata,
         solo_uscita,
+        budget_mensile,
         sottocategorie,
       });
       return response.data;
@@ -83,12 +84,20 @@ export const updateCategoria = createAsyncThunk<
   UpdateCategoriaParams
 >(
   "categorie/updateCategoria",
-  async ({ id, nome, solo_entrata, solo_uscita }, { rejectWithValue }) => {
+  async (
+    { id, nome, solo_entrata, solo_uscita, budget_mensile },
+    { rejectWithValue },
+  ) => {
     try {
+      // `budget_mensile` viaggia solo se il chiamante l'ha nominato: il BE usa
+      // `exclude_unset`, quindi mandarlo sempre a `undefined` andrebbe bene, ma
+      // mandarlo a `null` è il modo di *togliere* il budget — due cose diverse
+      // che devono restare distinguibili.
       const response = await api.put<Categoria>(`/categorie/${id}`, {
         nome,
         solo_entrata,
         solo_uscita,
+        ...(budget_mensile !== undefined ? { budget_mensile } : {}),
       });
       return response.data;
     } catch (error) {

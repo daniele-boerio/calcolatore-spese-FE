@@ -5703,6 +5703,21 @@
             "title": "Solo Uscita",
             "default": true
           },
+          "budget_mensile": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Mensile"
+          },
           "sottocategorie": {
             "anyOf": [
               {
@@ -5780,6 +5795,18 @@
             "title": "Solo Uscita",
             "default": true
           },
+          "budget_mensile": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Mensile"
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -5852,6 +5879,21 @@
               }
             ],
             "title": "Solo Uscita"
+          },
+          "budget_mensile": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Mensile"
           }
         },
         "type": "object",

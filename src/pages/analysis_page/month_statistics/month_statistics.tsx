@@ -29,6 +29,8 @@ import {
   ExpenseRow,
 } from "../../../features/statistics/expenses";
 import CategoryBars from "../../../components/category_bars/category_bars";
+import { budgetRows } from "../../../features/statistics/budget";
+import ProgressBar from "../../../components/progress_bar/progress_bar";
 import {
   getExpenseCompositionChart,
   getSavingsChart,
@@ -134,6 +136,22 @@ export default function MonthStatistics({
     () => expenseRows(data, categoriaSelezionata),
     [data, categoriaSelezionata],
   );
+
+  // Le categorie con un tetto di spesa, e quanto ci si è speso nel mese.
+  //
+  // Il tetto è mensile e va confrontato con la spesa del mese *intera* su
+  // quella categoria. Con un filtro per sottocategoria o per tag il speso che
+  // arriva è solo un pezzo di quella spesa: confrontarlo col tetto direbbe che
+  // si è spesa metà di quanto si è speso davvero, quindi la card tace.
+  //
+  // Con una categoria scelta invece il confronto regge — il speso è tutto il
+  // suo — ma si guarda solo lei: le altre non sono nel payload filtrato, e
+  // mostrarle vorrebbe dire dichiararle a zero quando non lo sono.
+  const budgets = useMemo(() => {
+    if (sottocategoriaIds.length > 0 || tagId) return [];
+
+    return budgetRows(data, categoriaSelezionata ? [categoriaSelezionata] : categorie);
+  }, [data, categorie, categoriaSelezionata, sottocategoriaIds, tagId]);
 
   const insights = useMemo(
     () =>
@@ -329,6 +347,57 @@ export default function MonthStatistics({
       </PageColumn>
 
       <PageColumn>
+      {budgets.length > 0 && (
+        <Card>
+          <CardTitle aside={t("analysis_budget_aside")}>
+            {t("analysis_budget")}
+          </CardTitle>
+
+          <div className="budget-bars">
+            {budgets.map((row) => (
+              <div className="budget-bars__row" key={row.id}>
+                <div className="budget-bars__line">
+                  <span className="budget-bars__name">{row.nome}</span>
+                  <span className="budget-bars__figure">
+                    <strong>
+                      <Amount value={row.speso} decimals={0} hideCurrency />
+                    </strong>
+                    {` ${t("analysis_budget_of")} `}
+                    <Amount value={row.budget} decimals={0} />
+                  </span>
+                </div>
+
+                {/* Il tetto è il track, la spesa è il segmento: il colore dice
+                    se ci si sta dentro, e oltre il tetto la barra è piena —
+                    quanto si è sforato lo scrive la riga sotto. */}
+                <ProgressBar
+                  height={8}
+                  label={`${row.nome} · ${Math.round(row.percent)}%`}
+                  segments={[
+                    {
+                      value: Math.min(row.percent, 100) / 100,
+                      tone: row.over ? "negative" : "accent",
+                    },
+                  ]}
+                />
+
+                <span
+                  className={`budget-bars__caption ${
+                    row.over ? "budget-bars__caption--over" : ""
+                  }`}
+                >
+                  {`${Math.round(row.percent)}% · `}
+                  {row.over
+                    ? `${t("analysis_budget_over")} `
+                    : `${t("analysis_budget_left")} `}
+                  <Amount value={Math.abs(row.resta)} decimals={0} />
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {insights.length > 0 && (
         <Card>
           <CardTitle>{t("analysis_notable")}</CardTitle>

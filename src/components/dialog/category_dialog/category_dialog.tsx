@@ -42,6 +42,9 @@ export default function CategoryDialog({
   const [nome, setNome] = useState("");
   const [isCatSoloUscita, setIsCatSoloUscita] = useState(true);
   const [isCatSoloEntrata, setIsCatSoloEntrata] = useState(true);
+  // Il budget resta una stringa mentre si scrive: "" è "nessun budget", e
+  // convertirlo a ogni battuta trasformerebbe il campo vuoto in uno zero.
+  const [budget, setBudget] = useState("");
   const [subs, setSubs] = useState<SubState[]>([]);
   const [subsToDelete, setSubsToDelete] = useState<string[]>([]);
   const [internalLoading, setInternalLoading] = useState(false);
@@ -53,6 +56,9 @@ export default function CategoryDialog({
         setNome(category.nome);
         setIsCatSoloEntrata(category.solo_entrata);
         setIsCatSoloUscita(category.solo_uscita);
+        setBudget(
+          category.budget_mensile === null ? "" : String(category.budget_mensile),
+        );
         setSubs(
           category.sottocategorie?.map((s) => ({
             id: s.id,
@@ -65,6 +71,7 @@ export default function CategoryDialog({
         setNome("");
         setIsCatSoloEntrata(true);
         setIsCatSoloUscita(true);
+        setBudget("");
         setSubs([]);
       }
       setSubsToDelete([]);
@@ -161,6 +168,21 @@ export default function CategoryDialog({
     try {
       let currentCatId = category?.id;
 
+      // Campo vuoto vuol dire "nessun budget": `null` lo toglie, e il BE lo
+      // distingue da "non l'ho toccato" perché la chiave c'è comunque.
+      //
+      // Su una categoria che non è di uscita il campo non si vede nemmeno: un
+      // tetto di spesa non le si applica, e lasciarci quello di prima
+      // vorrebbe dire mandare un valore che la schermata dichiara di non
+      // avere. Un numero che non si legge diventa `null` per lo stesso motivo
+      // per cui `NaN` non deve mai arrivare al BE: `JSON.stringify` lo
+      // scriverebbe `null`, cioè cancellerebbe il budget in silenzio.
+      const scritto = Number(budget.replace(",", "."));
+      const budgetValue =
+        !isCatSoloUscita || budget.trim() === "" || !Number.isFinite(scritto)
+          ? null
+          : scritto;
+
       // GESTIONE CATEGORIA PADRE
       if (!currentCatId) {
         const newCat = await dispatch(
@@ -168,6 +190,7 @@ export default function CategoryDialog({
             nome: nome.trim(),
             solo_entrata: isCatSoloEntrata,
             solo_uscita: isCatSoloUscita,
+            budget_mensile: budgetValue,
           }),
         ).unwrap();
         currentCatId = newCat.id;
@@ -179,6 +202,7 @@ export default function CategoryDialog({
             nome: nome.trim(),
             solo_entrata: isCatSoloEntrata,
             solo_uscita: isCatSoloUscita,
+            budget_mensile: budgetValue,
           }),
         ).unwrap();
       }
@@ -290,6 +314,24 @@ export default function CategoryDialog({
               onChange={(e) => setIsCatSoloUscita(e.value)}
             />
           </div>
+
+          {/* Il budget ha senso solo dove si spende: su una categoria di sole
+              entrate un tetto di spesa non vorrebbe dire niente. */}
+          {isCatSoloUscita && (
+            <div className="cat_budget">
+              <InputText
+                label={t("category_budget")}
+                value={budget}
+                onChange={(e) => setBudget(e.target.value)}
+                placeholder={t("category_budget_placeholder")}
+                inputMode="decimal"
+                keyfilter={/^\d*[.,]?\d{0,2}$/}
+              />
+              <span className="cat_budget__hint">
+                {t("category_budget_hint")}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="subcategories-section">

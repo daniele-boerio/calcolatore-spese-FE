@@ -112,3 +112,18 @@
     transform: translateX(0);
   }
 }
+
+// Il budget di spesa desiderato, sotto ai due interruttori: una riga di
+// spiegazione perché "budget mensile" da solo non dice che lasciarlo vuoto è
+// una scelta valida.
+.cat_budget {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  &__hint {
+    font-size: 12px;
+    line-height: 1.45;
+    color: v.$muted;
+  }
+}
