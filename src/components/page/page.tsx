@@ -1,4 +1,4 @@
-import { ReactNode, useRef } from "react";
+import { ReactNode } from "react";
 import { useScrollRestoration } from "../../features/ui/use_scroll_restoration";
 
 type SlotProps = {
@@ -6,8 +6,16 @@ type SlotProps = {
   className?: string;
 };
 
-/** Colonna della schermata: header fermo, contenuto che scorre, tab bar sotto. */
+/**
+ * Colonna della schermata: header fermo, contenuto che scorre, tab bar sotto.
+ *
+ * È lei a tenere la posizione di scroll per indirizzo: entrare in una sezione
+ * e tornare indietro, o passare da un tab all'altro, riporta all'altezza a cui
+ * la si era lasciata.
+ */
 export function Page({ children, className }: SlotProps) {
+  useScrollRestoration();
+
   return <div className={`page ${className ?? ""}`}>{children}</div>;
 }
 
@@ -17,16 +25,10 @@ export function PageHeader({ children, className }: SlotProps) {
   );
 }
 
-/**
- * Area scrollabile. È lei a tenere la posizione di scroll per percorso: passare
- * da un tab all'altro non deve far ripartire la lista dall'inizio.
- */
+/** Il contenuto sotto l'header, che scorre col documento. */
 export function PageContent({ children, className }: SlotProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  useScrollRestoration(ref);
-
   return (
-    <div ref={ref} className={`page__content ${className ?? ""}`}>
+    <div className={`page__content ${className ?? ""}`}>
       {children}
     </div>
   );
