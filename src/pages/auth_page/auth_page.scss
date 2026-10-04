@@ -37,11 +37,11 @@
 
   &__title {
     margin: 0;
-    font-family: v.$font-display;
-    font-size: 30px;
-    font-weight: v.$fw-display;
-    letter-spacing: -0.03em;
-    line-height: 1.1;
+    font-family: v.$font-serif;
+    font-size: 40px;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+    line-height: 1.05;
   }
 
   &__subtitle {

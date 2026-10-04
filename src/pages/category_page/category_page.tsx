@@ -252,12 +252,15 @@ export default function CategoryPage() {
                   }
                 />
               ) : (
-                visible.map((categoria) => {
+                // Una card sola per tutto l'elenco: una card per categoria
+                // faceva di ogni riga un oggetto a sé, e la pagina un mosaico.
+                <Card className="category-group">
+                {visible.map((categoria) => {
                   const isOpen = expanded === categoria.id;
                   const children = categoria.sottocategorie ?? [];
 
                   return (
-                    <Card key={categoria.id} className="category-card">
+                    <div key={categoria.id} className="category-card">
                       <button
                         type="button"
                         className="category-card__head"
@@ -316,9 +319,10 @@ export default function CategoryPage() {
                           />
                         </div>
                       )}
-                    </Card>
+                    </div>
                   );
-                })
+                })}
+                </Card>
               )}
 
               <button

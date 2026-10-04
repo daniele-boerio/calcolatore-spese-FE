@@ -271,8 +271,15 @@
     transform: scale(0.97);
     transition: transform v.$dur-press;
   }
+
+  // Sul desktop la riga è larga: a tutta larghezza il bottone diventava una
+  // barra. Resta allineato al nome, della misura di un bottone.
+  @media (min-width: v.$bp-desktop) {
+    flex: 0 0 auto;
+    min-width: 160px;
+  }
 }
-
+
 // Importo vero di una ricorrenza variabile, chiesto al momento di registrarla.
 .recurrings__amount-hint {
   margin: 0 0 12px;

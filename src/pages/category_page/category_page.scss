@@ -99,9 +99,19 @@
   }
 }
 
-.category-card {
+.category-group {
   gap: 0;
   padding: 0;
+  overflow: hidden;
+}
+
+.category-card {
+  display: flex;
+  flex-direction: column;
+
+  & + & {
+    border-top: 1px solid v.$line-soft;
+  }
 
   &__head {
     display: flex;
