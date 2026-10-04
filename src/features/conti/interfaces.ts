@@ -30,6 +30,19 @@ export interface Conto {
 }
 
 /** Una foto mensile del patrimonio, come la manda il BE. */
+/**
+ * Un conto il cui saldo non torna con i movimenti (GET /conti/verifica-saldi).
+ * Gli importi arrivano come stringhe Decimal e diventano Number nello slice.
+ */
+export interface VerificaSaldo {
+  conto_id: string;
+  nome: string;
+  saldo: number;
+  /** Il saldo che avrebbe se ogni movimento l'avesse mosso giusto. */
+  saldo_atteso: number;
+  differenza: number;
+}
+
 export interface PatrimonioPoint {
   label: string;
   conti: number;
@@ -102,6 +115,8 @@ export interface ContoState {
   include_future_recurring: boolean;
   /** Foto mensili del patrimonio, dalla più vecchia alla più recente. */
   patrimonio: PatrimonioPoint[];
+  /** Conti con il saldo fuori sincrono rispetto ai movimenti. Vuota = tutto ok. */
+  saldiFuoriSincrono: VerificaSaldo[];
 }
 
 // Interfaccia per il payload di aggiornamento budget

@@ -294,6 +294,14 @@ function DebitoCard({
       <div className="debt__meta">
         {debito.descrizione && <span>{debito.descrizione}</span>}
         {conto && <span>{conto}</span>}
+        {/* Pagato da una ricorrenza: ogni rata scala il residuo da sola, e la
+            fine stimata è quella del piano, non del ritmo passato. */}
+        {debito.ricorrenza_id && (
+          <span>
+            <i className="pi pi-refresh" aria-hidden="true" />{" "}
+            {t("debts_auto_installment")}
+          </span>
+        )}
         {fine && (
           <span>
             {`${t("debts_estimated_end")} ${fine}`}

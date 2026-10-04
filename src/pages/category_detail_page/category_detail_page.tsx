@@ -25,7 +25,10 @@ import { selectCategoriaCategorie } from "../../features/categorie/categoria_sli
 import { getTags } from "../../features/tags/api_calls";
 import { getTransactionsByCategory } from "../../features/transactions/api_calls";
 import { Transaction } from "../../features/transactions/interfaces";
-import { mapTransaction } from "../../features/transactions/transaction_slice";
+import {
+  mapTransaction,
+  selectTransactionRevision,
+} from "../../features/transactions/transaction_slice";
 import { displayAmount, signedAmount } from "../../features/transactions/group";
 import { transactionIcon } from "../../features/transactions/icons";
 import { openSheet } from "../../features/ui/ui_slice";
@@ -59,6 +62,9 @@ export default function CategoryDetailPage() {
   const categorie = useAppSelector(selectCategoriaCategorie);
   const monthlyData = useAppSelector(selectMonthlyStatisticsData);
   const loading = useAppSelector(selectStatisticsLoading);
+  // La lista di questa pagina vive qui, non nello store: senza questo una
+  // modifica fatta dal form lasciava a schermo l'importo vecchio.
+  const revision = useAppSelector(selectTransactionRevision);
 
   const categoria = categorie.find((item) => String(item.id) === String(id));
 
@@ -79,7 +85,7 @@ export default function CategoryDetailPage() {
         tag_id: tagId,
       }),
     );
-  }, [dispatch, id, year, month, tagId]);
+  }, [dispatch, id, year, month, tagId, revision]);
 
   useEffect(() => {
     let alive = true;
@@ -102,7 +108,7 @@ export default function CategoryDetailPage() {
     return () => {
       alive = false;
     };
-  }, [dispatch, id, year, month, sottocategoriaId, tagId]);
+  }, [dispatch, id, year, month, sottocategoriaId, tagId, revision]);
 
   // `monthDetails` filtrato su una categoria torna quella sola riga, con le
   // sue sottocategorie.

@@ -1,4 +1,5 @@
 import { PeriodPreset } from "./period";
+import type { QueuedTransaction } from "./offline_queue";
 
 export interface PaginationParams {
   page: number;
@@ -56,6 +57,14 @@ export interface TransactionsState {
   period: PeriodPreset;
   transactions: Transaction[];
   selectedTransaction: Transaction | null;
+  /** Movimenti salvati senza rete, in attesa di invio (vedi offline_queue.ts). */
+  pending: QueuedTransaction[];
+  /**
+   * Sale a ogni scrittura riuscita (crea, modifica, elimina, dividi, invio
+   * della coda). Le pagine che tengono una lista propria, fuori dallo store,
+   * lo mettono fra le dipendenze del caricamento per non restare indietro.
+   */
+  revision: number;
   pagination: {
     total: number | null;
     page: number | null;
@@ -78,6 +87,11 @@ export interface CreateTransactionParams {
   sottocategoria_id: string | null;
   tag_id: string | null;
   parent_transaction_id: string | null;
+  /**
+   * Una per salvataggio, inviata come header `Idempotency-Key`: lo stesso
+   * salvataggio ripetuto (rete caduta, coda offline) non crea doppioni.
+   */
+  idempotencyKey?: string;
 }
 
 export interface UpdateTransactionParams {

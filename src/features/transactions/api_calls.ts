@@ -20,6 +20,16 @@ import {
   getCurrentMonthExpensesByCategory,
   getConti,
 } from "../conti/api_calls";
+import { showError } from "../error/error_slice";
+import { saveFile } from "../../services/save_file";
+import { t } from "../../i18n";
+import {
+  isNetworkError,
+  newIdempotencyKey,
+  QUEUED_OFFLINE,
+  QueuedTransaction,
+  queueOf,
+} from "./offline_queue";
 
 /**
  * Ricarica budget e grafico del mese dopo una scrittura sulle transazioni.
@@ -33,6 +43,51 @@ const refreshMonthlyTotals = async (
   await dispatch(getCurrentMonthExpenses());
   await dispatch(getCurrentMonthExpensesByCategory());
 };
+
+/** I filtri dei Movimenti come query string: liste ripetute chiave per chiave. */
+const appendFilters = (
+  params: URLSearchParams,
+  filters: RootState["transaction"]["filters"],
+) => {
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== null && value !== undefined) {
+      if (Array.isArray(value)) {
+        value.forEach((v) => params.append(key, v.toString()));
+      } else {
+        params.append(key, value.toString());
+      }
+    }
+  });
+};
+
+/**
+ * Scarica i movimenti filtrati come CSV (stessi filtri della lista).
+ *
+ * Il file non passa dallo store — un Blob non è serializzabile — ma va dritto
+ * all'utente: sul telefono con il foglio di condivisione (Salva in File,
+ * Numbers, Mail…), altrove come download.
+ */
+export const exportTransactions = createAsyncThunk<
+  void,
+  void,
+  { state: RootState }
+>("export/transazioni", async (_, { getState, rejectWithValue }) => {
+  try {
+    const params = new URLSearchParams();
+    appendFilters(params, getState().transaction.filters);
+
+    const response = await api.get<Blob>(
+      `/transazioni/export?${params.toString()}`,
+      { responseType: "blob" },
+    );
+
+    const today = new Date().toISOString().slice(0, 10);
+    await saveFile(response.data, `movimenti_${today}.csv`, "text/csv");
+  } catch (error) {
+    const err = error as AxiosError;
+    return rejectWithValue(err.response?.data || "Errore export movimenti");
+  }
+});
 
 /**
  * Le ultime N transazioni, per la card "Ultimi movimenti" della Home.
@@ -95,17 +150,7 @@ export const getTransactionsPaginated = createAsyncThunk<
       params.append("size", size.toString());
 
       const state = getState() as RootState;
-      const filters = state.transaction.filters;
-
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (Array.isArray(value)) {
-            value.forEach((v) => params.append(key, v.toString()));
-          } else {
-            params.append(key, value.toString());
-          }
-        }
-      });
+      appendFilters(params, state.transaction.filters);
 
       const response = await api.get<PaginatedResponse>(
         `/transazioni/paginated?${params.toString()}`,
@@ -166,9 +211,15 @@ export const createTransaction = createAsyncThunk<
 >(
   "transazioni/createTransazione",
   async (params, { getState, dispatch, rejectWithValue }) => {
+    // Senza chiave dal chiamante ne generiamo una: serve comunque alla coda
+    // offline per non duplicare quando riprova.
+    const { idempotencyKey = newIdempotencyKey(), ...body } = params;
+
     try {
       // 1. Facciamo la chiamata API standard
-      const response = await api.post<Transaction>(`/transazioni`, params);
+      const response = await api.post<Transaction>(`/transazioni`, body, {
+        headers: { "Idempotency-Key": idempotencyKey },
+      });
       const newTx = response.data;
 
       // 2. Accediamo allo stato globale dell'app tramite getState()
@@ -193,6 +244,18 @@ export const createTransaction = createAsyncThunk<
 
       return enrichedTx;
     } catch (error) {
+      // Nessuna risposta: il movimento resta sul telefono e parte appena
+      // torna la rete (vedi offline_queue.ts e flushOfflineTransactions).
+      if (isNetworkError(error)) {
+        const item: QueuedTransaction = {
+          key: idempotencyKey,
+          owner: getState().profile.username ?? null,
+          params: body,
+          queuedAt: new Date().toISOString(),
+        };
+        return rejectWithValue({ ...QUEUED_OFFLINE, item });
+      }
+
       const err = error as AxiosError;
       return rejectWithValue(
         err.response?.data || "Errore creazione transazione",
@@ -200,6 +263,92 @@ export const createTransaction = createAsyncThunk<
     }
   },
 );
+
+/**
+ * Invia i movimenti salvati senza rete, uno alla volta e nell'ordine in cui
+ * sono stati inseriti.
+ *
+ * - inviato (o già arrivato in un tentativo precedente: lo dice la chiave di
+ *   idempotenza) → esce dalla coda;
+ * - rifiutato dal server con un 4xx → esce dalla coda e l'errore si mostra:
+ *   riprovarlo darebbe sempre lo stesso no;
+ * - rete ancora assente o 5xx → resta, e ci si ferma qui fino alla prossima.
+ *
+ * Non sta sotto il prefisso "transazioni/" apposta: non deve accendere lo
+ * spinner della lista mentre lavora in sottofondo.
+ */
+export const flushOfflineTransactions = createAsyncThunk<
+  { sent: { key: string; transaction: Transaction }[]; dropped: string[] },
+  void,
+  { state: RootState }
+>(
+  "offline/flushTransactions",
+  async (_, { getState, dispatch }) => {
+    const state = getState();
+    const queue = queueOf(
+      state.transaction.pending,
+      state.profile.username ?? null,
+    );
+
+    const sent: { key: string; transaction: Transaction }[] = [];
+    const dropped: string[] = [];
+
+    flushing = true;
+    try {
+      for (const item of queue) {
+        try {
+          const response = await api.post<Transaction>(
+            `/transazioni`,
+            item.params,
+            { headers: { "Idempotency-Key": item.key } },
+          );
+          sent.push({ key: item.key, transaction: response.data });
+        } catch (error) {
+          if (isNetworkError(error)) break;
+
+          const status = (error as AxiosError).response?.status ?? 0;
+          if (status >= 500 || status === 401 || status === 429) break;
+
+          // Il body è già normalizzato da services/api.js: `detail` è leggibile.
+          dropped.push(item.key);
+          const detail = (error as AxiosError<{ detail?: string }>).response
+            ?.data?.detail;
+          dispatch(
+            showError({
+              title: t("offline_rejected_title"),
+              message: [item.params.descrizione, detail]
+                .filter(Boolean)
+                .join(" — "),
+            }),
+          );
+        }
+      }
+    } finally {
+      flushing = false;
+    }
+
+    if (sent.length > 0) {
+      await dispatch(getConti());
+      await refreshMonthlyTotals(dispatch);
+    }
+
+    return { sent, dropped };
+  },
+  {
+    // Un invio alla volta: due flush in parallelo manderebbero le stesse voci
+    // (innocuo grazie alla chiave, ma inutile). Un flush scartato qui non è un
+    // errore: l'errorMiddleware ignora i rejected per `condition`.
+    condition: (_, { getState }) =>
+      !flushing &&
+      queueOf(
+        getState().transaction.pending,
+        getState().profile.username ?? null,
+      ).length > 0,
+  },
+);
+
+/** C'è un invio della coda offline in corso (vedi `condition` qui sopra). */
+let flushing = false;
 
 export const updateTransaction = createAsyncThunk<
   Transaction,

@@ -10,6 +10,7 @@ import {
   UpdateContoParams,
   AbsorbContoParams,
   PatrimonioPoint,
+  VerificaSaldo,
   DeleteContoParams,
   ImportStatementParams,
   ImportStatementResponse,
@@ -297,6 +298,41 @@ export const getPatrimonio = createAsyncThunk<PatrimonioPoint[], void>(
       const err = error as AxiosError;
       return rejectWithValue(
         err.response?.data || "Errore ricezione patrimonio",
+      );
+    }
+  },
+);
+
+/**
+ * I conti il cui saldo non torna con i movimenti registrati: un controllo che
+ * il BE fa anche ogni notte. Lista vuota = tutto in ordine.
+ */
+export const getVerificaSaldi = createAsyncThunk<VerificaSaldo[], void>(
+  "conti/getVerificaSaldi",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get<VerificaSaldo[]>("/conti/verifica-saldi");
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore verifica dei saldi",
+      );
+    }
+  },
+);
+
+/** Riporta il saldo di un conto a quello che dicono i movimenti. */
+export const correggiSaldo = createAsyncThunk<Conto, { id: string }>(
+  "conti/correggiSaldo",
+  async ({ id }, { rejectWithValue }) => {
+    try {
+      const response = await api.post<Conto>(`/conti/${id}/correggi-saldo`);
+      return response.data;
+    } catch (error) {
+      const err = error as AxiosError;
+      return rejectWithValue(
+        err.response?.data || "Errore correzione del saldo",
       );
     }
   },

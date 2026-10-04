@@ -6,6 +6,7 @@ import {
   CreateRecurringParams,
   UpdateRecurringParams,
   DeleteRecurringParams,
+  ExecuteRecurringParams,
 } from "./interfaces";
 import { RootState } from "../../store/store";
 
@@ -93,11 +94,12 @@ export const deleteRecurring = createAsyncThunk<string, DeleteRecurringParams>(
  */
 export const executeRecurring = createAsyncThunk<
   Recurring,
-  DeleteRecurringParams
+  ExecuteRecurringParams
 >("recurring/executeRecurring", async (params, { rejectWithValue }) => {
   try {
     const response = await api.post<Recurring>(
       `/ricorrenze/${params.id}/esegui`,
+      params.importo !== undefined ? { importo: params.importo } : undefined,
     );
     return response.data;
   } catch (error) {

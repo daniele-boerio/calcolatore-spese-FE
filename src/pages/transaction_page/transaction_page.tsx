@@ -24,7 +24,11 @@ import Chip from "../../components/chip/chip";
 import Button from "../../components/button/button";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
-import { getTransactionsPaginated } from "../../features/transactions/api_calls";
+import {
+  exportTransactions,
+  getTransactionsPaginated,
+} from "../../features/transactions/api_calls";
+import PendingSyncBanner from "../../components/pending_sync_banner/pending_sync_banner";
 import {
   applyFilters,
   resetFilters,
@@ -216,6 +220,16 @@ export default function TransactionPage() {
 
   const openFilters = () => dispatch(openSheet({ name: "filters" }));
 
+  const [exporting, setExporting] = useState(false);
+  const exportCsv = async () => {
+    setExporting(true);
+    try {
+      await dispatch(exportTransactions());
+    } finally {
+      setExporting(false);
+    }
+  };
+
   // Le stesse etichette dei chip del foglio dei filtri: la pillola che resta
   // in testa alla lista deve dire la parola che l'utente ha toccato.
   const typeLabel = filters.tipo
@@ -332,6 +346,21 @@ export default function TransactionPage() {
               <i className="pi pi-receipt" aria-hidden="true" />
             </button>
 
+            {/* Esporta quello che si vede: stessi filtri della lista. */}
+            <button
+              type="button"
+              className="movements__icon-button"
+              aria-label={t("mov_export")}
+              title={t("mov_export")}
+              disabled={exporting}
+              onClick={exportCsv}
+            >
+              <i
+                className={exporting ? "pi pi-spin pi-spinner" : "pi pi-download"}
+                aria-hidden="true"
+              />
+            </button>
+
             <button
               type="button"
               className="movements__icon-button movements__icon-button--filters"
@@ -393,6 +422,7 @@ export default function TransactionPage() {
       </PageHeader>
 
       <PageContent className="movements__list">
+        <PendingSyncBanner />
         <PageColumns split="filters">
           <PageColumn>
             {loading && transactions.length === 0 ? (

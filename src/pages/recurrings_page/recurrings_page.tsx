@@ -11,6 +11,7 @@ import Alert from "../../components/alert/alert";
 import EmptyState from "../../components/empty_state/empty_state";
 import SkeletonList from "../../components/skeleton/skeleton";
 import Button from "../../components/button/button";
+import Sheet from "../../components/sheet/sheet";
 import ThreeDotsActionsMenu from "../../components/three_dots_action_menu/three_dots_action_menu";
 import RecurrenceDialog from "../../components/dialog/recurrence_dialog/recurrence_dialog";
 import "./recurrings_page.scss";
@@ -65,6 +66,10 @@ export default function RecurringsPage() {
   const [editing, setEditing] = useState<Recurring | undefined>(undefined);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<Recurring | null>(null);
+  // Ricorrenza a importo variabile in registrazione: si chiede la cifra vera.
+  const [askingAmount, setAskingAmount] = useState<Recurring | null>(null);
+  const [actualAmount, setActualAmount] = useState("");
+  const [registering, setRegistering] = useState(false);
 
   useEffect(() => {
     dispatch(getRecurrings(undefined));
@@ -81,10 +86,13 @@ export default function RecurringsPage() {
 
   const late = useMemo(() => overdue(recurrings), [recurrings]);
 
-  const next = useMemo(
-    () => upcoming(recurrings, HORIZON_DAYS),
-    [recurrings],
-  );
+  // Una variabile in scadenza oggi sta già fra le scadute: non la ripetiamo.
+  const next = useMemo(() => {
+    const lateIds = new Set(late.map((item) => String(item.id)));
+    return upcoming(recurrings, HORIZON_DAYS).filter(
+      (item) => !lateIds.has(String(item.id)),
+    );
+  }, [recurrings, late]);
 
   // Quello che non è né in ritardo né in arrivo: annuali lontane e sospese.
   const rest = useMemo(() => {
@@ -102,6 +110,20 @@ export default function RecurringsPage() {
   const metaOf = (recurring: Recurring) =>
     [
       t(FREQUENCY_KEYS[recurring.frequenza] ?? "monthly"),
+      recurring.importo_variabile ? t("recurrence_meta_variable") : null,
+      recurring.rate_rimanenti !== null && recurring.rate_rimanenti !== undefined
+        ? t("recurrence_meta_installments").replace(
+            "{count}",
+            String(recurring.rate_rimanenti),
+          )
+        : null,
+      recurring.data_fine
+        ? `${t("recurrence_meta_until")} ${new Intl.DateTimeFormat(localeTag(), {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          }).format(new Date(`${recurring.data_fine}T00:00:00`))}`
+        : null,
       nameOf(categorie, recurring.categoria_id),
       nameOf(conti, recurring.conto_id),
     ]
@@ -113,17 +135,38 @@ export default function RecurringsPage() {
     setDialogOpen(true);
   };
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     if (!pendingDelete) return;
-
-    dispatch(deleteRecurring({ id: pendingDelete.id }));
-    dispatch(showToast({ variant: "success", title: t("recurring_deleted") }));
+    const target = pendingDelete;
     setPendingDelete(null);
+
+    try {
+      await dispatch(deleteRecurring({ id: target.id })).unwrap();
+      dispatch(
+        showToast({ variant: "success", title: t("recurring_deleted") }),
+      );
+    } catch {
+      // L'errore lo mostra il middleware; la ricorrenza resta in elenco.
+    }
   };
 
-  const register = async (recurring: Recurring) => {
+  // "Registra" su una ricorrenza variabile chiede prima l'importo vero.
+  const startRegister = (recurring: Recurring) => {
+    if (recurring.importo_variabile) {
+      setActualAmount(String(recurring.importo));
+      setAskingAmount(recurring);
+      return;
+    }
+    register(recurring);
+  };
+
+  const register = async (recurring: Recurring, importo?: number) => {
+    if (registering) return;
+    setRegistering(true);
+
     try {
-      await dispatch(executeRecurring({ id: recurring.id })).unwrap();
+      await dispatch(executeRecurring({ id: recurring.id, importo })).unwrap();
+      setAskingAmount(null);
       dispatch(
         showToast({ variant: "success", title: t("recurring_registered") }),
       );
@@ -133,8 +176,12 @@ export default function RecurringsPage() {
       dispatch(getCurrentMonthExpenses());
     } catch {
       // L'errore arriva dal middleware: qui non c'è niente da aggiungere.
+    } finally {
+      setRegistering(false);
     }
   };
+
+  const parsedAmount = parseFloat(actualAmount.replace(",", "."));
 
   const row = (recurring: Recurring, tone?: "late") => (
     <RecurringRow
@@ -143,7 +190,7 @@ export default function RecurringsPage() {
       meta={metaOf(recurring)}
       tone={tone}
       onOpen={() => openEdit(recurring)}
-      onRegister={tone === "late" ? () => register(recurring) : undefined}
+      onRegister={tone === "late" ? () => startRegister(recurring) : undefined}
       actions={
         <ThreeDotsActionsMenu
           className="recurrings__menu"
@@ -271,6 +318,41 @@ export default function RecurringsPage() {
           setEditing(undefined);
         }}
       />
+
+      <Sheet
+        open={askingAmount !== null}
+        onClose={() => setAskingAmount(null)}
+        title={askingAmount?.nome}
+        footer={
+          <Button
+            block
+            disabled={registering || !(parsedAmount > 0)}
+            onClick={() => askingAmount && register(askingAmount, parsedAmount)}
+          >
+            {t("recurring_register")}
+          </Button>
+        }
+      >
+        <p className="recurrings__amount-hint">
+          {t("recurrence_actual_amount_hint")}
+        </p>
+        <div className="recurrings__amount">
+          <input
+            value={actualAmount}
+            onChange={(event) => {
+              const value = event.target.value.replace(",", ".");
+              if (value === "" || /^\d*\.?\d{0,2}$/.test(value)) {
+                setActualAmount(value);
+              }
+            }}
+            inputMode="decimal"
+            placeholder="0"
+            aria-label={t("amount")}
+            autoFocus
+          />
+          <span>€</span>
+        </div>
+      </Sheet>
 
       <Alert
         open={pendingDelete !== null}

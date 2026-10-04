@@ -2,6 +2,7 @@ import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import {
   createTransaction,
   deleteTransaction,
+  flushOfflineTransactions,
   getLastTransactions,
   getTransactionsPaginated,
   updateTransaction,
@@ -15,6 +16,14 @@ import {
 import { RootState } from "../../store/store";
 import { PeriodPreset, periodRange } from "./period";
 import { DEFAULT_PERIOD } from "./filters_url";
+import {
+  dequeue,
+  enqueue,
+  isQueuedOffline,
+  loadQueue,
+  QueuedTransaction,
+  saveQueue,
+} from "./offline_queue";
 
 const DEFAULT_SORT = ["data:desc", "lastUpdate:desc"];
 
@@ -22,6 +31,8 @@ const initialState: TransactionsState = {
   loading: false,
   transactions: [],
   selectedTransaction: null,
+  pending: loadQueue(),
+  revision: 0,
   period: DEFAULT_PERIOD,
   pagination: {
     total: null,
@@ -57,6 +68,21 @@ const sortTransactions = (a: Transaction, b: Transaction) => {
   if (creationA !== creationB) return creationB - creationA;
 
   return String(b.id).localeCompare(String(a.id));
+};
+
+/**
+ * Inserisce movimenti nella lista in memoria, senza doppioni per id.
+ *
+ * Prima l'inserimento tagliava la lista alla dimensione di una pagina: chi
+ * aveva già scrollato e caricato altre pagine se le vedeva sparire, e lo
+ * scroll infinito perdeva il segno. La Home mostra comunque i primi N da sé.
+ */
+const insertTransactions = (state: TransactionsState, incoming: Transaction[]) => {
+  const ids = new Set(incoming.map((tx) => String(tx.id)));
+  state.transactions = [
+    ...state.transactions.filter((tx) => !ids.has(String(tx.id))),
+    ...incoming,
+  ].sort(sortTransactions);
 };
 
 const handlePending = (state: TransactionsState) => {
@@ -131,11 +157,11 @@ const transactionsSlice = createSlice({
         // Le pagine oltre la prima si accodano: la lista dei Movimenti cresce
         // verso il basso invece di ripartire da capo.
         const loaded = action.payload.data.map(mapTransaction);
-        const merged = action.meta.arg.append
-          ? [...state.transactions, ...loaded]
-          : loaded;
 
-        state.transactions = merged.sort(sortTransactions);
+        // Accodando una pagina, una riga può essere già in lista: un movimento
+        // inserito nel frattempo sposta tutte le altre di una posizione.
+        if (action.meta.arg.append) insertTransactions(state, loaded);
+        else state.transactions = loaded.sort(sortTransactions);
         state.pagination.total = action.payload.total;
         state.pagination.page = action.payload.page;
         state.pagination.size = action.payload.size;
@@ -151,19 +177,40 @@ const transactionsSlice = createSlice({
       .addCase(
         createTransaction.fulfilled,
         (state, action: PayloadAction<Transaction>) => {
-          const newTx = mapTransaction(action.payload);
           state.pagination.total = (state.pagination.total || 0) + 1;
-
-          const updatedList = [...state.transactions, newTx];
-          updatedList.sort(sortTransactions);
-
-          const pageSize = state.pagination.size || 10;
-          state.transactions =
-            updatedList.length > pageSize
-              ? updatedList.slice(0, pageSize)
-              : updatedList;
+          insertTransactions(state, [mapTransaction(action.payload)]);
         },
       )
+
+      // Senza rete il movimento va in coda (vedi offline_queue.ts): la coda
+      // vive anche in localStorage, così sopravvive alla chiusura dell'app.
+      .addCase(createTransaction.rejected, (state, action) => {
+        const payload = action.payload as
+          | { item?: QueuedTransaction }
+          | undefined;
+
+        if (isQueuedOffline(payload) && payload?.item) {
+          state.pending = enqueue(state.pending, payload.item);
+          saveQueue(state.pending);
+        }
+      })
+
+      .addCase(flushOfflineTransactions.fulfilled, (state, action) => {
+        const { sent, dropped } = action.payload;
+
+        for (const key of [...sent.map((item) => item.key), ...dropped]) {
+          state.pending = dequeue(state.pending, key);
+        }
+        saveQueue(state.pending);
+
+        if (sent.length > 0) {
+          state.pagination.total = (state.pagination.total || 0) + sent.length;
+          insertTransactions(
+            state,
+            sent.map((item) => mapTransaction(item.transaction)),
+          );
+        }
+      })
 
       .addCase(
         splitTransaction.fulfilled,
@@ -179,15 +226,7 @@ const transactionsSlice = createSlice({
           );
 
           // Map and insert new parts
-          const mapped = parts.map(mapTransaction);
-          const updatedList = [...state.transactions, ...mapped];
-          updatedList.sort(sortTransactions);
-
-          const pageSize = state.pagination.size || 10;
-          state.transactions =
-            updatedList.length > pageSize
-              ? updatedList.slice(0, pageSize)
-              : updatedList;
+          insertTransactions(state, parts.map(mapTransaction));
 
           // Adjust total (remove original, add parts)
           if (
@@ -205,7 +244,7 @@ const transactionsSlice = createSlice({
         (state, action: PayloadAction<Transaction>) => {
           const updatedTx = mapTransaction(action.payload);
           const index = state.transactions.findIndex(
-            (tran) => tran.id === updatedTx.id,
+            (tran) => String(tran.id) === String(updatedTx.id),
           );
 
           if (index !== -1) {
@@ -224,6 +263,21 @@ const transactionsSlice = createSlice({
           state.pagination.total = state.pagination.total
             ? state.pagination.total - 1
             : 0;
+        },
+      )
+
+      // Ogni scrittura riuscita fa avanzare la revisione (vedi interfaces.ts)
+      .addMatcher(
+        (action: Action) =>
+          [
+            createTransaction.fulfilled.type,
+            updateTransaction.fulfilled.type,
+            deleteTransaction.fulfilled.type,
+            splitTransaction.fulfilled.type,
+            flushOfflineTransactions.fulfilled.type,
+          ].includes(action.type),
+        (state) => {
+          state.revision += 1;
         },
       )
 
@@ -261,6 +315,15 @@ export const selectTransactionFilters = (state: RootState) =>
 
 export const selectTransactionPeriod = (state: RootState) =>
   state.transaction.period;
+
+export const selectTransactionRevision = (state: RootState) =>
+  state.transaction.revision;
+
+/** Movimenti salvati offline dall'utente collegato, in attesa di invio. */
+export const selectPendingTransactions = (state: RootState) =>
+  state.transaction.pending.filter(
+    (item) => item.owner === (state.profile.username ?? null),
+  );
 
 export const { updateFilters, applyFilters, setPeriod, resetFilters } =
   transactionsSlice.actions;

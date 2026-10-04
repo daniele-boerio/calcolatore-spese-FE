@@ -53,6 +53,21 @@ component.
 - Write flows: `await dispatch(thunk(...)).unwrap()` before the success toast
   (`showToast`) and closing; disable the submit while in flight.
 
+## Offline and repeated saves
+
+- `createTransaction` sends an `Idempotency-Key` header (pass `idempotencyKey`, one
+  per form opening, so a retry reuses it). Without network it rejects with
+  `QUEUED_OFFLINE` and the slice stores the save in `pending` (localStorage):
+  treat that rejection as "saved", show the `offline` toast and close the form.
+- `useOfflineSync` (mounted in `App.jsx`) sends the queue on start, `online` and
+  when the app returns to the foreground — iOS home-screen apps have no background
+  sync. `PendingSyncBanner` shows what is still waiting.
+- `public/sw.js` (registered only in production builds) caches the app shell,
+  hashed assets and API GETs (network-first) so the app opens offline; the API cache
+  is cleared on logout.
+- Pages that keep their own list outside the store add
+  `selectTransactionRevision` to their fetch effect so they refresh after writes.
+
 ## Types & the API contract
 
 - TS types for the backend are **hand-written** in each `features/<dominio>/interfaces.ts`.
@@ -68,6 +83,7 @@ component.
   that now exist: `npm run typecheck` (tsc, strict), `npm run lint` (ESLint over JS+TS)
   and `npm run test` (Vitest) — run them after changes. ESLint keeps a batch of
   pre-existing react-hooks/`no-explicit-any` findings as **warnings** (tech-debt);
-  don't let the count grow. A formatter (prettier) is still intentionally not set up.
+  don't let the count grow. CI (`.github/workflows/ci.yml`) runs all three plus
+  `npm run build`. A formatter (prettier) is still intentionally not set up.
 - Don't edit `vite.config.js` / `package.json` unless the task genuinely requires it.
 - `App.jsx`, `main.jsx`, and `services/api.js` are intentionally JS — leave them JS.

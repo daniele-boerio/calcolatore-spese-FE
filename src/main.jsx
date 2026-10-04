@@ -44,12 +44,27 @@ import { Provider } from "react-redux";
 import { store } from "./store/store.ts";
 import ErrorBoundary from "./components/error_boundary/error_boundary";
 import { installErrorLog } from "./services/error_log";
+import {
+  clearApiCache,
+  registerServiceWorker,
+} from "./services/service_worker";
 
 // Prima di ogni altra cosa: da qui in poi console.error, gli errori non
 // catturati e le promise rifiutate finiscono anche in un registro che la
 // schermata di errore sa copiare negli appunti. Su un iPhone in standalone
 // è l'unico modo di far uscire uno stack senza collegare il telefono.
 installErrorLog();
+
+// Offline: guscio dell'app e ultimi dati visti restano disponibili senza rete.
+registerServiceWorker();
+
+// Al logout i dati salvati per l'offline se ne vanno con la sessione.
+let wasAuthenticated = store.getState().profile.isAuthenticated;
+store.subscribe(() => {
+  const isAuthenticated = store.getState().profile.isAuthenticated;
+  if (wasAuthenticated && !isAuthenticated) clearApiCache();
+  wasAuthenticated = isAuthenticated;
+});
 
 // L'ErrorBoundary sta il più in alto possibile, fuori da App: un errore in
 // fase di render — tipicamente un chunk di pagina che non si scarica — senza

@@ -171,6 +171,11 @@
         ],
         "summary": "Update Monthly Budget",
         "operationId": "update_monthly_budget_monthlyBudget_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
         "parameters": [
           {
             "name": "include_future_recurring",
@@ -186,14 +191,14 @@
           }
         ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UserBudgetUpdate"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -216,12 +221,7 @@
               }
             }
           }
-        },
-        "security": [
-          {
-            "HTTPBearer": []
-          }
-        ]
+        }
       }
     },
     "/conti": {
@@ -479,6 +479,85 @@
         "responses": {
           "204": {
             "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/conti/verifica-saldi": {
+      "get": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Get Verifica Saldi",
+        "description": "I conti il cui saldo non torna con i movimenti registrati.\n\nLista vuota = tutto in ordine. Un conto mai controllato viene fotografato\nadesso e non compare: è il suo punto di partenza.",
+        "operationId": "get_verifica_saldi_conti_verifica_saldi_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/VerificaSaldoOut"
+                  },
+                  "type": "array",
+                  "title": "Response Get Verifica Saldi Conti Verifica Saldi Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/conti/{conto_id}/correggi-saldo": {
+      "post": {
+        "tags": [
+          "Conti"
+        ],
+        "summary": "Correggi Saldo",
+        "description": "Riporta il saldo a quello che dicono i movimenti.\n\nÈ l'uscita dal \"saldo fuori sincrono\": se invece il saldo giusto è quello\nattuale, basta reimpostarlo dal form del conto, che riallinea la base.",
+        "operationId": "correggi_saldo_conti__conto_id__correggi_saldo_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "conto_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Conto Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContoOut"
+                }
+              }
+            }
           },
           "422": {
             "description": "Validation Error",
@@ -1335,6 +1414,25 @@
             "HTTPBearer": []
           }
         ],
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -1963,6 +2061,264 @@
                 "schema": {
                   "$ref": "#/components/schemas/TransazionePagination"
                 }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transazioni/export": {
+      "get": {
+        "tags": [
+          "Transazioni"
+        ],
+        "summary": "Export Transazioni",
+        "description": "I movimenti filtrati come CSV, con gli stessi filtri della lista.\n\nSeparatore \";\" e virgola decimale (Excel in italiano), BOM UTF-8 così gli\naccenti si leggono anche in Excel. I nomi di conti e tassonomia si leggono\nuna volta per tabella, non una per riga.",
+        "operationId": "export_transazioni_transazioni_export_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "default": [
+                "data:desc",
+                "id:desc"
+              ],
+              "title": "Sort By"
+            }
+          },
+          {
+            "name": "importo_min",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Importo Min"
+            }
+          },
+          {
+            "name": "importo_max",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Importo Max"
+            }
+          },
+          {
+            "name": "tipo",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tipo"
+            }
+          },
+          {
+            "name": "data_inizio",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Inizio"
+            }
+          },
+          {
+            "name": "data_fine",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Data Fine"
+            }
+          },
+          {
+            "name": "descrizione",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Descrizione"
+            }
+          },
+          {
+            "name": "senza_categoria",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Senza Categoria"
+            }
+          },
+          {
+            "name": "conto_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Conto Id"
+            }
+          },
+          {
+            "name": "categoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Categoria Id"
+            }
+          },
+          {
+            "name": "sottocategoria_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Sottocategoria Id"
+            }
+          },
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Tag Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
               }
             }
           },
@@ -3348,7 +3704,7 @@
           "Ricorrenze"
         ],
         "summary": "Esegui Ricorrenza Ora",
-        "description": "Registra adesso una ricorrenza già scaduta.\n\nServe quando lo scheduler notturno non è passato (macchina spenta, deploy\na cavallo di mezzanotte): la ricorrenza resta indietro e da qui la si\nsblocca a mano. Non anticipa niente — una ricorrenza non ancora scaduta\nviene rifiutata — quindi non può fare doppioni con il task.",
+        "description": "Registra adesso una ricorrenza già scaduta.\n\nServe quando lo scheduler notturno non è passato (macchina spenta, deploy\na cavallo di mezzanotte): la ricorrenza resta indietro e da qui la si\nsblocca a mano. Non anticipa niente — una ricorrenza non ancora scaduta\nviene rifiutata — quindi non può fare doppioni con il task.\n\nRegistra una sola occorrenza, la più vecchia: se ne mancano altre, la\nricorrenza resta fra le scadute e si registra di nuovo. Per quelle a\nimporto variabile è l'unico modo di registrarle, con l'importo vero.",
         "operationId": "esegui_ricorrenza_ora_ricorrenze__ricorrenza_id__esegui_post",
         "security": [
           {
@@ -3366,6 +3722,23 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/RicorrenzaEseguiRequest"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "title": "Body"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Successful Response",
@@ -6624,6 +6997,17 @@
             ],
             "title": "Fine Stimata"
           },
+          "ricorrenza_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ricorrenza Id"
+          },
           "creationDate": {
             "type": "string",
             "format": "date-time",
@@ -7100,7 +7484,7 @@
           "accantonamento": {
             "type": "number",
             "title": "Accantonamento",
-            "default": 0
+            "default": 0.0
           }
         },
         "type": "object",
@@ -7128,6 +7512,38 @@
           "risparmio"
         ],
         "title": "MonthlySavingsOut"
+      },
+      "PatrimonioOut": {
+        "properties": {
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "conti": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Conti"
+          },
+          "titoli": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Titoli"
+          },
+          "totale": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Totale"
+          }
+        },
+        "type": "object",
+        "required": [
+          "label",
+          "conti",
+          "titoli",
+          "totale"
+        ],
+        "title": "PatrimonioOut",
+        "description": "Una foto mensile del patrimonio, come \"2026-09\"."
       },
       "PeriodoOut": {
         "properties": {
@@ -7247,6 +7663,46 @@
               }
             ],
             "title": "Tag Id"
+          },
+          "data_fine": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Fine"
+          },
+          "rate_rimanenti": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Rimanenti"
+          },
+          "importo_variabile": {
+            "type": "boolean",
+            "title": "Importo Variabile",
+            "default": false
+          },
+          "debito_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Debito Id"
           }
         },
         "type": "object",
@@ -7259,6 +7715,29 @@
           "conto_id"
         ],
         "title": "RicorrenzaCreate"
+      },
+      "RicorrenzaEseguiRequest": {
+        "properties": {
+          "importo": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Importo"
+          }
+        },
+        "type": "object",
+        "title": "RicorrenzaEseguiRequest",
+        "description": "Corpo opzionale di \"Registra\": l'importo vero di questa occorrenza.\n\nObbligatorio per le ricorrenze a importo variabile; per le altre sostituisce\nl'importo solo per questa volta."
       },
       "RicorrenzaOut": {
         "properties": {
@@ -7323,6 +7802,46 @@
               }
             ],
             "title": "Tag Id"
+          },
+          "data_fine": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Fine"
+          },
+          "rate_rimanenti": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Rimanenti"
+          },
+          "importo_variabile": {
+            "type": "boolean",
+            "title": "Importo Variabile",
+            "default": false
+          },
+          "debito_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Debito Id"
           },
           "id": {
             "type": "integer",
@@ -7459,6 +7978,52 @@
               }
             ],
             "title": "Tag Id"
+          },
+          "data_fine": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Fine"
+          },
+          "rate_rimanenti": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rate Rimanenti"
+          },
+          "importo_variabile": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Importo Variabile"
+          },
+          "debito_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Debito Id"
           }
         },
         "type": "object",
@@ -7914,8 +8479,7 @@
           "data": {
             "type": "string",
             "format": "date",
-            "title": "Data",
-            "default": "2026-09-03"
+            "title": "Data"
           },
           "descrizione": {
             "anyOf": [
@@ -8020,8 +8584,7 @@
           "data": {
             "type": "string",
             "format": "date",
-            "title": "Data",
-            "default": "2026-09-04"
+            "title": "Data"
           },
           "descrizione": {
             "anyOf": [
@@ -8326,8 +8889,7 @@
           "data": {
             "type": "string",
             "format": "date",
-            "title": "Data",
-            "default": "2026-09-03"
+            "title": "Data"
           },
           "descrizione": {
             "anyOf": [
@@ -8538,6 +9100,20 @@
         ],
         "title": "UserResponse"
       },
+      "UserUpdate": {
+        "properties": {
+          "username": {
+            "type": "string",
+            "title": "Username"
+          }
+        },
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "title": "UserUpdate",
+        "description": "Quello che l'utente può cambiare di sé dal profilo.\n\nSolo lo username: l'email identifica l'account (ci arriva il link di reset\npassword) e cambiarla è un'altra cosa; la password si cambia dal flusso di\nreset, che passa dalla casella di posta."
+      },
       "ValidationError": {
         "properties": {
           "loc": {
@@ -8571,51 +9147,42 @@
         ],
         "title": "ValidationError"
       },
-      "UserUpdate": {
+      "VerificaSaldoOut": {
         "properties": {
-          "username": {
+          "conto_id": {
+            "type": "integer",
+            "title": "Conto Id"
+          },
+          "nome": {
             "type": "string",
-            "title": "Username"
+            "title": "Nome"
+          },
+          "saldo": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Saldo"
+          },
+          "saldo_atteso": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Saldo Atteso"
+          },
+          "differenza": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Differenza"
           }
         },
         "type": "object",
         "required": [
-          "username"
+          "conto_id",
+          "nome",
+          "saldo",
+          "saldo_atteso",
+          "differenza"
         ],
-        "title": "UserUpdate",
-        "description": "Quello che l'utente può cambiare di sé dal profilo.\n\nSolo lo username: l'email identifica l'account (ci arriva il link di reset\npassword) e cambiarla è un'altra cosa; la password si cambia dal flusso di\nreset, che passa dalla casella di posta."
-      },
-      "PatrimonioOut": {
-        "properties": {
-          "label": {
-            "type": "string",
-            "title": "Label"
-          },
-          "conti": {
-            "type": "string",
-            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-            "title": "Conti"
-          },
-          "titoli": {
-            "type": "string",
-            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-            "title": "Titoli"
-          },
-          "totale": {
-            "type": "string",
-            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-            "title": "Totale"
-          }
-        },
-        "type": "object",
-        "required": [
-          "label",
-          "conti",
-          "titoli",
-          "totale"
-        ],
-        "title": "PatrimonioOut",
-        "description": "Una foto mensile del patrimonio, come \"2026-09\"."
+        "title": "VerificaSaldoOut",
+        "description": "Un conto il cui saldo non torna con i movimenti registrati."
       }
     },
     "securitySchemes": {

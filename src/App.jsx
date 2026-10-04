@@ -19,6 +19,7 @@ import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_g
 import SheetHost from "./components/sheet_host/sheet_host";
 import ToastHost from "./components/toast/toast";
 import { useThemeSync } from "./features/ui/use_theme";
+import { useOfflineSync } from "./features/transactions/use_offline_sync";
 import { lazyWithRetry } from "./services/lazy_with_retry";
 
 // Code-splitting per route: ogni pagina è un chunk separato caricato solo
@@ -72,6 +73,10 @@ function App() {
 
   // Tiene `data-theme` su <html> allineato alla preferenza salvata.
   useThemeSync();
+
+  // Invia i movimenti salvati senza rete appena è possibile (avvio, ritorno
+  // online, app di nuovo in primo piano).
+  useOfflineSync();
 
   const dispatch = useAppDispatch();
 

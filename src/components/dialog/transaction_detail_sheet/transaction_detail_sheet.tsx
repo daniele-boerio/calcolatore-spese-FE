@@ -25,6 +25,10 @@ import {
   selectCategoriaSottocategorie,
 } from "../../../features/categorie/categoria_slice";
 import { selectTagTags } from "../../../features/tags/tag_slice";
+import {
+  isQueuedOffline,
+  newIdempotencyKey,
+} from "../../../features/transactions/offline_queue";
 import "./transaction_detail_sheet.scss";
 
 type TransactionDetailSheetProps = {
@@ -54,6 +58,12 @@ export default function TransactionDetailSheet({
   const tags = useAppSelector(selectTagTags);
 
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  // Duplica ed Elimina aspettano il server: senza, "Eliminato" compariva
+  // anche quando la richiesta falliva, e un doppio tocco duplicava due volte.
+  const [busy, setBusy] = useState(false);
+  // Chiave fissa per questo dettaglio: due tocchi su Duplica, o un nuovo
+  // tentativo dopo un errore di rete, creano una copia sola.
+  const [duplicateKey] = useState(newIdempotencyKey);
 
   // Il saldo dopo non sta nella lista: sarebbe una somma progressiva per riga.
   // Lo chiediamo qui, dove serve e per una riga sola.
@@ -104,32 +114,54 @@ export default function TransactionDetailSheet({
     return written;
   }, [transaction.data, t]);
 
-  const duplicate = () => {
-    dispatch(
-      createTransaction({
-        importo: transaction.importo,
-        tipo: transaction.tipo,
-        data: transaction.data.slice(0, 10),
-        descrizione: transaction.descrizione || null,
-        conto_id: transaction.conto_id,
-        conto_destinazione_id: transaction.conto_destinazione_id ?? null,
-        categoria_id: transaction.categoria_id ?? null,
-        sottocategoria_id: transaction.sottocategoria_id ?? null,
-        tag_id: transaction.tag_id ?? null,
-        parent_transaction_id: null,
-      }),
-    );
+  const duplicate = async () => {
+    if (busy) return;
+    setBusy(true);
 
-    dispatch(showToast({ variant: "success", title: t("mov_duplicated") }));
-    onHide();
+    try {
+      await dispatch(
+        createTransaction({
+          importo: transaction.importo,
+          tipo: transaction.tipo,
+          data: transaction.data.slice(0, 10),
+          descrizione: transaction.descrizione || null,
+          conto_id: transaction.conto_id,
+          conto_destinazione_id: transaction.conto_destinazione_id ?? null,
+          categoria_id: transaction.categoria_id ?? null,
+          sottocategoria_id: transaction.sottocategoria_id ?? null,
+          tag_id: transaction.tag_id ?? null,
+          parent_transaction_id: null,
+          idempotencyKey: duplicateKey,
+        }),
+      ).unwrap();
+
+      dispatch(showToast({ variant: "success", title: t("mov_duplicated") }));
+      onHide();
+    } catch (error) {
+      if (isQueuedOffline(error)) {
+        dispatch(showToast({ variant: "offline", title: t("tx_saved_offline") }));
+        onHide();
+      }
+      // Gli altri errori li mostra il middleware; il dettaglio resta aperto.
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const remove = () => {
-    dispatch(deleteTransaction({ id: transaction.id }));
-    dispatch(showToast({ variant: "success", title: t("mov_deleted") }));
-
+  const remove = async () => {
+    if (busy) return;
+    setBusy(true);
     setConfirmingDelete(false);
-    onHide();
+
+    try {
+      await dispatch(deleteTransaction({ id: transaction.id })).unwrap();
+      dispatch(showToast({ variant: "success", title: t("mov_deleted") }));
+      onHide();
+    } catch {
+      // L'errore lo mostra il middleware; il movimento resta dov'era.
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -192,6 +224,7 @@ export default function TransactionDetailSheet({
             type="button"
             className="tx-detail__action"
             aria-label={t("mov_duplicate")}
+            disabled={busy}
             onClick={duplicate}
           >
             <i className="pi pi-clone" aria-hidden="true" />
@@ -201,6 +234,7 @@ export default function TransactionDetailSheet({
             type="button"
             className="tx-detail__action tx-detail__action--danger"
             aria-label={t("delete")}
+            disabled={busy}
             onClick={() => setConfirmingDelete(true)}
           >
             <i className="pi pi-trash" aria-hidden="true" />

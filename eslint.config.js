@@ -30,6 +30,14 @@ export default defineConfig([
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
+  // Il service worker gira nel suo contesto: `self`, `caches`, `clients`.
+  {
+    files: ['public/sw.js'],
+    languageOptions: {
+      globals: globals.serviceworker,
+      sourceType: 'script',
+    },
+  },
   // TS / TSX — the actual application code
   {
     files: ['**/*.{ts,tsx}'],

@@ -3,6 +3,7 @@ import { showError } from "../features/error/error_slice";
 import { setLogout } from "../features/profile/profile_slice";
 import { ApiError, isApiError } from "../services/api_error";
 import { t } from "../i18n";
+import { isQueuedOffline } from "../features/transactions/offline_queue";
 
 // Un 401 su login/registrazione vuol dire "credenziali sbagliate", non "sessione
 // scaduta": va mostrato il messaggio del server, non buttato fuori l'utente (che
@@ -43,6 +44,10 @@ export const errorMiddleware: Middleware =
     if (action.meta?.aborted || action.meta?.condition) return next(action);
 
     const payload = action.payload;
+
+    // Movimento messo in coda senza rete: non è fallito, partirà più tardi.
+    // Lo comunica il form con un toast suo.
+    if (isQueuedOffline(payload)) return next(action);
 
     // CASO 1 — il server ha risposto: `services/api.js` ha già normalizzato il corpo.
     if (isApiError(payload)) {

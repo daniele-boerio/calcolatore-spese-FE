@@ -83,6 +83,15 @@ describe("overdue", () => {
       overdue([rec({ importo: 10, prossima_esecuzione: "2026-09-03" })], today),
     ).toEqual([]);
   });
+
+  it("una variabile in scadenza oggi è già da registrare", () => {
+    const bolletta = rec({
+      importo: 80,
+      prossima_esecuzione: "2026-09-03",
+      importo_variabile: true,
+    });
+    expect(overdue([bolletta], today)).toEqual([bolletta]);
+  });
 });
 
 describe("upcoming", () => {

@@ -30,6 +30,10 @@ import {
 import SplitTransactionDialog from "../split_transaction_dialog/split_transaction_dialog";
 import RecurrenceDialog from "../recurrence_dialog/recurrence_dialog";
 import { toIsoDate } from "../../../services/dates";
+import {
+  isQueuedOffline,
+  newIdempotencyKey,
+} from "../../../features/transactions/offline_queue";
 
 interface TransactionDialogProps {
   visible: boolean;
@@ -85,6 +89,10 @@ export default function TransactionDialog({
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
   const [saving, setSaving] = useState(false);
+  // Una chiave per inserimento, non per tocco: un nuovo tentativo dopo un
+  // errore di rete riusa la stessa, e il server non crea un doppione se il
+  // primo invio era arrivato.
+  const [idempotencyKey, setIdempotencyKey] = useState(newIdempotencyKey);
   const [picker, setPicker] = useState<PickerName | null>(null);
   const [isSplitDialogVisible, setIsSplitDialogVisible] =
     useState<boolean>(false);
@@ -111,6 +119,7 @@ export default function TransactionDialog({
         setTransactionId(transaction.parent_transaction_id);
       } else {
         // Modalità CREATE (Reset)
+        setIdempotencyKey(newIdempotencyKey());
         setTipo("USCITA");
         setImporto("");
         setData(new Date());
@@ -291,14 +300,22 @@ export default function TransactionDialog({
           updateTransaction({ id: transaction.id, ...payload }),
         ).unwrap();
       } else {
-        await dispatch(createTransaction(payload)).unwrap();
+        await dispatch(
+          createTransaction({ ...payload, idempotencyKey }),
+        ).unwrap();
       }
 
       dispatch(showToast({ variant: "success", title: t("tx_saved") }));
       onHide();
-    } catch {
-      // Gli errori sono gestiti dal middleware: il form resta aperto, con i
-      // dati, così si può riprovare senza riscrivere tutto.
+    } catch (error) {
+      // Senza rete il movimento è in coda sul telefono: per l'utente è
+      // salvato, partirà da solo appena torna il segnale.
+      if (isQueuedOffline(error)) {
+        dispatch(showToast({ variant: "offline", title: t("tx_saved_offline") }));
+        onHide();
+      }
+      // Gli altri errori sono gestiti dal middleware: il form resta aperto,
+      // con i dati, così si può riprovare senza riscrivere tutto.
     } finally {
       setSaving(false);
     }
@@ -317,11 +334,19 @@ export default function TransactionDialog({
 
     try {
       const payload = await preparePayload();
-      const created = await dispatch(createTransaction(payload)).unwrap();
+      const created = await dispatch(
+        createTransaction({ ...payload, idempotencyKey }),
+      ).unwrap();
       setSplitTarget(created);
       setIsSplitDialogVisible(true);
-    } catch {
-      // Gli errori sono gestiti dal middleware
+    } catch (error) {
+      // Offline si salva, ma non si divide: la riga da dividere non c'è
+      // ancora sul server. La si dividerà dal dettaglio, una volta inviata.
+      if (isQueuedOffline(error)) {
+        dispatch(showToast({ variant: "offline", title: t("tx_saved_offline") }));
+        onHide();
+      }
+      // Gli altri errori sono gestiti dal middleware
     }
   };
 

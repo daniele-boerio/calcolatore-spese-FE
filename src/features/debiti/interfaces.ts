@@ -7,6 +7,8 @@ export interface Debito {
   conto_id: string | null;
   /** Mese in cui il debito si chiude al ritmo tenuto finora ("2027-06"). */
   fine_stimata?: string | null;
+  /** Rata ricorrente attiva che paga il debito; null se si paga a mano. */
+  ricorrenza_id?: string | null;
   creationDate: string;
   lastUpdate: string;
 }

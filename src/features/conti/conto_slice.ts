@@ -1,4 +1,4 @@
-import { getPatrimonio } from "./api_calls";
+import { correggiSaldo, getPatrimonio, getVerificaSaldi } from "./api_calls";
 import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
 import {
   confirmBankSession,
@@ -51,6 +51,7 @@ const initialState: ContoState = {
   include_future_recurring:
     localStorage.getItem(INCLUDE_FUTURE_RECURRING_STORAGE_KEY) === "true",
   patrimonio: [],
+  saldiFuoriSincrono: [],
 };
 
 // --- HELPERS ---
@@ -106,6 +107,27 @@ const contoSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(getVerificaSaldi.fulfilled, (state, action) => {
+        state.saldiFuoriSincrono = action.payload.map((riga) => ({
+          ...riga,
+          conto_id: String(riga.conto_id),
+          saldo: Number(riga.saldo),
+          saldo_atteso: Number(riga.saldo_atteso),
+          differenza: Number(riga.differenza),
+        }));
+      })
+
+      .addCase(correggiSaldo.fulfilled, (state, action: PayloadAction<Conto>) => {
+        const corretto = action.payload;
+        state.saldiFuoriSincrono = state.saldiFuoriSincrono.filter(
+          (riga) => String(riga.conto_id) !== String(corretto.id),
+        );
+        const index = state.conti.findIndex(
+          (conto) => String(conto.id) === String(corretto.id),
+        );
+        if (index !== -1) state.conti[index] = corretto;
+      })
+
       .addCase(getPatrimonio.fulfilled, (state, action) => {
         state.patrimonio = action.payload;
       })
@@ -305,6 +327,8 @@ export const selectContiMonthlyExpensesByCategory = (state: RootState) =>
 export const selectContiFilters = (state: RootState) => state.conto.filters;
 export const selectContiPatrimonio = (state: RootState) =>
   state.conto.patrimonio;
+export const selectSaldiFuoriSincrono = (state: RootState) =>
+  state.conto.saldiFuoriSincrono;
 
 export const selectIncludeFutureRecurring = (state: RootState) =>
   state.conto.include_future_recurring;

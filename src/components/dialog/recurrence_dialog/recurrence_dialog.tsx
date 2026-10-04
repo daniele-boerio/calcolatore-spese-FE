@@ -23,6 +23,22 @@ import {
   createRecurring,
   updateRecurring,
 } from "../../../features/recurrings/api_calls";
+import { getDebiti } from "../../../features/debiti/api_calls";
+import { selectDebitiDebiti } from "../../../features/debiti/debito_slice";
+
+/** Come finisce una ricorrenza: mai, a una data, dopo un numero di rate. */
+type EndMode = "MAI" | "DATA" | "RATE";
+
+// Date LOCALI: toISOString() passa per UTC e in Italia anticiperebbe di un giorno.
+const toLocalIso = (date: Date) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(
+    date.getDate(),
+  ).padStart(2, "0")}`;
+
+const fromLocalIso = (value: string) => {
+  const [y, m, d] = value.split("-").map(Number);
+  return new Date(y, m - 1, d);
+};
 
 /**
  * Valori con cui aprire il form in creazione. Li passa il foglio "Nuova
@@ -59,6 +75,7 @@ export default function RecurrenceDialog({
   const conti = useAppSelector(selectContiConti);
   const categorie = useAppSelector(selectCategoriaCategorie);
   const tags = useAppSelector(selectTagTags);
+  const debiti = useAppSelector(selectDebitiDebiti);
 
   const [nome, setNome] = useState<string>("");
   const [tipo, setTipo] = useState<tipoTransaction>("USCITA");
@@ -75,6 +92,19 @@ export default function RecurrenceDialog({
   const [newSubCategoryName, setNewSubCategoryName] = useState<string>("");
   const [tagId, setTagId] = useState<string | null>(null);
   const [newTagName, setNewTagName] = useState<string>("");
+  const [endMode, setEndMode] = useState<EndMode>("MAI");
+  const [dataFine, setDataFine] = useState<Date | null>(null);
+  const [rate, setRate] = useState<string>("");
+  const [importoVariabile, setImportoVariabile] = useState<boolean>(false);
+  const [debitoId, setDebitoId] = useState<string | null>(null);
+  const [saving, setSaving] = useState<boolean>(false);
+
+  // La lista dei debiti serve al menu "Rata di un debito": la pagina
+  // Ricorrenze di suo non la carica.
+  useEffect(() => {
+    if (visible && debiti.length === 0) dispatch(getDebiti());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   useEffect(() => {
     if (visible) {
@@ -95,6 +125,16 @@ export default function RecurrenceDialog({
         setCategoriaId(recurring.categoria_id);
         setSottoCategoriaId(recurring.sottocategoria_id);
         setTagId(recurring.tag_id);
+        setDataFine(
+          recurring.data_fine ? fromLocalIso(recurring.data_fine) : null,
+        );
+        const rateLeft = recurring.rate_rimanenti ?? null;
+        setRate(rateLeft !== null ? String(rateLeft) : "");
+        setEndMode(
+          recurring.data_fine ? "DATA" : rateLeft !== null ? "RATE" : "MAI",
+        );
+        setImportoVariabile(Boolean(recurring.importo_variabile));
+        setDebitoId(recurring.debito_id ?? null);
       } else {
         setNome(defaults?.nome ?? "");
         setImporto(defaults?.importo ?? "");
@@ -109,6 +149,11 @@ export default function RecurrenceDialog({
         setNewCategoryName("");
         setNewSubCategoryName("");
         setNewTagName("");
+        setEndMode("MAI");
+        setDataFine(null);
+        setRate("");
+        setImportoVariabile(false);
+        setDebitoId(null);
       }
     }
     // `defaults` è un oggetto ricreato a ogni render del form chiamante:
@@ -172,12 +217,25 @@ export default function RecurrenceDialog({
   }, [tags, t]);
 
   const handleSave = async () => {
-    // Usiamo i componenti LOCALI della data: toISOString() converte in UTC e
-    // per i fusi orari positivi (Italia) anticiperebbe la data di un giorno.
-    const formattedDate = `${prossimaEsecuzione.getFullYear()}-${String(
-      prossimaEsecuzione.getMonth() + 1,
-    ).padStart(2, "0")}-${String(prossimaEsecuzione.getDate()).padStart(2, "0")}`;
+    // Niente doppio invio: con la rete lenta un secondo tocco creava due
+    // ricorrenze identiche.
+    if (saving) return;
+    setSaving(true);
+
+    try {
+      await save();
+      onHide();
+    } catch {
+      // L'errore lo mostra il middleware; il form resta aperto con i dati.
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const save = async () => {
+    const formattedDate = toLocalIso(prossimaEsecuzione);
     const numericImporto = parseFloat(importo);
+    const numericRate = parseInt(rate, 10);
 
     let finalTagId = tagId === "NEW_TAG" ? newTagName : tagId;
     let finalCategoriaId =
@@ -267,14 +325,20 @@ export default function RecurrenceDialog({
       categoria_id: finalCategoriaId,
       sottocategoria_id: finalSottoCategoriaId,
       tag_id: finalTagId,
+      data_fine: endMode === "DATA" && dataFine ? toLocalIso(dataFine) : null,
+      rate_rimanenti:
+        endMode === "RATE" && !isNaN(numericRate) ? numericRate : null,
+      importo_variabile: importoVariabile,
+      debito_id: debitoId,
     };
 
     if (recurring?.id) {
-      await dispatch(updateRecurring({ id: recurring.id, ...payload }));
+      await dispatch(
+        updateRecurring({ id: recurring.id, ...payload }),
+      ).unwrap();
     } else {
-      await dispatch(createRecurring(payload));
+      await dispatch(createRecurring(payload)).unwrap();
     }
-    onHide();
   };
 
   const tipoOptions = [
@@ -287,6 +351,12 @@ export default function RecurrenceDialog({
     { label: t("weekly"), value: "SETTIMANALE" },
     { label: t("monthly"), value: "MENSILE" },
     { label: t("yearly"), value: "ANNUALE" },
+  ];
+
+  const endModeOptions = [
+    { label: t("recurrence_end_never"), value: "MAI" },
+    { label: t("recurrence_end_date"), value: "DATA" },
+    { label: t("recurrence_end_installments"), value: "RATE" },
   ];
 
   const handleImportoChange = (val: string) => {
@@ -315,7 +385,14 @@ export default function RecurrenceDialog({
             className="action-button"
             label={recurring ? t("save_changes") : t("save")}
             onClick={handleSave}
-            disabled={!importo || !contoId || !nome.trim()}
+            disabled={
+              saving ||
+              !importo ||
+              !contoId ||
+              !nome.trim() ||
+              (endMode === "DATA" && !dataFine) ||
+              (endMode === "RATE" && !(parseInt(rate, 10) > 0))
+            }
           />
         </div>
       }
@@ -390,6 +467,64 @@ export default function RecurrenceDialog({
               onChange={(e) => setContoId(e.value)}
               placeholder={t("bank_account_placeholder")}
               showClear={false}
+            />
+          </div>
+        </div>
+
+        {/* Fine della ricorrenza: abbonamenti annuali, rate di un finanziamento */}
+        <div className="form-row">
+          <div className="field">
+            <Dropdown
+              label={t("recurrence_end")}
+              value={endMode}
+              options={endModeOptions}
+              onChange={(e) => setEndMode(e.value)}
+              placeholder={t("recurrence_end")}
+              showClear={false}
+            />
+          </div>
+          <div className="field">
+            {endMode === "DATA" && (
+              <Calendar
+                label={t("recurrence_end_date")}
+                value={dataFine}
+                onChange={(e) => setDataFine((e.value as Date) ?? null)}
+                showIcon
+                minDate={prossimaEsecuzione}
+              />
+            )}
+            {endMode === "RATE" && (
+              <InputText
+                label={t("recurrence_installments_left")}
+                value={rate}
+                onChange={(e) => setRate(e.target.value.replace(/\D/g, ""))}
+                inputMode="numeric"
+                placeholder="12"
+              />
+            )}
+          </div>
+        </div>
+
+        {/* Rata di un debito: ogni esecuzione ne scala il residuo, e a debito
+            estinto la ricorrenza si ferma. Importo variabile: bollette, che
+            si registrano a mano con la cifra vera. */}
+        <div className="form-row">
+          <div className="field">
+            <Dropdown
+              label={t("recurrence_debt")}
+              value={debitoId}
+              options={debiti}
+              optionLabel="nome"
+              optionValue="id"
+              onChange={(e) => setDebitoId(e.value ?? null)}
+              placeholder={t("recurrence_debt_placeholder")}
+            />
+          </div>
+          <div className="field">
+            <label className="field-label">{t("recurrence_variable")}</label>
+            <Switch
+              checked={importoVariabile}
+              onChange={(e) => setImportoVariabile(Boolean(e.value))}
             />
           </div>
         </div>

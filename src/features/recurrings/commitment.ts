@@ -31,6 +31,9 @@ export function monthlyCommitment(recurrings: Recurring[]): number {
  * Ricorrenze attive la cui data è già passata. Di norma la lista è vuota: il
  * BE le esegue a mezzanotte. Se una resta indietro — tipicamente perché il suo
  * conto è in soft-delete — è l'unico posto in cui si vede.
+ *
+ * Le ricorrenze a importo variabile ci entrano già dal giorno in cui scadono:
+ * lo scheduler non le registra mai da sé, aspettano la cifra vera.
  */
 export function overdue(
   recurrings: Recurring[],
@@ -41,7 +44,8 @@ export function overdue(
   return recurrings.filter(
     (recurring) =>
       recurring.attiva &&
-      daysBetweenIso(dayKey(recurring.prossima_esecuzione), todayKey) > 0,
+      daysBetweenIso(dayKey(recurring.prossima_esecuzione), todayKey) >
+        (recurring.importo_variabile ? -1 : 0),
   );
 }
 

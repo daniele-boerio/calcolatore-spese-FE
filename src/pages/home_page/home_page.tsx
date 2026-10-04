@@ -53,6 +53,9 @@ import {
 } from "../../features/home/home_slice";
 import { percentDelta } from "../../features/home/derive";
 import { openSheet } from "../../features/ui/ui_slice";
+import PendingSyncBanner from "../../components/pending_sync_banner/pending_sync_banner";
+import BudgetAlertsCard from "../../components/budget_alerts/budget_alerts";
+import { budgetAlerts } from "../../features/statistics/budget_alerts";
 import ProfileSheet from "../../components/dialog/profile_sheet/profile_sheet";
 import { selectProfileUsername } from "../../features/profile/profile_slice";
 import "./home_page.scss";
@@ -145,6 +148,12 @@ export default function HomePage() {
 
   const saved = budget.remaining ?? 0;
 
+  // Budget vicini al limite o sforati: tetto del mese e categorie.
+  const alerts = useMemo(
+    () => budgetAlerts({ byCategory, categorie, spending }),
+    [byCategory, categorie, spending],
+  );
+
   // Solo contro un mese scorso in attivo: "+180% vs agosto" partendo da -50 €
   // e' aritmetica giusta e informazione falsa.
   const delta =
@@ -185,6 +194,7 @@ export default function HomePage() {
       </PageHeader>
 
       <PageContent>
+        <PendingSyncBanner />
         {/* Le colonne sono wrapper che sotto i 1180px spariscono: l'ordine qui
             sotto è quello che resta sul telefono, invariato. */}
         <PageColumns split="hero">
@@ -212,6 +222,8 @@ export default function HomePage() {
                 },
               ]}
             />
+
+            <BudgetAlertsCard alerts={alerts} />
 
             <Card>
               <CardTitle
