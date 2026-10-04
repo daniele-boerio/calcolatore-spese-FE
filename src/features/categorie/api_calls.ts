@@ -8,6 +8,8 @@ import {
   DeleteCategoriaParams,
   DeleteSottoCategoriaParams,
   DeleteSottoCategoriaResponse,
+  MigrateTransactionsParams,
+  MigrateTransactionsResult,
   SottoCategoria,
   UpdateCategoriaParams,
   UpdateSottoCategoriaParams,
@@ -198,31 +200,16 @@ export const deleteSottoCategoria = createAsyncThunk<
 
 // Migrazione Transazioni
 export const migrateTransactions = createAsyncThunk<
-  any,
-  {
-    old_categoria_id: string;
-    old_sottocategoria_id?: string;
-    new_categoria_id: string;
-    new_sottocategoria_id?: string;
-  }
+  MigrateTransactionsResult,
+  MigrateTransactionsParams
 >(
   "categorie/migrateTransactions",
-  async (
-    {
-      old_categoria_id,
-      old_sottocategoria_id,
-      new_categoria_id,
-      new_sottocategoria_id,
-    },
-    { rejectWithValue },
-  ) => {
+  async (params, { rejectWithValue }) => {
     try {
-      const response = await api.post(`/categorie/migrate`, {
-        old_categoria_id,
-        old_sottocategoria_id,
-        new_categoria_id,
-        new_sottocategoria_id,
-      });
+      const response = await api.post<MigrateTransactionsResult>(
+        `/categorie/migrate`,
+        params,
+      );
       return response.data;
     } catch (error) {
       const err = error as AxiosError;

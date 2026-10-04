@@ -6143,6 +6143,38 @@
               }
             ],
             "title": "New Sottocategoria Id"
+          },
+          "old_tag_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Old Tag Id"
+          },
+          "tag_action": {
+            "type": "string",
+            "enum": [
+              "keep",
+              "set",
+              "clear"
+            ],
+            "title": "Tag Action",
+            "default": "keep"
+          },
+          "new_tag_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Tag Id"
           }
         },
         "type": "object",

@@ -615,5 +615,18 @@
   "budget_alert_of_budget": "of the budget",
   "budget_alert_others": "and {count} more budgets",
   "budget_alert_over": "Over",
-  "budget_alert_of": "of"
+  "budget_alert_of": "of",
+  "nav_investments_short": "Invest",
+  "more_recurrings_hint": "Subscriptions, bills and instalments",
+  "more_debts_hint": "Loans and what is left to pay",
+  "migrate_from": "From",
+  "migrate_to": "To",
+  "migrate_source_tag": "Source tag",
+  "migrate_any_tag": "Any tag",
+  "migrate_tag_action": "Tag of moved transactions",
+  "migrate_tag_keep": "Keep their tag",
+  "migrate_tag_set": "Set another tag",
+  "migrate_tag_clear": "Remove the tag",
+  "migrate_destination_tag": "New tag",
+  "migrate_done": "Moved {tx} transactions and {ric} recurring items"
 }

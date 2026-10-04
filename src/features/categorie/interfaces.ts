@@ -93,3 +93,24 @@ export interface CategoriesFilters {
   solo_entrata?: boolean;
   solo_uscita?: boolean;
 }
+
+/** Cosa succede al tag dei movimenti spostati da una migrazione. */
+export type MigrateTagAction = "keep" | "set" | "clear";
+
+export interface MigrateTransactionsParams {
+  old_categoria_id: string;
+  old_sottocategoria_id?: string;
+  new_categoria_id: string;
+  new_sottocategoria_id?: string;
+  /** Solo i movimenti con questo tag; assente = tutti, con o senza tag. */
+  old_tag_id?: string;
+  /** "keep" lascia il tag, "set" mette `new_tag_id`, "clear" lo toglie. */
+  tag_action?: MigrateTagAction;
+  new_tag_id?: string;
+}
+
+export interface MigrateTransactionsResult {
+  message: string;
+  transazioni_aggiornate: number;
+  ricorrenze_aggiornate: number;
+}

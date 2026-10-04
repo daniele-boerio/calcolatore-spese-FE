@@ -613,5 +613,18 @@
   "budget_alert_of_budget": "del budget",
   "budget_alert_others": "e altri {count} budget",
   "budget_alert_over": "Sforato",
-  "budget_alert_of": "su"
+  "budget_alert_of": "su",
+  "nav_investments_short": "Titoli",
+  "more_recurrings_hint": "Abbonamenti, bollette e rate",
+  "more_debts_hint": "Prestiti e quanto manca a chiuderli",
+  "migrate_from": "Da",
+  "migrate_to": "A",
+  "migrate_source_tag": "Tag di origine",
+  "migrate_any_tag": "Qualsiasi tag",
+  "migrate_tag_action": "Tag dei movimenti spostati",
+  "migrate_tag_keep": "Lascia il tag che hanno",
+  "migrate_tag_set": "Imposta un altro tag",
+  "migrate_tag_clear": "Togli il tag",
+  "migrate_destination_tag": "Nuovo tag",
+  "migrate_done": "Spostati {tx} movimenti e {ric} ricorrenze"
 }
