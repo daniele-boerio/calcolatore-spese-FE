@@ -296,10 +296,20 @@ select {
   color: var(--on-accent);
   font-weight: 700;
   text-decoration: none;
-  transform: translateY(-200%);
 
-  &:focus-visible {
-    transform: none;
+  // Nascosto davvero finché la tastiera non lo raggiunge. Prima era solo
+  // spostato in su di una quantità fissa: su iPhone, con la barra di stato
+  // trasparente e la safe area, ne restava un pezzo accanto alla Dynamic
+  // Island. Ritagliato a zero non dipende da dove sta.
+  &:not(:focus-visible) {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
   }
 }
 
