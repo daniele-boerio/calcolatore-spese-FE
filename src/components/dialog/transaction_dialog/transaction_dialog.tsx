@@ -84,6 +84,7 @@ export default function TransactionDialog({
   const [to_data, setToData] = useState<Date | null>(null);
   const [transactionId, setTransactionId] = useState<string | null>(null);
 
+  const [saving, setSaving] = useState(false);
   const [picker, setPicker] = useState<PickerName | null>(null);
   const [isSplitDialogVisible, setIsSplitDialogVisible] =
     useState<boolean>(false);
@@ -277,16 +278,30 @@ export default function TransactionDialog({
   };
 
   const handleSave = async () => {
-    const payload = await preparePayload();
+    // Un secondo tocco mentre la prima richiesta è in volo (rete lenta) creava
+    // un doppione: il bottone resta spento finché non torna la risposta.
+    if (saving) return;
+    setSaving(true);
 
-    if (transaction?.id) {
-      await dispatch(updateTransaction({ id: transaction.id, ...payload }));
-    } else {
-      await dispatch(createTransaction(payload));
+    try {
+      const payload = await preparePayload();
+
+      if (transaction?.id) {
+        await dispatch(
+          updateTransaction({ id: transaction.id, ...payload }),
+        ).unwrap();
+      } else {
+        await dispatch(createTransaction(payload)).unwrap();
+      }
+
+      dispatch(showToast({ variant: "success", title: t("tx_saved") }));
+      onHide();
+    } catch {
+      // Gli errori sono gestiti dal middleware: il form resta aperto, con i
+      // dati, così si può riprovare senza riscrivere tutto.
+    } finally {
+      setSaving(false);
     }
-
-    dispatch(showToast({ variant: "success", title: t("tx_saved") }));
-    onHide();
   };
 
   // Apre lo split. In modifica divide la transazione esistente; in creazione la
@@ -415,7 +430,7 @@ export default function TransactionDialog({
         title={transaction ? t("edit_transaction") : t("new_transaction")}
         className="tx-sheet"
         footer={
-          <Button block disabled={!canSave} onClick={handleSave}>
+          <Button block disabled={!canSave || saving} onClick={handleSave}>
             {transaction ? t("save_changes") : t("tx_save")}
           </Button>
         }
