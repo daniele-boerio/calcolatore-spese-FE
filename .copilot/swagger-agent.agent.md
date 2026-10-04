@@ -11,7 +11,7 @@ Questo agente è pensato per integrare e mappare nuove chiamate backend a partir
 
 ## Regole di integrazione
 - Usa sempre l'istanza Axios di `src/services/api.js`.
-- Quando possibile, non replicare tipi: genera o aggiorna i tipi collegati agli schemi Swagger.
-- Se lo schema cambia, suggerisci di usare `npm run generate-types` o di aggiornare `src/swagger/schema.json`.
+- I tipi sono scritti a mano in `src/features/<dominio>/interfaces.ts`: aggiornali in base allo Swagger. I campi `Decimal` arrivano come stringhe.
+- Se lo schema cambia, va riesportato dal BE in `calcolatore_spese_swagger.json` (comando nell'agent `api-contract-sync` in `.claude/agents/`).
 - Mantieni la separazione tra backend contract e logica di presentazione.
 - Fai attenzione agli endpoint protetti da token Bearer; lo swagger può avere informazioni di sicurezza rilevanti.

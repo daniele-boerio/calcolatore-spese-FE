@@ -11,7 +11,8 @@ Questa skill supporta lo sviluppo delle integrazioni backend basate sul file Ope
 6. Verifica eventuali headers o autenticazione Bearer richiesti.
 
 ## Best practice
-- Preferisci un approccio DRY: non duplicare gli schemi già definiti.
+- Preferisci un approccio DRY: non duplicare i tipi già definiti in `interfaces.ts`.
+- I campi `Decimal` sono stringhe nel JSON: convertili in `Number` nel mapper dello slice.
 - Se il backend fornisce nuovi oggetti, estendi i tipi e i dati solo dove serve.
 - Mantieni l'accesso alle API centralizzato in `src/services/api.js`.
 - Non esporre chiamate fetch native nei componenti quando esiste già un thunk.

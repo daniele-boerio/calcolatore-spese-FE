@@ -1,13 +1,21 @@
 # FE — React 19 + TypeScript + Vite
 
-SPA for the Calcolatore Spese app. Redux Toolkit state, PrimeReact UI, Axios for
-I/O, SCSS for styling, i18n (it/en). Charts are hand-drawn SVG/CSS on the design
-tokens (see `pages/charts_page`, `features/statistics/trend.ts`) — no chart
-library: inside a canvas the theme custom properties do not resolve.
+SPA for the Calcolatore Spese app. Redux Toolkit state, an in-house component kit
+on design tokens (`src/styles/_tokens.scss`, light/dark), Axios for I/O, SCSS for
+styling, i18n (it/en). PrimeReact remains only where it carries real logic (date
+picker, filtered dropdown, overlays) and in legacy dialogs not yet redesigned. There
+is no MUI. Charts are hand-drawn SVG/CSS on the design tokens (see
+`pages/charts_page`, `features/statistics/trend.ts`) — no chart library: inside a
+canvas the theme custom properties do not resolve.
 
 ## Anatomy of a domain (`src/features/<dominio>/`)
 
-Each domain is a vertical slice with the same three files:
+Folder names are not all Italian: `transactions`, `recurrings`, `tags`, `profile`,
+`home`, `ui`, `error` sit next to `conti`, `categorie`, `debiti`, `investimenti`,
+`statistics`, `charts`, `bank_proposals`. Use the existing folder for a domain.
+
+Each domain is a vertical slice with the same three files, plus pure helpers
+(`group.ts`, `budget.ts`, `derive.ts`, …) with co-located Vitest `*.test.ts`:
 
 - `api_calls.ts` — `createAsyncThunk` thunks. **All** HTTP goes through the shared
   Axios instance `import api from "../../services/api"` — never call `axios`/`fetch`
@@ -34,15 +42,24 @@ component.
   `src/i18n/it.json`. Never hardcode a visible string.
 - Errors surface through `errorMiddleware` + the `error` slice; don't build ad-hoc
   error UI when a thunk rejection already flows there.
-- UI: reuse `src/components/*` (dialogs, inputs, dropdown, table) and the existing
-  SCSS. MUI and PrimeReact coexist — pick whichever the sibling component already uses.
+- UI: build on the in-house kit in `src/components/*` (`sheet`, `picker_sheet`,
+  `button`, `list_row`, `card`, `amount`, `chip`, `segmented_control`, `toast`, …)
+  and token variables (`var(--…)`, never literal colours). Don't add PrimeReact to
+  redesigned screens.
+- Global sheets (new/edit transaction, detail, filters) open via
+  `openSheet({ name, … })` from `features/ui/ui_slice` and mount once in
+  `components/sheet_host`. A sheet opened by id must not assume the entity is in the
+  store list (it only holds the loaded page/period): fetch it if missing.
+- Write flows: `await dispatch(thunk(...)).unwrap()` before the success toast
+  (`showToast`) and closing; disable the submit while in flight.
 
 ## Types & the API contract
 
-- TS types for the backend can be generated: `npm run generate-types`
-  (`openapi-typescript` → `src/types/api/schema.d.ts`, source `src/swagger/schema.json`).
-  When an endpoint's shape changes, regenerate rather than hand-writing types.
-- The authoritative contract is `calcolatore_spese_swagger.json` at the FE root.
+- TS types for the backend are **hand-written** in each `features/<dominio>/interfaces.ts`.
+  There is no type generation.
+- The authoritative contract is `calcolatore_spese_swagger.json` at the FE root. It's
+  exported from the BE (see the `api-contract-sync` agent for the command); when an
+  endpoint's shape changes, re-export it and update `interfaces.ts` + `api_calls.ts`.
 
 ## Don't
 

@@ -6,17 +6,19 @@ Questo repository contiene agenti progettati per supportare lo sviluppo di nuove
 - Obiettivo: aggiungere o estendere funzionalità frontend usando le best practice del progetto.
 - Deve usare le convenzioni già presenti in `src/features/*`:
   - `api_calls.ts` per le chiamate backend con `createAsyncThunk`
-  - `*.slice.ts` per lo stato e i reducer
+  - `<dominio>_slice.ts` per lo stato e i reducer (soldi da stringa a `Number` nel mapper dello slice)
+  - `interfaces.ts` per i tipi, scritti a mano (non c'è generazione dei tipi)
   - componenti e dialog nelle cartelle esistenti
 - Deve riutilizzare l'istanza Axios di `src/services/api.js` per tutte le chiamate API.
 - Deve privilegiare l'uso di `useAppDispatch` e `useAppSelector`.
-- Deve mantenere coerenza con le UI basate su MUI e PrimeReact, e lo stile SASS esistente.
+- Deve usare i componenti interni di `src/components/*` e i token di `src/styles/_tokens.scss` (niente colori letterali). PrimeReact resta solo per date picker, dropdown con filtro, overlay e dialog legacy; MUI non c'è.
+- Deve chiudere con `npm run typecheck`, `npm run lint` e `npm run test`.
 - Deve fare attenzione a non modificare file globali senza una reale necessità.
 
 ## swagger-agent
 - Obiettivo: estendere o mappare nuove chiamate backend usando il file Swagger `calcolatore_spese_swagger.json`.
 - Deve cercare i percorsi API e gli schemi nel file Swagger per definire tipi, validazione e payload.
-- Deve suggerire l'uso di `npm run generate-types` se si aggiorna o si espande lo schema OAS.
+- Se lo schema cambia, va riesportato dal BE e vanno aggiornati a mano `interfaces.ts` e `api_calls.ts` del dominio (i soldi `Decimal` arrivano come stringhe).
 - Deve considerare i percorsi attuali di `src/features/*` e integrare nuove API con la struttura Redux Toolkit.
 
 ## ui-agent
