@@ -63,6 +63,13 @@
     cursor: not-allowed;
   }
 
+  // Col mouse il bottone risponde già al passaggio, non solo al clic.
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      filter: brightness(0.95);
+    }
+  }
+
   &:not(:disabled):active {
     transform: scale(0.97);
     transition: transform v.$dur-press;

@@ -46,6 +46,13 @@ component.
   `button`, `list_row`, `card`, `amount`, `chip`, `segmented_control`, `toast`, …)
   and token variables (`var(--…)`, never literal colours). Don't add PrimeReact to
   redesigned screens.
+- Icons are **Phosphor, bold weight**: `<i className="ph-bold ph-house" />` (CSS from
+  `@phosphor-icons/web/bold`, loaded in `main.jsx`). PrimeIcons stays installed only for
+  PrimeReact's own internals — don't use `pi pi-*` in app code. A spinning icon is
+  `ph-bold ph-spinner icon-spin`.
+- Labels above numbers/sections use the `v.eyebrow` mixin (sentence case, no
+  uppercase tracking); page titles use `.page-title` (Instrument Serif); cards are
+  separated by `v.$card-edge`, not shadows. UI strings are sentence case, no "!".
 - Global sheets (new/edit transaction, detail, filters) open via
   `openSheet({ name, … })` from `features/ui/ui_slice` and mount once in
   `components/sheet_host`. A sheet opened by id must not assume the entity is in the

@@ -32,7 +32,7 @@ export default function StatRow({
             <span className="stat-row__label">
               {stat.label}
               {stat.onClick && (
-                <i className="pi pi-chevron-right" aria-hidden="true" />
+                <i className="ph-bold ph-caret-right" aria-hidden="true" />
               )}
             </span>
             <span

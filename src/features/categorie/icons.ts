@@ -4,19 +4,19 @@
 //
 // Solo icone presenti nell'elenco del design (PrimeIcons).
 const KEYWORD_ICONS: ReadonlyArray<readonly [readonly string[], string]> = [
-  [["spesa", "supermercato", "aliment", "grocer"], "pi pi-shopping-cart"],
-  [["casa", "affitto", "mutuo", "rent", "home"], "pi pi-home"],
-  [["trasport", "auto", "carburante", "benzina", "car", "fuel"], "pi pi-car"],
-  [["svago", "tempo libero", "divertimento", "cinema", "leisure"], "pi pi-ticket"],
-  [["utenz", "bollett", "luce", "gas", "energia", "util"], "pi pi-bolt"],
-  [["shopping", "abbigliamento", "vestiti", "clothes"], "pi pi-shopping-bag"],
-  [["stipendio", "salario", "lavoro", "salary", "income"], "pi pi-money-bill"],
-  [["banca", "conto", "bank"], "pi pi-building-columns"],
-  [["carta", "credito", "card"], "pi pi-credit-card"],
-  [["tass", "imposte", "bollo", "tax"], "pi pi-receipt"],
+  [["spesa", "supermercato", "aliment", "grocer"], "ph-bold ph-shopping-cart"],
+  [["casa", "affitto", "mutuo", "rent", "home"], "ph-bold ph-house"],
+  [["trasport", "auto", "carburante", "benzina", "car", "fuel"], "ph-bold ph-car"],
+  [["svago", "tempo libero", "divertimento", "cinema", "leisure"], "ph-bold ph-ticket"],
+  [["utenz", "bollett", "luce", "gas", "energia", "util"], "ph-bold ph-lightning"],
+  [["shopping", "abbigliamento", "vestiti", "clothes"], "ph-bold ph-shopping-bag"],
+  [["stipendio", "salario", "lavoro", "salary", "income"], "ph-bold ph-money"],
+  [["banca", "conto", "bank"], "ph-bold ph-bank"],
+  [["carta", "credito", "card"], "ph-bold ph-credit-card"],
+  [["tass", "imposte", "bollo", "tax"], "ph-bold ph-receipt"],
 ];
 
-const FALLBACK_ICON = "pi pi-tag";
+const FALLBACK_ICON = "ph-bold ph-tag";
 
 export function categoryIcon(name: string | null | undefined): string {
   if (!name) return FALLBACK_ICON;

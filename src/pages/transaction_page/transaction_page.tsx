@@ -333,7 +333,7 @@ export default function TransactionPage() {
               title={t("nav_recurrings")}
               onClick={() => navigate("/recurrings")}
             >
-              <i className="pi pi-refresh" aria-hidden="true" />
+              <i className="ph-bold ph-arrows-clockwise" aria-hidden="true" />
             </button>
 
             <button
@@ -343,7 +343,7 @@ export default function TransactionPage() {
               title={t("nav_debts")}
               onClick={() => navigate("/debts")}
             >
-              <i className="pi pi-receipt" aria-hidden="true" />
+              <i className="ph-bold ph-receipt" aria-hidden="true" />
             </button>
 
             {/* Esporta quello che si vede: stessi filtri della lista. */}
@@ -356,7 +356,7 @@ export default function TransactionPage() {
               onClick={exportCsv}
             >
               <i
-                className={exporting ? "pi pi-spin pi-spinner" : "pi pi-download"}
+                className={exporting ? "ph-bold ph-spinner icon-spin" : "ph-bold ph-download-simple"}
                 aria-hidden="true"
               />
             </button>
@@ -367,13 +367,13 @@ export default function TransactionPage() {
               aria-label={t("filters")}
               onClick={openFilters}
             >
-              <i className="pi pi-sliders-h" aria-hidden="true" />
+              <i className="ph-bold ph-sliders-horizontal" aria-hidden="true" />
             </button>
           </div>
         </div>
 
         <div className="movements__search">
-          <i className="pi pi-search" aria-hidden="true" />
+          <i className="ph-bold ph-magnifying-glass" aria-hidden="true" />
           <input
             type="search"
             value={query}
@@ -389,7 +389,7 @@ export default function TransactionPage() {
               <Chip
                 key={chip.key}
                 label={chip.label}
-                icon="pi pi-times"
+                icon="ph-bold ph-x"
                 variant="active"
                 onClick={chip.clear}
               />
@@ -433,7 +433,7 @@ export default function TransactionPage() {
               filtered ? (
                 <EmptyState
                   variant="search"
-                  icon="pi pi-search"
+                  icon="ph-bold ph-magnifying-glass"
                   title={t("mov_empty_filtered_title")}
                   description={t("mov_empty_filtered_text")}
                   actions={
@@ -451,7 +451,7 @@ export default function TransactionPage() {
                 />
               ) : (
                 <EmptyState
-                  icon="pi pi-list"
+                  icon="ph-bold ph-list-bullets"
                   title={t("home_empty_title")}
                   description={t("home_empty_text")}
                   actions={

@@ -69,7 +69,7 @@ export default function ForgotPasswordDialog({
             }}
           >
             <i
-              className="pi pi-check-circle"
+              className="ph-bold ph-check-circle"
               style={{ fontSize: "2rem", marginBottom: "1rem" }}
             ></i>
             <p>{t("password_reset_success")}</p>

@@ -72,7 +72,7 @@ export default function ListRow({
       {trailing && <span className="list-row__trailing">{trailing}</span>}
 
       {chevron && (
-        <i className="pi pi-chevron-right list-row__chevron" aria-hidden="true" />
+        <i className="ph-bold ph-caret-right list-row__chevron" aria-hidden="true" />
       )}
     </Tag>
   );

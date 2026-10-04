@@ -86,7 +86,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div className="error-boundary" role="alert">
         <span className="error-boundary__icon" aria-hidden="true">
-          <i className={offline ? "pi pi-wifi" : "pi pi-exclamation-triangle"} />
+          <i className={offline ? "ph-bold ph-wifi-slash" : "ph-bold ph-warning"} />
         </span>
 
         <div className="error-boundary__text">
@@ -112,7 +112,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           onClick={this.copy}
         >
           <i
-            className={copied === "yes" ? "pi pi-check" : "pi pi-copy"}
+            className={copied === "yes" ? "ph-bold ph-check" : "ph-bold ph-copy"}
             aria-hidden="true"
           />
           {copied === "yes" ? t("error_copied") : t("error_copy")}

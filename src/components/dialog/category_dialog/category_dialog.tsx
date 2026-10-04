@@ -149,7 +149,7 @@ export default function CategoryDialog({
       confirmPopup({
         target: event.currentTarget as HTMLElement,
         message: t("delete_message"),
-        icon: "pi pi-exclamation-triangle",
+        icon: "ph-bold ph-warning",
         acceptClassName: "p-button-danger",
         acceptLabel: t("yes"),
         rejectLabel: t("no"),
@@ -372,7 +372,7 @@ export default function CategoryDialog({
                   />
                 </div>
                 <Button
-                  icon="pi pi-trash"
+                  icon="ph-bold ph-trash"
                   className="trasparent-danger-button"
                   onClick={(e) => handleRemoveSub(e, index)}
                   compact
@@ -382,7 +382,7 @@ export default function CategoryDialog({
             ))}
 
             <Button
-              icon="pi pi-plus"
+              icon="ph-bold ph-plus"
               className="action-button icon-button"
               onClick={handleAddSub}
               compact

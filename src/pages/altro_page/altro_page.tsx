@@ -26,7 +26,7 @@ export default function AltroPage() {
         <Card className="more__menu">
           <List>
             <ListRow
-              icon="pi pi-refresh"
+              icon="ph-bold ph-arrows-clockwise"
               iconShape="square"
               title={t("nav_recurrings")}
               meta={t("more_recurrings_hint")}
@@ -35,7 +35,7 @@ export default function AltroPage() {
             />
 
             <ListRow
-              icon="pi pi-receipt"
+              icon="ph-bold ph-receipt"
               iconShape="square"
               title={t("nav_debts")}
               meta={t("more_debts_hint")}
@@ -48,7 +48,7 @@ export default function AltroPage() {
         <Card className="more__menu">
           <List>
             <ListRow
-              icon="pi pi-tags"
+              icon="ph-bold ph-tag-simple"
               iconShape="square"
               title={t("taxonomy_title")}
               meta={t("more_taxonomy_hint")}
@@ -57,7 +57,7 @@ export default function AltroPage() {
             />
 
             <ListRow
-              icon="pi pi-cog"
+              icon="ph-bold ph-gear"
               iconShape="square"
               title={t("nav_settings")}
               meta={t("more_settings_hint")}

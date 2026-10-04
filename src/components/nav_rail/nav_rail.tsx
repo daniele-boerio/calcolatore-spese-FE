@@ -48,34 +48,34 @@ export default function NavRail() {
     .join("");
 
   const primary: RailItem[] = [
-    { to: "/", icon: "pi pi-home", labelKey: "nav_home" },
+    { to: "/", icon: "ph-bold ph-house", labelKey: "nav_home" },
     {
       to: "/transactions",
-      icon: "pi pi-list",
+      icon: "ph-bold ph-list-bullets",
       labelKey: "nav_movements",
       // `total` è nullo finché la lista non è stata chiesta: zero e
       // "non lo so ancora" si scrivono allo stesso modo, cioè non si scrivono.
       badge: pagination.total ?? 0,
     },
-    { to: "/analysis", icon: "pi pi-chart-bar", labelKey: "nav_analysis" },
-    { to: "/accounts", icon: "pi pi-wallet", labelKey: "nav_accounts" },
+    { to: "/analysis", icon: "ph-bold ph-chart-bar", labelKey: "nav_analysis" },
+    { to: "/accounts", icon: "ph-bold ph-wallet", labelKey: "nav_accounts" },
   ];
 
   const management: RailItem[] = [
     {
       to: "/recurrings",
-      icon: "pi pi-refresh",
+      icon: "ph-bold ph-arrows-clockwise",
       labelKey: "nav_recurrings",
       badge: late,
       urgent: true,
     },
-    { to: "/categories", icon: "pi pi-tags", labelKey: "nav_categories" },
+    { to: "/categories", icon: "ph-bold ph-tag-simple", labelKey: "nav_categories" },
     {
       to: "/investments",
-      icon: "pi pi-chart-line",
+      icon: "ph-bold ph-chart-line-up",
       labelKey: "nav_investments",
     },
-    { to: "/debts", icon: "pi pi-receipt", labelKey: "nav_debts" },
+    { to: "/debts", icon: "ph-bold ph-receipt", labelKey: "nav_debts" },
   ];
 
   const renderItem = (item: RailItem) => (
@@ -116,7 +116,7 @@ export default function NavRail() {
         className="nav-rail__new"
         onClick={() => dispatch(openSheet({ name: "newTransaction" }))}
       >
-        <i className="pi pi-plus" aria-hidden="true" />
+        <i className="ph-bold ph-plus" aria-hidden="true" />
         {t("new_transaction")}
       </button>
 
@@ -135,7 +135,7 @@ export default function NavRail() {
           <span className="nav-rail__username">{username}</span>
           <span className="nav-rail__hint">{t("nav_settings")}</span>
         </span>
-        <i className="pi pi-cog" aria-hidden="true" />
+        <i className="ph-bold ph-gear" aria-hidden="true" />
       </NavLink>
     </nav>
   );

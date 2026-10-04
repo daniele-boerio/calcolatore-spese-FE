@@ -108,7 +108,7 @@ export default function PayDebitoDialog({
             value={importo}
             onChange={(e) => handleNumberChange(e.target.value, setImporto)}
             placeholder={t("debt_amount_placeholder")}
-            icon="pi pi-euro"
+            icon="ph-bold ph-currency-eur"
             iconPos="right"
             keyfilter={/^\d*[.,]?\d{0,2}$/}
             inputMode="decimal"

@@ -56,7 +56,7 @@ export default function AuthPage() {
             <Field
               id="auth-email"
               label={t("email")}
-              icon="pi pi-envelope"
+              icon="ph-bold ph-envelope"
               type="email"
               autoComplete="email"
               value={email}
@@ -68,7 +68,7 @@ export default function AuthPage() {
           <Field
             id="auth-username"
             label={t("username")}
-            icon="pi pi-user"
+            icon="ph-bold ph-user"
             autoComplete="username"
             value={username}
             placeholder={t("username_placeholder")}
@@ -78,7 +78,7 @@ export default function AuthPage() {
           <Field
             id="auth-password"
             label={t("password")}
-            icon="pi pi-lock"
+            icon="ph-bold ph-lock"
             type={revealed ? "text" : "password"}
             autoComplete={isLogin ? "current-password" : "new-password"}
             value={password}
@@ -92,7 +92,7 @@ export default function AuthPage() {
                 onClick={() => setRevealed((current) => !current)}
               >
                 <i
-                  className={`pi ${revealed ? "pi-eye-slash" : "pi-eye"}`}
+                  className={`ph-bold ${revealed ? "ph-eye-slash" : "ph-eye"}`}
                   aria-hidden="true"
                 />
               </button>

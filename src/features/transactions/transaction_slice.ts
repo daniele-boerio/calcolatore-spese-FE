@@ -1,4 +1,9 @@
-import { createSlice, PayloadAction, Action } from "@reduxjs/toolkit";
+import {
+  createSelector,
+  createSlice,
+  PayloadAction,
+  Action,
+} from "@reduxjs/toolkit";
 import {
   createTransaction,
   deleteTransaction,
@@ -319,11 +324,18 @@ export const selectTransactionPeriod = (state: RootState) =>
 export const selectTransactionRevision = (state: RootState) =>
   state.transaction.revision;
 
-/** Movimenti salvati offline dall'utente collegato, in attesa di invio. */
-export const selectPendingTransactions = (state: RootState) =>
-  state.transaction.pending.filter(
-    (item) => item.owner === (state.profile.username ?? null),
-  );
+/**
+ * Movimenti salvati offline dall'utente collegato, in attesa di invio.
+ * Memoizzato: un `filter` nudo darebbe un array nuovo a ogni lettura e
+ * farebbe ridisegnare chi lo usa a ogni azione dello store.
+ */
+export const selectPendingTransactions = createSelector(
+  [
+    (state: RootState) => state.transaction.pending,
+    (state: RootState) => state.profile.username ?? null,
+  ],
+  (pending, owner) => pending.filter((item) => item.owner === owner),
+);
 
 export const { updateFilters, applyFilters, setPeriod, resetFilters } =
   transactionsSlice.actions;

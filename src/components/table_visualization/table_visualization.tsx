@@ -107,14 +107,14 @@ export default function TableVisualization(props: TableVisualizationProps) {
             style={{ width: "4rem" }}
             body={(rowData) => (
               <Button
-                icon="pi pi-trash"
+                icon="ph-bold ph-trash"
                 className="trasparent-danger-button"
                 compact
                 onClick={(event) =>
                   confirmPopup({
                     target: event.currentTarget as HTMLElement,
                     message: t("delete_message"),
-                    icon: "pi pi-exclamation-triangle",
+                    icon: "ph-bold ph-warning",
                     acceptClassName: "p-button-danger",
                     acceptLabel: t("yes"),
                     rejectLabel: t("no"),

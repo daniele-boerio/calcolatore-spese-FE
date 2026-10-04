@@ -284,7 +284,7 @@ export default function Compensation({
                       value={importo}
                       onChange={(e) => handleImportoChange(e.target.value)}
                       label={t("amount")}
-                      icon="pi pi-euro"
+                      icon="ph-bold ph-currency-eur"
                       iconPos="right"
                       keyfilter={/^\d*[.,]?\d{0,2}$/} // Filtro lato PrimeReact
                       inputMode="decimal" // Forza tastiera numerica con punto/virgola su mobile

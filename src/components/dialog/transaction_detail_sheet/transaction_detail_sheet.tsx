@@ -227,7 +227,7 @@ export default function TransactionDetailSheet({
             disabled={busy}
             onClick={duplicate}
           >
-            <i className="pi pi-clone" aria-hidden="true" />
+            <i className="ph-bold ph-copy-simple" aria-hidden="true" />
           </button>
 
           <button
@@ -237,7 +237,7 @@ export default function TransactionDetailSheet({
             disabled={busy}
             onClick={() => setConfirmingDelete(true)}
           >
-            <i className="pi pi-trash" aria-hidden="true" />
+            <i className="ph-bold ph-trash" aria-hidden="true" />
           </button>
         </div>
       </Sheet>

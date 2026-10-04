@@ -91,7 +91,7 @@ export default function BudgetSettingsDialog({
           value={formData.amount}
           onChange={handleAmountChange}
           placeholder={t("dialog_budget_input_placeholder")}
-          icon="pi pi-euro"
+          icon="ph-bold ph-currency-eur"
           iconPos="right"
           label={t("dialog_budget_input_label")}
           className="budget-settings-input"

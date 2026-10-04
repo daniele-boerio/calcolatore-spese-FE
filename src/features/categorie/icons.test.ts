@@ -3,24 +3,24 @@ import { categoryIcon } from "./icons";
 
 describe("categoryIcon", () => {
   it("riconosce le categorie comuni dal nome", () => {
-    expect(categoryIcon("Spesa")).toBe("pi pi-shopping-cart");
-    expect(categoryIcon("Casa")).toBe("pi pi-home");
-    expect(categoryIcon("Trasporti")).toBe("pi pi-car");
-    expect(categoryIcon("Svago")).toBe("pi pi-ticket");
+    expect(categoryIcon("Spesa")).toBe("ph-bold ph-shopping-cart");
+    expect(categoryIcon("Casa")).toBe("ph-bold ph-house");
+    expect(categoryIcon("Trasporti")).toBe("ph-bold ph-car");
+    expect(categoryIcon("Svago")).toBe("ph-bold ph-ticket");
   });
 
   it("ignora maiuscole e accenti", () => {
-    expect(categoryIcon("UTENZE")).toBe("pi pi-bolt");
-    expect(categoryIcon("Bollètte")).toBe("pi pi-bolt");
+    expect(categoryIcon("UTENZE")).toBe("ph-bold ph-lightning");
+    expect(categoryIcon("Bollètte")).toBe("ph-bold ph-lightning");
   });
 
   it("riconosce anche dentro un nome più lungo", () => {
-    expect(categoryIcon("Spesa settimanale")).toBe("pi pi-shopping-cart");
+    expect(categoryIcon("Spesa settimanale")).toBe("ph-bold ph-shopping-cart");
   });
 
   it("ripiega su un'icona neutra quando non sa", () => {
-    expect(categoryIcon("Qualcosa di mio")).toBe("pi pi-tag");
-    expect(categoryIcon(null)).toBe("pi pi-tag");
-    expect(categoryIcon("")).toBe("pi pi-tag");
+    expect(categoryIcon("Qualcosa di mio")).toBe("ph-bold ph-tag");
+    expect(categoryIcon(null)).toBe("ph-bold ph-tag");
+    expect(categoryIcon("")).toBe("ph-bold ph-tag");
   });
 });

@@ -76,7 +76,7 @@ export default function BankConnectDialog({
     confirmPopup({
       target: event.currentTarget as HTMLElement,
       message: t("disconnect_bank_confirm"),
-      icon: "pi pi-exclamation-triangle",
+      icon: "ph-bold ph-warning",
       acceptClassName: "p-button-danger",
       acceptLabel: t("yes"),
       rejectLabel: t("no"),
@@ -142,7 +142,7 @@ export default function BankConnectDialog({
         ) : !listMode ? (
           // --- VISTA "CONNESSO" ---
           <div className="bank-connected">
-            <i className="pi pi-check-circle bank-connected__icon" />
+            <i className="ph-bold ph-check-circle bank-connected__icon" />
             <div className="bank-connected__title">{t("bank_connected")}</div>
 
             {conto?.bank_connector_institution_id && (
@@ -167,14 +167,14 @@ export default function BankConnectDialog({
               <Button
                 label={t("change_bank")}
                 className="reset-button"
-                icon="pi pi-sync"
+                icon="ph-bold ph-arrows-clockwise"
                 iconPos="left"
                 onClick={() => setShowList(true)}
               />
               <Button
                 label={t("disconnect_bank")}
                 className="trasparent-danger-button"
-                icon="pi pi-link"
+                icon="ph-bold ph-link"
                 iconPos="left"
                 loading={disconnecting}
                 onClick={handleDisconnect}
@@ -188,7 +188,7 @@ export default function BankConnectDialog({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder={t("search_bank")}
-              icon="pi pi-search"
+              icon="ph-bold ph-magnifying-glass"
               iconPos="left"
               inputMode="search"
             />
@@ -213,10 +213,10 @@ export default function BankConnectDialog({
                           className="bank-list__logo"
                         />
                       ) : (
-                        <i className="pi pi-building bank-list__logo-placeholder" />
+                        <i className="ph-bold ph-buildings bank-list__logo-placeholder" />
                       )}
                       <span className="bank-list__name">{institution.name}</span>
-                      <i className="pi pi-chevron-right bank-list__chevron" />
+                      <i className="ph-bold ph-caret-right bank-list__chevron" />
                     </button>
                   </li>
                 ))}

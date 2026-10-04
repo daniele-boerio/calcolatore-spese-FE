@@ -256,7 +256,7 @@ export default function ChartsPage({
   if (!hasData) {
     return (
       <EmptyState
-        icon="pi pi-chart-bar"
+        icon="ph-bold ph-chart-bar"
         title={t("analysis_empty_title")}
         description={t("analysis_empty_text")}
       />

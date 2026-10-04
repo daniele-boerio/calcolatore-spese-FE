@@ -113,6 +113,9 @@ select {
   min-height: 100vh;
   min-height: 100dvh;
   position: relative;
+  // Contesto di sovrapposizione proprio: la luce di fondo (::before, z-index -1)
+  // resta sopra lo sfondo del body e sotto il contenuto.
+  isolation: isolate;
 }
 
 // COMPATIBILITÀ — DA RIMUOVERE
@@ -254,6 +257,70 @@ select {
   }
 }
 
+// Righe toccabili sotto il mouse: uno sfondo tenue che sborda di qualche pixel
+// (l'ombra piena dello stesso colore), così il testo non si sposta e la riga,
+// che nelle liste non ha padding laterale, non resta a filo.
+@media (hover: hover) {
+  .list-row--tappable,
+  .tx-row,
+  .recurring-row__main,
+  .category-card__head {
+    transition:
+      background-color 150ms ease,
+      box-shadow 150ms ease;
+  }
+
+  .list-row--tappable:hover,
+  .tx-row:hover,
+  .recurring-row__main:hover {
+    background-color: var(--surface-2);
+    box-shadow: 0 0 0 6px var(--surface-2);
+    border-radius: var(--r-icon);
+  }
+
+  .category-card__head:hover {
+    background-color: var(--surface-2);
+  }
+}
+
+// Link per chi naviga da tastiera: salta menu e tab bar e va al contenuto.
+// Invisibile finché non prende il focus.
+.skip-link {
+  position: fixed;
+  top: calc(8px + env(safe-area-inset-top));
+  left: 8px;
+  z-index: 2000;
+  padding: 10px 14px;
+  border-radius: var(--r-field);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+
+  &:focus-visible {
+    transform: none;
+  }
+}
+
+// Tipografia di base: titoli bilanciati su più righe, paragrafi senza parole
+// orfane in fondo.
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 // Entrata del contenuto: le card salgono di poco e compaiono a cascata, invece
 // di montarsi tutte insieme. Solo `transform` e `opacity`, e niente del tutto
 // per chi ha chiesto al sistema di ridurre il movimento.
@@ -280,4 +347,36 @@ select {
       animation-delay: #{($i - 1) * 50}ms;
     }
   }
+}
+
+// Phosphor non ha una classe per far girare un'icona: lo spinner la prende da qui.
+@keyframes icon-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.icon-spin {
+  display: inline-block;
+  animation: icon-spin 0.9s linear infinite;
+}
+
+// Sagoma mostrata mentre si scarica il codice di una pagina.
+.route-fallback {
+  padding: calc(24px + env(safe-area-inset-top)) var(--gutter);
+}
+
+// Luce di fondo: un alone tenue dell'accento in alto, perché il fondo non sia
+// una tinta piatta. Fisso e fuori dagli eventi, sotto a tutto il contenuto.
+.App::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 60% at 15% -10%,
+    color-mix(in srgb, var(--accent) 7%, transparent),
+    transparent 60%
+  );
 }

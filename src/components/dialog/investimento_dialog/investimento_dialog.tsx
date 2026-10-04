@@ -202,7 +202,7 @@ export default function InvestimentoDialog({
                   handleNumberChange(e.target.value, setPrezzoCarico)
                 }
                 placeholder="0.00"
-                icon="pi pi-euro"
+                icon="ph-bold ph-currency-eur"
                 iconPos="right"
                 inputMode="decimal"
                 keyfilter={/^\d*[.,]?\d{0,6}$/}
@@ -229,7 +229,7 @@ export default function InvestimentoDialog({
                 handleNumberChange(e.target.value, setPrezzoAttuale)
               }
               placeholder="0.00"
-              icon="pi pi-euro"
+              icon="ph-bold ph-currency-eur"
               iconPos="right"
               inputMode="decimal"
               keyfilter={/^\d*[.,]?\d{0,6}$/}

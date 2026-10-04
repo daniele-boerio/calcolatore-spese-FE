@@ -132,7 +132,7 @@ export default function ImportStatementDialog({
           />
           <Button
             className="action-button"
-            icon="pi pi-upload"
+            icon="ph-bold ph-upload-simple"
             iconPos="left"
             label={t("import")}
             onClick={handleImport}

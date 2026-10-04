@@ -186,7 +186,7 @@ export default function YearStatistics({
   if (months.length === 0) {
     return (
       <EmptyState
-        icon="pi pi-chart-bar"
+        icon="ph-bold ph-chart-bar"
         title={t("analysis_empty_title")}
         description={t("analysis_empty_text")}
       />

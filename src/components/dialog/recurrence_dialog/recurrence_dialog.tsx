@@ -428,7 +428,7 @@ export default function RecurrenceDialog({
               value={importo}
               onChange={(e) => handleImportoChange(e.target.value)}
               label={t("amount")}
-              icon="pi pi-euro"
+              icon="ph-bold ph-currency-eur"
               iconPos="right"
               inputMode="decimal"
               placeholder="0.00"

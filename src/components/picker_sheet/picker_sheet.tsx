@@ -84,7 +84,7 @@ export default function PickerSheet({
     <Sheet open={open} onClose={close} title={title} className="picker">
       {options.length >= SEARCH_THRESHOLD && (
         <div className="picker__search">
-          <i className="pi pi-search" aria-hidden="true" />
+          <i className="ph-bold ph-magnifying-glass" aria-hidden="true" />
           <input
             type="search"
             value={query}
@@ -106,7 +106,7 @@ export default function PickerSheet({
               {clearLabel}
             </span>
             {value === null && (
-              <i className="pi pi-check picker__check" aria-hidden="true" />
+              <i className="ph-bold ph-check picker__check" aria-hidden="true" />
             )}
           </button>
         )}
@@ -129,7 +129,7 @@ export default function PickerSheet({
               </span>
 
               {selected && (
-                <i className="pi pi-check picker__check" aria-hidden="true" />
+                <i className="ph-bold ph-check picker__check" aria-hidden="true" />
               )}
             </button>
           );
@@ -138,7 +138,7 @@ export default function PickerSheet({
         {visible.length === 0 && (
           <EmptyState
             variant="search"
-            icon="pi pi-search"
+            icon="ph-bold ph-magnifying-glass"
             title={t("no_data")}
           />
         )}
@@ -148,7 +148,7 @@ export default function PickerSheet({
         (draft === null ? (
           <Button
             variant="neutral"
-            icon="pi pi-plus"
+            icon="ph-bold ph-plus"
             block
             onClick={() => setDraft(query.trim())}
           >

@@ -171,7 +171,7 @@ export default function CategoryDetailPage() {
               aria-label={t("back")}
               onClick={() => navigate(-1)}
             >
-              <i className="pi pi-arrow-left" aria-hidden="true" />
+              <i className="ph-bold ph-arrow-left" aria-hidden="true" />
             </button>
 
             <h1 className="category-detail__title">
@@ -184,7 +184,7 @@ export default function CategoryDetailPage() {
               onClick={() => setPeriodOpen(true)}
             >
               {`${monthName(month)} ${year}`}
-              <i className="pi pi-chevron-down" aria-hidden="true" />
+              <i className="ph-bold ph-caret-down" aria-hidden="true" />
             </button>
           </div>
         </PageHeader>
@@ -241,7 +241,7 @@ export default function CategoryDetailPage() {
             ) : transactions.length === 0 ? (
               <EmptyState
                 variant="search"
-                icon="pi pi-list"
+                icon="ph-bold ph-list-bullets"
                 title={t("mov_empty_filtered_title")}
                 description={t("category_detail_empty")}
               />

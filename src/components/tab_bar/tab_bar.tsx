@@ -21,17 +21,17 @@ type Tab = {
  * Il nome intero resta come `aria-label`.
  */
 const TABS: Tab[] = [
-  { to: "/", icon: "pi pi-home", labelKey: "nav_home" },
-  { to: "/transactions", icon: "pi pi-list", labelKey: "nav_movements" },
-  { to: "/analysis", icon: "pi pi-chart-bar", labelKey: "nav_analysis" },
-  { to: "/accounts", icon: "pi pi-wallet", labelKey: "nav_accounts" },
+  { to: "/", icon: "ph-bold ph-house", labelKey: "nav_home" },
+  { to: "/transactions", icon: "ph-bold ph-list-bullets", labelKey: "nav_movements" },
+  { to: "/analysis", icon: "ph-bold ph-chart-bar", labelKey: "nav_analysis" },
+  { to: "/accounts", icon: "ph-bold ph-wallet", labelKey: "nav_accounts" },
   {
     to: "/investments",
-    icon: "pi pi-chart-line",
+    icon: "ph-bold ph-chart-line-up",
     labelKey: "nav_investments",
     shortKey: "nav_investments_short",
   },
-  { to: "/altro", icon: "pi pi-ellipsis-h", labelKey: "nav_more" },
+  { to: "/altro", icon: "ph-bold ph-dots-three", labelKey: "nav_more" },
 ];
 
 export default function TabBar() {
@@ -66,7 +66,7 @@ export default function TabBar() {
         aria-label={t("new_transaction")}
         onClick={() => dispatch(openSheet({ name: "newTransaction" }))}
       >
-        <i className="pi pi-plus" aria-hidden="true" />
+        <i className="ph-bold ph-plus" aria-hidden="true" />
       </button>
 
       {right.map(renderTab)}

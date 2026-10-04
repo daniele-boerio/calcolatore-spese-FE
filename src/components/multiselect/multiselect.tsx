@@ -59,7 +59,7 @@ export default function Multiselect(props: MultiselectProps) {
         loading={props.loading}
         virtualScrollerOptions={props.virtualScrollerOptions}
         className={props.hidden ? "hidden-multiselect" : ""}
-        removeIcon="pi pi-times"
+        removeIcon="ph-bold ph-x"
         pt={{
           labelContainer: () => ({
             style: {

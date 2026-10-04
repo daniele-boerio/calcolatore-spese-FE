@@ -115,7 +115,7 @@ export default function InvestimentiPage() {
                   }`}
                 >
                   <i
-                    className={`pi ${pnl >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
+                    className={`ph-bold ${pnl >= 0 ? "ph-arrow-up-right" : "ph-arrow-down-right"}`}
                     aria-hidden="true"
                   />
                   {`${Math.abs(pnlPercent).toFixed(1)}%`}
@@ -149,7 +149,7 @@ export default function InvestimentiPage() {
             </Card>
           ) : investimenti.length === 0 ? (
             <EmptyState
-              icon="pi pi-chart-line"
+              icon="ph-bold ph-chart-line-up"
               title={t("investments_empty_title")}
               description={t("investments_empty_text")}
               actions={
@@ -175,7 +175,7 @@ export default function InvestimentiPage() {
                 className="investments__add"
                 onClick={() => openDialog(null)}
               >
-                <i className="pi pi-plus" aria-hidden="true" />
+                <i className="ph-bold ph-plus" aria-hidden="true" />
                 {t("investments_add")}
               </button>
             </>
@@ -304,7 +304,7 @@ function TitoloCard({
             aria-label={t("edit")}
             onClick={onEdit}
           >
-            <i className="pi pi-pencil" aria-hidden="true" />
+            <i className="ph-bold ph-pencil-simple" aria-hidden="true" />
           </button>
 
           <button
@@ -313,7 +313,7 @@ function TitoloCard({
             aria-label={t("delete")}
             onClick={onDelete}
           >
-            <i className="pi pi-trash" aria-hidden="true" />
+            <i className="ph-bold ph-trash" aria-hidden="true" />
           </button>
         </div>
       </div>

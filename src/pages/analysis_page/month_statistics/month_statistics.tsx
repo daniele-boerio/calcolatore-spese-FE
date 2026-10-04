@@ -46,11 +46,11 @@ import { addMonths, endOfMonth, startOfMonth, toIsoDate } from "../../../service
 const AVERAGE_MONTHS = 3;
 
 const ICONS: Record<Insight["kind"], string> = {
-  above_average: "pi pi-arrow-up-right",
-  concentration: "pi pi-chart-pie",
-  overspent: "pi pi-exclamation-circle",
-  saved_share: "pi pi-check",
-  streak: "pi pi-star",
+  above_average: "ph-bold ph-arrow-up-right",
+  concentration: "ph-bold ph-chart-pie",
+  overspent: "ph-bold ph-warning-circle",
+  saved_share: "ph-bold ph-check",
+  streak: "ph-bold ph-star",
 };
 
 type MonthStatisticsProps = {
@@ -238,7 +238,7 @@ export default function MonthStatistics({
   if (data.length === 0) {
     return (
       <EmptyState
-        icon="pi pi-chart-bar"
+        icon="ph-bold ph-chart-bar"
         title={t("analysis_empty_title")}
         description={t("analysis_empty_text")}
       />
@@ -268,7 +268,7 @@ export default function MonthStatistics({
               }`}
             >
               <i
-                className={`pi ${delta >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
+                className={`ph-bold ${delta >= 0 ? "ph-arrow-up-right" : "ph-arrow-down-right"}`}
                 aria-hidden="true"
               />
               {`${Math.abs(delta)}%`}

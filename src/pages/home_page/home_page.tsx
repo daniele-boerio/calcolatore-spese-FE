@@ -317,7 +317,7 @@ export default function HomePage() {
                   {upcoming.map((item) => (
                     <ListRow
                       key={item.id}
-                      icon="pi pi-refresh"
+                      icon="ph-bold ph-arrows-clockwise"
                       iconShape="square"
                       iconTone="invert"
                       title={item.nome}
@@ -349,7 +349,7 @@ export default function HomePage() {
                 <SkeletonList />
               ) : transactions.length === 0 ? (
                 <EmptyState
-                  icon="pi pi-list"
+                  icon="ph-bold ph-list-bullets"
                   title={t("home_empty_title")}
                   description={t("home_empty_text")}
                   actions={
@@ -436,7 +436,7 @@ function HeroCard({
             className={`hero__delta hero__delta--${delta >= 0 ? "good" : "bad"}`}
           >
             <i
-              className={`pi ${delta >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
+              className={`ph-bold ${delta >= 0 ? "ph-arrow-up-right" : "ph-arrow-down-right"}`}
               aria-hidden="true"
             />
             {`${Math.abs(delta)}% ${deltaLabel}`}
@@ -497,7 +497,7 @@ function SpendingCap({
     return spent > 0 ? (
       <Link className="spending-cap__set" to="/settings">
         {t("home_set_budget")}
-        <i className="pi pi-chevron-right" aria-hidden="true" />
+        <i className="ph-bold ph-caret-right" aria-hidden="true" />
       </Link>
     ) : null;
   }

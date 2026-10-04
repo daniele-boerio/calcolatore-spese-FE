@@ -93,14 +93,14 @@ export default function TableEdit(props: TableEditProps) {
               const rowId = rowData[idKey];
               return (
                 <Button
-                  icon="pi pi-trash"
+                  icon="ph-bold ph-trash"
                   className="trasparent-danger-button"
                   compact
                   onClick={(event) =>
                     confirmPopup({
                       target: event.currentTarget as HTMLElement,
                       message: t("delete_message"),
-                      icon: "pi pi-exclamation-triangle",
+                      icon: "ph-bold ph-warning",
                       acceptClassName: "p-button-danger",
                       acceptLabel: t("yes"),
                       rejectLabel: t("no"),

@@ -35,7 +35,7 @@ export default function PendingSyncBanner() {
 
   return (
     <div className="pending-sync" role="status">
-      <i className="pi pi-cloud-upload pending-sync__icon" aria-hidden="true" />
+      <i className="ph-bold ph-cloud-arrow-up pending-sync__icon" aria-hidden="true" />
       <span className="pending-sync__text">{label}</span>
       <Button size="sm" variant="neutral" disabled={sending} onClick={sendNow}>
         {t("offline_send_now")}

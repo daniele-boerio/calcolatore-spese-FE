@@ -29,7 +29,7 @@
     flex: 0 0 auto;
     width: 52px;
     height: 52px;
-    border-radius: v.$r-pill;
+    border-radius: v.$r-icon;
     background: v.$accent-soft;
     color: v.$accent;
 
@@ -164,7 +164,7 @@
     transition: transform v.$dur-press;
   }
 
-  & > .pi-chevron-right {
+  & > .ph-caret-right {
     flex: 0 0 auto;
     font-size: 12px;
     color: v.$muted-2;

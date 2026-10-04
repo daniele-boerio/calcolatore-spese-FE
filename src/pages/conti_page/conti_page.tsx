@@ -50,10 +50,10 @@ const isCollegato = (conto: Conto) => Boolean(conto.bank_connector_account_id);
 // L'icona segue il tipo scelto; i conti aperti prima che i tipi esistessero si
 // riconoscono dai campi che hanno.
 const ICONE: Record<string, string> = {
-  conto: "pi pi-building-columns",
-  carta: "pi pi-credit-card",
-  salvadanaio: "pi pi-wallet",
-  contanti: "pi pi-money-bill",
+  conto: "ph-bold ph-bank",
+  carta: "ph-bold ph-credit-card",
+  salvadanaio: "ph-bold ph-wallet",
+  contanti: "ph-bold ph-money",
 };
 
 const tipoOf = (conto: Conto) => {
@@ -304,7 +304,7 @@ export default function ContiPage() {
             <span className="accounts__eyebrow">
               {t("accounts_net_worth")}
               {worthEditable && (
-                <i className="pi pi-pencil" aria-hidden="true" />
+                <i className="ph-bold ph-pencil-simple" aria-hidden="true" />
               )}
             </span>
             <Amount className="accounts__worth-value" value={netWorth} />
@@ -316,7 +316,7 @@ export default function ContiPage() {
                 }`}
               >
                 <i
-                  className={`pi ${growth >= 0 ? "pi-arrow-up-right" : "pi-arrow-down-right"}`}
+                  className={`ph-bold ${growth >= 0 ? "ph-arrow-up-right" : "ph-arrow-down-right"}`}
                   aria-hidden="true"
                 />
                 {`${Math.abs(growth).toFixed(1)}% ${t("accounts_vs_last_month")}`}
@@ -330,7 +330,7 @@ export default function ContiPage() {
             aria-label={t("add_account")}
             onClick={openCreate}
           >
-            <i className="pi pi-plus" aria-hidden="true" />
+            <i className="ph-bold ph-plus" aria-hidden="true" />
           </button>
         </PageHeader>
 
@@ -345,7 +345,7 @@ export default function ContiPage() {
 
           {!loading && visibili.length === 0 && (
             <EmptyState
-              icon="pi pi-wallet"
+              icon="ph-bold ph-wallet"
               title={t("accounts_empty_title")}
               description={t("accounts_empty_text")}
               actions={
@@ -369,7 +369,7 @@ export default function ContiPage() {
                       items={[
                         {
                           label: t("edit"),
-                          icon: "pi pi-pencil",
+                          icon: "ph-bold ph-pencil-simple",
                           command: () => openEdit(conto),
                         },
                         ...(isOpenBankingAdmin
@@ -378,14 +378,14 @@ export default function ContiPage() {
                                 label: isCollegato(conto)
                                   ? t("bank_connected")
                                   : t("link_bank"),
-                                icon: "pi pi-building-columns",
+                                icon: "ph-bold ph-bank",
                                 command: () => setBankAccount(conto),
                               },
                             ]
                           : []),
                         {
                           label: t("delete"),
-                          icon: "pi pi-trash",
+                          icon: "ph-bold ph-trash",
                           command: () => askDelete(conto),
                         },
                       ]}
@@ -423,7 +423,7 @@ export default function ContiPage() {
               className="accounts__merge"
               onClick={() => setConfirmingMerge(true)}
             >
-              <i className="pi pi-arrow-right-arrow-left" aria-hidden="true" />
+              <i className="ph-bold ph-arrows-left-right" aria-hidden="true" />
               {t("accounts_merge")}
             </button>
           )}
@@ -436,7 +436,7 @@ export default function ContiPage() {
               className="accounts__merge"
               onClick={() => setConfirmingGiveUp(true)}
             >
-              <i className="pi pi-eye-slash" aria-hidden="true" />
+              <i className="ph-bold ph-eye-slash" aria-hidden="true" />
               {t("accounts_give_up")}
             </button>
           )}
@@ -532,7 +532,7 @@ export default function ContiPage() {
       <Alert
         open={confirmingMerge}
         tone="accent"
-        icon="pi pi-arrow-right-arrow-left"
+        icon="ph-bold ph-arrows-left-right"
         title={t("accounts_merge_title")}
         description={t("accounts_merge_text")}
         confirmLabel={t("accounts_merge_confirm")}
@@ -544,7 +544,7 @@ export default function ContiPage() {
       <Alert
         open={confirmingGiveUp}
         tone="accent"
-        icon="pi pi-eye-slash"
+        icon="ph-bold ph-eye-slash"
         title={t("accounts_give_up_title")}
         description={t("accounts_give_up_text")}
         confirmLabel={t("accounts_give_up_confirm")}

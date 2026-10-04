@@ -465,7 +465,7 @@
 
   "manage_accounts_subtitle": "View and manage your bank accounts and wallets",
   "add_account": "Add account",
-  "no_accounts_found": "No accounts found. Add your first one to start tracking!",
+  "no_accounts_found": "No accounts found. Add your first one to start tracking.",
 
   "approve": "Approve",
   "reject": "Reject",
@@ -484,7 +484,7 @@
   "no_banks_found": "No banks found",
   "redirecting_to_bank": "Redirecting to your bank…",
   "bank_callback_connecting": "Linking your account…",
-  "bank_callback_success": "Account linked successfully!",
+  "bank_callback_success": "Account linked successfully.",
   "bank_callback_error": "Could not complete the bank connection",
   "bank_callback_missing_ref": "Missing reference: invalid connection",
   "back_to_accounts": "Back to accounts",
@@ -561,7 +561,7 @@
   "email_example": "e.g. john.doe@mail.com",
   "error_sending_email": "Error while sending email.",
   "send_link": "Send link",
-  "password_reset_success": "Password reset request sent!",
+  "password_reset_success": "Password reset request sent.",
   "password_reset_instructions": "Enter the email address associated with your account.\nWe'll send you instructions for creating a new password.",
   "passwords_dont_match": "Passwords do not match.",
   "password_min_length": "Password must have at least 8 characters.",
@@ -628,5 +628,10 @@
   "migrate_tag_set": "Set another tag",
   "migrate_tag_clear": "Remove the tag",
   "migrate_destination_tag": "New tag",
-  "migrate_done": "Moved {tx} transactions and {ric} recurring items"
+  "migrate_done": "Moved {tx} transactions and {ric} recurring items",
+  "skip_to_content": "Skip to content",
+  "not_found_title": "Page not found",
+  "not_found_heading": "Nothing here",
+  "not_found_text": "This address doesn't match any screen. The link may be old or mistyped.",
+  "not_found_home": "Back to Home"
 }

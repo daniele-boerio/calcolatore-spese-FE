@@ -131,7 +131,7 @@ export default function DebitoDialog({
             value={ammontare}
             onChange={(e) => handleNumberChange(e.target.value, setAmmontare)}
             placeholder={t("debt_amount_placeholder")}
-            icon="pi pi-euro"
+            icon="ph-bold ph-currency-eur"
             iconPos="right"
             keyfilter={/^\d*[.,]?\d{0,2}$/}
             inputMode="decimal"
@@ -144,7 +144,7 @@ export default function DebitoDialog({
             value={residuo}
             onChange={(e) => handleNumberChange(e.target.value, setResiduo)}
             placeholder={t("debt_residual_placeholder")}
-            icon="pi pi-euro"
+            icon="ph-bold ph-currency-eur"
             iconPos="right"
             keyfilter={/^\d*[.,]?\d{0,2}$/}
             inputMode="decimal"

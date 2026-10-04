@@ -525,7 +525,7 @@ export default function TransactionDialog({
             <div className="tx-sheet__fields">
               {!isRicarica && (
                 <PickerRow
-                  icon="pi pi-tag"
+                  icon="ph-bold ph-tag"
                   label={t("category")}
                   value={labelOf(categorie, categoriaId)}
                   placeholder={t("category_placeholder")}
@@ -535,7 +535,7 @@ export default function TransactionDialog({
 
               {!isRicarica && categoriaId && (
                 <PickerRow
-                  icon="pi pi-hashtag"
+                  icon="ph-bold ph-hash"
                   label={t("sub_category")}
                   value={labelOf(tutteLeSottocategorie, sottoCategoriaId)}
                   placeholder={t("sub_category_placeholder")}
@@ -544,7 +544,7 @@ export default function TransactionDialog({
               )}
 
               <PickerRow
-                icon="pi pi-wallet"
+                icon="ph-bold ph-wallet"
                 label={isRicarica ? t("source_account") : t("account_type_bank")}
                 value={sourceLabel}
                 placeholder={t("bank_account_placeholder")}
@@ -553,7 +553,7 @@ export default function TransactionDialog({
 
               {(isRicarica || tipo === "ACCANTONAMENTO") && (
                 <PickerRow
-                  icon="pi pi-arrow-right-arrow-left"
+                  icon="ph-bold ph-arrows-left-right"
                   label={
                     isRicarica
                       ? t("destination_account")
@@ -567,7 +567,7 @@ export default function TransactionDialog({
 
               <div className="tx-sheet__pair">
                 <div className="tx-sheet__compact">
-                  <i className="pi pi-calendar" aria-hidden="true" />
+                  <i className="ph-bold ph-calendar-blank" aria-hidden="true" />
                   <span className="tx-sheet__compact-text">
                     <span className="tx-sheet__label">{t("date")}</span>
                     <input
@@ -593,7 +593,7 @@ export default function TransactionDialog({
                     className="tx-sheet__compact"
                     onClick={() => setPicker("tag")}
                   >
-                    <i className="pi pi-hashtag" aria-hidden="true" />
+                    <i className="ph-bold ph-hash" aria-hidden="true" />
                     <span className="tx-sheet__compact-text">
                       <span className="tx-sheet__label">{t("tag")}</span>
                       <span className="tx-sheet__value">
@@ -605,7 +605,7 @@ export default function TransactionDialog({
               </div>
 
               <div className="tx-sheet__compact tx-sheet__compact--wide">
-                <i className="pi pi-align-left" aria-hidden="true" />
+                <i className="ph-bold ph-text-align-left" aria-hidden="true" />
                 <input
                   value={descrizione}
                   placeholder={t("tx_description_optional")}
@@ -622,7 +622,7 @@ export default function TransactionDialog({
           {canRepeat && (
             <Chip
               variant="solid"
-              icon="pi pi-refresh"
+              icon="ph-bold ph-arrows-clockwise"
               label={t("tx_make_recurring")}
               onClick={() => setIsRecurrenceVisible(true)}
             />
@@ -630,7 +630,7 @@ export default function TransactionDialog({
 
           <Chip
             variant="solid"
-            icon="pi pi-clone"
+            icon="ph-bold ph-copy-simple"
             label={t("split_transaction")}
             onClick={canSplit ? handleOpenSplit : undefined}
             className={canSplit ? undefined : "chip--disabled"}
@@ -760,7 +760,7 @@ function PickerRow({
         </span>
       </span>
 
-      <i className="pi pi-chevron-right tx-sheet__chevron" aria-hidden="true" />
+      <i className="ph-bold ph-caret-right tx-sheet__chevron" aria-hidden="true" />
     </button>
   );
 }

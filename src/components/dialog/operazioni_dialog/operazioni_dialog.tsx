@@ -130,7 +130,7 @@ export default function OperazioniDialog({
     confirmPopup({
       target: event.currentTarget,
       message: t("delete_message"),
-      icon: "pi pi-exclamation-triangle",
+      icon: "ph-bold ph-warning",
       acceptClassName: "p-button-danger",
       acceptLabel: t("yes"),
       rejectLabel: t("no"),
@@ -193,7 +193,7 @@ export default function OperazioniDialog({
               value={prezzo}
               onChange={(e) => handleNumberChange(e.target.value, setPrezzo)}
               placeholder="0.00"
-              icon="pi pi-euro"
+              icon="ph-bold ph-currency-eur"
               iconPos="right"
               inputMode="decimal"
               keyfilter={/^\d*[.,]?\d{0,6}$/}
@@ -218,7 +218,7 @@ export default function OperazioniDialog({
             <Button
               className="action-button"
               label={editingId ? t("save_changes") : t("add")}
-              icon="pi pi-plus"
+              icon="ph-bold ph-plus"
               iconPos="left"
               onClick={handleSave}
               loading={loading}
@@ -259,13 +259,13 @@ export default function OperazioniDialog({
                   <div className="op-actions">
                     <Button
                       className="trasparent-button"
-                      icon="pi pi-pencil"
+                      icon="ph-bold ph-pencil-simple"
                       compact
                       onClick={() => startEdit(op)}
                     />
                     <Button
                       className="trasparent-danger-button"
-                      icon="pi pi-trash"
+                      icon="ph-bold ph-trash"
                       compact
                       onClick={(event) =>
                         handleDelete(

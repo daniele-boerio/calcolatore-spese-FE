@@ -23,7 +23,7 @@ type AlertProps = {
  */
 export default function Alert({
   open,
-  icon = "pi pi-trash",
+  icon = "ph-bold ph-trash",
   title,
   description,
   confirmLabel,

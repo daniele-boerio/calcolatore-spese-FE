@@ -218,7 +218,7 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
             <Button
               label={t("reject")}
               className="trasparent-danger-button"
-              icon="pi pi-times"
+              icon="ph-bold ph-x"
               iconPos="left"
               onClick={handleReject}
               loading={loading}
@@ -226,7 +226,7 @@ export default function BankProposalsDialog({ visible, onHide }: Props) {
             <Button
               label={t("approve")}
               className="action-button"
-              icon="pi pi-check"
+              icon="ph-bold ph-check"
               iconPos="left"
               onClick={handleApprove}
               loading={loading}

@@ -83,7 +83,7 @@ export default function ThreeDotsActionsMenu(props: ThreeDotsActionsMenuProps) {
         }}
       >
         <i
-          className="pi pi-ellipsis-v"
+          className="ph-bold ph-dots-three-vertical"
           style={{ transform: `rotate(${props.verticalDots ? "0" : "90"}deg)` }}
         />
       </button>

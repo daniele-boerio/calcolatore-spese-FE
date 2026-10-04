@@ -175,7 +175,7 @@ export default function SplitTransactionDialog({
           />
           <Button
             className="split-button"
-            icon="pi pi-sitemap"
+            icon="ph-bold ph-tree-structure"
             iconPos="left"
             label={t("split_transaction")}
             onClick={handleSplit}
@@ -221,7 +221,7 @@ export default function SplitTransactionDialog({
                   </span>
                   <Button
                     className="trasparent-danger-button"
-                    icon="pi pi-trash"
+                    icon="ph-bold ph-trash"
                     compact
                     disabled={parts.length <= 1}
                     onClick={() => removePart(idx)}
@@ -234,7 +234,7 @@ export default function SplitTransactionDialog({
                       label={t("amount")}
                       value={p.importo}
                       onChange={(e) => handleImporto(idx, e.target.value)}
-                      icon="pi pi-euro"
+                      icon="ph-bold ph-currency-eur"
                       iconPos="right"
                       keyfilter={/^\d*[.,]?\d{0,2}$/}
                       inputMode="decimal"
@@ -305,7 +305,7 @@ export default function SplitTransactionDialog({
 
           <Button
             label={t("add_part")}
-            icon="pi pi-plus"
+            icon="ph-bold ph-plus"
             iconPos="left"
             className="table-add-button split-add-button"
             onClick={addPart}

@@ -301,7 +301,7 @@ export default function FiltersSheet({
               <Chip
                 key={conto.id}
                 label={conto.nome}
-                icon={isOn("conto_id", conto.id) ? "pi pi-check" : undefined}
+                icon={isOn("conto_id", conto.id) ? "ph-bold ph-check" : undefined}
                 variant={isOn("conto_id", conto.id) ? "accent" : "solid"}
                 onClick={() => toggleIn("conto_id", conto.id)}
               />
@@ -318,7 +318,7 @@ export default function FiltersSheet({
                 key={categoria.id}
                 label={categoria.nome}
                 icon={
-                  isOn("categoria_id", categoria.id) ? "pi pi-check" : undefined
+                  isOn("categoria_id", categoria.id) ? "ph-bold ph-check" : undefined
                 }
                 variant={isOn("categoria_id", categoria.id) ? "accent" : "solid"}
                 onClick={() => toggleCategoria(categoria.id)}
@@ -336,7 +336,7 @@ export default function FiltersSheet({
                 key={sotto.id}
                 label={sotto.nome}
                 icon={
-                  isOn("sottocategoria_id", sotto.id) ? "pi pi-check" : undefined
+                  isOn("sottocategoria_id", sotto.id) ? "ph-bold ph-check" : undefined
                 }
                 variant={
                   isOn("sottocategoria_id", sotto.id) ? "accent" : "solid"
@@ -355,7 +355,7 @@ export default function FiltersSheet({
               <Chip
                 key={tag.id}
                 label={tag.nome}
-                icon={isOn("tag_id", tag.id) ? "pi pi-check" : undefined}
+                icon={isOn("tag_id", tag.id) ? "ph-bold ph-check" : undefined}
                 variant={isOn("tag_id", tag.id) ? "accent" : "solid"}
                 onClick={() => toggleIn("tag_id", tag.id)}
               />

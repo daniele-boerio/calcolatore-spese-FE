@@ -24,10 +24,10 @@ interface AccountDialogProps {
  * ricarica, un conto e i contanti no.
  */
 const TIPI = [
-  { value: "conto", icon: "pi pi-building-columns", labelKey: "account_type_bank" },
-  { value: "carta", icon: "pi pi-credit-card", labelKey: "account_type_card" },
-  { value: "salvadanaio", icon: "pi pi-wallet", labelKey: "account_type_goal" },
-  { value: "contanti", icon: "pi pi-money-bill", labelKey: "account_type_cash" },
+  { value: "conto", icon: "ph-bold ph-bank", labelKey: "account_type_bank" },
+  { value: "carta", icon: "ph-bold ph-credit-card", labelKey: "account_type_card" },
+  { value: "salvadanaio", icon: "ph-bold ph-wallet", labelKey: "account_type_goal" },
+  { value: "contanti", icon: "ph-bold ph-money", labelKey: "account_type_cash" },
 ] as const;
 
 const DEFAULT_TIPO = "conto";
@@ -342,7 +342,7 @@ function Row({
         </span>
       </span>
 
-      <i className="pi pi-chevron-right" aria-hidden="true" />
+      <i className="ph-bold ph-caret-right" aria-hidden="true" />
     </button>
   );
 }

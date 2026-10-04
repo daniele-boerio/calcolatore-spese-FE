@@ -69,7 +69,7 @@ export default function BankCallbackPage() {
 
         {status === "success" && (
           <>
-            <i className="pi pi-check-circle bank-callback-icon success" />
+            <i className="ph-bold ph-check-circle bank-callback-icon success" />
             <p className="bank-callback-message">{message}</p>
             <Button
               label={t("back_to_accounts")}
@@ -81,7 +81,7 @@ export default function BankCallbackPage() {
 
         {status === "error" && (
           <>
-            <i className="pi pi-times-circle bank-callback-icon error" />
+            <i className="ph-bold ph-x-circle bank-callback-icon error" />
             <p className="bank-callback-message">{message}</p>
             <Button
               label={t("back_to_accounts")}

@@ -38,7 +38,7 @@ export default function Stepper(props: StepperProps) {
               number: {
                 className:
                   activeIndex > index
-                    ? "p-stepper-number completed pi pi-check"
+                    ? "p-stepper-number completed ph-bold ph-check"
                     : "p-stepper-number",
               },
               separator: {

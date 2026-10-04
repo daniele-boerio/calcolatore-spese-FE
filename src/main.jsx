@@ -9,7 +9,10 @@ import ReactDOM from "react-dom/client";
 // arriva solo la struttura, la palette la mettiamo noi.
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 import "primereact/resources/primereact.min.css";
+// PrimeIcons resta solo per l'interno dei componenti PrimeReact (frecce dei
+// dropdown, calendario): le icone dell'app sono Phosphor, peso bold.
 import "primeicons/primeicons.css";
+import "@phosphor-icons/web/bold";
 
 import PrimeReact from "primereact/api";
 

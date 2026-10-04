@@ -121,7 +121,7 @@
     border-color: v.$positive;
     position: relative;
 
-    &.pi.pi-check::before {
+    &.ph-bold.ph-check::before {
       font-size: 0.875rem;
       color: v.$on-accent;
       position: absolute;

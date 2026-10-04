@@ -121,12 +121,12 @@ export default function ProfileSheet({ open, onClose }: ProfileSheetProps) {
             className="profile__row"
             onClick={() => setEditing(true)}
           >
-            <i className="pi pi-user" aria-hidden="true" />
+            <i className="ph-bold ph-user" aria-hidden="true" />
             <span className="profile__row-text">
               <span>{t("profile_change_username")}</span>
               <span className="profile__hint">{username}</span>
             </span>
-            <i className="pi pi-chevron-right profile__chevron" aria-hidden="true" />
+            <i className="ph-bold ph-caret-right profile__chevron" aria-hidden="true" />
           </button>
 
           <button
@@ -134,7 +134,7 @@ export default function ProfileSheet({ open, onClose }: ProfileSheetProps) {
             className="profile__row"
             onClick={resetPassword}
           >
-            <i className="pi pi-lock" aria-hidden="true" />
+            <i className="ph-bold ph-lock" aria-hidden="true" />
             <span className="profile__row-text">
               <span>{t("profile_reset_password")}</span>
               <span className="profile__hint">
@@ -150,7 +150,7 @@ export default function ProfileSheet({ open, onClose }: ProfileSheetProps) {
         className="profile__logout"
         onClick={() => dispatch(logout())}
       >
-        <i className="pi pi-sign-out" aria-hidden="true" />
+        <i className="ph-bold ph-sign-out" aria-hidden="true" />
         {t("logout")}
       </button>
     </Sheet>

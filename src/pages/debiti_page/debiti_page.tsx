@@ -99,7 +99,7 @@ export default function DebitiPage() {
               aria-label={t("back")}
               onClick={() => navigate(-1)}
             >
-              <i className="pi pi-arrow-left" aria-hidden="true" />
+              <i className="ph-bold ph-arrow-left" aria-hidden="true" />
             </button>
             <h1 className="page-title">{t("nav_debts")}</h1>
           </div>
@@ -145,7 +145,7 @@ export default function DebitiPage() {
             </Card>
           ) : debiti.length === 0 ? (
             <EmptyState
-              icon="pi pi-receipt"
+              icon="ph-bold ph-receipt"
               title={t("debts_empty_title")}
               description={t("debts_empty_text")}
               actions={
@@ -172,7 +172,7 @@ export default function DebitiPage() {
                 className="debts__add"
                 onClick={() => openDialog(null)}
               >
-                <i className="pi pi-plus" aria-hidden="true" />
+                <i className="ph-bold ph-plus" aria-hidden="true" />
                 {t("debts_add")}
               </button>
             </>
@@ -298,7 +298,7 @@ function DebitoCard({
             fine stimata è quella del piano, non del ritmo passato. */}
         {debito.ricorrenza_id && (
           <span>
-            <i className="pi pi-refresh" aria-hidden="true" />{" "}
+            <i className="ph-bold ph-arrows-clockwise" aria-hidden="true" />{" "}
             {t("debts_auto_installment")}
           </span>
         )}
@@ -324,7 +324,7 @@ function DebitoCard({
           aria-label={t("edit")}
           onClick={onEdit}
         >
-          <i className="pi pi-pencil" aria-hidden="true" />
+          <i className="ph-bold ph-pencil-simple" aria-hidden="true" />
         </button>
 
         <button
@@ -333,7 +333,7 @@ function DebitoCard({
           aria-label={t("delete")}
           onClick={onDelete}
         >
-          <i className="pi pi-trash" aria-hidden="true" />
+          <i className="ph-bold ph-trash" aria-hidden="true" />
         </button>
       </div>
     </Card>

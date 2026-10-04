@@ -16,7 +16,13 @@ type SlotProps = {
 export function Page({ children, className }: SlotProps) {
   useScrollRestoration();
 
-  return <div className={`page ${className ?? ""}`}>{children}</div>;
+  // `main` e non `div`: è il contenuto della schermata, ed è dove porta lo
+  // skip link ("Vai al contenuto") di App.
+  return (
+    <main id="contenuto" tabIndex={-1} className={`page ${className ?? ""}`}>
+      {children}
+    </main>
+  );
 }
 
 export function PageHeader({ children, className }: SlotProps) {

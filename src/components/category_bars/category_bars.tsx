@@ -71,7 +71,7 @@ export default function CategoryBars({
             </span>
 
             <i
-              className="pi pi-chevron-right category-bars__chevron"
+              className="ph-bold ph-caret-right category-bars__chevron"
               aria-hidden="true"
             />
           </button>

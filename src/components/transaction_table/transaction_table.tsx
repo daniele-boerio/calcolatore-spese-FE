@@ -84,7 +84,7 @@ export function TransactionTableRow({
         />
       </span>
 
-      <i className="pi pi-ellipsis-h tx-row__more" aria-hidden="true" />
+      <i className="ph-bold ph-dots-three tx-row__more" aria-hidden="true" />
     </button>
   );
 }

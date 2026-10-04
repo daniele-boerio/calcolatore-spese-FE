@@ -465,7 +465,7 @@
 
   "manage_accounts_subtitle": "Visualizza e gestisci i tuoi conti bancari e portafogli",
   "add_account": "Aggiungi conto",
-  "no_accounts_found": "Nessun conto trovato. Aggiungi il primo per iniziare il tracciamento!",
+  "no_accounts_found": "Nessun conto trovato. Aggiungi il primo per iniziare il tracciamento.",
 
   "approve": "Approva",
   "reject": "Rifiuta",
@@ -484,7 +484,7 @@
   "no_banks_found": "Nessuna banca trovata",
   "redirecting_to_bank": "Reindirizzamento alla banca…",
   "bank_callback_connecting": "Collegamento del conto in corso…",
-  "bank_callback_success": "Conto collegato con successo!",
+  "bank_callback_success": "Conto collegato con successo.",
   "bank_callback_error": "Impossibile completare il collegamento bancario",
   "bank_callback_missing_ref": "Riferimento mancante: collegamento non valido",
   "back_to_accounts": "Torna ai conti",
@@ -559,7 +559,7 @@
   "email_example": "es. mario.rossi@mail.com",
   "error_sending_email": "Errore durante l'invio della mail.",
   "send_link": "Invia link",
-  "password_reset_success": "Richiesta di reimpostazione password inviata!",
+  "password_reset_success": "Richiesta di reimpostazione password inviata.",
   "password_reset_instructions": "Inserisci l'email associata al tuo account.\nTi invieremo le istruzioni per creare una nuova password.",
   "passwords_dont_match": "Le password non coincidono.",
   "password_min_length": "La password deve avere almeno 8 caratteri.",
@@ -626,5 +626,10 @@
   "migrate_tag_set": "Imposta un altro tag",
   "migrate_tag_clear": "Togli il tag",
   "migrate_destination_tag": "Nuovo tag",
-  "migrate_done": "Spostati {tx} movimenti e {ric} ricorrenze"
+  "migrate_done": "Spostati {tx} movimenti e {ric} ricorrenze",
+  "skip_to_content": "Vai al contenuto",
+  "not_found_title": "Pagina non trovata",
+  "not_found_heading": "Qui non c'è niente",
+  "not_found_text": "L'indirizzo non corrisponde a nessuna schermata. Forse il link è vecchio o c'è un errore di battitura.",
+  "not_found_home": "Torna alla Home"
 }

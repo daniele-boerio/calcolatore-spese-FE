@@ -175,7 +175,7 @@ export default function AnalysisFiltersSheet({
               <Chip
                 key={sotto.id}
                 label={sotto.nome}
-                icon={isOn(sotto.id) ? "pi pi-check" : undefined}
+                icon={isOn(sotto.id) ? "ph-bold ph-check" : undefined}
                 variant={isOn(sotto.id) ? "accent" : "solid"}
                 onClick={() => toggle(sotto.id)}
               />

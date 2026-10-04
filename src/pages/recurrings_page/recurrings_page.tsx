@@ -198,12 +198,12 @@ export default function RecurringsPage() {
           items={[
             {
               label: t("edit"),
-              icon: "pi pi-pencil",
+              icon: "ph-bold ph-pencil-simple",
               command: () => openEdit(recurring),
             },
             {
               label: t("delete"),
-              icon: "pi pi-trash",
+              icon: "ph-bold ph-trash",
               command: () => setPendingDelete(recurring),
             },
           ]}
@@ -223,7 +223,7 @@ export default function RecurringsPage() {
               aria-label={t("back")}
               onClick={() => navigate(-1)}
             >
-              <i className="pi pi-arrow-left" aria-hidden="true" />
+              <i className="ph-bold ph-arrow-left" aria-hidden="true" />
             </button>
             <h1 className="page-title">{t("nav_recurrings")}</h1>
           </div>
@@ -257,7 +257,7 @@ export default function RecurringsPage() {
             </Card>
           ) : recurrings.length === 0 ? (
             <EmptyState
-              icon="pi pi-refresh"
+              icon="ph-bold ph-arrows-clockwise"
               title={t("recurring_empty_title")}
               description={t("recurring_empty_text")}
               actions={
@@ -302,7 +302,7 @@ export default function RecurringsPage() {
                 className="recurrings__add"
                 onClick={() => openEdit(undefined)}
               >
-                <i className="pi pi-plus" aria-hidden="true" />
+                <i className="ph-bold ph-plus" aria-hidden="true" />
                 {t("recurring_add")}
               </button>
             </>

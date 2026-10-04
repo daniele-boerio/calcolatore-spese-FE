@@ -19,7 +19,7 @@ export default function ErrorDialog() {
     <div>
       <Button
         label={t("close")}
-        icon="pi pi-check"
+        icon="ph-bold ph-check"
         onClick={onHide}
         className="p-button-text"
       />

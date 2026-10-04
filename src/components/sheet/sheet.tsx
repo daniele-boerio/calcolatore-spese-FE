@@ -178,7 +178,7 @@ export default function Sheet({
                 onClick={onClose}
                 aria-label="close"
               >
-                <i className="pi pi-times" aria-hidden="true" />
+                <i className="ph-bold ph-x" aria-hidden="true" />
               </button>
             </div>
           </div>

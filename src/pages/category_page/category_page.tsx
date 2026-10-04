@@ -142,7 +142,7 @@ export default function CategoryPage() {
               aria-label={t("back")}
               onClick={() => navigate(-1)}
             >
-              <i className="pi pi-arrow-left" aria-hidden="true" />
+              <i className="ph-bold ph-arrow-left" aria-hidden="true" />
             </button>
 
             <h1 className="page-title">{t("taxonomy_title")}</h1>
@@ -200,7 +200,7 @@ export default function CategoryPage() {
                           aria-label={`${t("delete")} ${tag.nome}`}
                           onClick={() => setPendingTag(tag)}
                         >
-                          <i className="pi pi-times" aria-hidden="true" />
+                          <i className="ph-bold ph-x" aria-hidden="true" />
                         </button>
                       </span>
                     ))}
@@ -213,7 +213,7 @@ export default function CategoryPage() {
                 className="taxonomy__add"
                 onClick={() => openTag(null)}
               >
-                <i className="pi pi-plus" aria-hidden="true" />
+                <i className="ph-bold ph-plus" aria-hidden="true" />
                 {t("add_tag")}
               </button>
             </>
@@ -242,7 +242,7 @@ export default function CategoryPage() {
 
               {!loading && visible.length === 0 ? (
                 <EmptyState
-                  icon="pi pi-tags"
+                  icon="ph-bold ph-tag-simple"
                   title={t("taxonomy_empty_title")}
                   description={t("taxonomy_empty_text")}
                   actions={
@@ -287,7 +287,7 @@ export default function CategoryPage() {
                         </span>
 
                         <i
-                          className={`pi pi-chevron-${isOpen ? "down" : "right"} category-card__chevron`}
+                          className={`ph-bold ph-caret-${isOpen ? "down" : "right"} category-card__chevron`}
                           aria-hidden="true"
                         />
                       </button>
@@ -305,14 +305,14 @@ export default function CategoryPage() {
 
                           <Chip
                             variant="dashed"
-                            icon="pi pi-plus"
+                            icon="ph-bold ph-plus"
                             label={t("add")}
                             onClick={() => openCategory(categoria)}
                           />
 
                           <Chip
                             variant="dashed"
-                            icon="pi pi-trash"
+                            icon="ph-bold ph-trash"
                             label={t("delete")}
                             className="chip--danger"
                             onClick={() => setPendingCategory(categoria)}
@@ -330,7 +330,7 @@ export default function CategoryPage() {
                 className="taxonomy__add"
                 onClick={() => openCategory(null)}
               >
-                <i className="pi pi-plus" aria-hidden="true" />
+                <i className="ph-bold ph-plus" aria-hidden="true" />
                 {t("add_category")}
               </button>
             </>

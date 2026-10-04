@@ -116,7 +116,7 @@ export default function SettingsPage() {
           aria-label={t("back")}
           onClick={() => navigate(-1)}
         >
-          <i className="pi pi-arrow-left" aria-hidden="true" />
+          <i className="ph-bold ph-arrow-left" aria-hidden="true" />
         </button>
         <h1 className="page-title">{t("nav_settings")}</h1>
       </PageHeader>
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                   t("settings_spending_budget_none")
                 )}
               </span>
-              <i className="pi pi-chevron-right" aria-hidden="true" />
+              <i className="ph-bold ph-caret-right" aria-hidden="true" />
             </button>
 
             <label className="settings-row">
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                   {t("import_statement_title")}
                 </span>
               </span>
-              <i className="pi pi-chevron-right" aria-hidden="true" />
+              <i className="ph-bold ph-caret-right" aria-hidden="true" />
             </button>
 
             <button
@@ -232,7 +232,7 @@ export default function SettingsPage() {
                     : t("settings_linked_none")}
                 </span>
               </span>
-              <i className="pi pi-chevron-right" aria-hidden="true" />
+              <i className="ph-bold ph-caret-right" aria-hidden="true" />
             </button>
           </div>
         </section>
@@ -242,7 +242,7 @@ export default function SettingsPage() {
           className="settings-logout"
           onClick={() => dispatch(logout())}
         >
-          <i className="pi pi-sign-out" aria-hidden="true" />
+          <i className="ph-bold ph-sign-out" aria-hidden="true" />
           {t("logout")}
         </button>
       </PageContent>

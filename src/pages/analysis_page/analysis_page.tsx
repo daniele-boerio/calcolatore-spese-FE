@@ -200,7 +200,7 @@ export default function AnalysisPage() {
               onClick={() => setFiltersOpen(true)}
             >
               {periodLabel}
-              <i className="pi pi-sliders-h" aria-hidden="true" />
+              <i className="ph-bold ph-sliders-horizontal" aria-hidden="true" />
             </button>
           </div>
 
@@ -221,7 +221,7 @@ export default function AnalysisPage() {
                 <Chip
                   key={chip.key}
                   label={chip.label}
-                  icon="pi pi-times"
+                  icon="ph-bold ph-x"
                   variant="active"
                   onClick={chip.clear}
                 />

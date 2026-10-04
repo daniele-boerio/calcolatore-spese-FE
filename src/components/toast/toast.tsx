@@ -10,9 +10,9 @@ import { ToastItem } from "../../features/ui/toast";
 import "./toast.scss";
 
 const ICONS: Record<ToastItem["variant"], string> = {
-  success: "pi pi-check-circle",
-  error: "pi pi-exclamation-triangle",
-  offline: "pi pi-wifi",
+  success: "ph-bold ph-check-circle",
+  error: "ph-bold ph-warning",
+  offline: "ph-bold ph-wifi-slash",
 };
 
 function Toast({ toast }: { toast: ToastItem }) {

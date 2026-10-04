@@ -12,7 +12,8 @@ import "./App.scss";
 import { useAppDispatch } from "./store/store";
 import { Suspense, useEffect } from "react";
 import { getProfile, restoreSession } from "./features/profile/api_calls";
-import { ProgressSpinner } from "primereact/progressspinner";
+import SkeletonList from "./components/skeleton/skeleton";
+import { useI18n } from "./i18n/use-i18n";
 import ErrorDialog from "./components/dialog/error_dialog/error_dialog";
 import { ConfirmPopup } from "primereact/confirmpopup";
 import BankProposalsGate from "./components/bank_proposals_gate/bank_proposals_gate";
@@ -56,19 +57,25 @@ const InvestimentiPage = lazyWithRetry(
 const ResetPasswordPage = lazyWithRetry(
   () => import("./pages/reset_password_page/reset_password_page"),
 );
+const NotFoundPage = lazyWithRetry(
+  () => import("./pages/not_found_page/not_found_page"),
+);
 const BankCallbackPage = lazyWithRetry(
   () => import("./pages/bank_callback_page/bank_callback_page"),
 );
 
+// Mentre si scarica il codice di una pagina: la sagoma di una lista invece di
+// uno spinner, così il passaggio alla pagina vera non fa saltare il layout.
 function RouteFallback() {
   return (
-    <div style={{ display: "flex", justifyContent: "center", padding: "3rem" }}>
-      <ProgressSpinner />
+    <div className="route-fallback" aria-busy="true">
+      <SkeletonList />
     </div>
   );
 }
 
 function App() {
+  const { t } = useI18n();
   const { isAuthenticated } = useSelector((state) => state.profile);
 
   // Tiene `data-theme` su <html> allineato alla preferenza salvata.
@@ -103,6 +110,9 @@ function App() {
 
   return (
     <Router>
+      <a className="skip-link" href="#contenuto">
+        {t("skip_to_content")}
+      </a>
       <div className="App">
         {!isAuthenticated ? (
           <Suspense fallback={<RouteFallback />}>
@@ -160,7 +170,7 @@ function App() {
                   }
                 />
 
-                <Route path="*" element={<Navigate to="/" replace />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>
             <TabBar />
