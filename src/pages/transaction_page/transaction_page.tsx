@@ -72,7 +72,7 @@ const SEARCH_DEBOUNCE = 300;
 
 const localeTag = () => (getLocale() === "it" ? "it-IT" : "en-GB");
 
-/** "2 SETTEMBRE", con "OGGI ·" o "IERI ·" davanti quando serve. */
+/** "2 settembre", con "Oggi ·" o "Ieri ·" davanti quando serve. */
 const groupLabel = (day: string, t: (key: string) => string) => {
   const written = new Intl.DateTimeFormat(localeTag(), {
     day: "numeric",
@@ -83,7 +83,7 @@ const groupLabel = (day: string, t: (key: string) => string) => {
   const prefix =
     offset === 0 ? t("mov_today") : offset === 1 ? t("mov_yesterday") : null;
 
-  return (prefix ? `${prefix} · ${written}` : written).toUpperCase();
+  return prefix ? `${prefix} · ${written}` : written;
 };
 
 /** Nomi indicizzati per id: le righe risolvono la tassonomia senza cercarla. */

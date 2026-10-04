@@ -279,6 +279,10 @@ export default function ContiPage() {
     <>
       <Page className="accounts">
         <PageHeader className="accounts__header">
+          {/* Titolo come nelle altre schermate: senza, Conti era l'unica che
+              si apriva direttamente su un numero. */}
+          <h1 className="page-title accounts__title">{t("nav_accounts")}</h1>
+
           <div
             className={`accounts__worth${
               worthEditable ? " accounts__worth--editable" : ""

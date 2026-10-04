@@ -23,24 +23,27 @@
   border-top: 1px solid v.$line;
   box-shadow: v.$shadow-tabbar;
 
-  // Sei slot senza etichetta: il nome vive nell'aria-label.
+  // Sei slot con icona ed etichetta corta.
   &__slot {
     flex: 1;
     min-width: 0;
     min-height: v.$tap-target;
-    padding-bottom: 8px;
+    padding: 6px 0 8px;
 
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 4px;
 
     text-decoration: none;
     color: v.$muted;
 
     i {
-      font-size: 20px;
+      font-size: 19px;
     }
 
+    // Solo il colore: un peso più alto allargava "Movimenti" fino a tagliarlo.
     &.active {
       color: v.$accent;
     }
@@ -52,6 +55,16 @@
     &:last-child {
       padding-right: 8px;
     }
+  }
+
+  &__label {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 
   // Sollevato sopra la barra: è l'azione principale dell'app.

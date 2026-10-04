@@ -40,11 +40,13 @@
   --toast-meta: #9ed9c1;
 
   // Card "In arrivo": superficie invertita.
-  --invert-surface: #0f2e24;
-  --invert-border: transparent;
-  --invert-ink: #eaf3ef;
-  --invert-meta: #9ed9c1;
-  --invert-fill: rgba(255, 255, 255, 0.1);
+  // Card "in evidenza" (In arrivo, Impegno fisso): un verde tenue della stessa
+  // famiglia dell'accento, non un blocco scuro in mezzo a una pagina chiara.
+  --invert-surface: #e4f2ec;
+  --invert-border: #cfe6db;
+  --invert-ink: #12211c;
+  --invert-meta: #0e6a4d;
+  --invert-fill: rgba(14, 124, 90, 0.1);
 
   // Riempimenti di barre e track.
   --track: #eef1f0;
@@ -72,7 +74,9 @@
   --series-5: #c2513c;
 
   // ── Ombre e overlay ─────────────────────────────────────────────────────
-  --shadow-card: 0 1px 2px rgba(18, 33, 28, 0.04);
+  --shadow-card: none;
+  // Il bordo che separa una card dal fondo, al posto dell'ombra.
+  --card-edge: 1px solid var(--line);
   --shadow-tabbar: 0 -8px 20px -12px rgba(18, 33, 28, 0.25);
   --shadow-fab: 0 10px 22px -8px rgba(14, 124, 90, 0.7);
   --shadow-sheet: 0 -12px 40px -16px rgba(18, 33, 28, 0.3);
@@ -86,6 +90,9 @@
   // Titoli e numeroni: stesso font del resto dell'app, in peso più alto. Un
   // solo carattere ovunque, in tutti e due i temi.
   --font-display: var(--font-ui);
+  // Serif editoriale per i titoli di pagina: dà una voce all'app senza toccare
+  // i numeri, che restano nel sans con cifre tabellari.
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", serif;
   --fw-display: 800;
   --tracking-display: -0.03em;
 
@@ -93,7 +100,7 @@
   --fs-hero: 46px;
   --lh-hero: 1;
   --tracking-hero: -0.04em;
-  --fs-page-title: 24px;
+  --fs-page-title: 34px;
   --fs-card-title: 15px;
   --fw-card-title: 700;
   --fs-greeting: 17px;
@@ -106,12 +113,12 @@
   --fs-field: 16px;
 
   // ── Raggi ───────────────────────────────────────────────────────────────
-  --r-card: 22px;
-  --r-inner: 20px;
-  --r-field: 16px;
-  --r-icon: 12px;
-  --r-sheet: 28px;
-  --r-alert: 24px;
+  --r-card: 18px;
+  --r-inner: 14px;
+  --r-field: 12px;
+  --r-icon: 10px;
+  --r-sheet: 24px;
+  --r-alert: 20px;
   --r-pill: 999px;
 
   // ── Metrica di layout ───────────────────────────────────────────────────

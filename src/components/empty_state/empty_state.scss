@@ -11,6 +11,7 @@
   border-radius: v.$r-card;
   background: v.$surface;
   box-shadow: v.$shadow-card;
+  border: v.$card-edge;
 
   &__icon {
     display: flex;

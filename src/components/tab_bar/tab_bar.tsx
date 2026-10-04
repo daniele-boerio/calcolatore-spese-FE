@@ -8,21 +8,29 @@ type Tab = {
   to: string;
   icon: string;
   labelKey: string;
+  /** Etichetta sotto l'icona, quando il nome intero non ci sta. */
+  shortKey?: string;
 };
 
 /**
  * Sei destinazioni più il FAB al centro: tre per lato, così il "+" resta in
  * mezzo. A sinistra il flusso — cosa succede ai soldi — a destra dove stanno.
  *
- * Solo icone: sei etichette da 10.5px su 430px verrebbero tagliate a metà.
- * Il nome resta come `aria-label`, che è quello che conta per chi non le vede.
+ * Icona più etichetta corta: con le sole icone "Analisi" e "Titoli" si
+ * distinguevano a fatica, e la pagina in cui sei si leggeva solo dal colore.
+ * Il nome intero resta come `aria-label`.
  */
 const TABS: Tab[] = [
   { to: "/", icon: "pi pi-home", labelKey: "nav_home" },
   { to: "/transactions", icon: "pi pi-list", labelKey: "nav_movements" },
   { to: "/analysis", icon: "pi pi-chart-bar", labelKey: "nav_analysis" },
   { to: "/accounts", icon: "pi pi-wallet", labelKey: "nav_accounts" },
-  { to: "/investments", icon: "pi pi-chart-line", labelKey: "nav_investments" },
+  {
+    to: "/investments",
+    icon: "pi pi-chart-line",
+    labelKey: "nav_investments",
+    shortKey: "nav_investments_short",
+  },
   { to: "/altro", icon: "pi pi-ellipsis-h", labelKey: "nav_more" },
 ];
 
@@ -42,6 +50,9 @@ export default function TabBar() {
       title={t(tab.labelKey)}
     >
       <i className={tab.icon} aria-hidden="true" />
+      <span className="tab-bar__label" aria-hidden="true">
+        {t(tab.shortKey ?? tab.labelKey)}
+      </span>
     </NavLink>
   );
 

@@ -5,6 +5,17 @@
 // così questo file non produce CSS e può essere `@use`ato da ogni componente
 // senza duplicare il blocco `:root` in ogni foglio di stile.
 
+// ── Etichette ─────────────────────────────────────────────────────────────
+// L'etichetta sopra un numero o una sezione ("Risparmio di ottobre", "Oggi ·
+// 5 ottobre"): minuscolo con l'iniziale maiuscola, peso medio. Il maiuscolo
+// spaziato ovunque urlava e si leggeva peggio.
+@mixin eyebrow {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 // ── Colore ────────────────────────────────────────────────────────────────
 $bg: var(--bg);
 $surface: var(--surface);
@@ -49,6 +60,8 @@ $series-5: var(--series-5);
 
 // ── Ombre e overlay ───────────────────────────────────────────────────────
 $shadow-card: var(--shadow-card);
+$card-edge: var(--card-edge);
+$font-serif: var(--font-serif);
 $shadow-tabbar: var(--shadow-tabbar);
 $shadow-fab: var(--shadow-fab);
 $shadow-sheet: var(--shadow-sheet);

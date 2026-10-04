@@ -6,8 +6,8 @@ import ListRow, { List } from "../../components/list_row/list_row";
 import "./altro_page.scss";
 
 /**
- * Quello che non è né un movimento né un saldo: la tassonomia con cui li
- * leggi e le preferenze dell'app. Stava dentro Conti, che non c'entrava
+ * Le destinazioni secondarie: ricorrenze e debiti, la tassonomia con cui
+ * leggi i movimenti e le preferenze dell'app. Stava dentro Conti, che non c'entrava
  * niente — un conto è un posto dove ci sono dei soldi, non un menu.
  */
 export default function AltroPage() {
@@ -21,6 +21,30 @@ export default function AltroPage() {
       </PageHeader>
 
       <PageContent>
+        {/* Movimenti che si ripetono o che devi ancora fare: si aprono anche
+            dall'intestazione dei Movimenti, ma lì sono due icone senza nome. */}
+        <Card className="more__menu">
+          <List>
+            <ListRow
+              icon="pi pi-refresh"
+              iconShape="square"
+              title={t("nav_recurrings")}
+              meta={t("more_recurrings_hint")}
+              chevron
+              onClick={() => navigate("/recurrings")}
+            />
+
+            <ListRow
+              icon="pi pi-receipt"
+              iconShape="square"
+              title={t("nav_debts")}
+              meta={t("more_debts_hint")}
+              chevron
+              onClick={() => navigate("/debts")}
+            />
+          </List>
+        </Card>
+
         <Card className="more__menu">
           <List>
             <ListRow

@@ -9,6 +9,7 @@
   border-radius: v.$r-card;
   background: v.$surface;
   box-shadow: v.$shadow-card;
+  border: v.$card-edge;
 
   &__cell {
     display: flex;
@@ -42,10 +43,7 @@
     align-items: center;
     gap: 5px;
 
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
+    @include v.eyebrow;
     color: v.$muted;
 
     // Il gallone è l'unico segno che la colonna si tocca: la card non cambia

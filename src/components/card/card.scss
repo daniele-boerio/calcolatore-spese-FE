@@ -9,6 +9,7 @@
   border-radius: v.$r-card;
   background: v.$surface;
   box-shadow: v.$shadow-card;
+  border: v.$card-edge;
 
   // Superficie invertita: al chiaro è un blocco scuro pieno, al buio è solo un
   // bordo accento su fondo pagina.

@@ -7,10 +7,7 @@
   gap: 12px;
   padding: 0 4px;
 
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  @include v.eyebrow;
   color: v.$muted;
 
   &__aside {
